@@ -1,0 +1,652 @@
+
+(object Petal
+    version    	43
+    _written   	"Rose 6.1.9113.5"
+    charSet    	0)
+
+(object Design "Logical View"
+    is_unit    	TRUE
+    is_loaded  	TRUE
+    quid       	"41F0C7120101"
+    defaults   	(object defaults
+	rightMargin 	0.250000
+	leftMargin 	0.250000
+	topMargin  	0.250000
+	bottomMargin 	0.500000
+	pageOverlap 	0.250000
+	clipIconLabels 	TRUE
+	autoResize 	TRUE
+	snapToGrid 	TRUE
+	gridX      	16
+	gridY      	16
+	defaultFont 	(object Font
+	    size       	10
+	    face       	"Arial"
+	    bold       	FALSE
+	    italics    	FALSE
+	    underline  	FALSE
+	    strike     	FALSE
+	    color      	0
+	    default_color 	TRUE)
+	showMessageNum 	1
+	showClassOfObject 	TRUE
+	notation   	"Unified")
+    root_usecase_package 	(object Class_Category "Use Case View"
+	quid       	"41F0C7120103"
+	exportControl 	"Public"
+	global     	TRUE
+	logical_models 	(list unit_reference_list)
+	logical_presentations 	(list unit_reference_list
+	    (object UseCaseDiagram "Main"
+		quid       	"41F0C7130299"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    root_category 	(object Class_Category "Logical View"
+	quid       	"41F0C7120102"
+	exportControl 	"Public"
+	global     	TRUE
+	subsystem  	"Component View"
+	quidu      	"41F0C7120104"
+	logical_models 	(list unit_reference_list
+	    (object Class "CTestServer"
+		quid       	"41F0C7460084"
+		operations 	(list Operations
+		    (object Operation "CreateTestStep"
+			quid       	"41F0D37B0324"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "CDstTestServer"
+		quid       	"41F0C75D01EC"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"41F0C7690278"
+			supplier   	"Logical View::CTestServer"
+			quidu      	"41F0C7460084")))
+	    (object Class "CUtcOffsetChangeEventNotifier"
+		quid       	"41F0C7750392"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"421466E20021"
+			supplier   	"Logical View::CActive"
+			quidu      	"4214665601D7")))
+	    (object Class "CDstIntServer"
+		quid       	"41F0C7D20084"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"41F0C7DC0055"
+			supplier   	"Logical View::CDstTestServer"
+			quidu      	"41F0C75D01EC"))
+		used_nodes 	(list uses_relationship_list
+		    (object Uses_Relationship
+			quid       	"41F0C80D00E2"
+			supplier   	"Logical View::CTestStep"
+			quidu      	"41F0C7FB0343"
+			supplier_cardinality 	(value cardinality "1..n"))))
+	    (object Class "CTestStep"
+		quid       	"41F0C7FB0343"
+		operations 	(list Operations
+		    (object Operation "doTestStepL"
+			quid       	"41F0CAB300B3"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "doTestStepPreambleL"
+			quid       	"41F0CAD10046"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "doTestStepPostambleL"
+			quid       	"41F0CADB0382"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "CDSTAutoUpdate"
+		quid       	"41F0C8AC02F5"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"41F0C8BE00A4"
+			supplier   	"Logical View::CTestStep"
+			quidu      	"41F0C7FB0343")))
+	    (object Class "CUTCOffset"
+		quid       	"41F0CA190065"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"41F0CA2D0334"
+			supplier   	"Logical View::CTestStep"
+			quidu      	"41F0C7FB0343")))
+	    (object Class "CAutoUpdateNotification"
+		quid       	"421466310179"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"4214664F00AE"
+			supplier   	"Logical View::CTestStep"
+			quidu      	"41F0C7FB0343")
+		    (object Inheritance_Relationship
+			quid       	"42146661014A"
+			supplier   	"Logical View::CActive"
+			quidu      	"4214665601D7"))
+		used_nodes 	(list uses_relationship_list
+		    (object Uses_Relationship
+			quid       	"421466A50031"
+			supplier   	"Logical View::CUtcOffsetChangeEventNotifier"
+			quidu      	"41F0C7750392"
+			supplier_cardinality 	(value cardinality "1..1"))))
+	    (object Class "CActive"
+		quid       	"4214665601D7")
+	    (object Class "CUTCAlarm"
+		quid       	"421B055F001D"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"421B076B0087"
+			supplier   	"Logical View::CTestStep"
+			quidu      	"41F0C7FB0343"))
+		used_nodes 	(list uses_relationship_list
+		    (object Uses_Relationship
+			quid       	"421B0780027B"
+			supplier   	"Logical View::CAlarmNotifier"
+			quidu      	"421B072C03E3"
+			supplier_cardinality 	(value cardinality "1..1"))))
+	    (object Class "CAlarmNotifier"
+		quid       	"421B072C03E3"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"421B078B0077"
+			supplier   	"Logical View::CActive"
+			quidu      	"4214665601D7"))))
+	logical_presentations 	(list unit_reference_list
+	    (object ClassDiagram "Main"
+		quid       	"41F0C71302A7"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list
+		    (object ClassView "Class" "Logical View::CTestServer" @1
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(400, 128)
+			label      	(object ItemLabel
+			    Parent_View 	@1
+			    location   	(221, 47)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	358
+			    justify    	0
+			    label      	"CTestServer")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0C7460084"
+			compartment 	(object Compartment
+			    Parent_View 	@1
+			    location   	(221, 108)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	2
+			    max_width  	365)
+			width      	376
+			height     	186
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CDstTestServer" @2
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(400, 512)
+			label      	(object ItemLabel
+			    Parent_View 	@2
+			    location   	(241, 461)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	318
+			    justify    	0
+			    label      	"CDstTestServer")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0C75D01EC"
+			width      	336
+			height     	126
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @3
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"41F0C7690278"
+			client     	@2
+			supplier   	@1
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CDstIntServer" @4
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(400, 880)
+			label      	(object ItemLabel
+			    Parent_View 	@4
+			    location   	(259, 828)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	282
+			    justify    	0
+			    label      	"CDstIntServer")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0C7D20084"
+			width      	300
+			height     	128
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @5
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"41F0C7DC0055"
+			client     	@4
+			supplier   	@2
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CTestStep" @6
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(1008, 464)
+			label      	(object ItemLabel
+			    Parent_View 	@6
+			    location   	(724, 327)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	569
+			    justify    	0
+			    label      	"CTestStep")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0C7FB0343"
+			compartment 	(object Compartment
+			    Parent_View 	@6
+			    location   	(724, 388)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	4
+			    max_width  	506)
+			width      	587
+			height     	299
+			annotation 	8
+			autoResize 	TRUE)
+		    (object UsesView "" @7
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"41F0C80D00E2"
+			client     	@4
+			supplier   	@6
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CDSTAutoUpdate" @8
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(400, 1408)
+			label      	(object ItemLabel
+			    Parent_View 	@8
+			    location   	(212, 1289)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	376
+			    justify    	0
+			    label      	"CDSTAutoUpdate")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0C8AC02F5"
+			width      	394
+			height     	262
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @9
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"41F0C8BE00A4"
+			client     	@8
+			supplier   	@6
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CUTCOffset" @10
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(864, 1408)
+			label      	(object ItemLabel
+			    Parent_View 	@10
+			    location   	(686, 1289)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	357
+			    justify    	0
+			    label      	"CUTCOffset")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0CA190065"
+			width      	375
+			height     	262
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @11
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"41F0CA2D0334"
+			client     	@10
+			supplier   	@6
+			line_style 	0)
+		    (object NoteView @12
+			location   	(1792, 432)
+			label      	(object ItemLabel
+			    Parent_View 	@12
+			    location   	(1373, 348)
+			    fill_color 	13434879
+			    nlines     	3
+			    max_width  	802
+			    label      	"CTestServer and CTestStep are TestExecute framework base classes")
+			line_color 	3342489
+			fill_color 	13434879
+			width      	862
+			height     	181)
+		    (object ClassView "Class" "Logical View::CAutoUpdateNotification" @13
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(1920, 1392)
+			label      	(object ItemLabel
+			    Parent_View 	@13
+			    location   	(1673, 1273)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	494
+			    justify    	0
+			    label      	"CAutoUpdateNotification")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"421466310179"
+			width      	512
+			height     	263
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @14
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"4214664F00AE"
+			client     	@13
+			supplier   	@6
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CActive" @15
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(1568, 2032)
+			label      	(object ItemLabel
+			    Parent_View 	@15
+			    location   	(1452, 1972)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	232
+			    justify    	0
+			    label      	"CActive")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4214665601D7"
+			width      	250
+			height     	144
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CUtcOffsetChangeEventNotifier" @16
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(1920, 1760)
+			label      	(object ItemLabel
+			    Parent_View 	@16
+			    location   	(1620, 1681)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	600
+			    justify    	0
+			    label      	"CUtcOffsetChangeEventNotifier")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"41F0C7750392"
+			width      	618
+			height     	182
+			annotation 	8
+			autoResize 	TRUE)
+		    (object UsesView "" @17
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"421466A50031"
+			client     	@13
+			supplier   	@16
+			line_style 	0)
+		    (object InheritView "" @18
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"421466E20021"
+			client     	@16
+			supplier   	@15
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CUTCAlarm" @19
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(1280, 1408)
+			label      	(object ItemLabel
+			    Parent_View 	@19
+			    location   	(1145, 1292)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	270
+			    justify    	0
+			    label      	"CUTCAlarm")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"421B055F001D"
+			width      	288
+			height     	256
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CAlarmNotifier" @20
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(1280, 1760)
+			label      	(object ItemLabel
+			    Parent_View 	@20
+			    location   	(1114, 1678)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	332
+			    justify    	0
+			    label      	"CAlarmNotifier")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"421B072C03E3"
+			width      	350
+			height     	188
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @21
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"421B076B0087"
+			client     	@19
+			supplier   	@6
+			line_style 	0)
+		    (object UsesView "" @22
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"421B0780027B"
+			client     	@19
+			supplier   	@20
+			line_style 	0)
+		    (object InheritView "" @23
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"421B078B0077"
+			client     	@20
+			supplier   	@15
+			line_style 	0)))))
+    root_subsystem 	(object SubSystem "Component View"
+	quid       	"41F0C7120104"
+	physical_models 	(list unit_reference_list)
+	physical_presentations 	(list unit_reference_list
+	    (object Module_Diagram "Main"
+		quid       	"41F0C7130298"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    process_structure 	(object Processes
+	quid       	"41F0C7120105"
+	ProcsNDevs 	(list
+	    (object Process_Diagram "Deployment View"
+		quid       	"41F0C7120111"
+		title      	"Deployment View"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    properties 	(object Properties
+	attributes 	(list Attribute_Set
+	    (object Attribute
+		tool       	"DDL"
+		name       	"propertyId"
+		value      	"809135966")
+	    (object Attribute
+		tool       	"DDL"
+		name       	"default__Project"
+		value      	(list Attribute_Set
+		    (object Attribute
+			tool       	"DDL"
+			name       	"Directory"
+			value      	"AUTO GENERATE")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DataBase"
+			value      	("DataBaseSet" 800))
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DataBaseSet"
+			value      	(list Attribute_Set
+			    (object Attribute
+				tool       	"DDL"
+				name       	"ANSI"
+				value      	800)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"Oracle"
+				value      	801)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"SQLServer"
+				value      	802)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"Sybase"
+				value      	803)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"Watcom"
+				value      	804)))
+		    (object Attribute
+			tool       	"DDL"
+			name       	"PrimaryKeyColumnName"
+			value      	"Id")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"PrimaryKeyColumnType"
+			value      	"NUMBER(5)")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"ViewName"
+			value      	"V_")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"TableName"
+			value      	"T_")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"InheritSuffix"
+			value      	"_V")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DropClause"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"BaseViews"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DDLScriptFilename"
+			value      	"DDL1.SQL")))
+	    (object Attribute
+		tool       	"DDL"
+		name       	"default__Attribute"
+		value      	(list Attribute_Set
+		    (object Attribute
+			tool       	"DDL"
+			name       	"ColumnType"
+			value      	"VARCHAR")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"Length"
+			value      	"")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"NullsOK"
+			value      	TRUE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"PrimaryKey"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"Unique"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"CompositeUnique"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"CheckConstraint"
+			value      	"")))
+	    (object Attribute
+		tool       	"DDL"
+		name       	"HiddenTool"
+		value      	FALSE)
+	    (object Attribute
+		tool       	"Rose Model Integrator"
+		name       	"HiddenTool"
+		value      	FALSE)
+	    (object Attribute
+		tool       	"Version Control"
+		name       	"HiddenTool"
+		value      	FALSE))
+	quid       	"41F0C7120106"))

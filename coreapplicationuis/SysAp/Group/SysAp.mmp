@@ -1,0 +1,254 @@
+/*
+* Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Project specification file for the SysAp
+*
+*/
+
+
+#include <data_caging_paths.hrh>
+#include <platform_paths.hrh>
+TARGET      SysAp.exe
+TARGETTYPE  exe
+UID         0x0 0x100058F3
+
+VENDORID        VID_DEFAULT
+CAPABILITY      ALL -TCB -AllFiles -DRM
+
+// Default stack size is not enough for SysAp for example when
+// debug versions of PoC components are included in image,
+// so little extra is required.
+EPOCSTACKSIZE 0x5000
+EPOCHEAPSIZE  0x800 0x400000 // min 2kB, max 4MB - some shutdown animations may use quite a lot of heap
+
+#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+MACRO SYSAP_USE_STARTUP_UI_PHASE
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION 
+
+SOURCEPATH  ../Src
+SOURCE SysApApp.cpp
+SOURCE SysApAppUi.cpp
+SOURCE SysApDocument.cpp
+SOURCE sysapkeymanagement.cpp
+SOURCE SysApLightsController.cpp
+SOURCE SysApTimer.cpp
+
+SOURCE SysApPubSubObserver.cpp
+SOURCE SysApProfileObserver.cpp
+SOURCE SysApEtelNetworkBarObserver.cpp
+SOURCE sysapetelnetworkbargetter.cpp
+
+SOURCE CenRepObservers/sysapcenrepfmtxobserver.cpp
+SOURCE CenRepObservers/SysApCenRepLogsObserver.cpp
+SOURCE CenRepObservers/SysApCenRepBTObserver.cpp
+SOURCE CenRepObservers/SysApCenRepHacSettingObserver.cpp
+SOURCE CenRepObservers/sysapcenreplightsettingsobserver.cpp
+SOURCE CenRepObservers/sysapcenrepcallforwardingobserver.cpp
+SOURCE CenRepObservers/sysapcenrepmsgwaitingobserver.cpp
+SOURCE SysApCenRepController.cpp
+
+SOURCE SysApStartupController.cpp
+SOURCE SysApConnectionMonitorObserver.cpp
+SOURCE SysApPowerKeyMenuObserver.cpp
+SOURCE SysApSsSettingsObserver.cpp
+SOURCE SysApShutdownImage.cpp
+SOURCE SysApShutdownAnimation.cpp
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+SOURCE SysApShutdownTone.cpp
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+SOURCE SysApMsgSimMemLowQuery.cpp
+SOURCE SysApNspsAnim.cpp
+SOURCE SysApNspsHandler.cpp
+SOURCE SysApEtelNetworkStatusNspsObserver.cpp
+SOURCE SysApEtelSmsStoreObserver.cpp
+SOURCE SysApWaitNote.cpp
+SOURCE SysApConfirmationQuery.cpp
+SOURCE SysApFeatureManager.cpp
+SOURCE SysApSubscriber.cpp
+
+SOURCE SysApAnimKeySndControl.cpp
+SOURCE SysApKeySndAnim.cpp
+SOURCE SysApKeySndHandler.cpp
+
+SOURCE SysApSimChanged.cpp
+LIBRARY logcli.lib
+
+SOURCE SysApAccessoryObserver.cpp
+LIBRARY AccClient.lib
+
+SOURCE SysApEtelConnector.cpp
+
+#ifdef __OFFLINE_MODE
+SOURCE OfflineModeController/SysApOfflineModeControllerImpl.cpp
+#else
+SOURCE OfflineModeController/SysApOfflineModeControllerStub.cpp
+#endif
+
+//Always use stub implementation of privacy framework, as it is no longer supported
+// Find out if/how a replacement must be done
+SOURCE PrivacyFramework/SysApLocationPrivacyIndicatorStub.cpp
+
+#ifdef __USB
+SOURCE Usb/SysApUsbIndicatorImpl.cpp
+LIBRARY     usbman.lib        // USB Manager
+#else
+SOURCE Usb/SysApUsbIndicatorStub.cpp
+#endif
+SOURCE Usb/sysapusbchargerdetector.cpp
+
+#ifdef __BT
+SOURCE Bt/SysApBtControllerImpl.cpp
+LIBRARY btengdevman.lib
+LIBRARY btengsettings.lib
+LIBRARY btmanclient.lib
+#else
+SOURCE Bt/SysApBtControllerStub.cpp
+#endif
+
+#ifdef __BT_SAP
+SOURCE BtSap/SysApBtSapControllerImpl.cpp
+LIBRARY btengconnman.lib
+LIBRARY btdevice.lib
+LIBRARY bluetooth.lib
+#else
+SOURCE BtSap/SysApBtSapControllerStub.cpp
+#endif
+
+SOURCE SysApMediatorObserver.cpp
+
+SOURCE sysapdefaultkeyhandler.cpp
+#ifdef RD_LIGHT_CONTROL_CHANGE
+SOURCE sysaplightpluginhandler.cpp
+#endif
+
+SOURCE sysapaudioroutingobserver.cpp
+SOURCE sysapeteldatabearerobserver.cpp
+
+SOURCE memorycard/SysApMMCObserver.cpp
+#ifdef RD_MULTIPLE_DRIVE
+SOURCE memorycard/sysapdrivelist.cpp
+SOURCE memorycard/sysapdriveunlockhandler.cpp
+SOURCE memorycard/sysapdriveejecthandler.cpp
+#endif // RD_MULTIPLE_DRIVE
+
+SOURCE sysapetelnetworkinfoobserver.cpp
+SOURCE sysapremconobserver.cpp
+SOURCE powersavemode/sysappsmcontroller.cpp
+SOURCE sysapbatteryinfocontroller.cpp
+
+SOURCE SysApSatObserver.cpp
+LIBRARY	    satclient.lib       // for sat refresh
+
+START RESOURCE ../Data/SysAp.rss
+HEADER
+TARGETPATH APP_RESOURCE_DIR
+LANGUAGE_IDS
+END  // RESOURCE
+
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+START RESOURCE ../Data/SysApShutdownAnimation.rss
+HEADER
+TARGETPATH APP_RESOURCE_DIR
+END  // RESOURCE
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
+START RESOURCE ../Data/SysAp_reg.rss
+HEADER
+TARGETPATH /private/10003a3f/apps
+END
+
+SOURCEPATH ../Data
+
+USERINCLUDE        . 
+USERINCLUDE        ../Inc
+USERINCLUDE        ../Src/CenRepObservers 
+USERINCLUDE        ../Src/memorycard 
+USERINCLUDE        ../Src/Usb 
+USERINCLUDE        ../Src/powersavemode
+USERINCLUDE        ../../inc // subsystem headers
+USERINCLUDE        ../../../inc // ado headers
+USERINCLUDE        ../CenRep
+USERINCLUDE        ../PubSub
+
+APP_LAYER_SYSTEMINCLUDE // used instead of MW_LAYER_SYSTEMINCLUDE due to dependencies to APP layer
+
+LIBRARY euser.lib
+LIBRARY apparc.lib
+LIBRARY cone.lib
+LIBRARY eikcore.lib
+LIBRARY apgrfx.lib
+LIBRARY ws32.lib
+LIBRARY avkon.lib
+LIBRARY bafl.lib
+LIBRARY aknnotify.lib
+LIBRARY eiksrvc.lib
+LIBRARY connmon.lib
+LIBRARY DSClient.lib
+LIBRARY ProfileEng.lib
+LIBRARY StarterClient.lib
+LIBRARY centralrepository.lib
+LIBRARY CenRepNotifHandler.lib
+LIBRARY CommonEngine.lib
+LIBRARY ActivityManager.lib
+LIBRARY AknCapServerClient.lib
+LIBRARY secui.lib
+LIBRARY sssettings.lib
+LIBRARY fbscli.lib
+LIBRARY etel.lib
+LIBRARY etelmm.lib
+LIBRARY customapi.lib
+LIBRARY featmgr.lib
+LIBRARY efsrv.lib
+LIBRARY aknmemorycardui.lib
+LIBRARY esock.lib
+#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+LIBRARY sanimctrl.lib
+#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
+LIBRARY MediaClientAudio.lib
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+LIBRARY hwrmlightclient.lib
+LIBRARY hwrmfmtxclient.lib
+LIBRARY	remconcoreapi.lib
+LIBRARY	remconinterfacebase.lib
+LIBRARY AknIcon.lib
+LIBRARY CdlEngine.lib
+
+// POC launching
+LIBRARY ServiceHandler.lib
+
+LIBRARY ecom.lib
+
+
+LIBRARY mediatorclient.lib
+LIBRARY bmpanim.lib
+
+LIBRARY TelephonyAudioRouting.lib
+LIBRARY etelpckt.lib
+
+#ifdef RD_MULTIPLE_DRIVE
+LIBRARY platformenv.lib
+LIBRARY disknotifyhandler.lib
+#endif // RD_MULTIPLE_DRIVE
+
+LIBRARY psmclient.lib
+
+LIBRARY keylockpolicyapi.lib
+
+LIBRARY bsutil.lib
+LIBRARY batterypopupcontrol.lib
+
+LIBRARY eikcoctl.lib
+//  End of File
+
+
+

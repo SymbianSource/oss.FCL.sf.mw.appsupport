@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE SystemDefinition SYSTEM "sysdef_1_4_0.dtd" [
+  <!ENTITY layer_real_source_path "sf/mw/appsupport" >
+]>
+
+<SystemDefinition name="appsupport" schema="1.4.0">
+  <systemModel>
+    <layer name="mw_layer">
+      <module name="appsupport">
+        <unit unitID="sydo.appsupport" name="appsupport" bldFile="&layer_real_source_path;/group" mrp="" />
+      </module>
+      <module name="">
+        <unit unitID="sydo.appsupport.appsupport_plat.flash_mmi_service_interface_custom_api" name="sydo_appsupport_appsupport_plat_flash_mmi_service_interface_custom_api" bldFile="&layer_real_source_path;/appsupport_plat/flash_mmi_service_interface_custom_api/group" mrp="" filter="!sf_build" />
+        <unit unitID="sydo.appsupport.appsupport_plat.flash_netscape_plugin_command_api" name="sydo_appsupport_appsupport_plat_flash_netscape_plugin_command_api" bldFile="&layer_real_source_path;/appsupport_plat/flash_netscape_plugin_command_api/group" mrp="" filter="!sf_build" />
+      </module>
+    </layer>
+  </systemModel>
+</SystemDefinition>

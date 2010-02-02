@@ -1,0 +1,36 @@
+/*
+* Copyright (c) 2006-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Build information file for the Splash Screen project.
+*
+*/
+
+
+#include <platform_paths.hrh>
+
+PRJ_PLATFORMS
+DEFAULT
+
+PRJ_EXPORTS
+../rom/splashscreen.iby         CORE_MW_LAYER_IBY_EXPORT_PATH(splashscreen.iby)
+../rom/splashscreen_variant.iby CUSTOMER_MW_LAYER_IBY_EXPORT_PATH(splashscreen_variant.iby)
+
+PRJ_MMPFILES
+splashscreen.mmp
+
+PRJ_EXTENSIONS
+START EXTENSION s60/mifconv
+    OPTION TARGETFILE splashscreen.mif
+    OPTION HEADERFILE splashscreen.mbg
+    OPTION SOURCES -c8 qgn_startup_screen
+END

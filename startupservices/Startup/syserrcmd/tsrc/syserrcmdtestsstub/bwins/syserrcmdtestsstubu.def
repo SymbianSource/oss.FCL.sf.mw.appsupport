@@ -1,0 +1,4 @@
+EXPORTS
+	?CustomCommandEnvStubL@SysErrCmdTestsStub@@SAPAVCSsmCustomCommandEnv@@AAVRFs@@@Z @ 1 NONAME ; class CSsmCustomCommandEnv * SysErrCmdTestsStub::CustomCommandEnvStubL(class RFs &)
+	?Rfs@CSsmCustomCommandEnv@@UBEABVRFs@@XZ @ 2 NONAME ; class RFs const & CSsmCustomCommandEnv::Rfs(void) const
+

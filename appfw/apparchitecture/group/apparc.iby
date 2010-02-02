@@ -1,0 +1,40 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+#ifndef __APPARC_IBY__
+#define __APPARC_IBY__
+
+REM Application Architecture
+
+file=ABI_DIR\BUILD_DIR\apparc.dll			System\Libs\apparc.dll
+file=ABI_DIR\BUILD_DIR\apfile.dll			System\Libs\apfile.dll
+file=ABI_DIR\BUILD_DIR\aplist.dll			System\Libs\aplist.dll
+file=ABI_DIR\BUILD_DIR\apgrfx.dll			System\Libs\apgrfx.dll
+file=ABI_DIR\DEBUG_DIR\apserv.dll			System\Libs\apserv.dll
+file=ABI_DIR\BUILD_DIR\apsexe.exe			System\Programs\apsexe.exe
+file=ABI_DIR\BUILD_DIR\ServiceRegistry.dll	System\Libs\ServiceRegistry.dll
+
+data=MULTI_LINGUIFY(RSC ZRESOURCE\APPS\ApfMimeContentPolicy	Resource\Apps\ApfMimeContentPolicy)
+
+
+#ifndef SYMBIAN_SYSTEM_STATE_MANAGEMENT
+file=ABI_DIR\BUILD_DIR\apstart.dll			System\Libs\apstart.dll
+#endif // SYMBIAN_SYSTEM_STATE_MANAGEMENT
+
+//Backup and restore
+data=EPOCROOT##epoc32\data\z\private\10003a3f\backup_registration.xml   \private\10003a3f\backup_registration.xml
+
+#endif
