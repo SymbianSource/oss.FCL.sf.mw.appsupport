@@ -22,7 +22,7 @@
 
 //  INCLUDES
 #include <e32base.h>
-#include <ecom/ECom.h>
+#include <ecom/ecom.h>
 #include <rfsPluginDef.h>
 
 // CONSTANTS

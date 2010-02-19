@@ -1,7 +1,24 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+
 /*	$OpenBSD: touch.c,v 1.3 1997/01/15 23:43:22 millert Exp $	*/
 /*	$NetBSD: touch.c,v 1.11 1995/08/31 22:10:06 jtc Exp $	*/
 //
-// © Portions Copyright (c) Symbian Software Ltd 2007. All rights reserved.
+// © 
 //
 /*
  * Copyright (c) 1993

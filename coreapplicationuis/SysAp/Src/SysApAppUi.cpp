@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -183,6 +183,9 @@ const TInt KFileManagerAppUid = 0x101F84EB;
 #endif // RD_MULTIPLE_DRIVE
 const TInt KCoefficientKhzToMhz = 1000;
 const TInt KDecimalsInMhzFrequency = 2;
+
+const TInt KHWSwitchGroup( 29 );
+const TInt KHWSwitchGrip( 2 );
 
 _LIT_SECURITY_POLICY_PASS(KAlwaysPassPolicy);
 _LIT_SECURITY_POLICY_C1(KWriteDeviceDataPolicy, ECapabilityWriteDeviceData);
@@ -401,11 +404,23 @@ void CSysApAppUi::ConstructL()
     TRACES ( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApDefaultKeyHandler::NewL()") ) );
     iSysApDefaultKeyHandler = CSysApDefaultKeyHandler::NewL( *this );
 
-
-    if ( iSysApFeatureManager->GripNotSupported() )
-        {
-        RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripOpen );
-        }
+    TInt status(0);
+    err = UserSvr::HalFunction( KHWSwitchGroup, KHWSwitchGrip, &status, 0 );
+    if( err == KErrNone )
+	    {
+	    if( status == 0 )
+		    {
+	        RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripOpen );
+		    }
+	    else
+		    {
+		    RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripClosed );
+		    }
+	    }
+     else
+	    {
+	    TRACES ( RDebug::Print( _L("CSysApAppUi::ConstructL: error in getting slide status: err = %d"), err ) );
+	    }
 
 #ifndef RD_MULTIPLE_DRIVE
     if ( iSysApFeatureManager->MmcSupported() )
@@ -733,6 +748,7 @@ void CSysApAppUi::HandleCommandL( TInt aCommand )
     switch ( aCommand )
         {
         case EEikCmdExit:   // EAknCmdExit
+	    // Quick fix for Defect: UTUL-7ZQLJU 
             Exit();
             break;
         default:
@@ -3593,10 +3609,11 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
 		TInt callType ( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallType ) );
 		if ( !( callState == EPSCTsyCallStateConnected && callType == EPSCTsyCallTypeH324Multimedia ) )
 			{
-			if ( iSysApFeatureManager->GripNotSupported() ||
-				( (!iSysApFeatureManager->GripNotSupported() ) && ( StateOfProperty( KPSUidHWRM, KHWRMGripStatus ) ==  EPSHWRMGripClosed ) ) )
-				// "Lock keypad" command is shown always when there is no grip, and if there
-				// there is no grip, only when the grip is closed.
+        if ( ( iSysApFeatureManager->GripNotSupported() && !iSysApFeatureManager->SlideSupported() ) ||
+             ( (!iSysApFeatureManager->GripNotSupported() || iSysApFeatureManager->SlideSupported() ) && 
+             ( StateOfProperty( KPSUidHWRM, KHWRMGripStatus ) ==  EPSHWRMGripClosed ) ) )
+            // "Lock keypad" command is shown always when there is no grip, and if there
+            // there is no grip, only when the grip is closed.
 				{
 				if ( CKeyLockPolicyApi::KeyguardAllowed() )
 					{
@@ -4671,6 +4688,25 @@ TBool CSysApAppUi::OkToInitiateShutdown()
         }
     }
 
+/**
+ * To check the for an emergency call. 
+ * 
+ * @return ETrue if there is an emergency call active otherwise, EFalse.
+ */
+TBool IsEmergencyCall()
+        {
+        TBool retVal( EFalse );
+        TInt err( KErrNone );
+        TInt state( 0 );
+     
+        err = RProperty::Get(KPSUidCtsyEmergencyCallInfo, KCTSYEmergencyCallInfo, state );
+        if ( err == KErrNone && state )
+            {
+            retVal = ETrue;            
+            }
+        return retVal;
+        }	
+
 // ----------------------------------------------------------------------------
 // CSysApAppUi::HandleCurrentCallStateChangeL()
 // ----------------------------------------------------------------------------
@@ -4686,9 +4722,10 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
 
     switch ( aCurrentCallState )
         {
-        case EPSCTsyCallStateRinging:
+        case EPSCTsyCallStateRinging:  
+            {
             iSysApLightsController->CallComingInL( ETrue );
-            // disable keylock when a call is coming in
+            // Disable keylock when a call is coming in
             if ( iKeyLockEnabled || iDeviceLockEnabled || iKeyLockOnBeforeCradle || iKeyLockOnBeforeAlarm )
                 {
                 TRACES( RDebug::Print( _L("CSysApAppUi::HandleCurrentCallStateChangeL: EPSCTsyCallStateRinging: disable keylock") ) );
@@ -4703,24 +4740,29 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                     }
                 }
             break;
+            }
 
         case EPSCTsyCallStateDialling:
-            // disable keylock during an emergency call
+            {
+            // Disable keypad lock during an emergency call
+            // no need to disable the key lock when a call is made using the wireless car-kit
+            // but if the call is an emergency one then we will disable the keypad lock
             if ( iKeyLockEnabled || iDeviceLockEnabled || iKeyLockOnBeforeCradle )
                 {
                 TRACES( RDebug::Print( _L("CSysApAppUi::HandleCurrentCallStateChangeL: EPSCTsyCallStateDialling: disable keylock") ) );
                 iKeyLockOnBeforeCall = ETrue;
 
-                if ( iKeyLockEnabled || iDeviceLockEnabled )
+                if ( IsEmergencyCall() && (iKeyLockEnabled || iDeviceLockEnabled ))
                     {
                     KeyLock().DisableWithoutNote();
                     }
                 }
 
-            // enable signal & network indicators when an emergency call is made in Offline Mode
+            // Enable signal & network indicators when an emergency call is made in Offline Mode
             if( iSysApOfflineModeController->OfflineModeActive() )
                     {
-                    if ( StateOfProperty(KPSUidCtsyCallInformation, KCTsyCallType) != EPSCTsyCallTypeVoIP) // signal indicators not updated with VoIP call
+                    // Signal indicators not updated with VoIP call
+                    if ( StateOfProperty(KPSUidCtsyCallInformation, KCTsyCallType) != EPSCTsyCallTypeVoIP) 
                         {
                         iEmergencyCallActive = ETrue;
                         UpdateSignalBarsL();
@@ -4728,11 +4770,13 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                         }
                     }
             break;
-
+            }
+            
         case EPSCTsyCallStateConnected:
+            {
             if (StateOfProperty(KPSUidCtsyCallInformation, KCTsyCallType) == EPSCTsyCallTypeCSVoice)
                 {
-                // check if GPRS suspended note is required
+                // Check if GPRS suspended note is required
                 iCallActivated = ETrue;
                 HandleGprsNotesL();
                 }
@@ -4743,8 +4787,10 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                 KeyLock().EnableAutoLockEmulation();
                 }
             break;
+            }
 
         case EPSCTsyCallStateNone:
+            {
             // reset timers in ScreenSaver and Autolock
             User::ResetInactivityTime();
 
@@ -4785,6 +4831,8 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                 }
             iCallActivated = EFalse;
             break;
+            }
+            
         default:
             break;
         }
