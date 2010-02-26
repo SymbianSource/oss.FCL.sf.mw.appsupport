@@ -18,19 +18,32 @@
 
 #include <platform_paths.hrh>
 
+#define USE_SF_SPLASH_SVG //comment this to use standard S60 splash icon
 PRJ_PLATFORMS
 DEFAULT
 
 PRJ_EXPORTS
 ../rom/splashscreen.iby         CORE_MW_LAYER_IBY_EXPORT_PATH(splashscreen.iby)
 ../rom/splashscreen_variant.iby CUSTOMER_MW_LAYER_IBY_EXPORT_PATH(splashscreen_variant.iby)
+#ifdef USE_SF_SPLASH_SVG
+// Export to SF-specific subdirectory
+../sfimage/sfsplash.svg         /epoc32/s60/icons/sf_startup_screen.svg 
+#endif
 
 PRJ_MMPFILES
+#ifdef USE_SF_SPLASH_SVG
+sf_splashscreen.mmp
+#else
 splashscreen.mmp
+#endif
 
 PRJ_EXTENSIONS
 START EXTENSION s60/mifconv
     OPTION TARGETFILE splashscreen.mif
     OPTION HEADERFILE splashscreen.mbg
+#ifdef USE_SF_SPLASH_SVG
+    OPTION SOURCES -c8 sf_startup_screen
+#else
     OPTION SOURCES -c8 qgn_startup_screen
+#endif
 END
