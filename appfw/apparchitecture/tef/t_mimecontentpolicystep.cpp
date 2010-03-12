@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,6 +20,11 @@
 */
 
 #include "t_mimecontentpolicystep.h"
+#include <centralrepository.h>
+#include <apmstd.h>
+
+//Closed content and extension information repository UID
+const TUid KClosedContentAndExtensionInfoRepositoryUID={0x10003A3F};
 
 _LIT(KPathjpg1, "z:\\system\\data\\type-r.jpg");
 _LIT(KPathjpg2, "z:\\system\\data\\propelli.jpg");
@@ -76,6 +81,7 @@ void CT_MimeContentPolicyStep::RunTestCasesL()
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, CCPTestIsDRMEnvelopeFileHandleL(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, CCPTestIsClosedFileFileHandleL(), iApaLsSession.FlushRecognitionCache());
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, CCPOOMTestL(), iApaLsSession.FlushRecognitionCache());
+	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, CCPTestIsClosedContentAndExtenstionInfoRepositoryReadOnlyL(), NO_CLEANUP);
 	}
 
 /**
@@ -89,8 +95,9 @@ void CT_MimeContentPolicyStep::RunTestCasesL()
  
    @SYMTestStatus Implemented
   
-   @SYMTestActions Closed types are the mime types which are listed in the ApfMimeContentPolicy.rss file.
+   @SYMTestActions Closed types are the mime types which are listed in the 10003a3f repository file.
    Calls CApfMimeContentPolicy::IsClosedType(const TDesC& aMimeType); for different closed and non-closed mime types.
+   And also it tests whether invalid mime types are not added to the list.
   
    @SYMTestExpectedResults The test checks whether IsClosedType returns ETrue for the Closed Mime types and EFalse for non-closed Mime types
  */
@@ -120,7 +127,17 @@ void CT_MimeContentPolicyStep::CCPTestIsClosedType()
 	_LIT(KMimeType20, "video/mpeg");
 	_LIT(KMimeType21, "video/quicktime");
 	_LIT(KMimeType22, "video/mpeg4-generic");
-								    
+		
+    //Invalid mime types
+    _LIT(KMimeType23, "/test");
+    _LIT(KMimeType24, "test");
+    _LIT(KMimeType25, "test/");
+    _LIT(KMimeType26, "/test/");
+    _LIT(KMimeType27, "test/testmime/");
+    _LIT(KMimeType28, "/test/testmime");
+    _LIT(KMimeType29, "test\\testmime");      
+
+    
   
 	INFO_PRINTF1(_L("Tests the MIME types found on closed content list"));
     
@@ -192,6 +209,27 @@ void CT_MimeContentPolicyStep::CCPTestIsClosedType()
   	
   	TEST(!iCcp->IsClosedType(KMimeType22));
   	INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType22);
+  	
+    TEST(!iCcp->IsClosedType(KMimeType23));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType23);
+   
+    TEST(!iCcp->IsClosedType(KMimeType24));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType24);
+  
+    TEST(!iCcp->IsClosedType(KMimeType25));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType25);
+
+    TEST(!iCcp->IsClosedType(KMimeType26));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType26);
+
+    TEST(!iCcp->IsClosedType(KMimeType27));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType27);
+    
+    TEST(!iCcp->IsClosedType(KMimeType28));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType28); 
+    
+    TEST(!iCcp->IsClosedType(KMimeType29));
+    INFO_PRINTF2(_L("%S is not Closed Type"), &KMimeType29);    
   	}
 
 /**
@@ -205,8 +243,9 @@ void CT_MimeContentPolicyStep::CCPTestIsClosedType()
  
    @SYMTestStatus Implemented
   
-   @SYMTestActions Closed file extensions are the file extensions which are listed in the ApfMimeContentPolicy.rss file.
+   @SYMTestActions Closed file extensions are the file extensions which are listed in the 10003a3f repository.
    Calls CApfMimeContentPolicy::IsClosedExtension(const TDesC& aFileExtension); for different closed and non-closed File Extensions.
+   And also it tests whether invalid closed extensions are not added to the list.
   
    @SYMTestExpectedResults The test checks whether IsClosedExtension returns ETrue for the Closed File Extensions and EFalse for non-closed File Extensions.
  */
@@ -229,6 +268,9 @@ void CT_MimeContentPolicyStep::CCPTestIsClosedExtension()
 	_LIT(KExtension14, ".sis7");
 	_LIT(KExtension15, ".0sis");
 	_LIT(KExtension16, ".gif");
+	
+	//Invalid extension
+    _LIT(KExtension17, "tst");	
 
     INFO_PRINTF1(_L("Tests the extensions found on closed content list"));
 	
@@ -282,6 +324,9 @@ void CT_MimeContentPolicyStep::CCPTestIsClosedExtension()
 	
 	TEST(!iCcp->IsClosedExtension(KExtension16));
 	INFO_PRINTF2(_L("%S is not Closed Extension"), &KExtension16);
+	
+    TEST(!iCcp->IsClosedExtension(KExtension17));
+    INFO_PRINTF2(_L("%S is not Closed Extension"), &KExtension17);	
 	}
 
 /**
@@ -322,7 +367,7 @@ void CT_MimeContentPolicyStep::CCPTestIsDRMEnvelopeFileNameL()
  
    @SYMTestStatus Implemented
   
-   @SYMTestActions Closed files are files whose file extensions are listed in the ApfMimeContentPolicy.rss file.
+   @SYMTestActions Closed files are files whose file extensions are listed in the 10003a3f repository.
    Calls CApfMimeContentPolicy::IsClosedFileL(const TDesC& aFileName); for different Closed and non-closed files.
    Calls CApfMimeContentPolicy::IsClosedFileL(const TDesC& aFileName); with file which is already open and checks whether \n
    call succeeds.
@@ -427,7 +472,7 @@ void CT_MimeContentPolicyStep::CCPTestIsDRMEnvelopeFileHandleL()
  
    @SYMTestStatus Implemented
   
-   @SYMTestActions Closed files are files whose file extensions are listed in the ApfMimeContentPolicy.rss file.
+   @SYMTestActions Closed files are files whose file extensions are listed in the 10003a3f repository.
    Calls CApfMimeContentPolicy::IsClosedFileL(RFile& aFileHandle); for different Closed and non-closed files.
      
    @SYMTestExpectedResults The test checks whether IsClosedFileL() returns EFalse for Files which are not closed and\n
@@ -509,3 +554,58 @@ void CT_MimeContentPolicyStep::CCPOOMTestL()
 	INFO_PRINTF1(_L("OOM test Completed"));	
 	}
 
+
+/**
+   @SYMTestCaseID APPFWK-APPARC-0108
+
+   @SYMREQ REQ410-2692
+ 
+   @SYMTestCaseDesc Tests Closed content and extension information repository is not writable.
+  
+   @SYMTestPriority High 
+ 
+   @SYMTestStatus Implemented
+  
+   @SYMTestActions Calls create, get, set, reset, delete functions on the repository. Checks only read operations are allowed.
+     
+   @SYMTestExpectedResults Tests should complete without any failure.
+ */
+
+void CT_MimeContentPolicyStep::CCPTestIsClosedContentAndExtenstionInfoRepositoryReadOnlyL()
+    {
+    INFO_PRINTF1(_L("Testcase CCPTestIsClosedContentAndExtenstionInfoRepositoryReadOnly...."));   
+    CRepository *cenrep=CRepository::NewL(KClosedContentAndExtensionInfoRepositoryUID);  
+    CleanupStack::PushL(cenrep);
+    TInt newKeyValue=0x00010000;
+    //This key already exists in the default Closed content and extension information repository
+    TInt existingKey=0x1;
+    TBuf<KMaxDataTypeLength> keyData;
+    TInt err=KErrNone;
+    
+    INFO_PRINTF1(_L("Testing creation of key in the repository"));
+    err=cenrep->Create(newKeyValue, 0);
+    TEST(err==KErrPermissionDenied);
+    INFO_PRINTF2(_L("Error code while creating a key: %d"), err);
+    
+    INFO_PRINTF1(_L("Testing setting value of an existing key in the repository"));    
+    err=cenrep->Set(existingKey, 0);
+    TEST(err==KErrPermissionDenied);
+    INFO_PRINTF2(_L("Error code while setting a value of an existing key: %d"), err);
+    
+    INFO_PRINTF1(_L("Testing getting value of an existing key in the repository"));
+    err=cenrep->Get(existingKey, keyData);
+    TEST(err==KErrNone);
+    INFO_PRINTF2(_L("Error code while getting a value of an existing key: %d"), err);
+    
+    INFO_PRINTF1(_L("Testing resetting value of an existing key in the repository"));
+    err=cenrep->Reset(existingKey);
+    TEST(err==KErrPermissionDenied);
+    INFO_PRINTF2(_L("Error code while reseting a value of existing key: %d"), err);
+
+    INFO_PRINTF1(_L("Testing deleting an existing key in the repository"));
+    err=cenrep->Delete(existingKey);
+    TEST(err==KErrPermissionDenied);
+    INFO_PRINTF2(_L("Error code while deleting an existing key: %d"), err);
+    CleanupStack::PopAndDestroy(cenrep);
+    INFO_PRINTF1(_L("Testcase CCPTestIsClosedContentAndExtenstionInfoRepositoryReadOnly completed...."));    
+    }

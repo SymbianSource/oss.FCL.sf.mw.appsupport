@@ -24,7 +24,7 @@
 #include "oomapplicationconfig.h"
 #include "oomrunpluginconfig.h"
 #include "oomcloseappconfig.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomConfig* COomConfig::NewL()
     {

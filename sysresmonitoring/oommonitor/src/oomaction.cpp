@@ -18,7 +18,7 @@
 
 #include "oomaction.h"
 #include "oomactionlist.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomAction::~COomAction()
     {

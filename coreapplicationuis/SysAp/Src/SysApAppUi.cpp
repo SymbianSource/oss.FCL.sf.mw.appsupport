@@ -620,6 +620,9 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
             }
 #endif // _DEBUG
 
+        TBool haveStatusPane = ( StatusPane()== NULL ) ? EFalse : StatusPane()->IsVisible();
+        TRACES( RDebug::Print( _L("CSysApAppUi::HandleKeyEventL: haveStatusPane = %d" ) ) );
+        
         TKeyResponse response( EKeyWasNotConsumed );
         if (iSysApKeyManagement && aKeyEvent.iCode != EKeyPowerOff && aKeyEvent.iCode != 'E')
             {
@@ -642,7 +645,14 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                         {
                         TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, Short powerkey") ) );
                         iLastPowerKeyWasShort = ETrue;
-                        HandleShortPowerKeyPressedL();
+                        if ( iPowerKeyPopupMenuActive || !iSysApFeatureManager->PowerKeyIsLockKey() || (iSysApFeatureManager->PowerKeyIsLockKey() && haveStatusPane ))
+                            {
+                            //do this only if the power key menu is active (handles item navigation)
+                            //or if the power key is not the lock key (default)
+                             HandleShortPowerKeyPressedL();
+                            }
+                        
+                        
                         iIgnoreNextPowerKeyRepeats = EFalse;
                         }
                     //Long power key press
@@ -651,7 +661,18 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                         iKeyBoardRepeatCount = -1;
                         TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, Long powerkey") ) );
                         iLastPowerKeyWasShort = EFalse;
-                        HandleLongPowerKeyPressedL();
+                        if ( !haveStatusPane && !iPowerKeyPopupMenuActive && iSysApFeatureManager->PowerKeyIsLockKey() && !iIgnoreNextPowerKeyRepeats )
+                            {
+                            if ( !iGlobalListQuery )
+                                {
+                                HandleShortPowerKeyPressedL();
+                                }
+                            }
+                        else
+                            {
+                            HandleLongPowerKeyPressedL();
+                            }
+                        
                         }
                     break;
 
@@ -671,36 +692,46 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                     break;
                 }
             }
-        else if( aType == EEventKeyUp )
+        else if ( aType == EEventKeyUp )
             {
-            if( aKeyEvent.iScanCode == EStdKeyDevice2 )
+            TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): aType == EEventKeyUp, PowerKeyIsLockKey = %d, iLastPowerKeyWasShort = %d, iPowerKeyPopupMenuActive = %d, iCharging = %d" ), iSysApFeatureManager->PowerKeyIsLockKey(), iLastPowerKeyWasShort, iPowerKeyPopupMenuActive, iCharging ) );
+            if ( iSysApFeatureManager->PowerKeyIsLockKey()
+                    && iLastPowerKeyWasShort && !iPowerKeyPopupMenuActive && !haveStatusPane )
                 {
-                if ( iIgnoreNextPowerKeyUpEvent )
+                //if the power key is the lock key && the last keypress was short && the power menu is not active
+                //then lock the phone
+                KeyLock().EnableWithoutNote();
+                }
+            else
+                {
+                if ( aKeyEvent.iScanCode == EStdKeyDevice2 )
                     {
-                    if ( !iPowerKeyPopupMenuDismissed ) // If the popup menu has been dismissed, do nothing
+                    if ( iIgnoreNextPowerKeyUpEvent )
                         {
-                        iPowerKeyPopupMenuActive = ETrue;
-                        iIgnoreNextPowerKeyUpEvent = EFalse;
-                        }
-                    }
-                else if( iLastPowerKeyWasShort )
-                    {
-                    if ( iPowerKeyPopupMenuActive )
-                        {
-                        if ( iGlobalListQuery )
+                        if ( !iPowerKeyPopupMenuDismissed ) // If the popup menu has been dismissed, do nothing
                             {
-                            if ( iSysApFeatureManager->NoPowerKeySupported() )
+                            iPowerKeyPopupMenuActive = ETrue;
+                            iIgnoreNextPowerKeyUpEvent = EFalse;
+                            }
+                        }
+                    else if ( iLastPowerKeyWasShort )
+                        {
+                        if ( iPowerKeyPopupMenuActive )
+                            {
+                            if ( iGlobalListQuery )
                                 {
-                            	CancelGlobalListQuery();
+                                if ( iSysApFeatureManager->NoPowerKeySupported() )
+                                    {
+                                    CancelGlobalListQuery();
+                                    }
+                                else
+                                    {
+                                    iGlobalListQuery->MoveSelectionDown();
+                                    }
                                 }
-                            else
-                                {
-                                iGlobalListQuery->MoveSelectionDown();	
-                                }                            
                             }
                         }
                     }
-
                 }
             }
 
@@ -3510,6 +3541,89 @@ TInt CSysApAppUi::ActiveProfileId()
     return iProfileEngine->ActiveProfileId();
     }
 
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::AddMmcMenuItemsL()
+// ----------------------------------------------------------------------------
+//
+void CSysApAppUi::AddMmcMenuItemsL( CDesCArray*& aProfileNameCDesCArray, RArray<TInt>& aItemIdArray,
+                                    TInt& aPowerMenuItemIndex )
+    {
+    TInt propertyValue( StateOfProperty( KPSUidUsbWatcher,
+            KUsbWatcherSelectedPersonality ) );
+
+    HBufC* itemStringBuf;
+#ifndef RD_MULTIPLE_DRIVE
+    iPowerkeyMenuEjectSelection = KErrAccessDenied;
+    if ( !IsEncryptionOperationOngoingL() )
+        {
+        if ( iSysApFeatureManager->MmcHotSwapSupported() &&
+                iMMCInserted &&
+                iSysApFeatureManager->EjectRequiredInPowerMenu() &&
+                propertyValue != KUsbPersonalityIdMS )
+            {
+            iPowerkeyMenuEjectShown = ETrue;
+            TRACES( RDebug::Print(_L("CSysApAppUi::AddMmcMenuItemsL: adding \"Eject\"" ) ) );
+            itemStringBuf = StringLoader::LoadLC( R_QTN_PWRC_EJECT_MMC, iEikonEnv );
+            aProfileNameCDesCArray->AppendL( itemStringBuf->Des() );
+            CleanupStack::PopAndDestroy(); // itemStringBuf
+            if ( iSysApFeatureManager->CoverDisplaySupported() )
+                {
+                aItemIdArray.AppendL(SecondaryDisplay::EPwrMenuItemEjectMMC);
+                }
+            iPowerkeyMenuEjectShown = ETrue;
+            iPowerkeyMenuEjectSelection = aPowerMenuItemIndex;
+            aPowerMenuItemIndex++;
+            }
+        }
+
+#else // RD_MULTIPLE_DRIVE
+    iPowerkeyMenuEjectSelectionBase = KErrAccessDenied;
+    if ( !IsEncryptionOperationOngoingL() )
+        {
+        if ( iSysApFeatureManager->MmcHotSwapSupported()
+                && iSysApFeatureManager->EjectRequiredInPowerMenu()
+                && propertyValue != KUsbPersonalityIdMS )
+            {
+            // Reset old eject status and dialog
+            iSysApDriveList->ResetDrivesToEject();
+            if ( iSysApConfirmationQuery )
+                {
+                if ( iSysApConfirmationQuery->CurrentQuery() == ESysApEjectMmcQuery )
+                    {
+                    iSysApConfirmationQuery->Cancel();
+                    }
+                }
+
+            // Append memory cards for eject selection
+            TInt count( iInsertedMemoryCards.Count() );
+            for ( TInt i( 0 ); i < count; ++i )
+                {
+                itemStringBuf = iSysApDriveList->GetFormattedDriveNameLC(
+                        iInsertedMemoryCards[ i ].iDrive,
+                        R_QTN_PWRC_EJECT_MEMORY_STORAGE );
+                aProfileNameCDesCArray->AppendL( *itemStringBuf );
+                CleanupStack::PopAndDestroy( itemStringBuf );
+
+                if ( iSysApFeatureManager->CoverDisplaySupported() )
+                    {
+                    aItemIdArray.AppendL(
+                            SecondaryDisplay::EPwrMenuItemEjectItemBase + i );
+                    }
+                }
+            if ( count > 0 )
+                {
+                TRACES( RDebug::Print(_L("CSysApAppUi::AddMmcMenuItemsL: added \"Eject\"" ) ) );
+                iPowerkeyMenuEjectShown = ETrue;
+                iPowerkeyMenuEjectSelectionBase = aPowerMenuItemIndex;
+                aPowerMenuItemIndex += count;
+                }
+            }
+        }
+#endif // RD_MULTIPLE_DRIVE
+    }
+
+
 // ----------------------------------------------------------------------------
 // CSysApAppUi::ShowPowerKeyPopUpMenuL()
 // ----------------------------------------------------------------------------
@@ -3572,7 +3686,7 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
         profileNameCDesCArray->Reset();
         HBufC* itemStringBuf;
 
-        TInt powerMenuItemIndex( 0 );
+        TInt powerMenuItemIndex = 0;
 
         // "Switch off" menu item
         if ( !IsEncryptionOperationOngoingL() )
@@ -3630,16 +3744,19 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
 					if ( iSysApFeatureManager->CoverDisplaySupported() )
 						{
 						itemIdArray.AppendL(SecondaryDisplay::EPwrMenuItemLockKeypad);
-						}
-					iPowerkeyMenuLockKeypadShown = ETrue;
-					iPowerkeyMenuLockKeypadSelection = powerMenuItemIndex;
-					powerMenuItemIndex++;
-					}
-				}
-			}
-
-        // "Exit SIM access profile" menu item
-
+                        }
+                    iPowerkeyMenuLockKeypadShown = ETrue;
+                    iPowerkeyMenuLockKeypadSelection = powerMenuItemIndex;
+                    powerMenuItemIndex++;
+                    }
+                }
+            }
+        if ( iSysApFeatureManager->PowerKeyIsLockKey() )
+            {
+            AddMmcMenuItemsL( profileNameCDesCArray,
+                    itemIdArray, powerMenuItemIndex );
+            }
+	    // "Exit SIM access profile" menu item
         if ( BtSapEnabled() )
             {
             TRACES( RDebug::Print(_L( "CSysApAppUi::ShowPowerKeyPopUpMenuL: show \"Exit SIM access profile\" item" ) ) );
@@ -3656,8 +3773,8 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
             }
 
         // Profile menu items
-
-        TInt arrayIndex ( 0 );
+        iProfileItemsOffset = powerMenuItemIndex;
+        TInt arrayIndex( 0 );
         TBufC<KMaxProfileNameLength> profileName;
 
         for ( arrayIndex = 0; arrayIndex < iNumberOfProfileNamesInPowerKeyMenu; arrayIndex++ )
@@ -3698,76 +3815,10 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
             iPowerkeyMenuLockSystemSelection = powerMenuItemIndex;
             powerMenuItemIndex++;
             }
-
-        // "Eject MMC" menu item
-
-        TInt propertyValue( StateOfProperty( KPSUidUsbWatcher, KUsbWatcherSelectedPersonality ) );
-
-#ifndef RD_MULTIPLE_DRIVE
-			if ( !IsEncryptionOperationOngoingL() )
-			{
-        if ( iSysApFeatureManager->MmcHotSwapSupported() &&
-             iMMCInserted &&
-             iSysApFeatureManager->EjectRequiredInPowerMenu() &&
-             propertyValue != KUsbPersonalityIdMS )
+        if ( !iSysApFeatureManager->PowerKeyIsLockKey() )
             {
-            iPowerkeyMenuEjectShown = ETrue;
-            TRACES( RDebug::Print(_L("CSysApAppUi::ShowPowerKeyPopUpMenuL: adding \"Eject\"" ) ) );
-            itemStringBuf = StringLoader::LoadLC( R_QTN_PWRC_EJECT_MMC, iEikonEnv );
-            profileNameCDesCArray->AppendL( itemStringBuf->Des() );
-            CleanupStack::PopAndDestroy(); // itemStringBuf
-            if ( iSysApFeatureManager->CoverDisplaySupported() )
-                {
-                itemIdArray.AppendL(SecondaryDisplay::EPwrMenuItemEjectMMC);
-                }
-            iPowerkeyMenuEjectShown = ETrue;
-            iPowerkeyMenuEjectSelection = powerMenuItemIndex;
-            powerMenuItemIndex++;
+                AddMmcMenuItemsL( profileNameCDesCArray, itemIdArray, powerMenuItemIndex );
             }
-        }
-
-#else // RD_MULTIPLE_DRIVE
-			if ( !IsEncryptionOperationOngoingL() )
-			{
-        if ( iSysApFeatureManager->MmcHotSwapSupported() &&
-             iSysApFeatureManager->EjectRequiredInPowerMenu() &&
-             propertyValue != KUsbPersonalityIdMS )
-            {
-            // Reset old eject status and dialog
-            iSysApDriveList->ResetDrivesToEject();
-            if ( iSysApConfirmationQuery )
-                {
-                if ( iSysApConfirmationQuery->CurrentQuery() == ESysApEjectMmcQuery )
-                    {
-                    iSysApConfirmationQuery->Cancel();
-                    }
-                }
-
-            // Append memory cards for eject selection
-            TInt count( iInsertedMemoryCards.Count() );
-            for ( TInt i( 0 ); i < count; ++i )
-                {
-                itemStringBuf = iSysApDriveList->GetFormattedDriveNameLC(
-                    iInsertedMemoryCards[ i ].iDrive,
-                    R_QTN_PWRC_EJECT_MEMORY_STORAGE );
-                profileNameCDesCArray->AppendL( *itemStringBuf );
-                CleanupStack::PopAndDestroy( itemStringBuf );
-
-                if ( iSysApFeatureManager->CoverDisplaySupported() )
-                    {
-                    itemIdArray.AppendL( SecondaryDisplay::EPwrMenuItemEjectItemBase + i );
-                    }
-                }
-            if ( count > 0 )
-                {
-                TRACES( RDebug::Print(_L("CSysApAppUi::ShowPowerKeyPopUpMenuL: added \"Eject\"" ) ) );
-                iPowerkeyMenuEjectShown = ETrue;
-                iPowerkeyMenuEjectSelectionBase = powerMenuItemIndex;
-                powerMenuItemIndex += count;
-                }
-            }
-				}
-#endif // RD_MULTIPLE_DRIVE
         
         // Activate/deactive power save mode
         if ( iSysApPsmController ) // variable feature, not create if power save is not used
@@ -3850,33 +3901,32 @@ void CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL( TInt aSelection )
         }
     else
         {
-        TInt firstProfileItemIndex( 1 + Max( 0, iPowerkeyMenuLockKeypadSelection, iPowerkeyMenuExitSapSelection ) ); // index of "General" profile
-
+        // first menu item <=> Switch off
         if ( aSelection == KPowerKeyMenuSelectionSwitchOff )
             {
             TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Switch off\" selected" ) ) );
             DoShutdownL( EFalse, KDummyReason );
             }
-
+        // 2nd menu item: lock display & keys
         else if ( iPowerkeyMenuLockKeypadShown && aSelection == iPowerkeyMenuLockKeypadSelection )
             {
             TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Lock keypad\" selected" ) ) );
             KeyLock().EnableKeyLock();
             }
-
+        // BT
         else if ( iPowerkeyMenuExitSapShown && aSelection == iPowerkeyMenuExitSapSelection )
             {
             TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Exit SAP\" selected" ) ) );
             ShowQueryL( ESysApBtSapDisconnectQuery );
             }
-
-        else if ( aSelection < firstProfileItemIndex + iNumberOfProfileNamesInPowerKeyMenu )
+        // Profile Items
+        else if ( ( aSelection >= iProfileItemsOffset ) && ( aSelection < iProfileItemsOffset + iNumberOfProfileNamesInPowerKeyMenu ) )
             {
             __ASSERT_DEBUG( iProfileNamesArray, User::Invariant() );
 
             if ( iProfileNamesArray )
                 {
-                iProfileToBeActivated = ( iProfileNamesArray->ProfileName( aSelection - firstProfileItemIndex ) )->Id();
+                iProfileToBeActivated = ( iProfileNamesArray->ProfileName( aSelection - iProfileItemsOffset ) )->Id();
 
                 TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: profile id: %d selected" ), iProfileToBeActivated ) );
                 if ( ! iSysApOfflineModeController->OfflineModeActive() ||
@@ -3891,19 +3941,21 @@ void CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL( TInt aSelection )
                     }
                 }
             }
-
+        // device lock
         else if ( iPowerkeyMenuLockSystemShown && aSelection == iPowerkeyMenuLockSystemSelection )
             {
             TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Lock system\" selected" ) ) );
             iSysApSystemLock->SetLockedL();
             }
 #ifndef RD_MULTIPLE_DRIVE
+        //eject single MMC
         else if ( iPowerkeyMenuEjectShown && aSelection == iPowerkeyMenuEjectSelection )
             {
             TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Eject\" selected" ) ) );
             ShowQueryL( ESysApEjectMmcQuery );
             }
 #else // RD_MULTIPLE_DRIVE
+        //eject nth MMC
         else if ( iPowerkeyMenuEjectShown &&
                 aSelection >= iPowerkeyMenuEjectSelectionBase &&
                 aSelection < iPowerkeyMenuEjectSelectionBase + iInsertedMemoryCards.Count() )
@@ -3929,6 +3981,8 @@ void CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL( TInt aSelection )
 
     delete iProfileNamesArray;
     iProfileNamesArray = NULL;
+    delete iGlobalListQuery;
+    iGlobalListQuery = NULL;
 
     TRACES( RDebug::Print(_L("CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: END" ) ) );
     }

@@ -25,6 +25,5 @@ DEFAULT
 PRJ_TESTMMPFILES
 
 gnumakefile icons_scalable_dc.mk
-//gnumakefile ..\help\build_help.mk 
 
 t_oomdummyapp.mmp

@@ -18,7 +18,7 @@
 
 #include "oomappclosetimer.h"
 #include "oomcloseapp.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomAppCloseTimer* COomAppCloseTimer::NewL(COomCloseApp& aMonitor)
     {

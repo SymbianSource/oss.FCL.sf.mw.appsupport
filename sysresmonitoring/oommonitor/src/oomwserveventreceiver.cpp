@@ -19,7 +19,7 @@
 #include <apgwgnam.h>
 #include "oomwserveventreceiver.h"
 #include "oommemorymonitor.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 #include "oomconstants.hrh"
 
 #include "apgwgnam.h"

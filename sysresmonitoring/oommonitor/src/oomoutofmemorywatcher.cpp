@@ -19,7 +19,7 @@
 
 #include "oomoutofmemorywatcher.h"
 #include "oommemorymonitor.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 // ======================================================================
 // class COutOfMemoryWatcher

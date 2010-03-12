@@ -17,7 +17,7 @@
 
 #include <e32property.h>
 #include "oomsubscribehelper.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 // ---------------------------------------------------------
 //

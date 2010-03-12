@@ -18,7 +18,7 @@
 
 #include "oomrunpluginconfig.h"
 #include "oomwindowgrouplist.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomRunPluginConfig* COomRunPluginConfig::NewL(TUint aPluginId, TOomPluginType aPluginType)
     {

@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -1206,9 +1206,6 @@ void CApaAppData::ExternalizeL(RWriteStream& aWriteStream) const
 	aWriteStream.WriteUint32L(I64HIGH(iTimeStamp.Int64()));
 	aWriteStream.WriteUint32L(I64LOW(iTimeStamp.Int64()));
 
-	aWriteStream.WriteUint32L(I64HIGH(iIconFileTimeStamp.Int64()));
-	aWriteStream.WriteUint32L(I64LOW(iIconFileTimeStamp.Int64()));
-	aWriteStream << *iCaption;	// Caption
 	if (iIconFileNameFromResourceFile)
 		{
 		aWriteStream.WriteUint32L(I64HIGH(iIconFileTimeStampFromResourceFile.Int64()));

@@ -18,7 +18,7 @@
 
 
 #include "oomcloseappconfig.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomCloseAppConfig* COomCloseAppConfig::NewL(TInt32 aId)
     {

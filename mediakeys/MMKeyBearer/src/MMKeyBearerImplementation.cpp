@@ -359,7 +359,7 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
 
     // Check for keypadlock if the events are from device keypad
     // If events are from accessory device,then do not check for keypadlock
-    if (aKeyType != EAccessoryVolumeKeys)
+    if (aKeyType != EAccessoryVolumeKeys && aKeyType != ESideVolumeKeys )
         {
         TBool keysLocked = EFalse;
         if (!(iAknServerConnected))  // Connect to server for first time
@@ -368,36 +368,18 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
                 {
                 iAknServerConnected = ETrue;
                 }
-            else                   // If connection fails, then return
+            else if (aKeyType == EMediaKeys)                 // If connection fails, then return
                 {
-                //Start the listener once again
-               if (aKeyType == ESideVolumeKeys)
-                    {
-                    iMMKeyBearerObserver->Start();
-                    }
-                if (aKeyType == EMediaKeys)
-                    {
-                    iMediaKeyObserver->Start();
-                    }
-                return ;
+                iMediaKeyObserver->Start();
+	    	return ;
                 }
             }
         iAknServer.ShowKeysLockedNote(keysLocked);
 
-        if (keysLocked)
+        if (keysLocked && aKeyType == EMediaKeys)
             {
             // Device is locked , Discard the key event
-
-            //Start the listener once again
-            if (aKeyType == ESideVolumeKeys)
-                {
-                iMMKeyBearerObserver->Start();
-                }
-            if (aKeyType == EMediaKeys)
-                {
-                iMediaKeyObserver->Start();
-                }
-
+            iMediaKeyObserver->Start();
             return;
             }
         }

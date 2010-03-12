@@ -18,7 +18,7 @@
 
 #include "oomforegroundrule.h"
 #include "oomwindowgrouplist.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 // If the specified target app is in the foreground then apply the specified priority
 COomForegroundRule::COomForegroundRule(TInt aTargetAppId, TInt aPriority) : iTargetAppId(aTargetAppId), iPriority(aPriority)

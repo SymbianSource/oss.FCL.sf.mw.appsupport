@@ -253,6 +253,16 @@ public:
     * @return ETrue if feature is supported
     */
     TBool FmTxRdsTextSupported() const;
+    
+    
+    /**
+     * Returns whether a short press of the power key
+     * triggers the keylock
+     * 
+     * @since S60 5.2
+     * @return ETrue if feature is supported 
+     */
+    TBool PowerKeyIsLockKey() const;
 
 private:
 
@@ -373,6 +383,12 @@ private:
     * FM TX RDS Text support status.
     */
     TBool iFmTxRdsTextSupported;
+    
+    
+    /**
+     * Short press of power key invokes keylock
+     */
+    TBool iPowerKeyIsLockKey;
 };
 
 #endif // SYSAPFEATUREMANAGER_H

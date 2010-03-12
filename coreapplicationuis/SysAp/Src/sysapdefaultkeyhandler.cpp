@@ -20,27 +20,27 @@
 #include <eikon.hrh>
 #include <coemain.h>
 #include <aknkeylock.h>
-#include <akntasklist.h>
+#include <AknTaskList.h>
 #include <apgtask.h>
 #include <apgcli.h>
 #include <apgwgnam.h>
 #include <apacmdln.h>
-#include <aiwpocparameters.h>
-#include <aiwservicehandler.h>
+#include <AiwPoCParameters.h>
+#include <AiwServiceHandler.h>
 #include <featmgr.h>
 #include <coreapplicationuisdomainpskeys.h>
-#include <psvariables.h>
+#include <PSVariables.h>
 #include <startupdomainpskeys.h>
 #include <hwrmdomainpskeys.h>
 #include <u32hal.h>
-#include <sysap.rsg>
+#include <SysAp.rsg>
 #include <centralrepository.h> //for CRepository
 #include <settingsinternalcrkeys.h>
 #include <keylockpolicyapi.h>
 #include "sysapdefaultkeyhandler.h"
 #include "sysapcallback.h"
 #include "SysAp.hrh"
-#include "aknsgcc.h"
+#include "AknSgcc.h"
 
 
 const TInt KModifierMask( 0 );

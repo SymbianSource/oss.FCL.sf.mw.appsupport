@@ -20,7 +20,7 @@
 #include "oommemorymonitorsession.h"
 #include "oommemorymonitor.h"
 #include "oommemorymonitorserver.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 #include "oomclientrequestqueue.h"
 
 CMemoryMonitorSession::CMemoryMonitorSession()

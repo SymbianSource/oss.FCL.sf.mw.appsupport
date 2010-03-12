@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1999-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -100,6 +100,8 @@ PRJ_EXPORTS
 // ConfML files
 ../conf/apparchitecture.confml          		MW_LAYER_EXPORTS_CONFML(apparchitecture.confml)
 ../conf/apparchitecture_1028583d.crml   		MW_LAYER_EXPORTS_CRML(apparchitecture_1028583d.crml)
+../conf/apparchitecture_closedcontentextinfo.confml          		MW_LAYER_EXPORTS_CONFML(apparchitecture_closedcontentextinfo.confml)
+../conf/apparchitecture_closedcontentextinfo_10003a3f.crml   		MW_LAYER_EXPORTS_CRML(apparchitecture_closedcontentextinfo_10003a3f.crml)
 
 PRJ_MMPFILES
 
@@ -346,6 +348,7 @@ PRJ_TESTEXPORTS
 ../tdata/mimecontentpolicy/propelli.jpg	 		/epoc32/data/z/system/data/propelli.jpg
 ../tdata/mimecontentpolicy/type-r.jpg			/epoc32/data/z/system/data/type-r.jpg
 ../tdata/1028583d.txt 							/epoc32/data/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
+../tdata/10003a3f.txt 							/epoc32/data/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
 
 // WINSCW UDEB
 ../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/resource/apps/tstappviewneg.xyz
@@ -385,6 +388,7 @@ PRJ_TESTEXPORTS
 ../tdata/mimecontentpolicy/propelli.jpg	 		/epoc32/release/winscw/udeb/z/system/data/propelli.jpg
 ../tdata/mimecontentpolicy/type-r.jpg			/epoc32/release/winscw/udeb/z/system/data/type-r.jpg
 ../tdata/1028583d.txt 							/epoc32/release/winscw/udeb/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
+../tdata/10003a3f.txt 							/epoc32/release/winscw/udeb/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
 ../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/winscw/udeb/z/system/data/testupdregappuninstallation_reg.rsc
 ../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/winscw/udeb/z/system/data/testupgradeupdregappuninstallation_reg.rsc
 
@@ -422,6 +426,7 @@ PRJ_TESTEXPORTS
 ../tdata/mimecontentpolicy/propelli.jpg	 		/epoc32/release/winscw/urel/z/system/data/propelli.jpg
 ../tdata/mimecontentpolicy/type-r.jpg			/epoc32/release/winscw/urel/z/system/data/type-r.jpg
 ../tdata/1028583d.txt 							/epoc32/release/winscw/urel/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
+../tdata/10003a3f.txt 							/epoc32/release/winscw/urel/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
 ../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/winscw/urel/z/system/data/testupdregappuninstallation_reg.rsc
 ../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/winscw/urel/z/system/data/testupgradeupdregappuninstallation_reg.rsc
 

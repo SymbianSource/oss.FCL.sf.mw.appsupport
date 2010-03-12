@@ -18,7 +18,7 @@
 
 
 #include "oomglobalconfig.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomGlobalConfig::~COomGlobalConfig()
     {

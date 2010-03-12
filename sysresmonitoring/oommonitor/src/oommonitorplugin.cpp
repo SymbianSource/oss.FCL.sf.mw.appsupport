@@ -19,7 +19,7 @@
 #include <apgwgnam.h>
 #include "oommonitorplugin.h"
 #include "oommemorymonitor.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 // TLS is used to store the CMemoryMonitor pointer, CMemoryMonitor
 // being the main object in the OOM monitor thread. This allows

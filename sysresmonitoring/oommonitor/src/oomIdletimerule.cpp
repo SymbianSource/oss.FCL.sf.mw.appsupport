@@ -17,7 +17,7 @@
 
 #include "oomidletimerule.h"
 #include "oomwindowgrouplist.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomIdleTimeRule* COomIdleTimeRule::NewL(TTimeIntervalSeconds aIdleTime, TInt aPriority)
     {

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -46,6 +46,7 @@ private:
     // aIsDRMEnvelope is ETrue for DRM Envelope and EFalse for ClosedFile
     TBool DoCCPTestUsingFileHandleL(const TDesC &aName, TBool aIsDRMEnvelope);
     void CCPOOMTestL();
+    void CCPTestIsClosedContentAndExtenstionInfoRepositoryReadOnlyL();
 
 private:
 	CApfMimeContentPolicy* iCcp;

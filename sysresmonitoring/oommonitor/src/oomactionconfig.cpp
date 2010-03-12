@@ -19,7 +19,7 @@
 
 #include "oomactionconfig.h"
 #include "oomruleconfig.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 // Add a rule
 // This class takes ownership of the given rule

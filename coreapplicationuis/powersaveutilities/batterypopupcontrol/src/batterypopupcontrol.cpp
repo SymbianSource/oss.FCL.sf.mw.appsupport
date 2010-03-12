@@ -557,7 +557,15 @@ void CBatteryPopupControl::HandlePointerEventL(
                 iHighlightedItem = EFalse; 
                 }
             }
-				}
+        else
+            {
+            if ( iHighlightedItem )
+                {         
+                iHighlightedItem = EFalse;             
+                DrawNow( iLinkRect );
+                }
+            }
+        }
     }
 // -----------------------------------------------------------------------------
 // CBatteryPopupControl::CreateIconL()

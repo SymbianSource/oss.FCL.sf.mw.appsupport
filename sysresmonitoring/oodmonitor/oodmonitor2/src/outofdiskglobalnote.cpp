@@ -240,7 +240,10 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
                 }
             }
         resReader.SetBuffer(str);
-	    HBufC* message( FormatStringL(resReader.ReadHBufCL()->Des(), *strings));
+	    HBufC* resHandle = resReader.ReadHBufCL();
+        CleanupStack::PushL( resHandle );
+        HBufC* message(FormatStringL(resHandle->Des(),*strings));
+        CleanupStack::PushL( message );
 	    TRACES1("COutOfDiskMonitor::ShowGlobalQueryL: txt: %S",message);
         DisplayL(message->Des());
 
@@ -252,8 +255,10 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
 
         iNoteInfo.iStatus = aStatus;
         iNoteInfo.iDrive = aDrive;        
+        CleanupStack::PopAndDestroy(message);
+        CleanupStack::PopAndDestroy(resHandle);
         CleanupStack::PopAndDestroy( str );
-        CleanupStack::PopAndDestroy( strings );
+        CleanupStack::PopAndDestroy( strings ); 
         iOutOfDiskMonitor->SetAsDisplayedL(aDrive, aStatus);
         }
     TRACES("COutOfDiskGlobalNote::ShowGlobalQueryL: End");

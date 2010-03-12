@@ -20,7 +20,7 @@
 #include <oommonitorsession.h>
 #include "oommonitorclientserver.h"
 #include "oompanic.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 EXPORT_C TInt ROomMonitorSession::Connect()
     {

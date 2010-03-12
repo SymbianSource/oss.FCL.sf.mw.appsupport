@@ -18,7 +18,7 @@
 
 
 #include "oomclientrequestqueue.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 #include "oomsubscribehelper.h"
 #include "oompanic.h"
 #include "oommemorymonitor.h"

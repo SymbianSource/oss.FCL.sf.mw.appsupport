@@ -82,6 +82,16 @@ NONSHARABLE_CLASS( mt_atspc )
          virtual void MrctspoDoOutgoingResponsePermitted(TBool /*aIsPermitted*/) {}
          virtual void MrctspoDoIncomingNotifyAddressed(TClientInfo* /*aClientInfo*/, TInt aError ) { iObserverResponse = aError; }
          virtual void MrctspoDoReAddressNotifies() {}
+         
+         
+         virtual TInt MrctspoSetLocalAddressedClient(const TUid& aBearerUid, const TClientInfo& aClientInfo){ return 0; }
+         virtual void MrctspoDoIncomingNotifyPermitted(TBool aIsPermitted){ }
+
+         virtual void MrctspoDoIncomingCommandPermitted(TBool aIsPermitted) { }
+
+         virtual void MrctspoDoOutgoingNotifyCommandPermitted(TBool aIsPermitted){ }
+
+         virtual void MrctspoDoOutgoingNotifyCommandAddressed(TRemConAddress* aConnection, TInt aError) { }
 
 public: // from MCFListener         
     void ContextIndicationL( const CCFContextIndication& aChangedContext ) {}

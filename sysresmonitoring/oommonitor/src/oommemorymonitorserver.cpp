@@ -21,7 +21,7 @@
 #include "oommonitorclientserver.h"
 #include "oommemorymonitorsession.h"
 #include "oommemorymonitor.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 #ifdef CLIENT_REQUEST_QUEUE        
 CMemoryMonitorServer* CMemoryMonitorServer::NewL(COomClientRequestQueue& aQueue)

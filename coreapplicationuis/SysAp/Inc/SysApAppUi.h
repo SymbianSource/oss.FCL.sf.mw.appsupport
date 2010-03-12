@@ -1425,7 +1425,21 @@ class CSysApAppUi :
         */
         CSysApCenRepLogsObserver& CSysApAppUi::LogsObserverL();
 
-    private: //Data members
+    /**
+     * Adds MMC removal item(s) to power menu.
+     * 
+     * @since S60 5.2
+     * 
+     * @param aProfileNameCDesCArray Array holding menu item labels
+     * @param aItemIdArray Item labels for cover ui
+     * @param aPowerMenuItemIndex last used index in power menue 
+     */
+    void AddMmcMenuItemsL( CDesCArray*& aProfileNameCDesCArray,
+                           RArray<TInt>& aItemIdArray, 
+                           TInt& aPowerMenuItemIndex );
+
+private:
+    //Data members
 
         /*****************************************************
          * Series 60 Customer / DOS
@@ -1649,15 +1663,18 @@ class CSysApAppUi :
         */
         CSysApBatteryInfoController* iSysApBatteryInfoController;
 
-		        /**
-         * Returns whether a de/encrypting operation is ongoing
-         *
-     	* @since S60 3.1
-     	* @return TBool ETrue if a de/encrypting operation is in progress
-     	*/
-         TBool IsEncryptionOperationOngoingL() const;
-		 TInt iKeyBoardRepeatCount;
-		 TBool iFlagForRmvMmcFrmShortPwrKey;
+    /**
+     * Returns whether a de/encrypting operation is ongoing
+     *
+     * @since S60 3.1
+     * @return TBool ETrue if a de/encrypting operation is in progress
+     */
+    TBool IsEncryptionOperationOngoingL() const;
+    TInt iKeyBoardRepeatCount;
+    TBool iFlagForRmvMmcFrmShortPwrKey;
+
+    //Offset of profile-related menu items in power key menu
+    TInt iProfileItemsOffset;
     };
 
 #endif      // SYSAPAPPUI_H

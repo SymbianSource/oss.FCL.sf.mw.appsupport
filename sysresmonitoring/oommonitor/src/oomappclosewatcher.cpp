@@ -19,7 +19,7 @@
 
 #include "oomappclosewatcher.h"
 #include "oomcloseapp.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomAppCloseWatcher::COomAppCloseWatcher(COomCloseApp& aMonitor) : CActive(CActive::EPriorityStandard), iMonitor(aMonitor)
     {

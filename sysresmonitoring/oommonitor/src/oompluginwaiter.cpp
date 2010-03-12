@@ -18,7 +18,7 @@
 
 #include "oompluginwaiter.h"
 #include "oomrunplugin.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 #include "oomconstants.hrh"
 
 COomPluginWaiter* COomPluginWaiter::NewL(TInt aMillisecondsToWait, COomRunPlugin& aCallbackClass)

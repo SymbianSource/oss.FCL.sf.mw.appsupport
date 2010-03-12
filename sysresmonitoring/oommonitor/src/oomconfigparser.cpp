@@ -19,7 +19,7 @@
 
 #include "oomconfigparser.h"
 #include "oompanic.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 #include "oomidletimerule.h"
 #include "oomforegroundrule.h"
 #include "oomconstants.hrh"

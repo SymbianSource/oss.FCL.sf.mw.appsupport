@@ -21,7 +21,7 @@
 #include "oommonitor.h"
 #include "oommemorymonitor.h"
 #include "oommonitorclientserver.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 const TInt KStackSize = 0x2000;
 

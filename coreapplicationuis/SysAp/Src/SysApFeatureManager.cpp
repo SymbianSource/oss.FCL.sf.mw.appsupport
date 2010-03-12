@@ -112,6 +112,9 @@ void CSysApFeatureManager::ConstructL()
     iFmTxRdsTextSupported = FeatureManager::FeatureSupported( KFeatureIdFfFmtxRdsText );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX RDS-TEXT supported=%d"), iFmTxRdsTextSupported ) );
     
+    iPowerKeyIsLockKey = FeatureManager::FeatureSupported( KFeatureIdFfPowerKeyAsKeyguard );
+    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Power Key as keyguard supported=%d"), iPowerKeyIsLockKey ) );
+    
     CRepository* repository = NULL;
     
     TRAPD( err, repository = CRepository::NewL( KCRUidCoreApplicationUIsConf ) );
@@ -188,7 +191,8 @@ CSysApFeatureManager::CSysApFeatureManager() : iFeatMgrActive( EFalse ),
                                                iPenEnabled( EFalse ),
                                                iVmbxCallDivertIconSupported( EFalse ),
                                                iTouchUnlockStrokeSupported( EFalse ),
-                                               iFmTxRdsTextSupported( EFalse )
+                                               iFmTxRdsTextSupported( EFalse ),
+                                               iPowerKeyIsLockKey ( EFalse )
 
     {
     }
@@ -426,6 +430,15 @@ TBool CSysApFeatureManager::TouchUnlockStrokeSupported() const
 TBool CSysApFeatureManager::FmTxRdsTextSupported() const
     {
     return iFmTxRdsTextSupported;
+    }
+
+//-----------------------------------------------------------------------------
+// CSysApFeatureManager::PowerKeyIsLockKey()
+//-----------------------------------------------------------------------------
+//
+TBool CSysApFeatureManager::PowerKeyIsLockKey() const
+    {
+    return iPowerKeyIsLockKey;
     }
 
 // End of File

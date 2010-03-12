@@ -33,7 +33,7 @@ USERINCLUDE ../inc
 USERINCLUDE ../../inc
 
 //project server
-sourcepath ..\clisrc\
+sourcepath ../clisrc/
 
 source client.cpp
 

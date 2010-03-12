@@ -22,9 +22,9 @@ xmlns:cep="http://www.nokia.com/ns/cep/1.0/">
             />
             
             <Tsp
-            routingTable='01'
-            ruleActiveAudio='00'
+            routingTable='01'            
             ruleForeground='01'
+            ruleActiveAudio='00'
             ruleLastPlayedAudio='03'
             ruleDefaultApp='02'
             defaultApplicationPhone='100058B3'

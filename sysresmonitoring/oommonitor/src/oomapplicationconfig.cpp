@@ -20,7 +20,7 @@
 #include "oomapplicationconfig.h"
 #include "oomconstants.hrh"
 #include "oomcloseappconfig.h"
-#include "oomtraces.h"
+#include "OomTraces.h"
 
 COomApplicationConfig* COomApplicationConfig::NewL(TUint aApplicationId)
     {
