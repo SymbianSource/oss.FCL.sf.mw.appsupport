@@ -63,6 +63,10 @@ void CSysApFeatureManager::ConstructL()
     iGripNotSupported = FeatureManager::FeatureSupported( KFeatureIdKeypadNoSlider );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: iGripNotSupported=%d"), iGripNotSupported ) );
     
+//    iSlideSupported = FeatureManager::FeatureSupported( KFeatureIdFfCommonSlide );
+		iSlideSupported = EFalse;
+    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: iSlideSupported=%d"), iSlideSupported ) );
+    
     iLocationPrivacySupported = FeatureManager::FeatureSupported( KFeatureIdPrivacyFramework );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Location Privacy supported=%d"), iLocationPrivacySupported ) );
 
@@ -341,6 +345,15 @@ TBool CSysApFeatureManager::SimSupported() const
 TBool CSysApFeatureManager::GripNotSupported() const
     {
     return iGripNotSupported;
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApFeatureManager::SlideSupported()
+// ----------------------------------------------------------------------------
+//
+TBool CSysApFeatureManager::SlideSupported() const
+    {
+    return iSlideSupported;
     }
     
 // ----------------------------------------------------------------------------

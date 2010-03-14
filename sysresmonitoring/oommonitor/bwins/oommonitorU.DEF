@@ -13,4 +13,8 @@ EXPORTS
 	?SetMemoryMonitorTls@@YAXPAVCMemoryMonitor@@@Z @ 12 NONAME ; void SetMemoryMonitorTls(class CMemoryMonitor *)
 	?ThisAppIsNotExiting@ROomMonitorSession@@QAEXH@Z @ 13 NONAME ; void ROomMonitorSession::ThisAppIsNotExiting(int)
 	?WsSession@COomMonitorPlugin@@QAEAAVRWsSession@@XZ @ 14 NONAME ; class RWsSession & COomMonitorPlugin::WsSession(void)
+	?FreeRam@COomMonitorPluginV2@@UAEXXZ @ 15 NONAME ; void COomMonitorPluginV2::FreeRam(void)
+	?RequestOptionalRam@ROomMonitorSession@@QAEHHHHAAH@Z @ 16 NONAME ; int ROomMonitorSession::RequestOptionalRam(int, int, int, int &)
+	?RequestOptionalRam@ROomMonitorSession@@QAEXHHHAAVTRequestStatus@@@Z @ 17 NONAME ; void ROomMonitorSession::RequestOptionalRam(int, int, int, class TRequestStatus &)
+	?SetOomPriority@ROomMonitorSession@@QAEXW4TOomPriority@1@@Z @ 18 NONAME ; void ROomMonitorSession::SetOomPriority(enum ROomMonitorSession::TOomPriority)
 

@@ -22,6 +22,7 @@
 #include <data_caging_paths_for_iby.hrh>
 
 file=ABI_DIR\BUILD_DIR\oommonitor.dll   SHARED_LIB_DIR\oommonitor.dll
+data=ZSYSTEM\..\private\10207218\oomconfig.xml  private\10207218\oomconfig.xml
 
 #endif // OOMMONITOR_IBY
 

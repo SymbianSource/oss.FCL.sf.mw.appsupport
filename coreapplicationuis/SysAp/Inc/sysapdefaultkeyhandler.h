@@ -25,6 +25,8 @@
 
 class MSysapCallback;
 class RAknKeylock2;
+class CRepository;
+class CKeyLockPolicyApi;
 
 
 /**
@@ -185,6 +187,11 @@ class CSysApDefaultKeyHandler : public CBase
         RAknKeylock2* iKeylock;
         
         /**
+         * Owned. Used to enable/disable keylock activation when slide is close/open
+         */
+        CKeyLockPolicyApi* iKeylockPolicy;
+        
+        /**
         * Handle of the captured camera key event.
         */
         TInt iCapturedEKeyCamera;
@@ -224,6 +231,11 @@ class CSysApDefaultKeyHandler : public CBase
         */
         RAknUiServer iAknUiServer;
         
+        /**
+         * Keypad slide handling CR
+         */
+        CRepository* iSlideRepository;
+        TBool iKeypadWasLocked;
     };
 
 #endif // SYSAPDEFAULTKEYHANDLER_H

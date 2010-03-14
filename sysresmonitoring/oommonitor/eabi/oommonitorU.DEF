@@ -17,4 +17,10 @@ EXPORTS
 	_ZN20CAppOomMonitorPlugin4NewLE4TUid @ 16 NONAME
 	_ZTI17COomMonitorPlugin @ 17 NONAME ; #<TI>#
 	_ZTV17COomMonitorPlugin @ 18 NONAME ; #<VT>#
+	_ZN18ROomMonitorSession18RequestOptionalRamEiiiRi @ 19 NONAME
+	_ZN19COomMonitorPluginV27FreeRamEv @ 20 NONAME
+	_ZTI19COomMonitorPluginV2 @ 21 NONAME ; #<TI>#
+	_ZTV19COomMonitorPluginV2 @ 22 NONAME ; #<VT>#
+	_ZN18ROomMonitorSession18RequestOptionalRamEiiiR14TRequestStatus @ 23 NONAME
+	_ZN18ROomMonitorSession14SetOomPriorityENS_12TOomPriorityE @ 24 NONAME
 

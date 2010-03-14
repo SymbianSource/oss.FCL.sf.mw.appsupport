@@ -180,6 +180,14 @@ public:
     TBool GripNotSupported() const;
     
     /**
+	* Returns whether SlideSupported is set.
+	*
+	* @since S60 9.2
+	* @return ETrue if feature is set
+	*/  
+    TBool CSysApFeatureManager::SlideSupported() const;
+    
+    /**
     * Returns whether Cover Display is supported.
     *
     * @since S60 3.2
@@ -320,6 +328,11 @@ private:
     * Grip not supported status.
     */ 
     TBool iGripNotSupported;
+    
+    /**
+	* Slide supported status.
+	*/ 
+	TBool iSlideSupported;
     
     /**
     * Cover display support status.

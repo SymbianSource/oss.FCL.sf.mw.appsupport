@@ -23,7 +23,7 @@
 
 #include "cfcontextsourcesettingsmanager.h"
 
-#include <GMXMLParser.h>
+#include <gmxmlparser.h>
 
 class RFs;
 class CMDXMLNode;
