@@ -29,7 +29,7 @@
 #include <cfcontextsourceplugin.h>
 #include <cfcontextobject.h>
 #include <cenrepnotifyhandler.h>
-#include <w32std.h>
+
 #include <apgwgnam.h>
 #include "cfapplicationstatesettings.h"
 #include "uidorientationpair.h"
@@ -37,22 +37,7 @@
 // FORWARD DECLARATIONS
 class CRepository;
 class CCenRepNotifyHandler;
-// FORWARD DECLARATIONS
-class CWsEventHandler;
 
-NONSHARABLE_CLASS( MWsEventObserver )
-    {
-public:
-
-    /**
-     * Handles window server event.
-     * 
-     * @since S60 5.0
-     * @param aEvent New window server event.
-     * @return None.
-     */
-    virtual void HandleWsEventL( RWsSession& aWsSession ) = 0;    
-    };
 // CLASS DECLARATION
 
 /**
@@ -66,7 +51,7 @@ public:
  */
 NONSHARABLE_CLASS( CApplicationStateSourcePlugIn ): 
 	public CCFContextSourcePlugIn,
-	public MWsEventObserver,
+	public MVwsSessionWrapperObserver,
 	public MCenRepNotifyHandlerCallback
     {
 public: // Constructors and destructor
@@ -91,7 +76,10 @@ public: // From CCFContextSourcePlugIn
     // @see CCFContextSourcePlugIn
     void InitializeL();
 
+public: // From MVwsSessionWrapperObserver
 
+    // @see MVwsSessionWrapperObserver
+    void HandleViewEventL( const TVwsViewEvent& aEvent );
 
 public: // From MCenRepNotifyHandlerCallback
 
@@ -123,7 +111,7 @@ private: // New functions
     
     // Initialize the fg application context
     void InitializeFgApplicationL();
-    void HandleWsEventL( RWsSession& aWsSession );
+    
     // Handles the view server event
     void DoHandleViewEventL( const TVwsViewEvent& aEvent );
     
@@ -161,7 +149,7 @@ private: // Data
 
     // Foreground application setting list
     RApplicationStateSettingsPointerArray iApplicationSettings;
-    CWsEventHandler* iWsEventHandler;
+    
     
     // Previous foreground application orientation
     TPtrC iPreviousOrientation;
@@ -178,67 +166,5 @@ private: // Data
     // KCRUidDefaultAppOrientation listener
     CCenRepNotifyHandler* iCRAppOrientationListener;
     };
-/**
- * Listens events from window server and forwards them to observer.
- */
-NONSHARABLE_CLASS( CWsEventHandler ): public CActive
-    {
-public:
 
-    /**
-     * Symbian two phased constructors.
-     *
-     * @since S60 5.0
-     * @param None.
-     * @return CDisplayServiceUILayout
-     */
-    static CWsEventHandler* NewL( MWsEventObserver& aObserver );
-    static CWsEventHandler* NewLC( MWsEventObserver& aObserver );
-
-    /**
-     * C++ destructor.
-     */
-    virtual ~CWsEventHandler();
-    
-public:
-    
-    /**
-     * Start event listening.
-     * 
-     * @since S60 5.0
-     * @param None.
-     * @return None.
-     */
-    void IssueRequest();
-    
-protected:
-    
-    // @see CActive
-    virtual void RunL();
-    
-    // @see CActive
-    virtual void DoCancel(); 
-    
-    // @see CActive
-    virtual TInt RunError( TInt aError ); 
-    
-private:
-
-    CWsEventHandler( MWsEventObserver& aObserver );
-    void ConstructL();
-
-private: // Data
-    
-    /** Observer */
-    MWsEventObserver& iObserver;
-
-    /** Window server session */
-    RWsSession iWsSession;
-    
-    /** Window group for receiving window server events */
-    RWindowGroup* iWindowGroup;
-    
-    /** Window group name to hide it from the task manager */
-    CApaWindowGroupName* iWindowGroupName;
-    };
 #endif // C_APPLICATIONSTATESOURCEPLUGIN_H

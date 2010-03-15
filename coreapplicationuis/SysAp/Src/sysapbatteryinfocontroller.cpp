@@ -218,3 +218,13 @@ void CSysApBatteryInfoController::ShowBatteryPreviewPopupL( TInt aCapacity )
     User::LeaveIfError( err );
     }
 
+
+// ---------------------------------------------------------------------------
+// CSysApBatteryInfoController::IsBatteryInfoAboveThreshold
+// ---------------------------------------------------------------------------
+//
+TBool CSysApBatteryInfoController::IsBatteryInfoAboveThreshold() const
+        {
+        TInt capacity = iBsUtil->GetBatteryCapacity();
+        return ((capacity <= iThresholdCapacity ? EBatteryInfoBelowThreshold : EBatteryInfoAboveThreshold) == EBatteryInfoAboveThreshold);
+        }

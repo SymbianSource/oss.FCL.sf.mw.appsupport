@@ -101,6 +101,12 @@ public:
      */
      void BatteryStatusUpdated( const TInt aValue );
 
+     /**
+     * Check if battery status is above the threshold level 
+     *
+     */
+     TBool IsBatteryInfoAboveThreshold() const;
+
 private:
 
     /**

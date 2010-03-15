@@ -525,6 +525,13 @@ class CSysApAppUi :
         * @return void
         */
         void ConstructL();
+	
+	    /**
+        * Deactivate PSM on reboot if battery level is above threshold value.
+        * @param None
+        * @return void
+        */
+	    void DeactivatePSMifBatteryNotLowL();
 
     private:
 
@@ -1671,8 +1678,7 @@ private:
      */
     TBool IsEncryptionOperationOngoingL() const;
     TInt iKeyBoardRepeatCount;
-    TBool iFlagForRmvMmcFrmShortPwrKey;
-
+ 
     //Offset of profile-related menu items in power key menu
     TInt iProfileItemsOffset;
     };

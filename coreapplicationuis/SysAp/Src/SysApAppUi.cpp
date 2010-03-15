@@ -190,6 +190,10 @@ const TInt KHWSwitchGrip( 2 );
 _LIT_SECURITY_POLICY_PASS(KAlwaysPassPolicy);
 _LIT_SECURITY_POLICY_C1(KWriteDeviceDataPolicy, ECapabilityWriteDeviceData);
 
+
+_LIT(KPowerSaveActivate,"Power saving mode activated");
+_LIT(KPowerSaveDeActivate,"Power saving mode deactivated");
+
 // ============================ MEMBER FUNCTIONS ==============================
 
 // ----------------------------------------------------------------------------
@@ -264,8 +268,7 @@ void CSysApAppUi::ConstructL()
     BaseConstructL( EAknEnableSkin );
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: BaseConstructL() OK") ) );
     
-    iFlagForRmvMmcFrmShortPwrKey = EFalse;
-
+ 
     /*SysAp is set as system application (Symbian terminology). This means some special privilege compared
       to other applications. For example it does not get closed when system is asked to close applications
     */
@@ -347,7 +350,8 @@ void CSysApAppUi::ConstructL()
 
     // Define P&S keys "owned" by SysAp
     RProperty::Define( KPSUidUikon, KUikMMCInserted, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy );
-    
+    //initially set the value as 0 assuming mmc is not inserted
+    RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
     TDriveInfo driveInfo;
     TInt driveNumber; 
     TInt err;    
@@ -355,11 +359,11 @@ void CSysApAppUi::ConstructL()
     for ( driveNumber = EDriveD; driveNumber < EDriveZ; driveNumber++ )
          {
 	  err = fileServer.Drive(driveInfo,driveNumber);
-          if(err == KErrNone && driveInfo.iType == EMediaHardDisk &&  driveInfo.iDriveAtt & KDriveAttRemovable)     
+          if(driveNumber==EDriveF && err == KErrNone && driveInfo.iType == EMediaHardDisk &&  driveInfo.iDriveAtt & KDriveAttRemovable)     
         	{     
-        	TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: err = %d, driveInfo.iType = %d, driveInfo.iDriveAtt %d, KDriveAttRemovable = %d "),err,driveInfo.iType,driveInfo.iDriveAtt,KDriveAttRemovable) );     
+          TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: err = %d, driveInfo.iType = %d, driveInfo.iDriveAtt %d, KDriveAttRemovable = %d "),err,driveInfo.iType,driveInfo.iDriveAtt,KDriveAttRemovable) );     
         	RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
-                break;  // Memory card drive found...     
+               break;  // Memory card drive found...     
       		}
          } 
 
@@ -485,9 +489,47 @@ void CSysApAppUi::ConstructL()
     // Create HAC setting observer now because telephony state may change before entering to normal state
     TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepHacSettingObserver::NewL") ) );
     iSysApCenRepHacSettingObserver = CSysApCenRepHacSettingObserver::NewL( *this );
-
+    
+    DeactivatePSMifBatteryNotLowL ();
+    
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );
     }
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::DeactivatePSMifBatteryNotLow()
+// ----------------------------------------------------------------------------
+ void CSysApAppUi::DeactivatePSMifBatteryNotLowL ()
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::DeactivatePSMifBatteryNotLow: Start") ) );
+    if ( iSysApFeatureManager->PowerSaveSupported()) //&& iSysApFeatureManager->Supported( KSysApFeatureIdBatteryInfoPopup ))
+        {
+        // Create batteruInfoController to get current battery status;
+	if(iSysApBatteryInfoController == NULL)
+	    {
+	    iSysApBatteryInfoController = CSysApBatteryInfoController::NewL( 
+                                                        iSysApCenRepController->GetInt( 
+                                                                KCRUidCoreApplicationUIsConf,
+                                                                KCoreAppUIsBatteryInformationLowThreshold ) );
+	    }
+        //Querry the battery level 
+        TBool status = iSysApBatteryInfoController->IsBatteryInfoAboveThreshold();
+        TRACES( RDebug::Print( _L("CCSysApAppUi::DeactivatePSMifBatteryNotLow  IsBatteryInfoAboveThreshold=%d"), status ) );
+        // Querry to deactivate PSM if PSM is activated and battery status is above threshold
+        if (status)
+            {
+			if(iSysApPsmController == NULL)
+				{
+				iSysApPsmController = CSysApPsmController::NewL( *this );
+				}
+            if ( iSysApPsmController->ShowDeactivateQuery())
+                ShowQueryL( ESysApBattChargingPowerSavingQuery );
+            else
+                iSysApPsmController->DoEnablePartialPsm( EFalse );
+            }
+        }
+    TRACES( RDebug::Print( _L("CSysApAppUi::DeactivatePSMifBatteryNotLow: End") ) );
+    } 
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::~CSysApAppUi()
@@ -1546,6 +1588,16 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
             {
             TPtr textBuffer = noteStringBuf->Des();
             TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL Next:note->ShowNoteL" ) ) );
+			if(textBuffer.Compare(KPowerSaveActivate)==0)
+                {
+                CleanupStack::PopAndDestroy(2); // note and noteStringbuf
+                return;
+                }
+            if(textBuffer.Compare(KPowerSaveDeActivate)==0)
+                     {
+                      CleanupStack::PopAndDestroy(2); // note and noteStringbuf
+                      return;
+                    }
             note->ShowNoteL( noteType, textBuffer );
             CleanupStack::PopAndDestroy( ); // noteStringbuf
             }
@@ -3966,7 +4018,6 @@ void CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL( TInt aSelection )
                 _L( "CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Eject\" selected, drive=%d" ),
                 iDriveToEject ) );
             iSysApDriveList->ResetDrivesToEject();
-            iFlagForRmvMmcFrmShortPwrKey = ETrue;
             RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
             EjectMMCL();
             }
@@ -4938,8 +4989,11 @@ void CSysApAppUi::DoSwStateNormalConstructionL()
     
     if ( iSysApFeatureManager->Supported( KSysApFeatureIdBatteryInfoPopup ) )
         {
-        iSysApBatteryInfoController = CSysApBatteryInfoController::NewL( iSysApCenRepController->GetInt( KCRUidCoreApplicationUIsConf, 
+		if( iSysApBatteryInfoController == NULL)
+            {
+			iSysApBatteryInfoController = CSysApBatteryInfoController::NewL( iSysApCenRepController->GetInt( KCRUidCoreApplicationUIsConf, 
                                                                                                      KCoreAppUIsBatteryInformationLowThreshold ) );    
+	    	}
         }
     
 
@@ -5488,11 +5542,7 @@ void CSysApAppUi::MMCStatusChangedL( TInt aDrive )
                     {
                     if ( memoryCardStatus == ESysApMemoryCardInserted )
                         {
-                        if(!iFlagForRmvMmcFrmShortPwrKey)
-                        	{
-                        	RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
-                      		}
-                      		iFlagForRmvMmcFrmShortPwrKey = EFalse;
+                       	RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
                         }
                     else
                         {
@@ -6659,7 +6709,7 @@ void CSysApAppUi::NotifyPowerSaveModeL( TSysApPsmStatus aStatus )
     // cancel any active power saving query because user has changed the state manually
     CancelQuery( ESysApBattChargingPowerSavingQuery );
     CancelQuery( ESysApBattLowPowerSavingQuery );
-    
+
     switch ( aStatus )
         {
         case MSysApPsmControllerNotifyCallback::EPsmActivationComplete:

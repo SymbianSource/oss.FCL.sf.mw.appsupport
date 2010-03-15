@@ -47,6 +47,7 @@ library         bitgdi.lib ws32.lib bafl.lib
 library         apserv.lib apfile.lib
 
 #ifdef USE_IH_RAISE_EVENT
+APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 LIBRARY			instrumentationhandler.lib
 #endif // USE_IH_RAISE_EVENT
 
