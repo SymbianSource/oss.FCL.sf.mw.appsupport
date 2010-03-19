@@ -1423,7 +1423,7 @@ class CSysApAppUi :
         * @since S60 3.2
         * @return reference to CSysApCenRepLogsObserver object
         */
-        CSysApCenRepLogsObserver& CSysApAppUi::LogsObserverL();
+        CSysApCenRepLogsObserver& LogsObserverL();
 
     private: //Data members
 

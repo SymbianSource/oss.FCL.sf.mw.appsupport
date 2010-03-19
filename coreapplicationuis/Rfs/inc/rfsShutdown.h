@@ -38,7 +38,7 @@ class CRfsShutdown : public CActive
         /**
         * Two-phased constructor.
         */
-        static CRfsShutdown* CRfsShutdown::NewL( TInt aPriority );
+        static CRfsShutdown* NewL( TInt aPriority );
 
         ~CRfsShutdown();
 

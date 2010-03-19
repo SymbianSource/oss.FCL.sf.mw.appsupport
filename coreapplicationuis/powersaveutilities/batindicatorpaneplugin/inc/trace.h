@@ -51,7 +51,7 @@
 /**
 * Prefix macro for strings
 */
-#define _PREFIX_CHAR( aMsg ) (const char*)"[BatIndicatorPanePlugin]: " ##aMsg
+#define _PREFIX_CHAR( aMsg ) (const char*)"[BatIndicatorPanePlugin]: " aMsg
 
 /**
 * Define needed directories if TRACE_INTO_FILE macro in use

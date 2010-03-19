@@ -25,9 +25,8 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
-typedef unsigned long uLong;
-typedef unsigned int  uInt;
-
+// Get definitions of uInt and uLong
+#include "zconf.h"
 
 #define unix
 
