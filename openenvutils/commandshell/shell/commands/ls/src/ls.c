@@ -674,7 +674,6 @@ mastercmp(a, b)
 }
 
 
-static 
 void
 usage()
 {

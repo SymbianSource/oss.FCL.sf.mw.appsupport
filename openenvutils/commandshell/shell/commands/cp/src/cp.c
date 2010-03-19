@@ -549,7 +549,7 @@ mastercmp(a, b)
 	return (0);
 }
 
-static void
+void
 usage()
 {
 	(void)fprintf(stderr, "%s\n%s\n",

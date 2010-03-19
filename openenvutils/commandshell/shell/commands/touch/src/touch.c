@@ -390,7 +390,7 @@ err:			rval = 1;
 	return (rval);
 }
 
-static void
+void
 usage()
 {
 	(void)fprintf(stderr,
