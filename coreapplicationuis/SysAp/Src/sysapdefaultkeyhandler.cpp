@@ -20,24 +20,27 @@
 #include <eikon.hrh>
 #include <coemain.h>
 #include <aknkeylock.h>
-#include <AknTaskList.h>
+#include <akntasklist.h>
 #include <apgtask.h>
 #include <apgcli.h>
 #include <apgwgnam.h>
 #include <apacmdln.h>
-#include <AiwPoCParameters.h>
-#include <AiwServiceHandler.h>
+#include <aiwpocparameters.h>
+#include <aiwservicehandler.h>
 #include <featmgr.h>
 #include <coreapplicationuisdomainpskeys.h>
-#include <PSVariables.h>
+#include <psvariables.h>
 #include <startupdomainpskeys.h>
 #include <hwrmdomainpskeys.h>
 #include <u32hal.h>
-#include <SysAp.rsg>
+#include <sysap.rsg>
+#include <centralrepository.h> //for CRepository
+#include <settingsinternalcrkeys.h>
+#include <keylockpolicyapi.h>
 #include "sysapdefaultkeyhandler.h"
 #include "sysapcallback.h"
 #include "SysAp.hrh"
-#include "AknSgcc.h"
+#include "aknsgcc.h"
 
 
 const TInt KModifierMask( 0 );
@@ -91,6 +94,8 @@ void CSysApDefaultKeyHandler::ConstructL()
     iCallback.ExecQueryL( MSysapCallback::EGetKeylock, lockBuf );  
     iKeylock = lockBuf();
     
+    iKeypadWasLocked = iKeylock->IsKeyLockEnabled();
+    
     __ASSERT_DEBUG( iKeylock, User::Panic( _L("CSysApDefaultKeyHandler::ConstructL: iKeylock not initialized"), KErrBadHandle ) );
     
     if ( iCoverDisplaySupported ) // if flip status is monitored, set the initial flip status now
@@ -119,6 +124,10 @@ void CSysApDefaultKeyHandler::ConstructL()
                 }
             }
         }
+    
+    //Load keylock slide handling CR 
+    TRAP_IGNORE( iSlideRepository = CRepository::NewL( KCRUidSlideSettings ) );
+    iKeylockPolicy = CKeyLockPolicyApi::NewL( EPolicyActivateKeyguard );
     }
 
 // ---------------------------------------------------------------------------
@@ -154,7 +163,8 @@ CSysApDefaultKeyHandler::~CSysApDefaultKeyHandler()
     groupWin.CancelCaptureKey( iCapturedEKeyGripOpen );
     groupWin.CancelCaptureKey( iCapturedEKeyGripClose );
     groupWin.CancelCaptureKey( iCapturedEKeyPoC );
-    
+    delete iSlideRepository;
+    delete iKeylockPolicy;
     }
     
 
@@ -180,6 +190,8 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
             case EKeyGripOpen:
                 TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyGripOpen") ) );
                 RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripOpen );
+                iKeypadWasLocked = iKeylock->IsKeyLockEnabled();
+                iKeylockPolicy->DisableKeyguardFeature();
                 if (!IsDeviceLocked())
                     {
                     iCallback.ExecCommandL( MSysapCallback::EResetKeyguardState );
@@ -193,11 +205,38 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
             case EKeyGripClose:
                 TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyGripClosed") ) );
                 RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripClosed );
+                iKeylockPolicy->EnableKeyguardFeature();
                 iCallback.ExecCommandL( MSysapCallback::ECancelPowermenu );
-                if ( !IsDeviceLocked() && UiReady() )
-                    {
-                    iKeylock->OfferKeyLock();
-                    }
+				if( !iSlideRepository )
+					{ // default behavior is to always ask for keylock
+					if ( !IsDeviceLocked() && UiReady() )
+						{
+						iKeylock->OfferKeyLock();
+						}
+					}
+				else
+					{ // keylock action is defined by user setting
+					TInt keyGuardSetting;
+					iSlideRepository->Get( KSlideKeyguard, keyGuardSetting );
+					switch( ( TSlideSettingKeyguard ) keyGuardSetting )
+						{
+						case ESlideSettingsKeyguardActivatingOn: 
+						    iKeylock->EnableKeyLock();
+						    break;
+						case ESlideSettingsKeyguardActivatingAskMe: 
+						    iKeylock->OfferKeyLock();
+							break;
+						case ESlideSettingsKeyguardActivatingOff: 
+						    //do nothing
+						    break;
+						case ESlideSettingsKeyguardActivatingAutomatic: 
+						    if( iKeypadWasLocked )
+							    {
+								iKeylock->EnableKeyLock();
+								}
+							break;
+						}
+					}
                 // apply default light control
                 iCallback.ExecCommandL( MSysapCallback::EUpdateLights, TUpdateLightsBuf(EKeyGripClose) );
                 break;

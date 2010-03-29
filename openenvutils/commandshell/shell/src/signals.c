@@ -1,7 +1,5 @@
-// signals.c - signals handling code
-//
-// © Portions Copyright (c) Symbian Software Ltd 2007. All rights reserved.
-//
+
+
 /*
  * This file is part of zsh, the Z shell.
  *

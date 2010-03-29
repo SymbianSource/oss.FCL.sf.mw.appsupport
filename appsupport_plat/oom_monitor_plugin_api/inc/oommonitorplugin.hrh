@@ -22,4 +22,6 @@
 #define KOomPluginInterfaceUidValue 0x10281eea
 #define KOomPluginInterfaceUid (TUid::Uid(KOomPluginInterfaceUidValue))
 
+#define KOomPluginInterfaceV2UidValue 0x10286A80
+#define KOomPluginInterfaceV2Uid (TUid::Uid(KOomPluginInterfaceV2UidValue))
 #endif // OOMMONITORPLUGIN_HRH

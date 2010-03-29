@@ -1,3 +1,22 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+
+
+
 /*-
  * Copyright (c) 1997 Peter Wemm <peter@freebsd.org>
  * All rights reserved.
@@ -24,7 +43,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * © Portions copyright (c) 2007 Symbian Software Ltd. All rights reserved.
  * $FreeBSD: src/sys/sys/poll.h,v 1.13 2002/07/10 04:47:25 mike Exp $
  */
 

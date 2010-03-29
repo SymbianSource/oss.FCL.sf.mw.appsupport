@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description:  Command definitions for OOM Monitor client/server interface.
+* Description:  The client / server classes allowing clients to make requests to OOM monitor.
 *
 */
 
@@ -22,20 +22,24 @@
 #include <e32std.h>
 
 enum TOomMonitorClientPanic
-	{
-	EPanicIllegalFunction,
-	EPanicRequestActive
-	};
+    {
+    EPanicIllegalFunction,
+    EPanicRequestActive
+    };
 
 void PanicClient(const RMessagePtr2& aMessage,TOomMonitorClientPanic aPanic);
 
 _LIT(KMemoryMonitorServerName, "OomMonitorServer");
 
 enum TOomMonitorCmd
-	{
-	EOomMonitorRequestFreeMemory,
-	EOomMonitorCancelRequestFreeMemory,
-	EOomMonitorThisAppIsNotExiting
-	};
+    {
+    EOomMonitorRequestFreeMemory,
+    EOomMonitorCancelRequestFreeMemory,
+    EOomMonitorThisAppIsNotExiting,
+    EOomMonitorRequestOptionalRam,
+    EOomMonitorSetPriorityBusy,
+    EOomMonitorSetPriorityNormal,
+    EOomMonitorSetPriorityHigh
+    };
 
 #endif // OOMMONITORCLIENTSERVER_H

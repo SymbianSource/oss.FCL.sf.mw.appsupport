@@ -19,10 +19,10 @@
 // SYSTEM INCLUDE
 #include <centralrepository.h>
 #include <driveinfo.h>
-#include <swi\sisregistrysession.h>
-#include <swi\sisregistryentry.h>
-#include <swi\sisregistrypackage.h>
-#include <mmf\common\mmfcontrollerpluginresolver.h>
+#include <swi/sisregistrysession.h>
+#include <swi/sisregistryentry.h>
+#include <swi/sisregistrypackage.h>
+#include <mmf/common/mmfcontrollerpluginresolver.h>
 // USER INCLUDE
 #include "formatterrfsplugin.h"
 #include "formatterrfspluginprivatecrkeys.h"

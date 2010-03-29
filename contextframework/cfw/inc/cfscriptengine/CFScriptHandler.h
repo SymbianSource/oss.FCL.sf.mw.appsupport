@@ -21,7 +21,7 @@
 
 #include <f32file.h>
 #include <badesca.h>
-#include <GMXMLParser.h>
+#include <gmxmlparser.h>
 
 #include "CFScriptEngineInterface.h"
 #include "cfstarterobserver.h"

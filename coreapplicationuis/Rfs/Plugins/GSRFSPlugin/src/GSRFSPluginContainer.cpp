@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -99,9 +99,7 @@ void CGSRFSPluginContainer::ConstructListBoxL( TInt aResLbxId )
 void CGSRFSPluginContainer::GetHelpContext( TCoeHelpContext& aContext ) const
     {
     aContext.iMajor = KUidGS;
-    // TODO: The following statement should be un-commented and assigned with 
-    // the RFS helper text UID once available from concerned team
-    // aContext.iContext = KSET_HLP_WLAN_SETTINGS;
+    aContext.iContext = KSET_HLP_GENERAL_ORIG_SET;
     }
 
 // End of File  
