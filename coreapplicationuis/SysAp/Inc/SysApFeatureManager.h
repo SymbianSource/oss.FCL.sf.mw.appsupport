@@ -185,7 +185,7 @@ public:
 	* @since S60 9.2
 	* @return ETrue if feature is set
 	*/  
-    TBool CSysApFeatureManager::SlideSupported() const;
+    TBool SlideSupported() const;
     
     /**
     * Returns whether Cover Display is supported.
