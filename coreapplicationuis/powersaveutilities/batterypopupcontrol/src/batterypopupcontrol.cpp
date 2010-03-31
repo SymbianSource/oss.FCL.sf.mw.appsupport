@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -287,46 +287,63 @@ TInt CBatteryPopupControl::CountComponentControls() const
 //
 void CBatteryPopupControl::Draw( const TRect& /*aRect*/ ) const
     {
-    FUNC_LOG
+   FUNC_LOG
       	
     CWindowGc& gc = SystemGc();
     MAknsSkinInstance* skin = AknsUtils::SkinInstance();
-    
+
     if( iIcon )
         {
-        CFbsBitmap* bmp = NULL;
         TRgb color( KRgbWhite ); // Default never used
-        bmp = AknsUtils::GetCachedBitmap( skin, KAknsIIDQsnComponentColorBmpCG2 );
+        
         AknsUtils::GetCachedColor( skin, color, 
-            KAknsIIDQsnComponentColors, EAknsCIQsnComponentColorsCG2 );
+                KAknsIIDQsnIconColors, EAknsCIQsnIconColorsCG6  );
+        
+        if (AknIconUtils::IsMifIcon(iIcon->Bitmap()))
+            {
+            AknIconUtils::SetIconColor( iIcon->Bitmap(), color );
+            }
 
-        AknIconUtils::SetSize( iIcon->Mask(), iBitmapLayout.Rect().Size() );
-        if ( bmp )
-            {
-            iBitmapLayout.DrawImage( gc, bmp, iIcon->Mask() );
-            }
-        else
-            {
-            AknIconUtils::SetSize( iIcon->Bitmap(), iBitmapLayout.Rect().Size() );     
-            bmp = iIcon->Bitmap();
-            iBitmapLayout.DrawImage( gc, bmp, iIcon->Mask() );
-            }
-        gc.Reset(); 
+        AknIconUtils::SetSize( iIcon->Bitmap(), iBitmapLayout.Rect().Size() );
+        iBitmapLayout.DrawImage( gc, iIcon->Bitmap(), iIcon->Mask() );
+
+        gc.Reset();
         }
-    TRgb textColor;
-    AknsUtils::GetCachedColor( skin, textColor, KAknsIIDQsnHighlightColors,
-                               EAknsCIQsnHighlightColorsCG3 );
-
-    gc.SetPenStyle( CGraphicsContext::ESolidPen ); 
-    gc.SetPenColor( textColor );
-
+    
+    gc.SetPenStyle( CGraphicsContext::ESolidPen );
     const CFont* font = iFont;
     if ( !font )
         {
         font = iCoeEnv->NormalFont();
         }
     gc.UseFont( font );
+        
+    if(iText)
+        {
+        TRect rect( iLinkRect );
+        TRgb textContentColor;
+        TInt err = AknsUtils::GetCachedColor( skin, textContentColor, KAknsIIDQsnTextColors, EAknsCIQsnTextColorsCG6 );
+        
+        if (!err)
+            {
+            TRAP_IGNORE( AknLayoutUtils::OverrideControlColorL( *iText,
+                    EColorLabelText, textContentColor ) );
+            }
+        
+        gc.SetPenColor( textContentColor );
+         
+        TInt textBaseLineOffset = 0;
+        textBaseLineOffset = (rect.Height() - font->FontMaxHeight())/2;
+        gc.DrawText( *(iText->Text()), rect, textBaseLineOffset, CGraphicsContext::ELeft );
+        //gc.Reset();
+       
+        }
+    
+    TRgb textColor;
+    AknsUtils::GetCachedColor( skin, textColor, KAknsIIDQsnHighlightColors,
+                               EAknsCIQsnHighlightColorsCG3 );
 
+    gc.SetPenColor( textColor );
     gc.SetUnderlineStyle( EUnderlineOn );
     if(iLinkText)
         {

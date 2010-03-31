@@ -190,10 +190,6 @@ const TInt KHWSwitchGrip( 2 );
 _LIT_SECURITY_POLICY_PASS(KAlwaysPassPolicy);
 _LIT_SECURITY_POLICY_C1(KWriteDeviceDataPolicy, ECapabilityWriteDeviceData);
 
-
-_LIT(KPowerSaveActivate,"Power saving mode activated");
-_LIT(KPowerSaveDeActivate,"Power saving mode deactivated");
-
 // ============================ MEMBER FUNCTIONS ==============================
 
 // ----------------------------------------------------------------------------
@@ -738,7 +734,10 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
             {
             TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): aType == EEventKeyUp, PowerKeyIsLockKey = %d, iLastPowerKeyWasShort = %d, iPowerKeyPopupMenuActive = %d, iCharging = %d" ), iSysApFeatureManager->PowerKeyIsLockKey(), iLastPowerKeyWasShort, iPowerKeyPopupMenuActive, iCharging ) );
             if ( iSysApFeatureManager->PowerKeyIsLockKey()
-                    && iLastPowerKeyWasShort && !iPowerKeyPopupMenuActive && !haveStatusPane )
+                 && iLastPowerKeyWasShort 
+				 				 && !iPowerKeyPopupMenuActive
+                 && !haveStatusPane  
+                 && ( aKeyEvent.iScanCode == EStdKeyDevice2 ) )
                 {
                 //if the power key is the lock key && the last keypress was short && the power menu is not active
                 //then lock the phone
@@ -1342,7 +1341,6 @@ void CSysApAppUi::FreeResources()
 void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL aNote: %d"), aNote ) );
-
     TInt tone( EAvkonSIDNoSound );
     TAknGlobalNoteType noteType( EAknGlobalBatteryLowNote );
     CAknGlobalNote* note = CAknGlobalNote::NewLC();
@@ -1441,7 +1439,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
             tone = EAvkonSIDInformationTone;
             break;
         case EPowerSaveModeActivated:
-            noteType = EAknGlobalConfirmationNote;
+        		noteType = EAknGlobalConfirmationNote;
             tone = EAvkonSIDConfirmationTone;
             secondaryDisplayId = SecondaryDisplay::ECmdShowPowerSavingActivatedNote;
             break;
@@ -1548,11 +1546,11 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
                 break;
                 }
             case EPowerSaveModeActivated:
-                noteStringBuf = StringLoader::LoadLC( R_QTN_POWER_SAVING_ACTIVATED_CONF_NOTE, iEikonEnv );
-                break;
+                noteStringBuf = StringLoader::LoadLC( R_QTN_POWER_SAVING_ACTIVATED_CONF_NOTE,  iEikonEnv );
+                 break;
             case EPowerSaveModeDeactivated:
-                noteStringBuf = StringLoader::LoadLC( R_QTN_POWER_SAVING_DEACTIVATED_CONF_NOTE, iEikonEnv );
-                break;
+                noteStringBuf = StringLoader::LoadLC( R_QTN_POWER_SAVING_DEACTIVATED_CONF_NOTE,  iEikonEnv );
+                 break;
             case ECannotActivatePowerSaveMode:
                 noteStringBuf = StringLoader::LoadLC( R_QTN_POWER_SAVING_FAILED_WARNING_NOTE, iEikonEnv );
                 break;
@@ -1588,16 +1586,6 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
             {
             TPtr textBuffer = noteStringBuf->Des();
             TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL Next:note->ShowNoteL" ) ) );
-			if(textBuffer.Compare(KPowerSaveActivate)==0)
-                {
-                CleanupStack::PopAndDestroy(2); // note and noteStringbuf
-                return;
-                }
-            if(textBuffer.Compare(KPowerSaveDeActivate)==0)
-                     {
-                      CleanupStack::PopAndDestroy(2); // note and noteStringbuf
-                      return;
-                    }
             note->ShowNoteL( noteType, textBuffer );
             CleanupStack::PopAndDestroy( ); // noteStringbuf
             }
@@ -6715,7 +6703,7 @@ void CSysApAppUi::NotifyPowerSaveModeL( TSysApPsmStatus aStatus )
         case MSysApPsmControllerNotifyCallback::EPsmActivationComplete:
             UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
             ShowUiNoteL( EPowerSaveModeActivated );
-            break;
+           break;
         
         case MSysApPsmControllerNotifyCallback::EPsmDeactivationComplete:
             UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );

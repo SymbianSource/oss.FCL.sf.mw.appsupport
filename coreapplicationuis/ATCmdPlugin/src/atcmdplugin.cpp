@@ -17,7 +17,7 @@
 
 
 // INCLUDES
-#include <HWRMLightDomainCRKeys.h>
+#include <hwrmlightdomaincrkeys.h>
 #include <coreapplicationuisdomainpskeys.h>
 #include <hal.h>
 #include <atcmdpluginresource.rsg>
