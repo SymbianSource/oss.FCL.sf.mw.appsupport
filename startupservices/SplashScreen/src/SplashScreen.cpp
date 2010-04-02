@@ -361,7 +361,11 @@ void CMainWindow::ConstructL (const TRect& aRect, CWindow* aParent)
     if ( !err )
         {
         TRACES("CMainWindow::ConstructL(): Image found");
+#ifdef USE_SF_SPLASH_ENUM
+        iBitmap = AknIconUtils::CreateIconL( fp->FullName(), EMbmSplashscreenSf_startup_screen );
+#else
         iBitmap = AknIconUtils::CreateIconL( fp->FullName(), EMbmSplashscreenQgn_startup_screen );
+#endif
         AknIconUtils::ExcludeFromCache(iBitmap);
         AknIconUtils::SetSize( iBitmap, iRect.Size(), EAspectRatioPreservedAndUnusedSpaceRemoved );
         }
