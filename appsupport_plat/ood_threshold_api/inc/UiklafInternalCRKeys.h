@@ -63,6 +63,6 @@ const TUint32 KUikOOMMaxAppExitTime        = 0x00000005;
  */
 const TUint32 KUikOODDiskFreeSpaceWarningNoteLevel = 0x00000006;
 
-#endif __UIKLAF_INTERNAL_CR_KEYS_H__
+#endif // __UIKLAF_INTERNAL_CR_KEYS_H__
 
 // End of file
