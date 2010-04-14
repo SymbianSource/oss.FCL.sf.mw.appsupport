@@ -1681,6 +1681,9 @@ private:
  
     //Offset of profile-related menu items in power key menu
     TInt iProfileItemsOffset;
+    //Flag to record if the TD network is enalbed.
+		TBool iTDEnable;
+
     };
 
 #endif      // SYSAPAPPUI_H

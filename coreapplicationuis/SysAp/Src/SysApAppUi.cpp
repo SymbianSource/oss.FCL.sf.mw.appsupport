@@ -2020,9 +2020,17 @@ void CSysApAppUi::SetSignalIndicatorGsmL()
 
 	        case EPSGprsUnattached:
 	        default:
+	        	  if ( iTDEnable )
+	            {
+	            signalGprsIndicatorState = EAknSignalEdgeIndicatorAvailable;
+	            signalIndicatorState = EAknSignalCommonPacketDataIndicatorAvailable;
+	            }
+	            else
+	            {
 	            signalGprsIndicatorState = EAknSignalEdgeIndicatorOff;
 	            signalIndicatorState = EAknSignalCommonPacketDataIndicatorOff;
-	            iGprsSuspendedNoteShown = EFalse;
+	            }
+              iGprsSuspendedNoteShown = EFalse;
 	            iGprsActivated = EFalse;
 	            iGprsSuspended = EFalse;
 	            iCallActivated = EFalse;
@@ -2077,8 +2085,17 @@ void CSysApAppUi::SetSignalIndicatorGsmL()
 
             case EPSGprsUnattached:
             default:
+                if ( iTDEnable )
+	              {
+	              signalGprsIndicatorState = EAknSignalGprsIndicatorAvailable;
+	              signalIndicatorState = EAknSignalCommonPacketDataIndicatorAvailable;
+	              }
+	              else
+	              {
                 signalGprsIndicatorState = EAknSignalGprsIndicatorOff;
                 signalIndicatorState = EAknSignalCommonPacketDataIndicatorOff;
+                }
+
                 iGprsSuspendedNoteShown = EFalse;
                 iGprsActivated = EFalse;
                 iGprsSuspended = EFalse;
