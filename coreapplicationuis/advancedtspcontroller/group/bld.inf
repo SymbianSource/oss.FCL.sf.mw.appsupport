@@ -27,14 +27,14 @@ PRJ_EXPORTS
 
 #ifdef RD_TSP_CLIENT_MAPPER
 // Rules for media key handling
-../data/keyevent.rul                                        	    /epoc32/data/Z/private/10282bc4/rules/keyevent.rul
-../data/keyevent.rul                                        	    /epoc32/RELEASE/winscw/UDEB/Z/private/10282BC4/Rules/keyevent.rul
+../data/keyevent.rul                                        	    /epoc32/data/z/private/10282bc4/rules/keyevent.rul
+../data/keyevent.rul                                        	    /epoc32/release/winscw/udeb/z/private/10282bc4/rules/keyevent.rul
 // Call handling rules
-../data/keyincall.rul                               	            /epoc32/data/Z/private/10282bc4/rules/keyincall.rul
-../data/keyincall.rul                               	            /epoc32/RELEASE/winscw/UDEB/Z/private/10282BC4/Rules/keyincall.rul
+../data/keyincall.rul                               	            /epoc32/data/z/private/10282bc4/rules/keyincall.rul
+../data/keyincall.rul                               	            /epoc32/release/winscw/udeb/z/private/10282bc4/rules/keyincall.rul
 // FM transmitter handling rules
-../data/keyinfmtx.rul                               	            /epoc32/data/Z/private/10282bc4/rules/keyinfmtx.rul
-../data/keyinfmtx.rul                               	            /epoc32/RELEASE/winscw/UDEB/Z/private/10282BC4/Rules/keyinfmtx.rul
+../data/keyinfmtx.rul                               	            /epoc32/data/z/private/10282bc4/rules/keyinfmtx.rul
+../data/keyinfmtx.rul                               	            /epoc32/release/winscw/udeb/z/private/10282bc4/rules/keyinfmtx.rul
 ../rom/advancedtspcontroller.iby CORE_MW_LAYER_IBY_EXPORT_PATH(advancedtspcontroller.iby)
 
 PRJ_MMPFILES

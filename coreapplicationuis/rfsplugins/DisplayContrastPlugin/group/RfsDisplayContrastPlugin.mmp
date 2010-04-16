@@ -19,7 +19,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET      RfsDisplayContrastPlugin.dll
+TARGET      rfsdisplaycontrastplugin.dll
 
 TARGETTYPE	PLUGIN
 
@@ -34,7 +34,7 @@ SOURCE      Proxy.cpp
 
 START RESOURCE 102071F7.rss
 #ifdef SYMBIAN_SECURE_ECOM 
-  TARGET RfsDisplayContrastPlugin.rsc
+  TARGET rfsdisplaycontrastplugin.rsc
 #endif 
 END
 
@@ -44,5 +44,5 @@ USERINCLUDE ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY euser.lib       // Base library
-LIBRARY ECom.lib	    // ECom library
+LIBRARY ecom.lib	    // ECom library
 LIBRARY hal.lib         // HAL library

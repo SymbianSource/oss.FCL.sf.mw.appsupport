@@ -91,12 +91,12 @@ LIBRARY         starterclient.lib       //use of Starter to remove splash screen
 LIBRARY         ws32.lib
 LIBRARY         aknnotify.lib           //AknGlobalNote
 LIBRARY         apgrfx.lib              //
-LIBRARY         Egul.lib                //DrawUtils
+LIBRARY         egul.lib                //DrawUtils
 LIBRARY         featmgr.lib
 LIBRARY         bafl.lib
 LIBRARY         timezonelocalization.lib
 LIBRARY	        tzclient.lib
-LIBRARY         AknIcon.lib
+LIBRARY         aknicon.lib
 LIBRARY         mediatorclient.lib
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
 LIBRARY         sanimctrl.lib
@@ -109,3 +109,5 @@ LIBRARY         bmpanim.lib
 LIBRARY	        gfxtrans.lib
 #endif
 LIBRARY         aknskins.lib
+
+SMPSAFE

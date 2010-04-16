@@ -20,7 +20,7 @@
 #include <e32property.h>
 #include <sacls.h>
 #include <startupdomainpskeys.h>
-#include "CoreApplicationUIsPrivatePSKeys.h"
+#include "coreapplicationuisprivatepskeys.h"
 #include <ctsydomainpskeys.h>
 #include <wlaninternalpskeys.h>
 #include <connect/sbdefs.h>

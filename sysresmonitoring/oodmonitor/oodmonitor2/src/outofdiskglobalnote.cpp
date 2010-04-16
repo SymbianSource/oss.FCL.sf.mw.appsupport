@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -18,16 +18,12 @@
 
 // SYSTEM INCLUDES
 #include <e32property.h>
-#include <AknGlobalNote.h>
-#include <SecondaryDisplay/AknSecondaryDisplayDefs.h>
-#include <aknSDData.h>
-#include <avkon.rsg>
 #include <data_caging_path_literals.hrh>
 #include <driveinfo.h>
 #include <outofdiskmonitor.rsg>
 #include <bautils.h>                // BaflUtils
 #include <StringLoader.h>
-#include <aknnotewrappers.h>
+
 
 // USER INCLUDES
 #include "UiklafInternalCRKeys.h"
@@ -60,7 +56,6 @@ COutOfDiskGlobalNote* COutOfDiskGlobalNote::NewL
 COutOfDiskGlobalNote::~COutOfDiskGlobalNote()
     {
     TRACES("COutOfDiskGlobalNote::~COutOfDiskGlobalNote");
-    delete iQuery;
     iOODResourceFile.Close();
     Cancel(); // Cancel active object    
     TRACES("COutOfDiskGlobalNote::~COutOfDiskGlobalNote: End");
@@ -110,19 +105,15 @@ void COutOfDiskGlobalNote::ConstructL()
 void COutOfDiskGlobalNote::DisplayL(const TDesC& aMessage)
     {
     TRACES("COutOfDiskGlobalNote::DisplayL");
-    if (iNoteInfo.iNoteId > KErrNotFound)
-        {
-        CancelNoteL();
-        }
-    
-    if (!iQuery)
-        {
-        TRACES("COutOfDiskGlobalNote::COutOfDiskGlobalNote::DisplayL: Create iQuery");        
-        iQuery = CAknGlobalNote::NewL();
-        iQuery->SetSoftkeys(R_AVKON_SOFTKEYS_OK_EMPTY);
-        }
-    iNoteInfo.iNoteId = iQuery->ShowNoteL(iStatus, EAknGlobalWarningNote, aMessage);
-    SetActive();
+       
+     TRACES("COutOfDiskGlobalNote::COutOfDiskGlobalNote::DisplayL: Create iQuery");        
+     CHbDeviceMessageBoxSymbian* globalNote = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EWarning);
+     CleanupStack::PushL(globalNote);
+     globalNote->SetTextL(aMessage);
+     globalNote->SetTimeoutL(0);
+     globalNote->ExecL();
+     CleanupStack::PopAndDestroy(globalNote);
+     
     TRACES("COutOfDiskGlobalNote::DisplayL: End");
     }
 
@@ -143,8 +134,7 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
 
     if (iOutOfDiskMonitor->GetGlobalNotesAllowed())
         {
-        TInt sdDialogId = 0;
-
+    
         TResourceReader resReader;
         HBufC8* str(NULL);
         CDesCArray* strings = new ( ELeave ) CDesCArrayFlat( 2 );
@@ -169,7 +159,6 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
             
             if (aDrive == iOutOfDiskMonitor->GetDefaultPhoneMemory())
                 {
-                sdDialogId = EAknDiskWarnignNote;
                 str = iOODResourceFile.AllocReadLC(R_QTN_MEMLO_DEVICE_MEMORY_LOW);
                 resReader.SetBuffer(str);    
                 strings->AppendL( driveName );
@@ -177,7 +166,6 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
             else if (driveStatus & DriveInfo::EDriveRemovable)
                 {
                 TRACES1("COutOfDiskGlobalNote::ShowGlobalQueryL: Warning note! volNameLength: %d", nameLength);
-                sdDialogId = EAknMMCWarningNote;
                 TBufC<KMaxFileName> name(volInfo.iName);
                 if (nameLength)
                     {
@@ -196,7 +184,6 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
                 }
             else
                 {
-                sdDialogId = EAknDiskWarnignNote;
                 str = iOODResourceFile.AllocReadLC(R_QTN_MEMLO_MASS_STORAGE_MEMORY_LOW);
                 resReader.SetBuffer(str);    
                 strings->AppendL( driveName );                
@@ -207,14 +194,12 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
             TRACES1("COutOfDiskGlobalNote::ShowGlobalQueryL: Critical note! Drive: %c", aDrive+'A');
             if (aDrive == iOutOfDiskMonitor->GetDefaultPhoneMemory())
                 {
-                sdDialogId = EAknDiskFullNote;
                 str = iOODResourceFile.AllocReadLC(R_QTN_MEMLO_DEVICE_MEMORY_FULL);
                 resReader.SetBuffer(str);    
                 strings->AppendL( driveName );                
                 }                
             else if (driveStatus & DriveInfo::EDriveRemovable)
                 {
-                sdDialogId = EAknMMCFullNote;
                 TBufC<KMaxFileName> name(volInfo.iName);
                 if (nameLength)
                     {
@@ -233,27 +218,25 @@ void COutOfDiskGlobalNote::ShowGlobalQueryL(TInt aStatus, TInt aDrive)
                 }
             else
                 {
-                sdDialogId = EAknDiskFullNote;
                 str = iOODResourceFile.AllocReadLC(R_QTN_MEMLO_MASS_STORAGE_FULL);
                 resReader.SetBuffer(str);
                 strings->AppendL( driveName );                
                 }
             }
         resReader.SetBuffer(str);
-	    HBufC* message( FormatStringL(resReader.ReadHBufCL()->Des(), *strings));
-	    TRACES1("COutOfDiskMonitor::ShowGlobalQueryL: txt: %S",message);
+	      HBufC* resHandle = resReader.ReadHBufCL();
+        CleanupStack::PushL( resHandle );
+        HBufC* message(FormatStringL(resHandle->Des(),*strings));
+        CleanupStack::PushL( message );
+	      TRACES1("COutOfDiskMonitor::ShowGlobalQueryL: txt: %S",message);
         DisplayL(message->Des());
-
-		TBuf8<2> sdDriveName;
-		sdDriveName.Append(aDrive+'A');
-		sdDriveName.Append(_L8(":"));	
-        CAknSDData* sd = CAknSDData::NewL(KAknSecondaryDisplayCategory, sdDialogId, sdDriveName);
-        iQuery->SetSecondaryDisplayData(sd);     
 
         iNoteInfo.iStatus = aStatus;
         iNoteInfo.iDrive = aDrive;        
+        CleanupStack::PopAndDestroy(message);
+        CleanupStack::PopAndDestroy(resHandle);
         CleanupStack::PopAndDestroy( str );
-        CleanupStack::PopAndDestroy( strings );
+        CleanupStack::PopAndDestroy( strings ); 
         iOutOfDiskMonitor->SetAsDisplayedL(aDrive, aStatus);
         }
     TRACES("COutOfDiskGlobalNote::ShowGlobalQueryL: End");
@@ -341,10 +324,6 @@ void COutOfDiskGlobalNote::CancelNoteL()
     {
     TRACES("COutOfDiskGlobalNote::CancelNoteL");
     
-    if (iNoteInfo.iNoteId > KErrNotFound)
-        {    
-        iQuery->CancelNoteL(iNoteInfo.iNoteId);
-        }
     Cancel();
     TRACES("COutOfDiskGlobalNote::CancelNoteL: End");    
     }    

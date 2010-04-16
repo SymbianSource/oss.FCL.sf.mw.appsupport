@@ -19,7 +19,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET      FavouritesRFSPlugin.dll
+TARGET      favouritesrfsplugin.dll
 
 TARGETTYPE	PLUGIN
 
@@ -34,7 +34,7 @@ SOURCE      Proxy.cpp
 
 START RESOURCE 102071F6.rss
 #ifdef SYMBIAN_SECURE_ECOM 
-  TARGET FavouritesRFSPlugin.rsc
+  TARGET favouritesrfsplugin.rsc
 #endif 
 END
 
@@ -45,5 +45,5 @@ USERINCLUDE ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY euser.lib            // Base library
-LIBRARY ECom.lib	         // ECom library
-LIBRARY FavouritesEngine.lib // Favourites engine library
+LIBRARY ecom.lib	         // ECom library
+LIBRARY favouritesengine.lib // Favourites engine library

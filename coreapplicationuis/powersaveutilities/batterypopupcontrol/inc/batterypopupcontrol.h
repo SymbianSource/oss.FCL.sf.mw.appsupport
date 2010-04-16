@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,10 +19,10 @@
 #ifndef CBATTERYPOPUPCONTROL_H
 #define CBATTERYPOPUPCONTROL_H
 
-#include <AknControl.h>
-#include <AknUtils.h>
-#include <AknPreviewPopUpController.h> // Controlling the preview pop-up component
-
+//#include <akncontrol.h>
+//#include <aknutils.h>
+//#include <aknpreviewpopupcontroller.h> // Controlling the preview pop-up component
+#include<coecobs.h>
 class MEikCommandObserver; 
 class CEikLabel;
 class CGulIcon;
@@ -42,10 +42,9 @@ class CGulIcon;
 *  @lib BatteryPopupControl.lib
 *  @since S60 5.0
 */
-NONSHARABLE_CLASS( CBatteryPopupControl ) :
-    public CAknControl,
-    public MCoeControlObserver,
-    public MAknPreviewPopUpObserver
+NONSHARABLE_CLASS( CBatteryPopupControl ) :public MCoeControlObserver
+   // public CAknControl,
+       // public MAknPreviewPopUpObserver
     {
 public:
     
@@ -134,8 +133,8 @@ private:
     /**
      * @see MAknPreviewPopUpObserver
      */
-    void HandlePreviewPopUpEventL( CAknPreviewPopUpController* aController,
-                                   TPreviewPopUpEvent aEvent );     
+ //   void HandlePreviewPopUpEventL( CAknPreviewPopUpController* aController,
+ //                                  TPreviewPopUpEvent aEvent );     
 
     /**
      * Default constructor.
@@ -159,8 +158,8 @@ private:
      * @param aParent Parent rect.
      * @param aComponentLayout Layout data.
      */
-    TRect RectFromLayout( const TRect& aParent,
-        const TAknWindowComponentLayout& aComponentLayout ) const;
+ //   TRect RectFromLayout( const TRect& aParent,
+ //       const TAknWindowComponentLayout& aComponentLayout ) const;
 
     /**
      * Gets rect from layout data.
@@ -168,8 +167,8 @@ private:
      * @since S60 5.0
      * @param aComponentLayout Layout data.
      */
-    TRect PopUpWindowRectFromLayout( const TAknWindowComponentLayout&
-        aComponentLayout ) const;
+ //   TRect PopUpWindowRectFromLayout( const TAknWindowComponentLayout&
+ //       aComponentLayout ) const;
     
     /**
      * Creates CGulIcon.
@@ -271,7 +270,7 @@ private: // data
     /**
      * Layout for icon  
      */
-    TAknLayoutRect iBitmapLayout;  
+  //  TAknLayoutRect iBitmapLayout;  
 
     /**
      * Variant, 
@@ -284,7 +283,7 @@ private: // data
      * Popup controller
      * Own.  
      */    
-    CAknPreviewPopUpController* iController;
+  //  CAknPreviewPopUpController* iController;
     
     /**
      * Rect for link  

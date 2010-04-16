@@ -49,3 +49,5 @@ LIBRARY         commonengine.lib
 // MACRO        __SSM_TRACE_INTO_FILE__
 // LIBRARY      flogger.lib
 // <<< uncomment to direct trace output to file
+
+SMPSAFE

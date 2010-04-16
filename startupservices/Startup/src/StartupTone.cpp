@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -28,7 +28,7 @@
 #include "AudioPreference.h"
 
 #define MIN_VOLUME 0
-#define MAX_VOLUME 10
+#define MAX_VOLUME 10000
 
 //=============================== MEMBER FUNCTIONS ============================
 // ---------------------------------------------------------

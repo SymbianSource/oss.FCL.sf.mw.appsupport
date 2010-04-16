@@ -18,7 +18,7 @@
 
 #include <data_caging_paths.hrh>
 #include <platform_paths.hrh>
-TARGET      SysAp.exe
+TARGET      sysap.exe
 TARGETTYPE  exe
 UID         0x0 0x100058F3
 
@@ -84,7 +84,7 @@ SOURCE SysApSimChanged.cpp
 LIBRARY logcli.lib
 
 SOURCE SysApAccessoryObserver.cpp
-LIBRARY AccClient.lib
+LIBRARY accclient.lib
 
 SOURCE SysApEtelConnector.cpp
 
@@ -180,7 +180,7 @@ USERINCLUDE        ../../../inc // ado headers
 USERINCLUDE        ../CenRep
 USERINCLUDE        ../PubSub
 
-APP_LAYER_SYSTEMINCLUDE // used instead of MW_LAYER_SYSTEMINCLUDE due to dependencies to APP layer
+MW_LAYER_SYSTEMINCLUDE 
 
 LIBRARY euser.lib
 LIBRARY apparc.lib
@@ -193,14 +193,14 @@ LIBRARY bafl.lib
 LIBRARY aknnotify.lib
 LIBRARY eiksrvc.lib
 LIBRARY connmon.lib
-LIBRARY DSClient.lib
-LIBRARY ProfileEng.lib
-LIBRARY StarterClient.lib
+LIBRARY dsclient.lib
+LIBRARY profileeng.lib
+LIBRARY starterclient.lib
 LIBRARY centralrepository.lib
-LIBRARY CenRepNotifHandler.lib
-LIBRARY CommonEngine.lib
-LIBRARY ActivityManager.lib
-LIBRARY AknCapServerClient.lib
+LIBRARY cenrepnotifhandler.lib
+LIBRARY commonengine.lib
+LIBRARY activitymanager.lib
+LIBRARY akncapserverclient.lib
 LIBRARY secui.lib
 LIBRARY sssettings.lib
 LIBRARY fbscli.lib
@@ -220,11 +220,11 @@ LIBRARY hwrmlightclient.lib
 LIBRARY hwrmfmtxclient.lib
 LIBRARY	remconcoreapi.lib
 LIBRARY	remconinterfacebase.lib
-LIBRARY AknIcon.lib
-LIBRARY CdlEngine.lib
+LIBRARY aknicon.lib
+LIBRARY cdlengine.lib
 
 // POC launching
-LIBRARY ServiceHandler.lib
+LIBRARY servicehandler.lib
 
 LIBRARY ecom.lib
 
@@ -232,7 +232,7 @@ LIBRARY ecom.lib
 LIBRARY mediatorclient.lib
 LIBRARY bmpanim.lib
 
-LIBRARY TelephonyAudioRouting.lib
+LIBRARY telephonyaudiorouting.lib
 LIBRARY etelpckt.lib
 
 #ifdef RD_MULTIPLE_DRIVE

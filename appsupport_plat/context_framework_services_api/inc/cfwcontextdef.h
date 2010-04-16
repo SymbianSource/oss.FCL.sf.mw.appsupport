@@ -20,7 +20,7 @@
 #ifndef CFWCONTEXTDEF_H
 #define CFWCONTEXTDEF_H
 
-#include <CFDefinitions.h>
+#include <cfdefinitions.h>
 
 //-----------------------------------------------------------------------------
 // Source:  'ContextFramework'

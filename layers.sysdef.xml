@@ -12,6 +12,7 @@
       <module name="">
         <unit unitID="sydo.appsupport.appsupport_plat.flash_mmi_service_interface_custom_api" name="sydo_appsupport_appsupport_plat_flash_mmi_service_interface_custom_api" bldFile="&layer_real_source_path;/appsupport_plat/flash_mmi_service_interface_custom_api/group" mrp="" filter="!sf_build" />
         <unit unitID="sydo.appsupport.appsupport_plat.flash_netscape_plugin_command_api" name="sydo_appsupport_appsupport_plat_flash_netscape_plugin_command_api" bldFile="&layer_real_source_path;/appsupport_plat/flash_netscape_plugin_command_api/group" mrp="" filter="!sf_build" />
+        <unit unitID="sydo.appsupport.coreapplicationuis.atcmdplugin" name="sydo_appsupport_appsupport_coreapplicationuis_atcmdplugin" bldFile="&layer_real_source_path;/coreapplicationuis/atcmdplugin/group" mrp="" filter="!oem_build" />
       </module>
     </layer>
   </systemModel>

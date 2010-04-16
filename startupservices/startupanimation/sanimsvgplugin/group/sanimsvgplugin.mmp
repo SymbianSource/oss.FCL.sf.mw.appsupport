@@ -48,3 +48,5 @@ LIBRARY         fbscli.lib
 LIBRARY         gdi.lib
 LIBRARY         sanimengine.lib
 LIBRARY         svgengine.lib
+
+SMPSAFE

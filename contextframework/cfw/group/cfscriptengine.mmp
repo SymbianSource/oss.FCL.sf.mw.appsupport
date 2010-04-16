@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include "../inc/common/cftraceconfiguration.hrh"
 
-TARGET          		CFScriptEngine.dll
+TARGET          		cfscriptengine.dll
 TARGETTYPE      		dll
 UID             		0x1000008d 0x10282BC7
 EPOCSTACKSIZE   		20480
@@ -54,7 +54,7 @@ LIBRARY                 	xmldom.lib
 LIBRARY         		cfservices.lib
 LIBRARY         		cfoperationpluginservices.lib
 LIBRARY         		ecom.lib
-LIBRARY				PlatformEnv.lib
+LIBRARY				platformenv.lib
 #ifdef TRACE_INTO_FILE
 LIBRARY         		flogger.lib
 #endif

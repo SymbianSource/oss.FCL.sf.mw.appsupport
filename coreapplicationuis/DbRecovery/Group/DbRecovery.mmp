@@ -21,7 +21,7 @@
 #include <platform_paths.hrh>
 
 
-TARGET          DbRecovery.exe
+TARGET          dbrecovery.exe
 TARGETTYPE      exexp
 
 UID             0x100039CE 0x10005A17
@@ -42,8 +42,8 @@ APP_LAYER_SYSTEMINCLUDE
 LIBRARY         euser.lib
 LIBRARY         edbms.lib
 LIBRARY         diskspacereserver.lib
-LIBRARY         EFSRV.LIB
-LIBRARY	        CHARCONV.LIB
-LIBRARY         ESTOR.LIB
+LIBRARY         efsrv.lib
+LIBRARY	        charconv.lib
+LIBRARY         estor.lib
 LIBRARY         cntmodel.lib
 // End of File

@@ -20,7 +20,7 @@
 #include <platform_paths.hrh>
 #include <data_caging_paths.hrh>
 
-TARGET          SPLASHSCREEN.EXE
+TARGET          splashscreen.exe
 TARGETTYPE      EXE
 TARGETPATH      PROGRAMS_DIR
 UID             0x100039CE 0x100059DE
@@ -45,5 +45,7 @@ END
 LIBRARY         euser.lib 
 LIBRARY         ws32.lib
 LIBRARY         efsrv.lib
-LIBRARY         AknIcon.lib   // AknIconUtils
+LIBRARY         aknicon.lib   // AknIconUtils
 LIBRARY         fbscli.lib 
+
+SMPSAFE

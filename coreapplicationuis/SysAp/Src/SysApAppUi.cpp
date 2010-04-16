@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -36,7 +36,7 @@
 #include <hwrmdomainpskeys.h>
 
 #include <PSVariables.h>
-#include "CoreApplicationUIsPrivatePSKeys.h"
+#include "coreapplicationuisprivatepskeys.h"
 #include <ctsydomainpskeys.h>
 #include <startupdomainpskeys.h>
 #include <startupdomaincrkeys.h>
@@ -77,8 +77,8 @@
 #include "SysApCenRepBTObserver.h"
 #include "SysApCenRepHacSettingObserver.h"
 #include "SysApCenRepController.h"
-#include "CoreApplicationUIsPrivateCRKeys.h"
-#include "CoreApplicationUIsPrivatePSKeys.h"
+#include "coreapplicationuisprivatecrkeys.h"
+#include "coreapplicationuisprivatepskeys.h"
 #include <UikonInternalPSKeys.h>
 
 #include "SysApStartupController.h"
@@ -261,7 +261,7 @@ void CSysApAppUi::ConstructL()
     BaseConstructL( EAknEnableSkin );
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: BaseConstructL() OK") ) );
     
-    iFlagForRmvMmcFrmShortPwrKey = EFalse;
+   
 
     /*SysAp is set as system application (Symbian terminology). This means some special privilege compared
       to other applications. For example it does not get closed when system is asked to close applications
@@ -344,7 +344,8 @@ void CSysApAppUi::ConstructL()
 
     // Define P&S keys "owned" by SysAp
     RProperty::Define( KPSUidUikon, KUikMMCInserted, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy );
-    
+    //initially assuming that the memory card is not inserted
+    RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
     TDriveInfo driveInfo;
     TInt driveNumber; 
     TInt err;    
@@ -352,7 +353,7 @@ void CSysApAppUi::ConstructL()
     for ( driveNumber = EDriveD; driveNumber < EDriveZ; driveNumber++ )
          {
 	  err = fileServer.Drive(driveInfo,driveNumber);
-          if(err == KErrNone && driveInfo.iType == EMediaHardDisk &&  driveInfo.iDriveAtt & KDriveAttRemovable)     
+          if(driveNumber == EDriveF && err == KErrNone && driveInfo.iType == EMediaHardDisk &&  driveInfo.iDriveAtt & KDriveAttRemovable)     
         	{     
         	TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: err = %d, driveInfo.iType = %d, driveInfo.iDriveAtt %d, KDriveAttRemovable = %d "),err,driveInfo.iType,driveInfo.iDriveAtt,KDriveAttRemovable) );     
         	RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
@@ -3897,7 +3898,6 @@ void CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL( TInt aSelection )
                 _L( "CSysApAppUi::PowerKeyPopUpMenuSelectionDoneL: \"Eject\" selected, drive=%d" ),
                 iDriveToEject ) );
             iSysApDriveList->ResetDrivesToEject();
-            iFlagForRmvMmcFrmShortPwrKey = ETrue;
             RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
             EjectMMCL();
             }
@@ -4671,6 +4671,25 @@ TBool CSysApAppUi::OkToInitiateShutdown()
         }
     }
 
+/**
+ * To check the for an emergency call. 
+ * 
+ * @return ETrue if there is an emergency call active otherwise, EFalse.
+ */
+TBool IsEmergencyCall()
+        {
+        TBool retVal( EFalse );
+        TInt err( KErrNone );
+        TInt state( 0 );
+     
+        err = RProperty::Get(KPSUidCtsyEmergencyCallInfo, KCTSYEmergencyCallInfo, state );
+        if ( err == KErrNone && state )
+            {
+            retVal = ETrue;            
+            }
+        return retVal;
+        }	
+
 // ----------------------------------------------------------------------------
 // CSysApAppUi::HandleCurrentCallStateChangeL()
 // ----------------------------------------------------------------------------
@@ -4687,8 +4706,9 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
     switch ( aCurrentCallState )
         {
         case EPSCTsyCallStateRinging:
+            {
             iSysApLightsController->CallComingInL( ETrue );
-            // disable keylock when a call is coming in
+            // Disable keylock when a call is coming in
             if ( iKeyLockEnabled || iDeviceLockEnabled || iKeyLockOnBeforeCradle || iKeyLockOnBeforeAlarm )
                 {
                 TRACES( RDebug::Print( _L("CSysApAppUi::HandleCurrentCallStateChangeL: EPSCTsyCallStateRinging: disable keylock") ) );
@@ -4703,24 +4723,29 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                     }
                 }
             break;
-
+            }
+            
         case EPSCTsyCallStateDialling:
-            // disable keylock during an emergency call
+            {
+            // Disable keypad lock during an emergency call
+            // no need to disable the key lock when a call is made using the wireless car-kit
+            // but if the call is an emergency one then we will disable the keypad lock
             if ( iKeyLockEnabled || iDeviceLockEnabled || iKeyLockOnBeforeCradle )
                 {
                 TRACES( RDebug::Print( _L("CSysApAppUi::HandleCurrentCallStateChangeL: EPSCTsyCallStateDialling: disable keylock") ) );
                 iKeyLockOnBeforeCall = ETrue;
 
-                if ( iKeyLockEnabled || iDeviceLockEnabled )
+                if ( IsEmergencyCall() && (iKeyLockEnabled || iDeviceLockEnabled ))
                     {
                     KeyLock().DisableWithoutNote();
                     }
                 }
 
-            // enable signal & network indicators when an emergency call is made in Offline Mode
+            // Enable signal & network indicators when an emergency call is made in Offline Mode
             if( iSysApOfflineModeController->OfflineModeActive() )
                     {
-                    if ( StateOfProperty(KPSUidCtsyCallInformation, KCTsyCallType) != EPSCTsyCallTypeVoIP) // signal indicators not updated with VoIP call
+                    // Signal indicators not updated with VoIP call
+                    if ( StateOfProperty(KPSUidCtsyCallInformation, KCTsyCallType) != EPSCTsyCallTypeVoIP) 
                         {
                         iEmergencyCallActive = ETrue;
                         UpdateSignalBarsL();
@@ -4728,11 +4753,13 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                         }
                     }
             break;
-
+            }
+            
         case EPSCTsyCallStateConnected:
+            {
             if (StateOfProperty(KPSUidCtsyCallInformation, KCTsyCallType) == EPSCTsyCallTypeCSVoice)
                 {
-                // check if GPRS suspended note is required
+                // Check if GPRS suspended note is required
                 iCallActivated = ETrue;
                 HandleGprsNotesL();
                 }
@@ -4743,9 +4770,11 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                 KeyLock().EnableAutoLockEmulation();
                 }
             break;
+            }
 
         case EPSCTsyCallStateNone:
-            // reset timers in ScreenSaver and Autolock
+            {
+            // Reset timers in ScreenSaver and Autolock
             User::ResetInactivityTime();
 
             if ( iEmergencyCallActive )
@@ -4785,6 +4814,8 @@ void CSysApAppUi::HandleCurrentCallStateChangeL( TInt aCurrentCallState )
                 }
             iCallActivated = EFalse;
             break;
+            }
+            
         default:
             break;
         }
@@ -5386,12 +5417,8 @@ void CSysApAppUi::MMCStatusChangedL( TInt aDrive )
                     {
                     if ( memoryCardStatus == ESysApMemoryCardInserted )
                         {
-                        if(!iFlagForRmvMmcFrmShortPwrKey)
-                        	{
-                        	RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
-                      		}
-                      		iFlagForRmvMmcFrmShortPwrKey = EFalse;
-                        }
+                         RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
+                      	}
                     else
                         {
                         RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );

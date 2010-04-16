@@ -18,7 +18,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET          NspsWsPlugin.DLL
+TARGET          nspswsplugin.dll
 TARGETTYPE      ANI
 UID             0x10003B22 0x10005A15
 VENDORID        VID_DEFAULT
@@ -34,7 +34,7 @@ MW_LAYER_SYSTEMINCLUDE
 SOURCE          NspsWsPlugin.cpp
 SOURCE          NspsWsPluginDll.cpp
 
-LIBRARY         EUSER.LIB
+LIBRARY         euser.lib
 
 EXPORTUNFROZEN
 

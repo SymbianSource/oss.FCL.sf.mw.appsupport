@@ -20,7 +20,7 @@
 #include "SysApCenRepController.h"
 #include "SysApAppUi.h"
 #include "SysAp.hrh"
-#include "CoreApplicationUIsPrivateCRKeys.h"
+#include "coreapplicationuisprivatecrkeys.h"
 #include "accessoriescrkeys.h"
 
 

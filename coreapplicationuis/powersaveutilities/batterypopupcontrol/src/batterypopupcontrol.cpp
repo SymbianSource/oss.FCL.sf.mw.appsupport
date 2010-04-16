@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -16,17 +16,17 @@
 */
 
 
-#include <AknUtils.h>
-#include <AknPanic.h>
-#include <AknPreviewPopUpController.h>
-#include <aknglobalpopupprioritycontroller.h>
+//#include <aknutils.h>
+//#include <aknpanic.h>
+//#include <aknpreviewpopupcontroller.h>
+//#include <aknglobalpopupprioritycontroller.h>
 #include <barsread.h> // TResourceReader
 #include <eiklabel.h>
 #include <fbs.h>
-#include <aknappui.h>
-#include <aknlayoutscalable_avkon.cdl.h>
-#include <AknsDrawUtils.h>
-#include <AknBidiTextUtils.h>
+//#include <aknappui.h>
+//#include <aknlayoutscalable_avkon.cdl.h>
+//#include <aknsdrawutils.h>
+//#include <aknbiditextutils.h>
 #include <data_caging_path_literals.hrh> // KDC_RESOURCE_FILES_DIR
 #include <batterypopupcontrol.mbg>
 // ----------- Touch feedback additions start
@@ -39,9 +39,9 @@
 #include "trace.h"
 
 // Constants
-const TInt KPopupShowDelay = 0;       // Show immediately
-const TInt KPopupHideDelay = 3000000; // hide after 3 sec
-const TInt KMaxLinkTextLength = 255;
+//const TInt KPopupShowDelay = 0;       // Show immediately
+//const TInt KPopupHideDelay = 3000000; // hide after 3 sec
+//const TInt KMaxLinkTextLength = 255;
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -80,7 +80,7 @@ EXPORT_C CBatteryPopupControl* CBatteryPopupControl::NewL(
 EXPORT_C CBatteryPopupControl::~CBatteryPopupControl()
     {  
     FUNC_LOG   
-    delete iController;
+  //  delete iController;
     delete iText;
     delete iIcon;
     delete iLinkText;
@@ -105,7 +105,7 @@ EXPORT_C void CBatteryPopupControl::ShowPopUpL()
     {    
     FUNC_LOG
     
-    iController = CAknPreviewPopUpController::NewL( *this, CAknPreviewPopUpController::ELayoutDefault | CAknPreviewPopUpController::EDontClose );            
+ /*   iController = CAknPreviewPopUpController::NewL( *this, CAknPreviewPopUpController::ELayoutDefault | CAknPreviewPopUpController::EDontClose );            
     iController->AddObserverL( *this );
     
     // Set popup's hide/show delays
@@ -121,7 +121,7 @@ EXPORT_C void CBatteryPopupControl::ShowPopUpL()
         }
 		
     // Launch
-    iController->ShowPopUp();  
+    iController->ShowPopUp();  */
     }
 
 // -----------------------------------------------------------------------------
@@ -134,11 +134,11 @@ void CBatteryPopupControl::HandleResourceChange(
     {
     FUNC_LOG
     	
-    CCoeControl::HandleResourceChange( aType );
+   /* CCoeControl::HandleResourceChange( aType );
     if ( aType == KEikDynamicLayoutVariantSwitch )
         {
         SizeChanged();
-        }
+        }*/
     }
 
 
@@ -152,7 +152,7 @@ void CBatteryPopupControl::SetContainerWindowL(
     {
     FUNC_LOG
     	
-    CCoeControl::SetContainerWindowL( aContainer );
+ //   CCoeControl::SetContainerWindowL( aContainer );
     
     if( iText )
         {
@@ -175,9 +175,10 @@ void CBatteryPopupControl::HandleControlEventL(
 // From MAknPreviewPopUpObserver
 // ---------------------------------------------------------------------------
 //
+/*
 void CBatteryPopupControl::HandlePreviewPopUpEventL(
-    CAknPreviewPopUpController* /*aController*/,
-    TPreviewPopUpEvent aEvent )
+    CAknPreviewPopUpController aController,
+   TPreviewPopUpEvent aEvent )
     {
     FUNC_LOG
 
@@ -191,7 +192,7 @@ void CBatteryPopupControl::HandlePreviewPopUpEventL(
             break;
         }
     }
-    
+    */
 // -----------------------------------------------------------------------------
 // CAknStylusActivatedPopUpContent::ConstructL
 // -----------------------------------------------------------------------------
@@ -217,7 +218,7 @@ void CBatteryPopupControl::ConstructL( const TDesC& aContentText,
             }      
         iLinkText = aLinkText.AllocL(); 
         }
-        
+ /*       
     TRect rectPopUpWindow = PopUpWindowRectFromLayout( 
         AknLayoutScalable_Avkon::popup_battery_window( iVariant ) );
       
@@ -230,9 +231,9 @@ void CBatteryPopupControl::ConstructL( const TDesC& aContentText,
         AknLayoutScalable_Avkon::popup_battery_window_t1( iVariant );
     TAknLayoutText textRect;
     textRect.LayoutText( rectPopUpWindow, textLayout );
-    
+    */
     // Font for command links
-    iFont = textRect.Font();    
+  //  iFont = textRect.Font();    
     }
     
 // -----------------------------------------------------------------------------
@@ -254,8 +255,8 @@ CCoeControl* CBatteryPopupControl::ComponentControl(
                 }
             }        
         default:
-            __ASSERT_ALWAYS( aIndex >= 0, User::Panic( 
-                _L("CBatteryPopupControl::ComponentControl"), EAknPanicOutOfRange ) );
+         //   __ASSERT_ALWAYS( aIndex >= 0, User::Panic( 
+          //      _L("CBatteryPopupControl::ComponentControl"), EAknPanicOutOfRange ) );
             return NULL;
         }        
     }
@@ -289,7 +290,7 @@ void CBatteryPopupControl::Draw( const TRect& /*aRect*/ ) const
     {
     FUNC_LOG
       	
-    CWindowGc& gc = SystemGc();
+ /*   CWindowGc& gc = SystemGc();
     MAknsSkinInstance* skin = AknsUtils::SkinInstance();
     
     if( iIcon )
@@ -375,7 +376,7 @@ void CBatteryPopupControl::Draw( const TRect& /*aRect*/ ) const
         gc.DrawText( ptr, rect, baselineOffset, 
             CGraphicsContext::ELeft );
         delete visualText; 
-        }
+        }*/
     }
 
 
@@ -406,9 +407,9 @@ TSize CBatteryPopupControl::MinimumSize()
         TInt tempWidth = iFont->TextWidthInPixels( *( iLinkText ) );
         minWidth = Max( minWidth, tempWidth );
         }
-    TInt rectWidth = 0;
+  //  TInt rectWidth = 0;
     
-    TAknWindowComponentLayout infoPaneLayout = 
+/*    TAknWindowComponentLayout infoPaneLayout = 
         AknLayoutScalable_Avkon::bg_popup_sub_pane_cp25( iVariant );
                
     TRect rectPopUpWindow =  PopUpWindowRectFromLayout( 
@@ -418,9 +419,9 @@ TSize CBatteryPopupControl::MinimumSize()
     
     rectWidth = Max( rectInfoPane.Width(), minWidth ); 
     
-    TInt rectHeight = rectInfoPane.Height();
+    TInt rectHeight = rectInfoPane.Height();*/
    
-    return TSize( rectWidth, rectHeight ); 
+ //   return TSize( rectWidth, rectHeight ); 
     }
 
 
@@ -433,7 +434,7 @@ void CBatteryPopupControl::SizeChanged()
     {
     FUNC_LOG 	
     // Get popup window rect
-    TRect rectPopUpWindow =  PopUpWindowRectFromLayout( 
+ /*   TRect rectPopUpWindow =  PopUpWindowRectFromLayout( 
         AknLayoutScalable_Avkon::bg_popup_sub_pane_cp25( iVariant ) );
     
     // Get pane icon and text layouts
@@ -486,27 +487,27 @@ void CBatteryPopupControl::SizeChanged()
             }
         tempRect.SetWidth( tempWidth );
         iLinkRect = tempRect;
-        }
+        }*/
     }
 
 // -----------------------------------------------------------------------------
 // RectFromLayout
 // -----------------------------------------------------------------------------
 //
-TRect CBatteryPopupControl::RectFromLayout( const TRect& aParent,
+/*TRect CBatteryPopupControl::RectFromLayout( const TRect& aParent,
         const TAknWindowComponentLayout& aComponentLayout ) const
     {
     TAknWindowLineLayout lineLayout = aComponentLayout.LayoutLine();
     TAknLayoutRect layoutRect;
     layoutRect.LayoutRect( aParent, lineLayout );
     return layoutRect.Rect();
-    }
+    }*/
 
 // -----------------------------------------------------------------------------
 // PopUpWindowRectFromLayout
 // -----------------------------------------------------------------------------
 //
-TRect CBatteryPopupControl::PopUpWindowRectFromLayout( const
+/*TRect CBatteryPopupControl::PopUpWindowRectFromLayout( const
     TAknWindowComponentLayout& aComponentLayout ) const
     {
     FUNC_LOG          
@@ -519,7 +520,7 @@ TRect CBatteryPopupControl::PopUpWindowRectFromLayout( const
     layoutRect.LayoutRect( iAvkonAppUi->ApplicationRect(), lineLayout );
 
     return layoutRect.Rect();
-    }
+    }*/
    
 // -----------------------------------------------------------------------------
 // From class CCoeControl
@@ -537,7 +538,7 @@ void CBatteryPopupControl::HandlePointerEventL(
             if ( !iHighlightedItem )
                 {         
                 iHighlightedItem = ETrue;             
-                DrawNow( iLinkRect );
+             //   DrawNow( iLinkRect );
                 }
 #ifdef RD_TACTILE_FEEDBACK
             if ( aPointerEvent.iType == TPointerEvent::EButton1Down )
@@ -553,7 +554,7 @@ void CBatteryPopupControl::HandlePointerEventL(
             // Nofity command observer  
             if ( aPointerEvent.iType == TPointerEvent::EButton1Up )
                 {
-                iCommandObserver->ProcessCommandL( ELinkFirst );
+              //  iCommandObserver->ProcessCommandL( ELinkFirst );
                 iHighlightedItem = EFalse; 
                 }
             }
@@ -577,12 +578,12 @@ void CBatteryPopupControl::CreateIconL(  )
     delete iIcon;
     iIcon = NULL;
     
-    iIcon = AknsUtils::CreateGulIconL( AknsUtils::SkinInstance(),
+ /*   iIcon = AknsUtils::CreateGulIconL( AknsUtils::SkinInstance(),
                                        KAknsIIDQgnPropBatteryIcon,
                                        fp->FullName(),
                                        EMbmBatterypopupcontrolQgn_prop_battery_ps_deactivate,
                                        EMbmBatterypopupcontrolQgn_prop_battery_ps_deactivate_mask );
-
+*/
     CleanupStack::PopAndDestroy( fp );
     }      
 //  End of File

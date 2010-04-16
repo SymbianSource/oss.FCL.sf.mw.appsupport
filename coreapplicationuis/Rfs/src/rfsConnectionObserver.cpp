@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,12 +20,12 @@
 // SYSTEM INCLUDES
 #include <rfs.rsg>                      
 #include <PSVariables.h>
-#include <AknWaitDialog.h>
 #include <featmgr.h>
+#include <eikenv.h>  
 #include <centralrepository.h>
-#include <AknWaitDialog.h>
 #include <pdpcontextmanagerpskeys.h>
 #include <pdpcontextmanagerinternalcrkeys.h>
+#include <StringLoader.h> 
 
 // P&S KEYS FROM SIP & PDP CONNECTION
 #include <e32property.h>
@@ -111,12 +111,12 @@ void CRfsConnectionObserver::ConstructL()
     // proceed further to create a common dialog. This will be a wait for dialog which will be 
     // of synchrnous type and can only be closed inside the RunL() of this active class.
     // Provisions needed to be added to know whether this dialog needs resetting the pointer,
-    // this will be the case when dialog is actually started using 'ExecuteLD()', 
+    // this will be the case when dialog is actually started using 'showl()', 
     // Otherwise we need to delete this dialog and reset the pointer to NULL.
-    if (iIsDialogNeedToBeDisplayed)
-        {
-        iWaitDialog = new( ELeave ) CAknWaitDialog(reinterpret_cast<CEikDialog**>( &iWaitDialog ) );
-        }
+   if (iIsDialogNeedToBeDisplayed)
+       {
+       iDialog = CHbDeviceProgressDialogSymbian::NewL(CHbDeviceProgressDialogSymbian::EWaitDialog);
+       }
    
     // Now we proceed further to setting of the next state i,e, enter the state machine of this active object
     // which will start from closing of the active connections and proceed to close the other connections
@@ -171,6 +171,7 @@ CRfsConnectionObserver::~CRfsConnectionObserver()
     {
     TRACES("CRfsConnectionObserver::~CRfsConnectionObserver()");
     Cancel();
+    delete iWait;
     TRACES("CRfsConnectionObserver::~CRfsConnectionObserver(): End");
     }
 
@@ -214,31 +215,59 @@ TBool CRfsConnectionObserver::CloseAlwaysOnConnectionL()
         return EFalse; 
         }
     
-    // we set the flag to indicate ExecuteLD is called and the dialog needs to be
+    // we set the flag to indicate showl is called and the dialog needs to be
     // dismissed from within the RunL()
     iIsWaitForDialogExecuted = ETrue;
     // Start displaying the dialog which will then be closed form the RunL()
     // Here the code execution blocks and we will proceed further only when 
     // this dialog is canceled
-    err = iWaitDialog->ExecuteLD( R_CLOSING_CONNECTIONS );
+
+    HBufC* prompt = StringLoader::LoadLC( R_CLOSING_CONNECTIONS ); 
     
-    
+    iDialog->SetTextL(*prompt);
+             
+    //observer interface is used since showl is aynchronous and we have to have callbacks 
+    //if cancel is pressed or dialog is closed
+    iDialog->SetObserver(this);   
+    iDialog->ShowL();
+    //activeschedulerwait is used since we want synchronous execution and control goes into 
+    //a loop here and returns to start when dialog is cancelled or closed.              
+    iWait = new (ELeave) CActiveSchedulerWait;
+    iWait->Start();
+    delete iWait;
+    iWait=NULL;
+    CleanupStack::PopAndDestroy( prompt );
+              
+    return iAllConnectionClosed;
+     }
+
+void CRfsConnectionObserver::ProgressDialogCancelled(const CHbDeviceProgressDialogSymbian* iDialog)
+{
     // following is the case when the user presses the Cancel button from the wait 
     // for dialog and in that case we need to resend the notificaiton of RFS failed
-    // to whom all we have told previous of this to close the RFS connection
-    if (err == EEikBidCancel)
-        {
-        if (iIsSipInformedForClosingAllConnection)
-            {
-            err = iSIPProperty.Set(KPSSipRfsUid, KSipRfsState, ESipRfsFailed );
-            }
-        if (iIsPDPInformedforClosingAllConnection)
-            {
-            iPDPProperty.Set(KPDPContextManager2,KPDPContextManagerFactorySettingsReset,EPDPContextManagerFactorySettingsResetStop);
-            }
-        }
-    return iAllConnectionClosed;
-    }
+    // to whom all we have told previous of this to close the RFS connection 
+    
+    if (iIsSipInformedForClosingAllConnection)
+                {
+             TInt    err = iSIPProperty.Set(KPSSipRfsUid, KSipRfsState, ESipRfsFailed );
+                }
+    if (iIsPDPInformedforClosingAllConnection)
+                {
+                iPDPProperty.Set(KPDPContextManager2,KPDPContextManagerFactorySettingsReset,EPDPContextManagerFactorySettingsResetStop);
+                }
+       
+                   
+        
+}
+
+
+void CRfsConnectionObserver::ProgressDialogClosed(const CHbDeviceProgressDialogSymbian *  iDialog)
+{
+    //this function is called when the dialog is closed ,note that the control from progressdialogcancelled  
+    //comes to ProgressDialogClosed once dialog is closed
+      iWait->AsyncStop(); //from here the control goes to iWait->start();
+}
+
 
 void CRfsConnectionObserver::ReportRfsCompletionToSip()
     {
@@ -443,22 +472,21 @@ void CRfsConnectionObserver::DismissWaitDialog()
     {
     TRACES("CRfsConnectionObserver::DismissWaitDialog()");
     
-    if ( iWaitDialog && iIsWaitForDialogExecuted)
+    if ( iDialog && iIsWaitForDialogExecuted)
         {
-        TRAP_IGNORE( iWaitDialog->ProcessFinishedL() );
+        iDialog->Cancel();
         }
     
     // Sanity Check:
     // It can be a case when dialog was need to be displayed but was not due to some error
-    // this means that the 'iWaitDialog' was constructed but never used and destroyed
-    // i.e. the ExecuteLD() was never called
-    else if(iIsDialogNeedToBeDisplayed && !iIsWaitForDialogExecuted)
+    // this means that the 'iDialog' was constructed but never used and destroyed
+    // i.e. the showl() was never called
+   else if(iIsDialogNeedToBeDisplayed && !iIsWaitForDialogExecuted)
         {
-        delete iWaitDialog;
+        delete iDialog;
         }
-    
-    // Reset the pointer to NULL
-    iWaitDialog = NULL;
+      // Reset the pointer to NULL
+    iDialog = NULL;
     
     TRACES("CRfsConnectionObserver::DismissWaitDialog(): End");
     }

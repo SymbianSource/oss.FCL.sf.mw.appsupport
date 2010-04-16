@@ -17,8 +17,8 @@
 
 
 // INCLUDE FILES
-#include <favouritesdb.h>
-#include <favouriteslimits.h>
+#include <FavouritesDb.h>
+#include <FavouritesLimits.h>
 #include "FavouritesRFSPluginPrivateCRKeys.h"
 #include "FavouritesRFSPlugin.h"
 

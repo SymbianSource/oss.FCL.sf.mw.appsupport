@@ -50,4 +50,7 @@ LIBRARY                 oommonitor.lib
 LIBRARY        			ws32.lib
 LIBRARY         		apgrfx.lib	// TApaTask
 
+
+SMPSAFE
 // End of file
+

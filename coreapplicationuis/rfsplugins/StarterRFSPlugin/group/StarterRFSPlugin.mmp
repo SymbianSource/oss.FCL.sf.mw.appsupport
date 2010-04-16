@@ -19,7 +19,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET      StarterRFSPlugin.dll
+TARGET      starterrfsplugin.dll
 
 TARGETTYPE	PLUGIN
 
@@ -34,7 +34,7 @@ SOURCE      Proxy.cpp
 
 START RESOURCE 2000F8BB.rss
 #ifdef SYMBIAN_SECURE_ECOM 
-  TARGET StarterRFSPlugin.rsc
+  TARGET starterrfsplugin.rsc
 #endif 
 END
 
@@ -45,4 +45,4 @@ USERINCLUDE ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY euser.lib       // Base library
-LIBRARY ECom.lib	    // ECom library
+LIBRARY ecom.lib	    // ECom library

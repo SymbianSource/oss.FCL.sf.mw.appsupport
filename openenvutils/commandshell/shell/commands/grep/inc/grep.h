@@ -1,4 +1,21 @@
-/* © Portions copyright (c) 2007 Symbian Software Ltd.  All rights reserved.*/
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+
+
 /*	$NetBSD: grep.h,v 1.3 2006/05/15 21:12:21 rillig Exp $	*/
 
 /*-

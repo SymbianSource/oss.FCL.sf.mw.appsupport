@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -17,11 +17,11 @@
 
 
 // SYSTEM INCLUDES
-#include <StringLoader.h>
-#include <AknGlobalNote.h>          //used for Selftest failed note
-#include <aknPopup.h>
+#include <stringloader.h>
+#include <aknglobalnote.h>          //used for Selftest failed note
+#include <aknpopup.h>
 #include <aknlists.h>
-#include <aknSDData.h>
+#include <aknsddata.h>
 #include <badesca.h>
 #include <tzlocalizationdatatypes.h>
 #include <tzlocalizer.h>
@@ -33,7 +33,7 @@
 #include "startupappprivatepskeys.h"
 #include <startupdomainpskeys.h>
 #include <startupdomaincrkeys.h>
-#include <CoreApplicationUIsSDKCRKeys.h>
+#include <coreapplicationuissdkcrkeys.h>
 #include <starterclient.h>
 
 #ifdef RD_UI_TRANSITION_EFFECTS_PHASE2
@@ -864,7 +864,17 @@ void CStartupAppUi::DoStartupFirstBootAndRTCCheckL()
             MarkFirstBoot();
             }
         }
-
+	else
+		{
+		// Temporary fix for the defect VEZI-7YDEAR , as clock is not yet supported.
+		TRACES("CStartupAppUi::DoStartupFirstBootAndRTCCheckL(): if PredictiveTimeEnabled is set");
+		if( iFirstBoot && !HiddenReset() )
+		    {
+            TRACES("CStartupAppUi::DoStartupFirstBootAndRTCCheckL(): Mark first boot");
+            MarkFirstBoot();
+			}
+		// End of temporary fix.
+		}
     TRACES("CStartupAppUi::DoStartupFirstBootAndRTCCheckL(): Setting KPSStartupAppState = EStartupAppStateFinished");
     TInt err = RProperty::Set( KPSUidStartupApp, KPSStartupAppState, EStartupAppStateFinished );
     if( KErrNone != err )

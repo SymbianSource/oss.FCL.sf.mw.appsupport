@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -22,7 +22,8 @@
 // SYSTEM INCLUDES
 #include <uiklaf/private/lafshut.h>
 #include <coemain.h>
-#include <AknGlobalNote.h>
+#include "hbdevicemessageboxsymbian.h"
+
 
 // USER INCLUDES
 
@@ -64,7 +65,6 @@ NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public CActive
     private: // Data
         COutOfDiskMonitor*  iOutOfDiskMonitor; //uses
         RFs&                iFs;
-        CAknGlobalNote*     iQuery;
         RResourceFile       iOODResourceFile;
         TNoteInfo           iNoteInfo;
     };

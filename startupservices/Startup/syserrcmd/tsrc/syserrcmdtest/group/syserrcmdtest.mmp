@@ -47,3 +47,5 @@ LIBRARY apparc.lib
 LIBRARY eikcore.lib
 //LIBRARY     component_under_test.lib
 
+
+SMPSAFE

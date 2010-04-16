@@ -23,8 +23,8 @@
 // INCLUDES
 #include <ecom/ecom.h>
 #include <e32base.h>
-#include <COEDEF.H>
-#include <W32STD.H>
+#include <coedef.h>
+#include <w32std.h>
 #include <sysapcallback.h>
 
 //CONSTANTS

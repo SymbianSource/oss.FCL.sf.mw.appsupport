@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include "../inc/CallStateSourcePlugInConst.hrh"
 
-TARGET          CallStateSourcePlugIn.dll
+TARGET          callstatesourceplugin.dll
 TARGETTYPE      PLUGIN
 UID             0x10009D8D KCallStateSourcePluginDllUid
 CAPABILITY      ALL -TCB
@@ -36,7 +36,7 @@ MW_LAYER_SYSTEMINCLUDE
 
 SOURCEPATH      ../data
 START RESOURCE	CallStateSourcePlugIn.rss
-TARGET 		    CallStateSourcePlugIn.rsc
+TARGET 		    callstatesourceplugin.rsc
 TARGETPATH 	    /resource/plugins
 END
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -26,7 +26,9 @@
 #include <remcon/remconbearerplugin.h>
 #include <remcon/remconbearerinterface.h>
 #include <remcon/messagetype.h>
-#include <AknCapServerClient.h>
+#include <keyguardaccessapi.h>
+
+
 
 #include "MMKeyBearerObserverPS.h"
 
@@ -155,8 +157,7 @@ class CMMKeyBearer : public CRemConBearerPlugin,
         RProperty iProperty;
         
         // For keylock interaction
-        RAknUiServer iAknServer;
-        TBool iAknServerConnected;
-    };
+        CKeyguardAccessApi* iKeyguardAccess;
+        };
 
 #endif // __MMKEYBEARERIMPLEMENTATION_H__

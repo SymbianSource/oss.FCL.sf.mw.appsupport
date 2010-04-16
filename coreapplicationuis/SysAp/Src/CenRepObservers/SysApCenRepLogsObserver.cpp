@@ -69,6 +69,12 @@ CSysApCenRepLogsObserver::~CSysApCenRepLogsObserver()
 
 void CSysApCenRepLogsObserver::ConstructL()
     {
+    const TUid KCRUidLogs = {0x101F874E};
+    /**
+    * Informs the Logs application about the amount of new missed calls.
+    * Integer type
+    **/
+    const TUint32 KLogsNewMissedCalls = 0x00000006;
     TRAPD( err, iSession = CRepository::NewL( KCRUidLogs ) );
     TRACES( RDebug::Print( _L("CSysApCenRepLogsObserver::ConstructL: err=%d (KCRUidLogs)"), err ) );
     User::LeaveIfError( err );

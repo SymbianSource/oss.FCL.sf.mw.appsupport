@@ -1,7 +1,26 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+
+
+
 /*	$Id: ls.c,v 1.2 2000/08/22 22:20:23 amai Exp $	*/
 /*	$NetBSD: ls.c,v 1.18 1996/07/09 09:16:29 mycroft Exp $	*/
 //
-// © Portions Copyright (c) Symbian Software Ltd 2007-2008. All rights reserved.
+// © 
 //
 /*
  * Copyright (c) 1989, 1993, 1994

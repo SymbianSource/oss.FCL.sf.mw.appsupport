@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@
 #ifndef __RFSPDPOBSERVER_H
 #define __RFSPDPOBSERVER_H
 
+#include <hbdeviceprogressdialogsymbian.h>
 
 enum TRfsConnectionCloseState
     {
@@ -26,7 +27,7 @@ enum TRfsConnectionCloseState
     EPdpConnectionClose // this should be the last enum
     };
 
-NONSHARABLE_CLASS( CRfsConnectionObserver ): CActive
+NONSHARABLE_CLASS( CRfsConnectionObserver ): CActive,public MHbDeviceProgressDialogObserver
     {      
 public:
     
@@ -39,6 +40,11 @@ public:
      * Destructor
      */
     virtual ~CRfsConnectionObserver();
+    
+    void ProgressDialogCancelled(const CHbDeviceProgressDialogSymbian* iDialog);
+                    
+    void ProgressDialogClosed(const CHbDeviceProgressDialogSymbian *  iDialog) ;
+
         
 public:
     /**
@@ -128,9 +134,8 @@ private:
     /**
      * Own: Wait dialog
      */
-    CAknWaitDialog* iWaitDialog;
-    
-    /**
+     CHbDeviceProgressDialogSymbian* iDialog ;
+       /**
      * Own: PDP property
      */
     RProperty iPDPProperty;
@@ -169,6 +174,8 @@ private:
     TBool iIsClosingConnectionsApplicable;
     
     TRfsConnectionCloseState iState;
+    //for synchronous dialog handling
+    CActiveSchedulerWait *iWait;
     };
     
 #endif    //RFSPDPOBSERVER_H

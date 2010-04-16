@@ -20,7 +20,7 @@
 #include <platform_paths.hrh>
 
 CAPABILITY          CAP_ECOM_PLUGIN
-TARGET              GSRFSPlugin.dll
+TARGET              gsrfsplugin.dll
 TARGETTYPE          PLUGIN
 UID                 0x10009D8D 0x10275117
 VENDORID            VID_DEFAULT
@@ -47,7 +47,7 @@ MW_LAYER_SYSTEMINCLUDE
 SOURCEPATH      ../data
 
 START RESOURCE  10275117.rss
-TARGET          GSRFSPlugin.rsc
+TARGET          gsrfsplugin.rsc
 END
 
 START RESOURCE  GSRFSPluginRsc.rss
@@ -68,14 +68,14 @@ LIBRARY   egul.lib
 LIBRARY   ws32.lib
 LIBRARY   rfs.lib
 LIBRARY   gsecomplugin.lib
-LIBRARY   CommonEngine.lib
+LIBRARY   commonengine.lib
 LIBRARY   fbscli.lib
-LIBRARY   AknIcon.lib
+LIBRARY   aknicon.lib
 LIBRARY   aknskins.lib
 
 LIBRARY   hlplch.lib
-LIBRARY   GSFramework.lib
-LIBRARY   GSListBox.lib
+LIBRARY   gsframework.lib
+LIBRARY   gslistbox.lib
 
 
 DOCUMENT            10275117.rss

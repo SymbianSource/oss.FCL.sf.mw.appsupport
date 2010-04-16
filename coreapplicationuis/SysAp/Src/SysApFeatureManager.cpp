@@ -23,7 +23,7 @@
 #include "SysApFeatureManager.h"
 #include "SysAp.hrh"
 #include <centralrepository.h>
-#include "CoreApplicationUIsPrivateCRKeys.h"
+#include "coreapplicationuisprivatecrkeys.h"
 #include <hwrmlight.h>
 #include <AknUtils.h>
 

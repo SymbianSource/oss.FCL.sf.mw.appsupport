@@ -37,7 +37,7 @@
 #include "MSysApPropertyResponder.h"
 #include "SysApTimer.h"
 #include <e32property.h>
-#include "CoreApplicationUIsPrivateCRKeys.h"
+#include "coreapplicationuisprivatecrkeys.h"
 #include <sysapcallback.h>
 
 #include "SysApAccessoryObserver.h"
@@ -1657,8 +1657,7 @@ class CSysApAppUi :
      	*/
          TBool IsEncryptionOperationOngoingL() const;
 		 TInt iKeyBoardRepeatCount;
-		 TBool iFlagForRmvMmcFrmShortPwrKey;
-    };
+		     };
 
 #endif      // SYSAPAPPUI_H
 

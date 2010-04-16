@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -29,6 +29,14 @@ CAPABILITY CAP_GENERAL_DLL
 
 USERINCLUDE ../inc
 
+
+SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
+
+
+LIBRARY		HbWidgets.lib
+
+
+
 MW_LAYER_SYSTEMINCLUDE
 
 SOURCEPATH ../src
@@ -51,18 +59,17 @@ END  // RESOURCE
 LIBRARY euser.lib
 LIBRARY efsrv.lib
 LIBRARY bafl.lib
-LIBRARY avkon.lib
 LIBRARY cone.lib
 LIBRARY etel.lib
 LIBRARY etelmm.lib
-LIBRARY CommonEngine.lib
+LIBRARY commonengine.lib
 LIBRARY sysutil.lib
 LIBRARY hal.lib
 LIBRARY secui.lib
 LIBRARY eikcore.lib
-LIBRARY SysLangUtil.lib
-LIBRARY PlatformEnv.lib  // PathInfo
+LIBRARY syslangutil.lib
+LIBRARY platformenv.lib  // PathInfo
 LIBRARY centralrepository.lib // Central Repository
 LIBRARY starterclient.lib
 LIBRARY ecom.lib
-LIBRARY FeatMgr.lib
+LIBRARY featmgr.lib

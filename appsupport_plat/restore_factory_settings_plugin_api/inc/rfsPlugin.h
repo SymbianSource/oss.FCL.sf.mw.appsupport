@@ -22,8 +22,8 @@
 
 //  INCLUDES
 #include <e32base.h>
-#include <ecom/ECom.h>
-#include <rfsPluginDef.h>
+#include <ecom/ecom.h>
+#include <rfsplugindef.h>
 
 // CONSTANTS
 
@@ -89,7 +89,7 @@ private:
     TUid iDtor_ID_Key;
     };
 
-#include "rfsPlugin.inl"
+#include "rfsplugin.inl"
 
 #endif //RFSPLUGIN_H
 

@@ -43,3 +43,5 @@ END
 LIBRARY         euser.lib
 LIBRARY         mediaclientaudio.lib
 LIBRARY         sanimengine.lib
+
+SMPSAFE

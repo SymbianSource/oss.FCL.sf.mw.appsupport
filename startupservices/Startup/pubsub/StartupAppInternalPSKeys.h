@@ -20,7 +20,7 @@
 #define STARTUPAPPINTERNALPSKEYS_H
 
 // INCLUDES
-#include <StartupDomainPSKeys.h>
+#include <startupdomainpskeys.h>
 
 // =============================================================================
 // Touch Screen Calibration API

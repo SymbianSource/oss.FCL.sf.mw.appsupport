@@ -24,8 +24,6 @@ PRJ_EXPORTS
 // If there's no destination then the source file will be copied
 // to the same name in /epoc32/include
 
-../eBookmark/ebookmark.doc /epoc32/engdoc/ebookmark/ebookmark.doc
-
 ../group/recognisers.iby /epoc32/rom/include/recognisers.iby
 
 ../waprecogniser/wapmime.h SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(wapmime.h)

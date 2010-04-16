@@ -1,8 +1,23 @@
+#
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
+
 component	application-protocols_recognisers
 source	\sf\mw\appsupport\contenthandling\webrecognisers
 binary	\sf\mw\appsupport\contenthandling\webrecognisers\group	all
 exports	\sf\mw\appsupport\contenthandling\webrecognisers\group
--export_file	\sf\mw\appsupport\contenthandling\webrecognisers\eBookmark\ebookmark.doc	\epoc32\engdoc\ebookmark\eBookmark.doc
 notes_source	\component_defs\release.src
 
 

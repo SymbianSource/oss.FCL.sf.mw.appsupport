@@ -20,7 +20,7 @@
 #include <activitymanager.h>
 #include "SysApLightsController.h"
 #include "SysApAppUi.h"
-#include "CoreApplicationUIsInternalPSKeys.h"
+#include "coreapplicationuisinternalpskeys.h"
 #include <e32svr.h>
 #include <hwrmdomainpskeys.h>
 #include "SysApFeatureManager.h"

@@ -46,3 +46,5 @@ LIBRARY         bafl.lib
 LIBRARY         ecom.lib
 LIBRARY         hal.lib
 LIBRARY         efsrv.lib
+
+SMPSAFE

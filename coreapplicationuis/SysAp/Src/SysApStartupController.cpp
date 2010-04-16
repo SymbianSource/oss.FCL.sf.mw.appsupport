@@ -20,7 +20,7 @@
 
 #include <startupdomainpskeys.h>
 #include <startupdomaincrkeys.h>
-#include "CoreApplicationUIsPrivateCRKeys.h"
+#include "coreapplicationuisprivatecrkeys.h"
 #include <hwrmpowerstatesdkpskeys.h>
 #include "SysApStartupController.h"
 #include "SysApAppUi.h"

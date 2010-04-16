@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007,2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -30,7 +30,7 @@
 #include "trace.h"
 
 const TInt KMinVolume( 0 );  /** Minimum allowed volume level. */
-const TInt KMaxVolume( 10 ); /** Maximum allowed volume level. */
+const TInt KMaxVolume( 10000 ); /** Maximum allowed volume level. */
 
 const TInt KDefaultRepeatCount( 1 ); /** Default repeat count for animation and tone. */
 const TInt KDefaultVolumeRamp( 0 );  /** Default volume ramp value in microseconds. */

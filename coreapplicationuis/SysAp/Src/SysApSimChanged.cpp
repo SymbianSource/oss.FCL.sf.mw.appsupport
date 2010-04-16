@@ -20,7 +20,7 @@
 #include "SysApSimChanged.h"
 #include "SysApAppUi.h"
 #include <settingsinternalcrkeys.h>
-#include <LogsDomainCRKeys.h>
+//#include <LogsDomainCRKeys.h>
 #include <logcli.h>
 #include <centralrepository.h>
 const TInt KPSetDefaultCFTimer = 30;
@@ -71,6 +71,12 @@ CSysApSimChanged::~CSysApSimChanged()
 
 void CSysApSimChanged::ClearRepositoriesL()
     {
+    const TUid KCRUidLogs = {0x101F874E};
+    /**
+    * Informs the Logs application about the amount of new missed calls.
+    * Integer type
+    **/
+    const TUint32 KLogsNewMissedCalls = 0x00000006;
     TRACES( RDebug::Print( _L("CSysApSimChanged::ClearRepositoriesL(): opening KCRUidCallForwarding") ) );
     
     CRepository* repository = CRepository::NewL( KCRUidCallForwarding );

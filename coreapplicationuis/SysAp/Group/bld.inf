@@ -41,11 +41,11 @@ PRJ_EXPORTS
 ../rom/SysAp_variant.iby CUSTOMER_MW_LAYER_IBY_EXPORT_PATH(SysAp_variant.iby)
 ../loc/SysAp.loc MW_LAYER_LOC_EXPORT_PATH(SysAp.loc)
 
-../PubSub/CoreApplicationUIsInternalPSKeys.h |../../../inc/CoreApplicationUIsInternalPSKeys.h
-../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../inc/CoreApplicationUIsPrivatePSKeys.h
-../CenRep/CoreApplicationUIsPrivateCRKeys.h |../../inc/CoreApplicationUIsPrivateCRKeys.h
+../PubSub/CoreApplicationUIsInternalPSKeys.h |../../../inc/coreapplicationuisinternalpskeys.h
+../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../inc/coreapplicationuisprivatepskeys.h
+../CenRep/CoreApplicationUIsPrivateCRKeys.h |../../inc/coreapplicationuisprivatecrkeys.h
 
-../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../../inc/CoreApplicationUIsPrivatePSKeys.h // Illegal export for avoiding breaks
+../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../../inc/coreapplicationuisprivatepskeys.h // Illegal export for avoiding breaks
 
 PRJ_MMPFILES
 //gnumakefile sysap_icons.mk 

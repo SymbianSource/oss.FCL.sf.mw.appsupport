@@ -42,15 +42,15 @@ LIBRARY   avkon.lib
 LIBRARY   efsrv.lib               // TParsePtrC
 LIBRARY   flogger.lib
 LIBRARY   eikcoctl.lib
-LIBRARY   AknLayout2.lib
-LIBRARY   AknLayout2Scalable.lib
-LIBRARY   CdlEngine.lib
-LIBRARY   AknSkins.lib // Skins support
+LIBRARY   aknlayout2.lib
+LIBRARY   aknlayout2scalable.lib
+LIBRARY   cdlengine.lib
+LIBRARY   aknskins.lib // Skins support
 LIBRARY   gdi.lib
-LIBRARY   AknIcon.lib
+LIBRARY   aknicon.lib
 LIBRARY   egul.lib
-LIBRARY   FontProvider.lib
-LIBRARY   FontUtils.lib
+LIBRARY   fontprovider.lib
+LIBRARY   fontutils.lib
 #ifndef AVKON_BATTERYPOPUP_LAYOUTS
 LIBRARY   aknnotify.lib
 #endif //AVKON_BATTERYPOPUP_LAYOUTS

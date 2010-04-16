@@ -21,7 +21,7 @@ NAME    SYSA
 
 //  INCLUDES
 #include <eikon.rh>
-#include <sysap.loc>
+#include <SysAp.loc>
 #include <avkon.loc>
 #include <avkon.rsg>
 #include <AiwCommon.rh>

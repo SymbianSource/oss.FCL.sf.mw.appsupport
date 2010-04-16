@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,10 +19,10 @@
 // SYSTEM INCLUDE
 #include <centralrepository.h>
 #include <driveinfo.h>
-#include <swi\sisregistrysession.h>
-#include <swi\sisregistryentry.h>
-#include <swi\sisregistrypackage.h>
-#include <mmf\common\mmfcontrollerpluginresolver.h>
+#include <swi/sisregistrysession.h>
+#include <swi/sisregistryentry.h>
+#include <swi/sisregistrypackage.h>
+#include <mmf/common/mmfcontrollerpluginresolver.h>
 // USER INCLUDE
 #include "formatterrfsplugin.h"
 #include "formatterrfspluginprivatecrkeys.h"
@@ -44,56 +44,58 @@ _LIT(KPathDelimeter, "\\");
 //
 static void FileWriteL(RPointerArray<HBufC> &files)
     {
-    RFs iFs;
-    RFile iFile;
-    User::LeaveIfError(iFs.Connect());
-    TInt err = iFile.Open(iFs,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite);
+    RFs fileSession;
+    RFile file;
+    User::LeaveIfError(fileSession.Connect());
+    TInt err = file.Open(fileSession,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite|EFileStreamText);
 
     if ( err != KErrNone )
         {
         RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL , FileWrite : Failed to open the file"));
         return;
         }
-    TBuf8 <1> newLine;
-    newLine.Append('\n');
     TInt pos = 0;
-    iFile.Seek(ESeekEnd,pos);
+    file.Seek(ESeekEnd,pos);
     TInt size = files.Count();
+    RBuf filenameBuf;
+
     for ( TInt i=0; i < size; i++)
         {
         HBufC8* fileName = HBufC8::NewLC(files[i]->Size());
         TPtr8 fileNamePtr(fileName->Des());
         fileNamePtr.Copy(*files[i]);
-        iFile.Write(*fileName);
-        iFile.Write(newLine);
+
+        filenameBuf.Create(fileNamePtr.Length());
+        filenameBuf.Copy(fileNamePtr);
+        TFileText fileText ;
+        fileText.Set(file) ;
+        fileText.Seek(ESeekStart);
+        fileText.Write(filenameBuf);
         CleanupStack::PopAndDestroy();//Filename
-        iFile.Flush();
+        file.Flush();
         }
-    iFile.Close();
-    iFs.Close();
-    
+    file.Close();
+    fileSession.Close();    
     }
 
 static void MergeFilesL()
     {
     
-    RFs iSession;
-    RFile iExclude;
+    RFs fileSession;
+    RFile excludeFileName;
     
-    RFs iFs;
-    RFile iFile;
+    RFile fileName;
     TInt pos = 0;
     TInt size_of_script( 0 );
     TInt buffer_size( sizeof(TText) );
     TInt number_of_chars;
     
-    User::LeaveIfError(iSession.Connect());
-    TInt ret = iExclude.Open(iSession,_L("c:\\private\\100059C9\\excludelist.txt"),EFileRead);
+    User::LeaveIfError(fileSession.Connect());
+    TInt ret = excludeFileName.Open(fileSession,_L("c:\\private\\100059C9\\excludelist.txt"),EFileRead);
 
-    User::LeaveIfError(iFs.Connect());
-    TInt err1 = iFile.Open(iFs,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite);
+    TInt err1 = fileName.Open(fileSession,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite|EFileStreamText);
     
-    iFile.Seek(ESeekEnd,pos);
+    fileName.Seek(ESeekEnd,pos);
     if ( ret != KErrNone || err1 != KErrNone)
             {
             RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL , MergeFiles : Failed to open the file"));
@@ -103,7 +105,7 @@ static void MergeFilesL()
     TPtr8 bufferPtr( (TUint8*)buffer->Ptr(), buffer_size);
     
     TInt err(0);
-    err = iExclude.Size( size_of_script );
+    err = excludeFileName.Size( size_of_script );
     number_of_chars = size_of_script / sizeof(TText);
 
     TInt i(0);
@@ -111,50 +113,47 @@ static void MergeFilesL()
        {
        if ( err == KErrNone )
             {
-            err = iExclude.Read( bufferPtr);                
+            err = excludeFileName.Read( bufferPtr);                
             }
-        iFile.Write(bufferPtr);
+        fileName.Write(bufferPtr);
         }
-    iFile.Flush();
-    iFile.Close();
-    iFs.Close();
+    fileName.Flush();
+    fileName.Close();
     
-    iExclude.Close();
-    iSession.Close();
-
+    excludeFileName.Close();
+    fileSession.Close();
     CleanupStack::PopAndDestroy();//buffer
-    
+
     }
 
 static HBufC* ExcludeListNameL( TChar aSystemDrive )
     {
     FUNC_LOG;
-
+		
     RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL"));
     
-    RFs iFs;
-    RFile iFile;
+    RFs fileSession;
+    RFile file;
     
     _LIT8(KFileName, "c:\\private\\100059C9\\excludelistcache.txt\n");
     TBuf8 <50> fileName;
     fileName.Copy(KFileName);
 
-    User::LeaveIfError(iFs.Connect());
+    User::LeaveIfError(fileSession.Connect());
     
     RDir dir;
-    if(dir.Open(iFs,_L("c:\\private\\100059C9\\"),KEntryAttNormal) != KErrNone)
+    if(dir.Open(fileSession,_L("c:\\private\\100059C9\\"),KEntryAttNormal) != KErrNone)
         {
-        iFs.MkDir(_L("c:\\private\\100059C9\\"));
+        User::LeaveIfError(fileSession.MkDir(_L("c:\\private\\100059C9\\")));
         }
     
-    TInt rev = iFile.Replace(iFs,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite);
+    TInt rev = file.Replace(fileSession,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite|EFileStreamText);
     
     RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL, Replace returned %d"),rev);
     
-    iFile.Write(fileName);
-    iFile.Flush();
-    iFile.Close();
-    iFs.Close();
+    file.Flush();
+    file.Close();
+    fileSession.Close();
     
     Swi::RSisRegistrySession session;
     CleanupClosePushL(session);
@@ -171,76 +170,97 @@ static HBufC* ExcludeListNameL( TChar aSystemDrive )
     CleanupClosePushL(entry);
     CleanupClosePushL(entry2);
     
-    
-    //No issues until here
-    RPointerArray<HBufC> allfiles;
+    RPointerArray<HBufC> registryFiles;
+    RPointerArray<HBufC> augmentedRegistryFiles;
     RPointerArray<HBufC> nonRemovableFiles;
     RPointerArray<HBufC> nonRemovableAugmentedFiles;
-    CleanupResetAndDestroyPushL(allfiles);
+    CleanupResetAndDestroyPushL(registryFiles);
+    CleanupResetAndDestroyPushL(augmentedRegistryFiles);
     CleanupResetAndDestroyPushL(nonRemovableFiles);
     CleanupResetAndDestroyPushL(nonRemovableAugmentedFiles);
     
-    //Logic starts
-    TInt count;
-    RPointerArray<Swi::CSisRegistryPackage> augmentationPackages;
-    CleanupResetAndDestroyPushL(augmentationPackages);
-    for ( TInt iter=0; iter<uidcount; iter++)
-        {
-        User::LeaveIfError(entry.Open(session,uids[iter]));
-        if(EFalse == entry.RemovableL())
-            {
-            entry.FilesL(nonRemovableFiles);
-            TInt fileCount = nonRemovableFiles.Count(); 
-            for (TInt z=fileCount-1; z>=0;z--)
-                {
-                TPtr firstChar(nonRemovableFiles[z]->Des());
-                if(firstChar.Mid(0,1) == _L("z"))
-                    {
-                    delete nonRemovableFiles[z];
-                    nonRemovableFiles.Remove(z);
-                    }
-                }
-            // Look for augmentations.
-            if(entry.IsAugmentationL())
-                {
-                entry.AugmentationsL(augmentationPackages);
-                count = entry.AugmentationsNumberL();
-                for (TInt i=0; i < count; ++i)
-                    {
-                    User::LeaveIfError(entry2.OpenL(session,*augmentationPackages[i]));
-                    if(EFalse == entry2.RemovableL())
-                        {
-                        entry2.FilesL(nonRemovableAugmentedFiles);
-                        for (TInt c=0; c<nonRemovableAugmentedFiles.Count();c++)
-                              {
-                              TPtr firstChar(nonRemovableAugmentedFiles[c]->Des());
-                              if(firstChar.Mid(0,1) == _L("z"))
-                                  {
-                                  delete nonRemovableAugmentedFiles[c];
-                                  nonRemovableAugmentedFiles.Remove(c);
-                                  }
-                              }
-                        }
-                    entry2.Close();
-                    }
-                }
-            }
-        entry.Close();
-        }
-    RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL Writing the file names to the excludelist.txt"));
+     TInt count;
+     RPointerArray<Swi::CSisRegistryPackage> augmentationPackages;
+     CleanupResetAndDestroyPushL(augmentationPackages);
+     for ( TInt iter=0; iter<uidcount; iter++)
+         {
+         User::LeaveIfError(entry.Open(session,uids[iter]));
+         if(EFalse == entry.RemovableL())
+             {
+             entry.FilesL(nonRemovableFiles);
+             entry.RegistryFilesL(registryFiles);
+             TInt fileCount = nonRemovableFiles.Count(); 
+             for (TInt z=fileCount-1; z>=0;z--)
+                 {
+                 TPtr firstChar(nonRemovableFiles[z]->Des());
+                 if(firstChar.Mid(0,1) == _L("z"))
+                     {
+                     delete nonRemovableFiles[z];
+                     nonRemovableFiles.Remove(z);
+                     }
+                 }
+             // Look for augmentations.
+             if(entry.IsAugmentationL())
+                 {
+                 entry.AugmentationsL(augmentationPackages);
+                 count = entry.AugmentationsNumberL();
+                 for (TInt i=0; i < count; ++i)
+                     {
+                     User::LeaveIfError(entry2.OpenL(session,*augmentationPackages[i]));
+                     if(EFalse == entry2.RemovableL())
+                         {
+                         entry2.FilesL(nonRemovableAugmentedFiles);
+                         entry2.RegistryFilesL(augmentedRegistryFiles);
+                         for (TInt c=0; c<nonRemovableAugmentedFiles.Count();c++)
+                               {
+                               TPtr firstChar(nonRemovableAugmentedFiles[c]->Des());
+                               if(firstChar.Mid(0,1) == _L("z"))
+                                   {
+                                   delete nonRemovableAugmentedFiles[c];
+                                   nonRemovableAugmentedFiles.Remove(c);
+                                   }
+                               }
+											}
+                     	entry2.Close();
+                     	}
+                 }
+             }
+         entry.Close();
+         }
+     RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL Writing the file names to the excludelist.txt"));
+ 
+     MergeFilesL();
+		 FileWriteL(nonRemovableAugmentedFiles);
+		 FileWriteL(augmentedRegistryFiles);
+		 FileWriteL(nonRemovableFiles);
+ 		 FileWriteL(registryFiles);
 
-		FileWriteL(nonRemovableFiles);
-    FileWriteL(nonRemovableAugmentedFiles);
-    MergeFilesL();
+     TInt pos = 0;
+     User::LeaveIfError(fileSession.Connect());
+     User::LeaveIfError(file.Open(fileSession,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite|EFileStreamText));
+          
+     file.Seek(ESeekEnd,pos);
+
+     TBuf<KMaxFileName> configurationLine ;
+     TFileText fileText ;
+     fileText.Set(file) ;
+     fileText.Seek(ESeekStart);
+     configurationLine.Format(_L("c:\\private\\100059C9\\excludelistcache.txt")) ;
+     fileText.Write(configurationLine);
+     
+     file.Flush();
+     file.Close();
+     fileSession.Close();
     
-    CleanupStack::PopAndDestroy(8,&session);
+     
+     CleanupStack::PopAndDestroy(9,&session);
 
-    HBufC* buf = HBufC::NewLC( KExcludeListcache().Length() + KExcludeListPathNameLenExt );
-    TPtr bufPtr = buf->Des();
-    bufPtr.Append( aSystemDrive );
-    bufPtr.Append( KDriveDelimiter );
-    bufPtr.Append( KExcludeListcache );
-    CleanupStack::Pop( buf );
+     HBufC* buf = HBufC::NewLC( KExcludeListcache().Length() + KExcludeListPathNameLenExt );
+     TPtr bufPtr = buf->Des();
+     bufPtr.Append( aSystemDrive );
+     bufPtr.Append( KDriveDelimiter );
+     bufPtr.Append( KExcludeListcache );
+     CleanupStack::Pop( buf );
     return buf;
     }
 

@@ -65,7 +65,7 @@ LIBRARY     commonengine.lib        // stringloader
 LIBRARY     efsrv.lib               // TParsePtrC
 LIBRARY     flogger.lib
 LIBRARY     psmclient.lib
-LIBRARY     BSUtil.lib
+LIBRARY     bsutil.lib
 LIBRARY     batterypopupcontrol.lib
 LIBRARY     centralrepository.lib
 // End of File

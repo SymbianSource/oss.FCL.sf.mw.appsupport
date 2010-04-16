@@ -22,7 +22,7 @@
 
 
 #include <e32base.h>
-#include <CFContextSourcePlugInConst.hrh>
+#include <cfcontextsourcepluginconst.hrh>
 
 class MCFContextInterface;
 class MCFContextSourceSetting;
