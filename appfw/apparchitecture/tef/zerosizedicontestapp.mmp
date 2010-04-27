@@ -25,8 +25,7 @@ SOURCEPATH    	.
 SOURCE		zerosizedicontestapp.cpp
 
 USERINCLUDE   	.
-SYSTEMINCLUDE 	/epoc32/include
-SYSTEMINCLUDE 	/epoc32/include/techview
+MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 // Application exe specific resource which is localised to the application
 RESOURCE	zerosizedicon_loc.rss

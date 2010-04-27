@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -10,6 +10,7 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
+* NTT DOCOMO, INC - BUG 2365
 *
 * Description:  Build information file for project SensorSourcePlugin
 *
@@ -26,11 +27,14 @@ PRJ_EXPORTS
 #ifdef RD_CONTEXT_FRAMEWORK
 ../rom/sensorsourceplugin.iby CORE_MW_LAYER_IBY_EXPORT_PATH(SensorSourcePlugin.iby)
 
-../data/10282DF0.xml\
-    /epoc32/RELEASE/winscw/UDEB/Z/private/10282BC4/Settings/10282DF0/10282DF0.xml
+/*
+Copy 10282DF0.xml to 
+1. \epoc32\data\z\private\10282BC4\Settings\10282DF0\10282DF0.xml
+2. \epoc32\release\winscw\udeb\z\private\10282BC4\Settings\10282DF0\10282DF0.xml
+3. \epoc32\release\winscw\urel\z\private\10282BC4\Settings\10282DF0\10282DF0.xml
+*/
+../data/10282DF0.xml	Z:/private/10282BC4/Settings/10282DF0/10282DF0.xml
 
-../data/10282DF0.xml\
-    /epoc32/data/Z/private/10282BC4/Settings/10282DF0/10282DF0.xml
 #endif // RD_CONTEXT_FRAMEWORK
 
 PRJ_MMPFILES

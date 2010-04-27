@@ -477,7 +477,7 @@ void CCFContextSourceManager::InitializePhaseL(
 void CCFContextSourceManager::UpdatePlugInsL()
 	{
     FUNC_LOG;
-
+	if (!iUpdatePluginsAllowed){return;}
     // List all plugins
     RImplInfoPtrArray implInfoArray;
     CleanupResetAndDestroyPushL( implInfoArray );
@@ -784,7 +784,7 @@ void CCFContextSourceManager::InitDeviceStartingPhaseL()
 void CCFContextSourceManager::InitLoadingPluginsPhaseL()
     {
     FUNC_LOG;
-
+	iUpdatePluginsAllowed = ETrue;
     UpdatePlugInsL();
     }
 

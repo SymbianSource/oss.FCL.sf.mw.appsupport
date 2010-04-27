@@ -1685,7 +1685,8 @@ void CSysApAppUi::HandleChargerNotesL( const TInt aValue )
     else if ( aValue == EChargingStatusNotConnected )
         {
         TRACES( RDebug::Print( _L("SysAp: charger removed") ) );
-        iSysApLightsController->ChargerConnectedL( EFalse );
+        iSysApLightsController->ChargerConnectedL( EFalse );    
+        iSysApUsbChargerDetector.Reset();
         
         if ( !iSysApUsbChargerDetector.HostOnlyUsbChargingUsed() &&
              iSysApFeatureManager->Supported( KSysApFeatureIdChargerReminderNotes ) )
@@ -1695,7 +1696,6 @@ void CSysApAppUi::HandleChargerNotesL( const TInt aValue )
                 ShowUiNoteL( EUnplugChargerNote );
                 }
             }
-        iSysApUsbChargerDetector.Reset();
         }
     else if ( aValue == EChargingStatusNotCharging )
         {

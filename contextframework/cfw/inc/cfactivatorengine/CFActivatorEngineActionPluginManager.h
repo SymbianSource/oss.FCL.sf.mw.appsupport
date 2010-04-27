@@ -158,6 +158,8 @@ private:
          * Not own. Can be NULL
          */
         MCFStarterEventHandler* iEventHandler;
+// JNIA-849K7Gs
+	TBool iUpdatePluginsAllowed;
     };
 
 #endif

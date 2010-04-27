@@ -161,8 +161,9 @@ static HBufC* ExcludeListNameL( TChar aSystemDrive )
     
     file.Flush();
     file.Close();
-    fileSession.Close();
     dir.Close();
+    fileSession.Close();
+
     Swi::RSisRegistrySession session;
     CleanupClosePushL(session);
     User::LeaveIfError(session.Connect());

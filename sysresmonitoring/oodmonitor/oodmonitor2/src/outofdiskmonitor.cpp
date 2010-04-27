@@ -219,8 +219,16 @@ TInt64 COutOfDiskMonitor::GetThreshold(TInt aLevel, TInt aDrive)
 			    }
 			else
 			    {
-                TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold Mass Memory: %ld bytes",iOODWarningThresholdMassMemory);
-			    threshold = iOODWarningThresholdMassMemory;			                
+			    if(iOODWarningThresholdMassMemory < volSize )
+                    {
+                    TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold Mass Memory: %ld bytes",iOODWarningThresholdMassMemory);
+                    threshold = iOODWarningThresholdMassMemory;
+                    }
+                else
+                    {
+                    TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold Phone Memory: Used disk space %d percent",iOODWarningThreshold);
+                    threshold = ((volSize*(100-iOODWarningThreshold))/100);                                
+                    }
 			    }
 			}
         }

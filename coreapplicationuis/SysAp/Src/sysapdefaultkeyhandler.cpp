@@ -271,6 +271,7 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
                 TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyCamera") ) );
                 if ( iCameraSupported && !IsDeviceLocked() && !DoShowKeysLockedNote() )
                     {
+					iCallback.ExecCommandL( MSysapCallback::ECancelPowermenu );
                     ActivateApplicationL( KSysApCamcorderUid );
                     }
                 break;
