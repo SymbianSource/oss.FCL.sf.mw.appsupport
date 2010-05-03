@@ -30,7 +30,7 @@
 #include "SysApAppUi.h"
 #include "SysApFeatureManager.h"
 #include <ir_sock.h>
-#include <NetworkHandlingDomainPSKeys.h>
+#include <networkhandlingdomainpskeys.h>
 #include <hwrmdomainpskeys.h>
 #include <DataSyncInternalPSKeys.h>
 #include <hwrmfmtxdomainpskeys.h>

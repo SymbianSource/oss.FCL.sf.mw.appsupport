@@ -11,10 +11,6 @@ xmlns:cep="http://www.nokia.com/ns/cep/1.0/">
                 <contextRef source='Call' type='State'/>
                 <string>None</string>
             </equals>
-            <equals>
-                <contextRef source='CurrentVolume' type='Mute'/>
-                <string>Off</string>
-            </equals>
         </and>
         <actions>
             <!-- FM Tx has been enabled -->

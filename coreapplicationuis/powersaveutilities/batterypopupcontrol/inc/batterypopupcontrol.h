@@ -71,7 +71,7 @@ public:
     /**
      * Destructor.
      */
-    ~CBatteryPopupControl();
+    IMPORT_C ~CBatteryPopupControl();
        
     /**
      * Sets the command observer of the preview pop-up content. When

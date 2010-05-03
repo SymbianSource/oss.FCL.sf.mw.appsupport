@@ -268,7 +268,7 @@ void CCFActivatorEngineActionPluginManager::InitDeviceStartingPhaseL()
 void CCFActivatorEngineActionPluginManager::InitLoadingPluginsPhaseL()
     {
     FUNC_LOG;
-
+	iUpdatePluginsAllowed = ETrue;
     UpdatePlugInsL();
     }
 
@@ -280,7 +280,7 @@ void CCFActivatorEngineActionPluginManager::InitLoadingPluginsPhaseL()
 void CCFActivatorEngineActionPluginManager::UpdatePlugInsL()
 	{
     FUNC_LOG;
-
+	if (!iUpdatePluginsAllowed){return;}
     // List all plugins
     RImplInfoPtrArray implInfoArray;
     CleanupPushImplInfoArrayL( implInfoArray );

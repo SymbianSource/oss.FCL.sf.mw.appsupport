@@ -20,7 +20,7 @@
 #include "SysApSsSettingsObserver.h"
 #include "SysApAppUi.h"
 #include <avkon.hrh>
-#include <RSSSettings.h>
+#include <rsssettings.h>
 
 //CONSTANTS
 

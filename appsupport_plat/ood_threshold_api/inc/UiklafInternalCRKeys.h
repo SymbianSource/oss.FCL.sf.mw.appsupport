@@ -63,6 +63,13 @@ const TUint32 KUikOOMMaxAppExitTime        = 0x00000005;
  */
 const TUint32 KUikOODDiskFreeSpaceWarningNoteLevel = 0x00000006;
 
+/**
+ * Threshold for disk space warning note level for mass memory.
+ * Read-only key. Default value: 20971520
+ */
+const TUint32 KUikOODDiskFreeSpaceWarningNoteLevelMassMemory = 0x00000007;
+
+
 #endif __UIKLAF_INTERNAL_CR_KEYS_H__
 
 // End of file

@@ -115,7 +115,7 @@
 
 #include <ir_sock.h> // KIrdaPropertyCategory // KIrdaStatus
 
-#include <NetworkHandlingDomainPSKeys.h>
+#include <networkhandlingdomainpskeys.h>
 
 // POC launching
 #include <AiwServiceHandler.h>

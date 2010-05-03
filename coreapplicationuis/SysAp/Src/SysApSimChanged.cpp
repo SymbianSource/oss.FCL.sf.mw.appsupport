@@ -24,7 +24,7 @@
 #include <logcli.h>
 #include <centralrepository.h>
 const TInt KPSetDefaultCFTimer = 30;
-#include <RSSSettings.h>
+#include <rsssettings.h>
 #include <startupdomainpskeys.h>
 #include <PSVariables.h>
 #include "SysAp.hrh"

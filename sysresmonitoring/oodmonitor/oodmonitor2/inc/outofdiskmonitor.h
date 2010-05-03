@@ -90,6 +90,7 @@ NONSHARABLE_CLASS(COutOfDiskMonitor)
         TInt                        iDefaultMassStorage;
         TInt                        iDefaultRomDrive;
         RResourceFile               iResourceFile;
+        TInt64                      iOODWarningThresholdMassMemory;
     };
 
 #endif // __OUTOFDISKMONITOR_H__

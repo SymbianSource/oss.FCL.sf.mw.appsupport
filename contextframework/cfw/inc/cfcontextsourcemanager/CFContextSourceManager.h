@@ -288,6 +288,8 @@ private: // data
 
         // Event handler, not own, can be NULL
         MCFStarterEventHandler* iEventHandler;
+	//JNIA-849K7G Error
+	TBool iUpdatePluginsAllowed;
     };
 
 #endif

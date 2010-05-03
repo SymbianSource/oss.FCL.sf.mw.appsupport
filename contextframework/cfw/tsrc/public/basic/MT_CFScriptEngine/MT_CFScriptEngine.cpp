@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -36,7 +36,6 @@
 #include "ScriptEventNotifierSession.h"
 #include "basicoperationspluginconst.hrh"
 #include "cfcommon.h"
-#include "cfenvutils.h"
 
 // CONSTANTS
 
@@ -68,8 +67,6 @@ MT_CFScriptEngine* MT_CFScriptEngine::NewLC()
 // Destructor (virtual by CBase)
 MT_CFScriptEngine::~MT_CFScriptEngine()
     {
-    // Enable screen saver
-    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -83,9 +80,6 @@ void MT_CFScriptEngine::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
-
-    // Disable screen saver
-    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 

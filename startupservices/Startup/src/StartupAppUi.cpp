@@ -17,11 +17,11 @@
 
 
 // SYSTEM INCLUDES
-#include <stringloader.h>
-#include <aknglobalnote.h>          //used for Selftest failed note
-#include <aknpopup.h>
+#include <StringLoader.h>
+#include <AknGlobalNote.h>          //used for Selftest failed note
+#include <aknPopup.h>
 #include <aknlists.h>
-#include <aknsddata.h>
+#include <aknSDData.h>
 #include <badesca.h>
 #include <tzlocalizationdatatypes.h>
 #include <tzlocalizer.h>

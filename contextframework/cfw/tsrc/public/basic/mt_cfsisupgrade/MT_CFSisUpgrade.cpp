@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -42,7 +42,6 @@
 #include "actiondef_v1.h"
 #include "actiondef_v2.h"
 #include "operation_v1.hrh"
-#include "cfenvutils.h"
 
 // CONSTANTS
 const TInt KSecond = 1000000;
@@ -69,8 +68,6 @@ MT_CFSisUpgrade* MT_CFSisUpgrade::NewLC()
 // Destructor (virtual by CBase)
 MT_CFSisUpgrade::~MT_CFSisUpgrade()
     {
-    // Disable screen saver
-    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -84,9 +81,6 @@ void MT_CFSisUpgrade::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
-
-    // Disable screen saver
-    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 //  METHODS

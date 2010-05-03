@@ -107,18 +107,22 @@ void COutOfDiskMonitor::ConstructL()
     CRepository* repository( NULL );
     TInt warningThreshold(0);
     TInt criticalThreshold(0);
+    TInt warningThresholdMassMemory(0);
     TRAPD( err, repository = CRepository::NewL( KCRUidUiklaf ) );
     if ( err == KErrNone )
         {
         err = repository->Get(KUikOODDiskFreeSpaceWarningNoteLevel, warningThreshold);
         err = repository->Get(KUikOODDiskCriticalThreshold, criticalThreshold);
+        err = repository->Get(KUikOODDiskFreeSpaceWarningNoteLevelMassMemory, warningThresholdMassMemory);
         }
     delete repository;
     iOODWarningThreshold = warningThreshold;
     iOODCriticalThreshold = criticalThreshold;
+    iOODWarningThresholdMassMemory = warningThresholdMassMemory;
     
-	TRACES1("COutOfDiskMonitor::ConstructL: Warning threshold: %d percent",iOODWarningThreshold);
+	TRACES1("COutOfDiskMonitor::ConstructL: Warning threshold Phone Memory: %d percent",iOODWarningThreshold);
     TRACES1("COutOfDiskMonitor::ConstructL: Critical threshold: %ld bytes",iOODCriticalThreshold);
+    TRACES1("COutOfDiskMonitor::ConstructL: Warning threshold Mass Memory: %ld bytes",iOODWarningThresholdMassMemory);
     
     iOutOfDiskNotifyObserver = COutOfDiskNotifyObserver::NewL( this, iFs );
     TRACES("COutOfDiskMonitor::ConstructL: End");
@@ -208,8 +212,24 @@ TInt64 COutOfDiskMonitor::GetThreshold(TInt aLevel, TInt aDrive)
         TRACES1("COutOfDiskMonitor::GetThreshold: Volume size: %ld",volSize);		
 		if ( ret == KErrNone )
 			{
-			TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold: Used disk space %d percent",iOODWarningThreshold);
-			threshold = ((volSize*(100-iOODWarningThreshold))/100);		
+			if(aDrive == EDriveC)
+			    {
+                TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold Phone Memory: Used disk space %d percent",iOODWarningThreshold);
+                threshold = ((volSize*(100-iOODWarningThreshold))/100);
+			    }
+			else
+			    {
+			    if(iOODWarningThresholdMassMemory < volSize )
+                    {
+                    TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold Mass Memory: %ld bytes",iOODWarningThresholdMassMemory);
+                    threshold = iOODWarningThresholdMassMemory;
+                    }
+                else
+                    {
+                    TRACES1("COutOfDiskMonitor::GetThreshold: Warning threshold Phone Memory: Used disk space %d percent",iOODWarningThreshold);
+                    threshold = ((volSize*(100-iOODWarningThreshold))/100);                                
+                    }
+			    }
 			}
         }
     else if (aLevel == DISK_SPACE_CRITICAL)
