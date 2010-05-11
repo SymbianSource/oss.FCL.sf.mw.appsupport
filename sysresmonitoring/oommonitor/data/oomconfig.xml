@@ -108,6 +108,19 @@ threshold values are used.
 			<app_close_idle_priority idle_time="900" priority="50"></app_close_idle_priority>
 			<app_close_idle_priority idle_time="43200" priority="20"></app_close_idle_priority>
 		</close_app>
+		
+		<!--CWRTWidget.exe -->		
+		<close_app uid="200267C0" priority="100" sync_mode="check"> <!-- Ovi Widget UI -->
+            <app_close_idle_priority idle_time="900" priority="50"></app_close_idle_priority>
+            <app_close_idle_priority idle_time="43200" priority="30"></app_close_idle_priority>
+        </close_app>		
+		<!--CWRTWidget.exe  End -->
+		<!--CWRTWidget2.exe -->		
+		<close_app uid="200267D6" priority="80" sync_mode="check"> 
+            <app_close_idle_priority idle_time="900" priority="50"></app_close_idle_priority>
+            <app_close_idle_priority idle_time="43200" priority="30"></app_close_idle_priority>
+        </close_app>		
+		<!--CWRTWidget2.exe  End -->
 <!--		Widget UI plugin handles the closing of widgets. Widget UI application is not closed.
 -->
 		<close_app uid="10282822" priority="NEVER_CLOSE" sync_mode="check"> </close_app> <!-- Widget UI --> 
@@ -150,5 +163,19 @@ threshold values are used.
 		<app_plugin uid="10282855" target_app_id="10282822" priority="70" wait="3500" sync_mode="check" call_if_target_app_not_running="false"> <!-- WIDGETMEMORYPLUGIN, target app Widget UI -->
 			<plugin_foreground_app_priority target_app_id="10282822" priority="NEVER_CLOSE"></plugin_foreground_app_priority> <!-- target app Widget UI -->
 		</app_plugin>
+	<!--CWRTWidget.exe  -  Plugin -->	
+		
+		<app_plugin uid="200267D3" target_app_id="200267C0" priority="70" wait="3500" sync_mode="check" call_if_target_app_not_running="false"> 
+			<plugin_foreground_app_priority target_app_id="200267C0" priority="NEVER_CLOSE"></plugin_foreground_app_priority>
+		</app_plugin>
+	
+	<!--CWRTWidget.exe  -  Plugin   End-->		
+	<!--CWRTWidget2.exe  -  Plugin -->	
+		
+		<app_plugin uid="200267DB" target_app_id="200267D6" priority="50" wait="3500" sync_mode="check" call_if_target_app_not_running="false"> 
+			<plugin_foreground_app_priority target_app_id="200267D6" priority="NEVER_CLOSE"></plugin_foreground_app_priority>
+		</app_plugin>
+	
+	<!--CWRTWidget2.exe  -  Plugin   End-->		
 	</app_plugin_settings>
 </oom_config>

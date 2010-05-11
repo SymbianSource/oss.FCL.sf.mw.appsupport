@@ -139,6 +139,13 @@ void CBatteryPopupControl::HandleResourceChange(
         {
         SizeChanged();
         }
+
+	// Position
+	TPoint uipRect;
+	if( AknLayoutUtils::LayoutMetricsPosition( AknLayoutUtils::EBatteryPane, uipRect ) )
+		{
+		iController->SetPosition( uipRect );
+		}
     }
 
 

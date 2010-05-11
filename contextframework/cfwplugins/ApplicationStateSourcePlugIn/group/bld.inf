@@ -31,9 +31,9 @@ PRJ_EXPORTS
 // Rule files
 /*
 Copy autorotateui_activate.xml, autorotateui_alwaysinportrait.xml, autorotateui_init.xml, autorotateui_rotate.xml to 
-1. \epoc32\data\z\private\10282BC4\rules\
-2. \epoc32\release\winscw\udeb\z\private\10282BC4\rules\
-3. \epoc32\release\winscw\urel\z\private\10282BC4\rules\
+1. /epoc32/data/z/private/10282BC4/rules/
+2. /epoc32/release/winscw/udeb/z/private/10282BC4/rules/
+3. /epoc32/release/winscw/urel/z/private/10282BC4/rules/
 */
 ../data/autorotateui_activate.xml Z:/private/10282bc4/rules/autorotateui_activate.rul
     

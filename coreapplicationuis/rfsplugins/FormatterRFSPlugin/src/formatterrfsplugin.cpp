@@ -23,6 +23,7 @@
 #include <swi/sisregistryentry.h>
 #include <swi/sisregistrypackage.h>
 #include <mmf/common/mmfcontrollerpluginresolver.h>
+#include <starterdomaincrkeys.h>
 // USER INCLUDE
 #include "formatterrfsplugin.h"
 #include "formatterrfspluginprivatecrkeys.h"
@@ -86,12 +87,6 @@ static void MergeFilesL()
     RFs fileSession;
     RFile excludeFileName;
     
-    RFile fileName;
-    TInt pos = 0;
-    TInt size_of_script( 0 );
-    TInt buffer_size( sizeof(TText) );
-    TInt number_of_chars;
-    
     User::LeaveIfError(fileSession.Connect());
     TInt ret = excludeFileName.Open(fileSession,_L("c:\\private\\100059C9\\excludelist.txt"),EFileRead);
 
@@ -100,38 +95,16 @@ static void MergeFilesL()
 			RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL , MergeFiles : Failed to open the file"));
 			return;
 			}
-    ret = fileName.Open(fileSession,_L("c:\\private\\100059C9\\excludelistcache.txt"),EFileWrite|EFileStreamText);
-    if ( ret != KErrNone)
-            {
-            excludeFileName.Close();
-            RDebug::Print(_L("CFormatterRFSPlugin::ExcludeListNameL , MergeFiles : Failed to open the file"));
-            return;
-            }
-    fileName.Seek(ESeekEnd,pos);
-    
-    HBufC* buffer = HBufC::NewMaxLC( buffer_size );        
-    TPtr8 bufferPtr( (TUint8*)buffer->Ptr(), buffer_size);
-    
-    TInt err(0);
-    err = excludeFileName.Size( size_of_script );
-    number_of_chars = size_of_script / sizeof(TText);
-
-    TInt i(0);
-    for (i = 0; i < number_of_chars; i++)
-       {
-       if ( err == KErrNone )
-            {
-            err = excludeFileName.Read( bufferPtr);                
-            }
-        fileName.Write(bufferPtr);
-        }
-    fileName.Flush();
-    fileName.Close();
-    
     excludeFileName.Close();
-    fileSession.Close();
-    CleanupStack::PopAndDestroy();//buffer
 
+    CFileMan* fileMan=CFileMan::NewL(fileSession);
+    CleanupStack::PushL(fileMan);
+ 
+    TInt result=fileMan->Copy(_L("c:\\private\\100059C9\\excludelist.txt"),_L("c:\\private\\100059C9\\excludelistcache.txt"),CFileMan::EOverWrite);
+		RDebug::Print(_L("CFormatterRFSPlugin::MergeFilesL copying the excludelist.txt to excludelistcache.txt , CFileMan::Copy returned = %d"), result);   
+    CleanupStack::PopAndDestroy(fileMan);
+
+    fileSession.Close();
     }
 
 static HBufC* ExcludeListNameL( TChar aSystemDrive )
@@ -464,6 +437,14 @@ void CFormatterRFSPlugin::GetScriptL( const TRfsReason /*aType*/, TDes& aPath )
         aPath.AppendNumFixedWidthUC( KDeepFormatterRFSPlugin, EHex, KHexLength );
         aPath.Append( KScriptUidSeparator );
         INFO_1( "Script = '%S'", &aPath );
+        }
+    else
+        {
+        RDebug::Print(_L("Resetting the KStartupFirstBoot value"));
+		CRepository* repository = CRepository::NewL(KCRUidStartup);
+        CleanupStack::PushL( repository );
+        repository->Reset(KStartupFirstBoot);
+        CleanupStack::PopAndDestroy( repository );
         }
     }
 

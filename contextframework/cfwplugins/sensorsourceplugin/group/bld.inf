@@ -29,9 +29,9 @@ PRJ_EXPORTS
 
 /*
 Copy 10282DF0.xml to 
-1. \epoc32\data\z\private\10282BC4\Settings\10282DF0\10282DF0.xml
-2. \epoc32\release\winscw\udeb\z\private\10282BC4\Settings\10282DF0\10282DF0.xml
-3. \epoc32\release\winscw\urel\z\private\10282BC4\Settings\10282DF0\10282DF0.xml
+1. /epoc32/data/z/private/10282BC4/Settings/10282DF0/10282DF0.xml
+2. /epoc32/release/winscw/udeb/z/private/10282BC4/Settings/10282DF0/10282DF0.xml
+3. /epoc32/release/winscw/urel/z/private/10282BC4/Settings/10282DF0/10282DF0.xml
 */
 ../data/10282DF0.xml	Z:/private/10282BC4/Settings/10282DF0/10282DF0.xml
 

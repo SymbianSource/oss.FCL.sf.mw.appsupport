@@ -27,13 +27,13 @@ DEFAULT
 PRJ_EXPORTS
 
 #ifdef RD_TSP_CLIENT_MAPPER
-// Rules for media key handling
 /*
 Copy keyevent.rul, keyincall.rul, keyinfmtx.rul to 
-1. \epoc32\data\z\private\10282BC4\rules\
-2. \epoc32\release\winscw\udeb\z\private\10282BC4\rules\
-3. \epoc32\release\winscw\urel\z\private\10282BC4\rules\
+1. /epoc32/data/z/private/10282BC4/rules/
+2. /epoc32/release/winscw/udeb/z/private/10282BC4/rules/
+3. /epoc32/release/winscw/urel/z/private/10282BC4/rules/
 */
+// Rules for media key handling
 ../data/keyevent.rul                                        	    Z:/private/10282bc4/rules/keyevent.rul
 // Call handling rules
 ../data/keyincall.rul                               	            Z:/private/10282bc4/rules/keyincall.rul

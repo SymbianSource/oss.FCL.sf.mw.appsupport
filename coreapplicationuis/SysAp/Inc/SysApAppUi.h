@@ -1522,9 +1522,6 @@ private:
         TInt                            iApplicationScanningRoundNumberInBtSap;
         TBool                           iTimeToKillInBtSap;
 
-        CAknGlobalNote*                 iProfileNote;
-        TInt                            iProfileNoteId;
-
         TBool                           iLastPowerKeyWasShort;
         TBool                           iIgnoreNextPowerKeyUpEvent;
         TBool                           iIgnoreNextPowerKeyRepeats;

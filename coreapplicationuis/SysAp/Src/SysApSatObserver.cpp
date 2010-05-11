@@ -18,8 +18,8 @@
 
 
 // INCLUDE FILES
-#include <RSatRefresh.h>
-#include <RSatSession.h>
+#include <rsatrefresh.h>
+#include <rsatsession.h>
 #include <e32debug.h>
 #include "SysApSatObserver.h"
 #include "SysAp.hrh"

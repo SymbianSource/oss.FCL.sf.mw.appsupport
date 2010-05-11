@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1999-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -742,6 +742,7 @@ Retrieves a list of all alarm categories in use within the alarm server.
 */
 EXPORT_C void RASCliSession::GetAvailableCategoryListL(RArray<TAlarmCategory>& aCategories) const
 	{
+	CleanupClosePushL(aCategories);
 	// First step is to build the transfer buffer in the server
 	// and get the size (in bytes) so that we know
 	// how big to make the client-side (corresponding) temporary one.
@@ -768,6 +769,8 @@ EXPORT_C void RASCliSession::GetAvailableCategoryListL(RArray<TAlarmCategory>& a
 	//
 	stream.Close();
 	CleanupStack::PopAndDestroy(2, buffer);
+  // relieve the ownership of the array to the caller
+  CleanupStack::Pop(&aCategories);
 	}
 
 
@@ -1328,6 +1331,7 @@ EXPORT_C TInt RASCliSession::__DbgSetEnvChgHandling(TBool
 */
 void RASCliSession::FetchAlarmIdsFromBufferL(RArray<TAlarmId>& aAlarmIds, TInt aBufferSize) const
 	{
+	CleanupClosePushL(aAlarmIds);
 	CBufBase* buffer = FetchTransferBufferLC(aBufferSize);
 
 	// The buffer just contains serialized TAlarmId's so we need to
@@ -1344,6 +1348,8 @@ void RASCliSession::FetchAlarmIdsFromBufferL(RArray<TAlarmId>& aAlarmIds, TInt a
 		}
 	//
 	CleanupStack::PopAndDestroy(2, buffer);
+	// relieve the ownership of the array to the caller
+	CleanupStack::Pop(&aAlarmIds); 
 	}
 
 /** 

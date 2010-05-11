@@ -18,6 +18,7 @@
 
 // INCLUDES
 
+#include<akndiscreetpopup.h>
 #include <avkon.hrh>
 #include <avkon.rsg>
 #include <eikon.hrh>
@@ -207,8 +208,6 @@ CSysApAppUi::CSysApAppUi() :
 #ifndef RD_MULTIPLE_DRIVE
     iMemoryCardDialog( 0 ),
 #endif // RD_MULTIPLE_DRIVE
-    iProfileNote( NULL ),
-    iProfileNoteId( 0 ),
     iPowerKeyPopupMenuActive( EFalse ),
     iDisablePowerkeyMenu( EFalse ),
     iDeviceLockEnabled( EFalse ),
@@ -554,7 +553,7 @@ CSysApAppUi::~CSysApAppUi()
         }
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
-    delete iProfileNote;
+  
 
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
     if( iAnimTimer )
@@ -1724,13 +1723,7 @@ void CSysApAppUi::ShowProfileNoteL()
 
     if ( UiReady() )
         {
-        if ( iProfileNote )
-            {
-            // when a call is coming in, there might be a pending "Selected profile"
-            // we don't want to show anymore
-            iProfileNote->CancelNoteL( iProfileNoteId );
-            }
-
+      
         TBufC<KMaxProfileNameLength> profileName;
         HBufC* noteStringBuf = NULL;
         ActiveProfileNameL( profileName.Des() );
@@ -1738,13 +1731,7 @@ void CSysApAppUi::ShowProfileNoteL()
         TPtr textBuffer = noteStringBuf->Des();
         AknTextUtils::DisplayTextLanguageSpecificNumberConversion( textBuffer );
 
-        // profile note is constructed when it is needed for the first time
-        if ( !iProfileNote )
-            {
-            iProfileNote = CAknGlobalNote::NewL();
-            iProfileNote->SetTone( EAvkonSIDConfirmationTone );
-            }
-
+       
         // Set secondary display data if necessary
         if ( iSysApFeatureManager->CoverDisplaySupported() )
             {
@@ -1753,12 +1740,13 @@ void CSysApAppUi::ShowProfileNoteL()
             sdProfileName.Append(profileName.Left(SecondaryDisplay::KProfileNameMaxLen));
             SecondaryDisplay::TProfileNotePckg pckg(sdProfileName);
             CAknSDData* sd = CAknSDData::NewL(SecondaryDisplay::KCatSysAp, SecondaryDisplay::ECmdShowProfileNote, pckg);
-            iProfileNote->SetSecondaryDisplayData(sd); // ownership to notifier client
+           
             }
 
-        iProfileNoteId = iProfileNote->ShowNoteL( EAknGlobalConfirmationNote, textBuffer );
 
-        CleanupStack::PopAndDestroy( ); // noteStringbuf
+        CAknDiscreetPopup::ShowGlobalPopupL(textBuffer,KNullDesC, KAknsIIDNone, KNullDesC);
+         
+        CleanupStack::PopAndDestroy(); // noteStringbuf 
 
         iSysApLightsController->ProfileChangedL(); // All notes should always turn lights on.
         }
@@ -4059,14 +4047,14 @@ void CSysApAppUi::SetDeviceLockEnabledL( const TBool aLockEnabled )
         iSysApLightsController->DeviceLockStateChangedL( iDeviceLockEnabled );
         }
     
-    if( iDeviceLockEnabled )
+ /*   if( iDeviceLockEnabled )
         {
         if( iKeyLockEnabled )
             {
             KeyLock().DisableWithoutNote();
             }
-        }
-    else
+        }*/
+    if(! iDeviceLockEnabled )
         {
         // let's not activate keylock in case device lock was disabled during call or in cradle
         iKeyLockOnBeforeCall = EFalse;
