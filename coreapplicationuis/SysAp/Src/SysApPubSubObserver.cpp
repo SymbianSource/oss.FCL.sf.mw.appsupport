@@ -33,8 +33,8 @@
 #include <networkhandlingdomainpskeys.h>
 #include <hwrmdomainpskeys.h>
 #include <DataSyncInternalPSKeys.h>
-#include <hwrmfmtxdomainpskeys.h>
-#include <hwrmfmtx.h>
+//#include <hwrmfmtxdomainpskeys.h>
+//#include <hwrmfmtx.h>
 #include "sysapremconobserver.h"
 #include <lbs/locationfwdomainpskeys.h>
 #include <smsuaddr.h>
@@ -166,14 +166,14 @@ void CSysApPubSubObserver::ConstructL()
     iFlipStatusSubscriber = CSysApSubscriber::NewL( *this, KPSUidHWRM, KHWRMFlipStatus );
     iFlipStatusSubscriber->Subscribe();
     
-    if ( iSysApAppUi.SysApFeatureManager().FmTxSupported() )
+/*    if ( iSysApAppUi.SysApFeatureManager().FmTxSupported() )
         {
         // Category KHWRMFmTxStatus
         iFmTxStatusSubscriber = CSysApSubscriber::NewL( *this, KPSUidHWRMFmTx, KHWRMFmTxStatus );
         iFmTxStatusSubscriber->Subscribe();
         iPreviousFmTxPSValue = EFmTxStateUnknown;    
         }
-
+*/
     iSyncStatusSubscriber = CSysApSubscriber::NewL( *this, KPSUidDataSynchronizationInternalKeys, KDataSyncStatus );
     iSyncStatusSubscriber->Subscribe();
     
@@ -230,8 +230,8 @@ CSysApPubSubObserver::~CSysApPubSubObserver()
     delete iNetworkModeSubscriber;
     delete iWlanIndicatorSubscriber;
     delete iFlipStatusSubscriber;
-    delete iFmTxStatusSubscriber;
-    delete iFmTxRemConObserver;
+//    delete iFmTxStatusSubscriber;
+//    delete iFmTxRemConObserver;
     delete iSyncStatusSubscriber;
     delete iVideoSharingIndicatorSubscriber;
     delete iGpsIndicatorSubscriber;
@@ -302,11 +302,11 @@ void CSysApPubSubObserver::HandlePropertyChangedL( const TUid& aCategory, const 
         {
         HandleHwrmCategoryL( aKey, value );
         }
-    else if ( aCategory == KPSUidHWRMFmTx )
+/*    else if ( aCategory == KPSUidHWRMFmTx )
         {
         HandleHwrmFmTxCategoryL( aKey, value );
         }
-    else if ( aCategory == KPSUidDataSynchronizationInternalKeys )
+*/    else if ( aCategory == KPSUidDataSynchronizationInternalKeys )
         {
         HandleDataSyncCategoryL( aKey, value );
         }
@@ -609,7 +609,7 @@ void CSysApPubSubObserver::HandleHwrmPowerStateCategoryL( const TUint aKey, cons
             break;
         } 
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApPubSubObserver::HandleHwrmFmTxCategoryL()
 // ----------------------------------------------------------------------------
@@ -750,6 +750,7 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
         iPreviousFmTxPSValue = aValue;
         }
     }
+*/
 
 // ----------------------------------------------------------------------------
 // CSysApPubSubObserver::HandleWlanCategoryL()

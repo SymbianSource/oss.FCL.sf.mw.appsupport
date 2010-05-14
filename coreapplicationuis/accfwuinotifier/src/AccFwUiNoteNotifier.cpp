@@ -20,7 +20,7 @@
 #include <featmgr.h>
 #include <accfwnoteuinotifier.rsg>
 #include <data_caging_path_literals.hrh> 
-#include <secondarydisplay/secondarydisplayaccfwapi.h>
+#include <SecondaryDisplay/SecondaryDisplayAccFwAPI.h>
 #include <bautils.h>
 #include <hbdevicemessageboxsymbian.h>
 #include "AccFwUiNoteNotifier.h"
@@ -67,7 +67,6 @@ CAccFwUiNoteNotifier::~CAccFwUiNoteNotifier()
     {
     API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::~CAccFwUiNoteNotifier()" );
 
-  //  delete iNote;
     delete iNoteText;
     CActive::Cancel();
     
@@ -227,13 +226,7 @@ void CAccFwUiNoteNotifier::StartL(
     iMessage = aMessage;
     if( showNote )
         {
-        if ( FeatureManager::FeatureSupported( KFeatureIdCoverDisplay ) )
-            {
-    		API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Cover UI supported" );
-            iPublishNote = ETrue;
-            }
-
-    	iIsCancelled = EFalse;
+        iIsCancelled = EFalse;
         SetActive();
         TRequestStatus* status = &iStatus;
         User::RequestComplete( status, KErrNone ); // RunL() function will get called
@@ -315,7 +308,7 @@ void CAccFwUiNoteNotifier::Cancel()
 
     iIsCancelled = ETrue;
     
-    	   // Cancel active object, delete dialog and free resources
+    	   // Cancel active object and free resources
         if ( IsActive() )
             {
             CActive::Cancel();    

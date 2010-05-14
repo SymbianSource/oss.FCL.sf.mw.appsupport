@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1999-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -24,8 +24,11 @@ VENDORID 	0x70000001
 SOURCEPATH    	.
 SOURCE		zerosizedicontestapp.cpp
 
-USERINCLUDE   	.
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
+APP_LAYER_SYSTEMINCLUDE_SYMBIAN
+USERINCLUDE   	.
+SYSTEMINCLUDE 	/epoc32/include
+SYSTEMINCLUDE 	/epoc32/include/techview
 
 // Application exe specific resource which is localised to the application
 RESOURCE	zerosizedicon_loc.rss

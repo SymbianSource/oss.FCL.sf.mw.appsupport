@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -48,15 +48,16 @@
 #if !defined(__E32TEST_H__)
 #include <e32test.h>
 #endif
+#include "T_SisFileInstaller.h"
 
 _LIT(KCompleted, "Completed.");
 
 
-_LIT(KRSCDIR,"C:\\Resource\\apps\\");
-_LIT(KRSCREGDIR,"C:\\private\\10003a3f\\import\\apps\\");
+_LIT(KCtrlApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\app_CTRL2.sis");
+_LIT(KCtrlApp2Component, "app_CTRL2");
+
 _LIT(KNEWCTLPATH,"C:\\sys\\bin\\app_CTRL2.exe");
-_LIT(KSRCRESOURCEPATH,"Z:\\private\\10003a3f\\import\\apps\\App_CTRL2_reg.Rsc");
-_LIT(KDESTRESOURCEPATH,"C:\\private\\10003a3f\\import\\apps\\App_CTRL2_reg.Rsc");
+
 
 LOCAL_D TInt SimulateKeyL(TAny*)
 	{
@@ -86,17 +87,6 @@ LOCAL_D TInt SimulateKeyL(TAny*)
 	session.Close();
 	return KErrNone;
 	}
-
-void CT_ControlPanelTestStep::RemoveFilesFromCDrive()
-	{
-	TInt ret = iTestServ.SetReadOnly(KDESTRESOURCEPATH,0); //remove READ ONLY option
-	TEST(ret==KErrNone);
-
-	TRAP(ret,iTestServ.DeleteFileL(KDESTRESOURCEPATH));
-	TEST(ret==KErrNone);
-	}
-
-
 
 /**
   Auxiliary Fn for Test Case ID T-ControlPanelStep-testControls1L,
@@ -209,15 +199,15 @@ void CT_ControlPanelTestStep::testControls2L()
 	{
 	INFO_PRINTF1(_L("In testControls2L......"));	
 	
-	iTestServ.CreateDirectoryL(KRSCDIR);
-	iTestServ.CreateDirectoryL(KRSCREGDIR);
+	INFO_PRINTF1(_L("Application installing to C Drive......"));
 
-	TInt ret=iTestServ.CopyFileL(KSRCRESOURCEPATH,KDESTRESOURCEPATH);
-	TEST(ret==KErrNone);
-	
-	INFO_PRINTF1(_L("Files Copied to C Drive......"));
-	INFO_PRINTF1(_L("Updating the list ......"));
-	iControlCount=iControlList->UpdateCount();
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KCtrlApp2SisFile);
+    sisFileInstaller.InstallSisL(KCtrlApp2SisFile);
+    
+    INFO_PRINTF1(_L("Updating the list ......"));
+    TInt ret;
+    iControlCount=iControlList->UpdateCount();
 	while(iControlList->UpdateCount()<=iControlCount)
 		{
 		TRAP(ret, iControlList->UpdateL());
@@ -238,8 +228,9 @@ void CT_ControlPanelTestStep::testControls2L()
 
 	TFileName name=iControlList->Control(iIndex)->FileName();
 	TEST(name.CompareF(KNEWCTLPATH)==0);
-	RemoveFilesFromCDrive();
-	INFO_PRINTF1(_L("Removed the file from C Drive......"));
+	
+	sisFileInstaller.UninstallSisL(KCtrlApp2Component);
+	INFO_PRINTF1(_L("Removed application from C Drive......"));
 	INFO_PRINTF1(_L("Updating the list ......"));
 	iControlCount=iControlList->UpdateCount();
 	while(iControlList->UpdateCount()<=iControlCount)
@@ -448,6 +439,14 @@ TVerdict CT_ControlPanelTestStep::doTestStepL()
 	
 	// connect to the test utils server
 	User::LeaveIfError(iTestServ.Connect());
+	
+	RApaLsSession ls;
+	User::LeaveIfError(ls.Connect());
+	
+	TRequestStatus status;
+	ls.SetNotify(ETrue, status);
+	User::WaitForRequest(status);
+	ls.Close();
 	
 	// Run the tests...w	
 	TRAPD(ret,DoStepTestsInCallbackL())

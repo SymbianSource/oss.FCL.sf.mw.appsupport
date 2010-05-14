@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,7 +20,7 @@
 #define SPLASHSCREENDEFINES_H
 
 //CONSTANTS
-_LIT(KSplashBitmapName, "Z:SPLASHSCREEN.MIF");
+_LIT(KSplashBitmapName, "Z:QGN_STARTUP_SCREEN.SVG");
 _LIT(KPanicMsg,"SplashScreen");
 
 _LIT(KSplashScreenWindowGroup, "S60SplashScreenGroup");
@@ -28,6 +28,8 @@ _LIT(KSplashScreenWindowGroup, "S60SplashScreenGroup");
 
 _LIT_SECURITY_POLICY_C1(KReadPolicy, ECapabilityReadDeviceData);
 _LIT_SECURITY_POLICY_C1(KWritePolicy, ECapabilityWriteDeviceData);
+#define SIZE_X 360
+#define SIZE_Y 360
 
 // MACROS
 #define TRACE_ADDPREFIX(aText) (TPtrC((const TText *)L"SplashScreen: \"" L##aText L"\""))

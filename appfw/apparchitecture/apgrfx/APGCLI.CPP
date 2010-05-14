@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,10 @@
 
 #include "../apserv/APSCLSV.H"
 #include "../apserv/apsserv.h"
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+#include "../apgrfx/apgcommonutils.h"
+#endif
 
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #if !defined(__APA_INTERNAL_H__)
@@ -1547,25 +1551,41 @@ EXPORT_C RFs* RApaLsSession::FsSession()
 /** @publishedPartner */
 EXPORT_C void RApaLsSession::RegisterNonNativeApplicationTypeL(TUid aApplicationType, const TDesC& aNativeExecutable)
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServRegisterNonNativeApplicationType, TIpcArgs(aApplicationType.iUid, &aNativeExecutable)));
+#else
+	(void)aApplicationType; //to make compiler happy
+	(void)aNativeExecutable; 
+    User::Leave(KErrNotSupported);	
+#endif	
 	} //lint !e1762 Suppress member function could be made const
 
 /** @publishedPartner */
 EXPORT_C void RApaLsSession::DeregisterNonNativeApplicationTypeL(TUid aApplicationType)
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServDeregisterNonNativeApplicationType, TIpcArgs(aApplicationType.iUid)));
+#else
+	(void)aApplicationType;	//to make compiler happy
+    User::Leave(KErrNotSupported); 
+#endif	
 	} //lint !e1762 Suppress member function could be made const
 	
 /** @publishedPartner */
 EXPORT_C void RApaLsSession::PrepareNonNativeApplicationsUpdatesL()
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	TIpcArgs ipcArgs(0, 0, 0, 0);
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServPrepareNonNativeApplicationsUpdates, ipcArgs));
+#else
+    User::Leave(KErrNotSupported);
+#endif
 	} //lint !e1762 Suppress member function could be made const
 
 /** @publishedPartner */
 EXPORT_C void RApaLsSession::RegisterNonNativeApplicationL(TUid aApplicationType, const TDriveUnit& aDrive, CApaRegistrationResourceFileWriter& aRegistrationResourceFile, CApaLocalisableResourceFileWriter* aLocalisableResourceFile, const RFile* aIconFile)
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK      
 	TIpcArgs ipcArgs(0, 0, 0, 0);
 	RBuf8 ipcParameter0;
 	CleanupClosePushL(ipcParameter0);
@@ -1616,12 +1636,26 @@ EXPORT_C void RApaLsSession::RegisterNonNativeApplicationL(TUid aApplicationType
 
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServRegisterNonNativeApplication, ipcArgs));
 	CleanupStack::PopAndDestroy(2, &ipcParameter0);
+#else
+	(void) aApplicationType; //to make compiler happy
+	(void) aDrive;
+	(void) aRegistrationResourceFile;
+	(void) aRegistrationResourceFile;
+	(void) aLocalisableResourceFile;
+	(void) aIconFile;	
+    User::Leave(KErrNotSupported);  
+#endif	
 	} //lint !e1762 Suppress member function could be made const
 
 /** @publishedPartner */
 EXPORT_C void RApaLsSession::DeregisterNonNativeApplicationL(TUid aApplication)
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServDeregisterNonNativeApplication, TIpcArgs(aApplication.iUid)));
+#else
+	(void) aApplication;
+    User::Leave(KErrNotSupported);  	
+#endif
 	} //lint !e1762 Suppress member function could be made const
 	
 /**
@@ -1635,8 +1669,12 @@ until the application list is updated.
 
 EXPORT_C void RApaLsSession::CommitNonNativeApplicationsUpdatesL()
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK      
 	TIpcArgs ipcArgs(EFalse, 0, 0, 0);
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServCommitNonNativeApplications, ipcArgs));
+#else
+    User::Leave(KErrNotSupported);
+#endif	
 	} //lint !e1762 Suppress member function could be made const
 	
 
@@ -1653,8 +1691,12 @@ of updating the application list.
 
 EXPORT_C void RApaLsSession::ForceCommitNonNativeApplicationsUpdatesL()
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK      
 	TIpcArgs ipcArgs(ETrue, 0, 0, 0);
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServCommitNonNativeApplications, ipcArgs));
+#else
+    User::Leave(KErrNotSupported);  	
+#endif
 	}
 
 /** 
@@ -1668,8 +1710,12 @@ case it does nothing).
 */
 EXPORT_C TInt RApaLsSession::RollbackNonNativeApplicationsUpdates()
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK      
 	TIpcArgs ipcArgs(0, 0, 0, 0);
 	return SendReceiveWithReconnect(EAppListServRollbackNonNativeApplications, ipcArgs);
+#else
+    return KErrNotSupported;    
+#endif
 	} //lint !e1762 Suppress member function could be made const
 
 /**
@@ -1724,6 +1770,7 @@ trying to launch the recently installed applications.
 */
 EXPORT_C TInt RApaLsSession::ForceRegistration(const RPointerArray<TDesC>& aRegFiles)
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK     
 	CBufFlat* buffer = 0;
 	TRAPD(err, buffer = CreateRegFilesBufferL(aRegFiles));
 	if (err)
@@ -1733,6 +1780,10 @@ EXPORT_C TInt RApaLsSession::ForceRegistration(const RPointerArray<TDesC>& aRegF
 	const TInt returnValue=SendReceiveWithReconnect(EAppListServForceRegistration,TIpcArgs(&ptr));
 	delete buffer;
 	return returnValue;
+#else
+	(void) aRegFiles;
+    return KErrNotSupported;	
+#endif	
 	} //lint !e1762 Suppress member function could be made const
 	
 	
@@ -1840,7 +1891,7 @@ EXPORT_C void RApaLsSession::CancelNotifyOnDataMappingChange()
 	SendReceive(ECancelNotifyOnDataMappingChange,TIpcArgs());
 	} //lint !e1762 Suppress member function could be made const
 
-
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
 CBufFlat* RApaLsSession::CreateRegFilesBufferL(const RPointerArray<TDesC>& aRegFiles)
 	{
 	// Serialize the array
@@ -1873,3 +1924,211 @@ CBufFlat* RApaLsSession::CreateRegFilesBufferL(const RPointerArray<TDesC>& aRegF
 	CleanupStack::Pop(buffer);
 	return buffer;
 	}
+#endif
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+
+/* This function is only for use by Installers.
+
+Installers can provide the information about installed, uninstaleld and upgraded applications using this function.
+The function takes list of TApaAppUpdateInfo objects. TApaAppUpdateInfo object contains the application uid and
+corresponding action done on that application like installed, uninstalled and upgraded.
+
+Apparc updates the application list based on the information provided in the list. 
+
+UpdateAppListL initiates applist update. It will not wait till the applist update completed.
+
+@param aAppUpdateInfo List of TApaAppUpdateInfo objects, which contains application uid and corresponding action information 
+					  like installed, uninstalled and changed.
+@return A standard error code.
+@publishedAll
+@released
+*/
+
+EXPORT_C TInt RApaLsSession::UpdateAppListL(RArray<TApaAppUpdateInfo>& aAppUpdateInfo)
+    {
+    //Create a buffer with the application UID and corresponding action information.
+    CBufFlat* buffer = 0;
+    TRAPD(err, buffer = CreateAppUpdateInfoBufferL(aAppUpdateInfo));
+    if (err)
+        return err;
+    
+    TPtr8 ptr = buffer->Ptr(0);
+    const TInt returnValue=SendReceiveWithReconnect(EAppListServUpdateAppList,TIpcArgs(&ptr));
+    delete buffer;
+    return returnValue;
+    }
+
+
+/**
+This function is only for use by Software Install.
+
+ForceRegistration allows Software Install to provide a list of application information that need to be 
+included in apparc's application list even if they have not been marked as installed in the SISRegistry. 
+The force registered applications will be removed from application list once Software Install notifies
+the end of the installation by calling UpdateApplist.
+
+
+@param aAppsData The list of application information needs to be added to application list. Apparc don't take the 
+				 ownership of this array.
+@return A standard error code.
+@publishedAll
+@released
+*/
+
+EXPORT_C TInt RApaLsSession::ForceRegistration(const RPointerArray<Usif::CApplicationRegistrationData>& aForceRegAppsInfo)
+{
+    //If there are no applications to update, just return.
+    if(aForceRegAppsInfo.Count()==0)
+        return(KErrNone);
+    
+    //Create a buffer with the application uid and corresponding action information.
+    CBufFlat* buffer = 0;
+    TRAPD(err, buffer = CreateForceRegAppInfoBufferL(aForceRegAppsInfo));
+    if (err)
+        return err;
+    
+    TPtr8 ptr = buffer->Ptr(0);
+    const TInt returnValue=SendReceiveWithReconnect(EAppListServForceRegistration,TIpcArgs(&ptr));
+    delete buffer;
+    return returnValue;
+}
+
+
+/*
+ * Creates a buffer for applications uids and action information. 
+ */
+CBufFlat* RApaLsSession::CreateAppUpdateInfoBufferL(RArray<TApaAppUpdateInfo>& aAppUpdateInfo)
+    {
+    TInt count=aAppUpdateInfo.Count();
+    TInt requiredBufferSize=sizeof(TInt32)+(count*sizeof(TApaAppUpdateInfo)); //Size of count + size of TApaAppUpdateInfo objects
+
+    CBufFlat* const buffer = CBufFlat::NewL(requiredBufferSize);
+    CleanupStack::PushL(buffer);
+    buffer->ExpandL(0,requiredBufferSize);
+    RBufWriteStream writeStream;
+    writeStream.Open(*buffer);
+    CleanupClosePushL(writeStream);
+    
+	//Write number of TApaAppUpdateInfo objects to stream.
+    writeStream.WriteUint32L(count);
+
+    for(TInt index=0;index<count;index++)
+        {
+		//Write one application information at a time
+        writeStream<<aAppUpdateInfo[index];
+        }
+
+    writeStream.CommitL();
+    CleanupStack::PopAndDestroy(&writeStream);
+    CleanupStack::Pop(buffer);
+    
+    return buffer;
+    }
+	
+
+/* Creates buffer for force registered application information array*/
+
+CBufFlat* RApaLsSession::CreateForceRegAppInfoBufferL(const RPointerArray<Usif::CApplicationRegistrationData>& aForceRegAppsInfo)
+    {
+    TInt count=aForceRegAppsInfo.Count();
+    TInt requiredBufferSize=sizeof(TInt32); //For count
+    
+    for(TInt index=0; index<count; index++)
+        {
+        //Get each application information size and add it to required size.
+        requiredBufferSize += GetObjectSizeL(aForceRegAppsInfo[index]);
+        }
+
+    CBufFlat* const buffer = CBufFlat::NewL(requiredBufferSize);
+    CleanupStack::PushL(buffer);
+    buffer->ExpandL(0,requiredBufferSize);
+    
+    RBufWriteStream writeStream;
+    writeStream.Open(*buffer);
+    CleanupClosePushL(writeStream);
+    
+    //Write count to stream.
+    writeStream.WriteUint32L(count);
+
+    for(TInt index=0;index<count;index++)
+        {
+        //Write one applciation information at a time to stream.
+        writeStream<<*aForceRegAppsInfo[index];
+        }
+
+    writeStream.CommitL();
+    CleanupStack::PopAndDestroy(&writeStream);
+    CleanupStack::Pop(buffer);
+    
+    return buffer;    
+    }
+
+
+
+/* 
+Provides updated application information after apparc notifies application list change. It provides list of TApaAppUpdateInfo
+objects which contains the information about updated application UID and the action, i.e installed, uninstalled and changed.
+
+The function returns empty list if the application list is changed due to initial application list creation or because of phone 
+language change. During that time the list of changed applications can be large.
+
+This function should be called only after the client receives the applist notification from AppArc registered through SetNotify(). Otherwise the 
+return values are unpredictable.
+
+@param aUpdatedAppsInfo On return, provides the list of TApaAppUpdateInfo objects, which contains changed application uids and 
+                        corresponding action information like installed, uninstalled and changed. If this list is empty, then 
+                        the applist is updated because of initial applist creation or because of phone language change. In that 
+                        case use GetAllApps and GetNextApp APIs to retrieve the complete applist information.
+                           
+@return A standard error code.
+@publishedAll
+@released
+*/
+
+EXPORT_C TInt RApaLsSession::UpdatedAppsInfoL(RArray<TApaAppUpdateInfo>& aUpdatedAppsInfo)
+    {
+    const TInt KDefaultUpdateAppEntries=10;
+  
+    //Create a buffer with default size
+    TInt sizeRequired=(KDefaultUpdateAppEntries * sizeof(TApaAppUpdateInfo)) + 2;
+    CBufFlat* buffer=CBufFlat::NewL(sizeRequired);
+    CleanupStack::PushL(buffer);
+    buffer->ExpandL(0, sizeRequired);
+    TPtr8 ptr = buffer->Ptr(0); 
+
+    TPckgBuf<TInt> pckg(sizeRequired);
+    
+    //pass the buffer and size of the buffer.
+    TInt returnValue=SendReceiveWithReconnect(EAppListUpdatedAppsInfo,TIpcArgs(&ptr, &pckg));
+    
+    //If the size of the buffer is not enough expand it to required size and pass it again.
+    if(returnValue==KErrOverflow)
+        {
+        buffer->ExpandL(0, sizeRequired);
+        returnValue=SendReceiveWithReconnect(EAppListUpdatedAppsInfo,TIpcArgs(&ptr, &pckg));
+        }
+    
+    if(returnValue==KErrNone)
+        {
+        RBufReadStream readStream;
+        readStream.Open(*buffer);
+        
+        //Read count from the stream
+        TInt count=readStream.ReadUint32L();
+    
+        //Read updated applications information and add it to array 
+        for(TInt index=0; index<count; index++)
+            {
+            TApaAppUpdateInfo appUpdateInfo;
+            readStream>>appUpdateInfo;
+            aUpdatedAppsInfo.AppendL(appUpdateInfo);
+            }
+        }
+    
+    CleanupStack::PopAndDestroy(buffer);
+    return returnValue;
+    }
+
+#endif
+    

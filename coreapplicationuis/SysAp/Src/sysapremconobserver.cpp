@@ -102,13 +102,13 @@ void CSysApRemConObserver::MrccatoCommand( TRemConCoreApiOperationId aOperationI
 	        || aOperationId == ERemConCoreApiMute )
 	        {
             // A volume key is pressed down
-            TRAPD( err, iSysApAppUi.ShowUiNoteL( EFmTxVolumeDisabledNote ) );
+/*            TRAPD( err, iSysApAppUi.ShowUiNoteL( EFmTxVolumeDisabledNote ) );
             
             if ( err != KErrNone )
                 {
                 TRACES( RDebug::Print( _L("CSysApRemConObserver::MrccatoCommand: err=%d"), err ) );
                 }
-	        }
+*/	        }
 	    }
 	}
 

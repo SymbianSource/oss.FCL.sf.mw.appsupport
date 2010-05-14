@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -50,6 +50,14 @@
 #if !defined(__E32TEST_H__)
 #include <e32test.h>
 #endif
+#include "T_SisFileInstaller.h"
+
+_LIT(KMCtrlAppV2SisFile, "z:\\apparctest\\apparctestsisfiles\\m_ctrl_v2.sis");
+_LIT(KMCtrlAppV2Component, "m_ctrl_v2");
+
+_LIT(KTstAppStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TSTAPP_standalone.sis");
+_LIT(KTstAppStandAloneComponent, "TSTAPP_standalone");
+
 
 TInt PanicTestThread(TAny* aOption);
 
@@ -61,16 +69,9 @@ enum TPanicOption
 	ELast
 	};
 
-
-_LIT(KCTLDIR,"C:\\private\\10003a3f\\import\\apps\\");
-_LIT(KSOURCEPATH,"z:\\private\\10003a3f\\import\\apps\\m_ctrl_reg.rsc");
-_LIT(KNEWCTLPATH,"C:\\private\\10003a3f\\import\\apps\\m_ctrl_reg.rsc");
 _LIT(KNEWPATH,"C:\\cm.txt");
 _LIT(KEMPTYFILEPATH,"z:\\system\\data\\Testpath\\FilterTests\\testfile1.txt");
 
-_LIT(KRSCDIR,"C:\\Resource\\apps\\");
-_LIT(KLOCPATH,"z:\\Resource\\apps\\M_ctrl_loc.rsc");
-_LIT(KNEWLOCPATH,"C:\\Resource\\apps\\M_ctrl_loc.rsc");
 _LIT(KCTRLNAME,"C:\\sys\\bin\\m_ctrl.exe");
 TFileName ctlPath=_L("z:\\sys\\bin\\m_ctrl.exe");
 
@@ -1015,14 +1016,10 @@ void CT_ProStep::testControls2L()
 	RSmlTestUtils testSession;
 	User::LeaveIfError(testSession.Connect());
 
-	testSession.CreateDirectoryL(KCTLDIR);
-	testSession.CreateDirectoryL(KRSCDIR);
-
-	TInt ret=testSession.CopyFileL(KSOURCEPATH,KNEWCTLPATH);
-	TEST(ret==KErrNone);
-	ret=testSession.CopyFileL(KLOCPATH,KNEWLOCPATH);
-	TEST(ret==KErrNone);
-
+	CSisFileInstaller sisFileInstaller;
+	INFO_PRINTF2(_L("Installing sis file from -> %S"), &KMCtrlAppV2SisFile);
+	sisFileInstaller.InstallSisL(KMCtrlAppV2SisFile);
+	TInt ret;
 	TInt controlCount=iControlList->UpdateCount();
 	while(iControlList->UpdateCount()<=controlCount)
 		{
@@ -1048,11 +1045,8 @@ void CT_ProStep::testControls2L()
 		}
 	
 	// hide the control and do an update - there should be changes
-	testSession.SetReadOnly(KNEWCTLPATH,0);  // remove the read only attribute
-	ret=testSession.DeleteFileL(KNEWCTLPATH);
-	TEST(ret==KErrNone);
-	testSession.SetReadOnly(KNEWLOCPATH,0);  // remove the read only attribute
-	ret=testSession.DeleteFileL(KNEWLOCPATH);
+	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KMCtrlAppV2Component);
+	
 	TEST(ret==KErrNone);
 	controlCount=iControlList->UpdateCount();
 	while(iControlList->UpdateCount()<=controlCount)
@@ -1145,6 +1139,13 @@ void CT_ProStep::testControlsL()
 	{
 	INFO_PRINTF1(_L("Testing CApaSystemControlList"));
 
+	RApaLsSession ls;
+	User::LeaveIfError(ls.Connect());
+	
+	TRequestStatus status;
+	ls.SetNotify(ETrue, status);
+	User::WaitForRequest(status);
+	
 	//Create a session with F & B server
 	TInt ret = RFbsSession::Connect();
 	TEST(ret == KErrNone);
@@ -1300,38 +1301,29 @@ void CT_ProStep::ClosePanicWindowL()
  */
 void CT_ProStep::DoAppListInvalidTestL(RApaLsSession& aLs)
 	{
-	_LIT(KTempAppDir, "C:\\private\\10003a3f\\import\\apps\\");
-	_LIT(KTempRegPath, "C:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc");
+
 	TFullName regPath=_L("z:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc");
 	
 	CFileMan* fileMan = CFileMan::NewL (iFs);
 	CleanupStack::PushL(fileMan);
 	
 	INFO_PRINTF1(_L("Copy tstapp files to C: drive......."));
-	TInt ret = iFs.MkDirAll(KTempAppDir);
-	TEST(ret==KErrNone || ret==KErrAlreadyExists);
-	TEST(fileMan->Copy(regPath, KTempRegPath)==KErrNone);	//Just to start the idle update.
 
-	User::After(8000000);
+	CSisFileInstaller sisFileInstaller;
+	INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
+	sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppStandAloneSisFile);
 	
 	INFO_PRINTF1(_L("Get app list......."));
+	TInt ret;
 	ret = aLs.GetAllApps();
 	TEST(ret==KErrNone);
 
 	INFO_PRINTF1(_L("Remove temp files from C: drive......."));
-	TRequestStatus status;
-	TTime tempTime(0); // added tempTime to avoid asynch CFileMan::Attribs request completing with KErrArgument
-	TInt err=fileMan->Attribs(KTempAppDir,0,KEntryAttReadOnly, tempTime, CFileMan::ERecurse, status);
-	TEST(err==KErrNone);
-	User::WaitForRequest(status);
-	TEST(status.Int() == KErrNone);
-	TEST(fileMan->Delete(KTempRegPath)==KErrNone);	//Just to start the idle update.
-	TEST(fileMan->RmDir(KTempAppDir)==KErrNone);
 
-	User::After(8000000);
-	
+	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KTstAppStandAloneComponent);
 	INFO_PRINTF1(_L("Testing GetNextApp() never returns RApaLsSession::EAppListInvalid."));
 	TApaAppInfo info;
+	
 	while(ret==KErrNone)
 		{
 		ret=aLs.GetNextApp(info);
@@ -1535,7 +1527,7 @@ TVerdict CT_ProStep::doTestStepL()
 
 	iFs.Connect();
 	setup();
-
+	
 	TRAPD(ret,DoStepTestsInCallbackL())
 	TEST(ret==KErrNone);
 

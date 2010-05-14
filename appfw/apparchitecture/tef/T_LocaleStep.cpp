@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -35,13 +35,19 @@
 #include <hal.h>
 #include <apgcli.h>
 #include "T_LocaleStep.h"
+#include "T_SisFileInstaller.h"
 
 const TUid KUidTestApp = { 10 }; //uid of tstapp.
 const TUid KUidCustomiseDefaultIconApp = {0x10208181}; // uid of CustomiseDefaultIconApp.
-const TInt KDelayForOnDemand = 20000; //a small delay
+const TInt KDelayForOnDemand = 4000000; //a small delay
 const TInt KDelay = 4000000; // Most apparc tests have 2.5 secs wait time to let apparc update the app-list, but on safer side let us give 4 secs.
 const TInt KViewCount = 3; // Total no of views in tstapp
 
+_LIT(KTstAppStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TSTAPP_standalone.sis");
+_LIT(KTstAppStandAloneComponent, "TSTAPP_standalone");
+
+_LIT(KTstCustomiseDefaultIconAppSisFile, "z:\\apparctest\\apparctestsisfiles\\CustomiseDefaultIconApp.sis");
+_LIT(KTstCustomiseDefaultIconAppComponent, "CustomiseDefaultIconApp");
 
 /**
   Auxiliary Fn for Test Case ID T-LocaleStep-TestAllLanguages
@@ -51,7 +57,7 @@ const TInt KViewCount = 3; // Total no of views in tstapp
  
 */
 void CT_LocaleStep::ChangeLocaleL(TLanguage aLanguage)
-	{
+	{/*
 #ifdef SYMBIAN_DISTINCT_LOCALE_MODEL 
 	_LIT(KLitLocaleDllNameBase, "elocl_lan");
 	_LIT(KLitLocaleDllNameExtension, ".loc");
@@ -87,7 +93,64 @@ void CT_LocaleStep::ChangeLocaleL(TLanguage aLanguage)
 #else	
 	User::LeaveIfError(UserSvr::ChangeLocale(localeDllName));
 #endif
-	CleanupStack::PopAndDestroy(); // localeDll
+	CleanupStack::PopAndDestroy(); // localeDll */
+	
+#ifdef SYMBIAN_DISTINCT_LOCALE_MODEL 
+    _LIT(KLitLanguageLocaleDllNameBase, "elocl_lan");
+    //Region and collation code values are hard coded, as the check, after changing the locale is made for the language only.
+    _LIT(KLitRegionLocaleDllNameBase, "elocl_reg.826");        
+    _LIT(KLitCollationLocaleDllNameBase, "elocl_col.001");
+    _LIT(ThreeDigExt,".%03d");
+    TExtendedLocale localeDll;    
+    const TUidType uidType(TUid::Uid(0x10000079),TUid::Uid(0x100039e6));
+    TBuf<16> languageLocaleDllName(KLitLanguageLocaleDllNameBase);  
+    languageLocaleDllName.AppendFormat(ThreeDigExt, aLanguage);
+    TBuf<16> regionLocaleDllName(KLitRegionLocaleDllNameBase);  
+    TBuf<16> collationLocaleDllName(KLitCollationLocaleDllNameBase);  
+    // Try to load the locale dll
+    TInt error=localeDll.LoadLocale(languageLocaleDllName, regionLocaleDllName, collationLocaleDllName);
+        
+    if (error==KErrNotFound)
+        {
+        // Locale dll is not found for the asked language. 
+        ERR_PRINTF2(_L("Failed to find the locale dll for %d"), aLanguage);
+        }
+           
+    User::LeaveIfError(error);
+    localeDll.SaveSystemSettings();
+#else
+    _LIT(KLitLocaleDllNameBase, "ELOCL");
+    _LIT(TwoDigExt,".%02d");
+    
+    RLibrary localeDll; 
+    CleanupClosePushL(localeDll);
+    
+    const TUidType uidType(TUid::Uid(0x10000079),TUid::Uid(0x100039e6));
+    TBuf<16> localeDllName(KLitLocaleDllNameBase);  
+    localeDllName.AppendFormat(TwoDigExt, language);
+    
+    // Try to load the locale dll
+    TInt error=localeDll.Load(localeDllName, uidType);
+    if (error==KErrNotFound)
+        {
+        // Locale dll is not found for the asked language. 
+        ERR_PRINTF2(_L("Failed to find the locale dll for %d"), language);
+        }
+    
+    User::LeaveIfError(error);
+    User::LeaveIfError(UserSvr::ChangeLocale(localeDllName));
+    CleanupStack::PopAndDestroy(); // localeDll
+#endif
+    
+    // Check if the device locale has changed
+    if (aLanguage == User::Language())
+        {
+        SetTestStepResult(EPass);
+        }
+    else
+        {
+        ERR_PRINTF3(_L("Failed to change the locale to %d whereas the current locale is"), aLanguage, User::Language());
+        }
 	}
 
 // CheckIcons is a function used in testcase TestLocaleDefaultIconL to check the size of the default icons
@@ -758,6 +821,11 @@ TVerdict CT_LocaleStep::doTestStepPreambleL()
    Override of base class virtual
  */
 	{
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppStandAloneSisFile);
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstCustomiseDefaultIconAppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTstCustomiseDefaultIconAppSisFile);    
 	SetTestStepResult(EPass);
 	return TestStepResult();
 	}
@@ -768,6 +836,9 @@ TVerdict CT_LocaleStep::doTestStepPostambleL()
    Override of base class virtual
  */
 	{
+	CSisFileInstaller sisFileInstaller;
+	sisFileInstaller.UninstallSisL(KTstAppStandAloneComponent);
+	sisFileInstaller.UninstallSisL(KTstCustomiseDefaultIconAppComponent);	
 	return TestStepResult();
 	}
 

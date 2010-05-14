@@ -99,7 +99,7 @@ private:
     /**
     * Handle keys under category KPSUidHWRMFmTx
     */
-    void HandleHwrmFmTxCategoryL( const TUint aKey, const TInt aValue );
+//    void HandleHwrmFmTxCategoryL( const TUint aKey, const TInt aValue );
     
     /**
     * Handle keys under category KPSUidDataSynchronizationInternalKeys
@@ -160,11 +160,11 @@ private:
     CSysApSubscriber*   iSimChangedSubscriber;               // KPSSimChanged
 
     // Category KHWRMFmTxStatus
-    CSysApSubscriber*   iFmTxStatusSubscriber;   // KPSUidHWRMFmTx
+//    CSysApSubscriber*   iFmTxStatusSubscriber;   // KPSUidHWRMFmTx
     
-    TInt iPreviousFmTxPSValue;
+//    TInt iPreviousFmTxPSValue;
     
-    CSysApRemConObserver* iFmTxRemConObserver;
+//    CSysApRemConObserver* iFmTxRemConObserver;
     
     // Category KPSUidCoreApplicationUIs
 

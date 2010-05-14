@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -37,6 +37,7 @@ _LIT8(KTResultPass, "PASS");
 _LIT8(KTResultFail, "FAIL");
 
 
+
 //!  A CT_ProcStep test class.
 
 /**  Checks for child process existence when its parent terminates. */
@@ -46,6 +47,8 @@ class CT_ProcStep : public CTestStep
 public:
 	CT_ProcStep();
 	~CT_ProcStep();
+    virtual TVerdict doTestStepPreambleL();
+    virtual TVerdict doTestStepPostambleL();	
 	virtual TVerdict doTestStepL();
 private:
 	void testChildExistsL(void);

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -44,20 +44,20 @@ APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 //reg added for Datacaging
 START RESOURCE	tstapp_reg.rss
-TARGETPATH		/private/10003a3f/import/apps
+TARGETPATH		/apparctestregfiles
 END
 
 START RESOURCE 	TSTAPP.rss
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 END
 
 START RESOURCE 	tstapp_loc.rss
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 LANG 			SC 01 02 03 04 05
 END
 
 START BITMAP 	tstapp.mbm
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 SOURCEPATH 		../tdatasrc
 SOURCE 			c8,1 tstappicon24x20.bmp tstappicon24x20m.bmp
 SOURCE 			c8,1 tstappicon24x20.bmp tstappicon24x20m.bmp
@@ -66,19 +66,19 @@ SOURCE 			c8,1 tstappicon40x55.bmp tstappicon40x55m.bmp
 END
 
 START BITMAP 	tstapp02.m02
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 SOURCEPATH 		../tdatasrc
 SOURCE 			c8,1 def25.bmp def25m.bmp def25.bmp def25m.bmp def50.bmp def50m.bmp
 END
 
 START BITMAP 	tstappview01.m01
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 SOURCEPATH 		../tdatasrc
 SOURCE 			c8,1 def25.bmp def25m.bmp def35.bmp def35m.bmp def50.bmp def50m.bmp
 END
 
 START BITMAP 	tstappview02.k
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 SOURCEPATH 		../tdatasrc
 SOURCE 			c8,1 tstappicon24x20.bmp tstappicon24x20m.bmp
 SOURCE 			c8,1 tstappicon24x20.bmp tstappicon24x20m.bmp
@@ -86,13 +86,13 @@ SOURCE 			c8,1 tstappicon40x55.bmp tstappicon40x55m.bmp
 END
 
 START BITMAP 	tstappview01.m02
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 SOURCEPATH 		../tdatasrc
 SOURCE 			c8,1 def25.bmp def25m.bmp def35.bmp def35m.bmp def50.bmp def50m.bmp
 END
 
 START BITMAP 	tstappview
-TARGETPATH 		/resource/apps
+TARGETPATH 		/apparctestregfiles
 SOURCEPATH 		../tdatasrc
 SOURCE 			c8,1 tstappicon24x20.bmp tstappicon24x20m.bmp
 SOURCE 			c8,1 tstappicon24x20.bmp tstappicon24x20m.bmp

@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -44,7 +44,7 @@
 	
 _LIT(KTLogFileAccess,"TestLogFile");
 _LIT(KFilePath,"c:\\logs\\TestExecute\\EnvSlots.txt");
-_LIT(KTAppName,"Z:\\sys\\bin\\T_EnvSlots.exe");
+_LIT(KTAppName,"C:\\sys\\bin\\T_EnvSlots.exe");
 _LIT(KTDocName,"C:\\System\\data\\temp.test");
 _LIT(KTEnvSlots,"T_EnvSlots");
 

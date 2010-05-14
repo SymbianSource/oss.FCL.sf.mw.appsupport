@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -38,8 +38,6 @@
 #include "t_foreground.h"
 #include "T_ProStep.h"
 #include "T_OOMStep.h"
-#include "T_File2Step.h"
-#include "T_File3Step.h"
 #include "T_BackupStep.h"
 #include "T_MdrStep.h"
 #include "T_Serv2Step.h"
@@ -72,18 +70,28 @@
 #include "T_DataMappingPersistenceA.h"
 #include "T_DataMappingPersistenceB.h"
 #include "T_DataMappingPersistenceC.h"
-#include "T_NonNativeAppsStep.h"
-#include "T_IntegritySupportStep.h"
-#include "T_IntegritySupportRebootStep.h"
 #include "T_ApsScan.h"
 #include "T_EndTaskStep.h"
 #include "T_RecUpgrade.h"
 #include "T_AppListFileBootStep.h"
 #include "T_AppListFileUpdateStep.h"
 #include "t_largestackstep.h"
-#include "t_drivenotification.h"
 #include "t_mimecontentpolicystep.h"
 #include "t_servicebasestep.h"
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK     
+#include "t_updateapplist.h"
+#include "t_forceregstep.h"
+#include "t_clientnotifstep.h"
+#include "t_nonnativetest.h"
+#else
+#include "T_File2Step.h"
+#include "T_File3Step.h"
+#include "T_NonNativeAppsStep.h"
+#include "T_IntegritySupportStep.h"
+#include "T_IntegritySupportRebootStep.h"
+#include "t_drivenotification.h"
+#endif
 
 CApparctestServer* CApparctestServer::NewL()
 /**
@@ -131,6 +139,7 @@ CTestStep* CApparctestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CT_OOMStep();
 		}
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	else if(aStepName == KT_File2Step)
 		{
 		testStep = new CT_File2Step();
@@ -139,6 +148,7 @@ CTestStep* CApparctestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CT_File3Step();
 		}
+#endif	
 	else if(aStepName == KT_BackupStep)
 		{
 		testStep = new CT_BackupStep();
@@ -278,6 +288,7 @@ CTestStep* CApparctestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CT_DataMappingPersistenceCTestStep();
 		}
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	else if (aStepName == _L("T_NonNativeApps"))
 		{
 		testStep = new CT_NonNativeAppsStep();
@@ -294,6 +305,7 @@ CTestStep* CApparctestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CT_IntegritySupportReboot2TestStep();
 		}
+#endif  	
 	else if (aStepName == KT_ApsScanStep)
 		{
 		testStep = new CT_ApsScanStep();
@@ -322,10 +334,12 @@ CTestStep* CApparctestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CT_LargeStackStep();
 		}
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	else if (aStepName == KT_DriveNotificationStep)
 		{
 		testStep = new CT_DriveNotificationStep();
 		}
+#endif	
 	else if (aStepName == KT_MimeContentPolicyStep)
 		{
 		testStep = new CT_MimeContentPolicyStep();
@@ -338,6 +352,24 @@ CTestStep* CApparctestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CT_RecUpgradeStep();
 		}
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
+    else if (aStepName == KT_TestUpdateAppListStep)
+        {
+        testStep = new CT_TestUpdateAppListStep();
+        }
+    else if (aStepName == KT_ForceRegStep)
+        {
+        testStep = new CT_ForceRegStep();
+        }
+    else if (aStepName == KT_ClientNotifStep)
+        {
+        testStep = new CT_ClientNotifStep();
+        }
+    else if (aStepName == KT_NonNativeTestStep)
+        {
+        testStep = new CT_NonNativeTestStep();
+        }   
+#endif	
 
 	return testStep;
 	}

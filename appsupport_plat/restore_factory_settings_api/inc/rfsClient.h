@@ -24,7 +24,7 @@
 
 // INCLUDES
 #include <e32base.h>
-#include "rfshandler.h"
+#include "rfsHandler.h"
 
 // CONSTANTS
 

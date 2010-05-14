@@ -110,7 +110,7 @@ void COutOfDiskGlobalNote::DisplayL(const TDesC& aMessage)
      CHbDeviceMessageBoxSymbian* globalNote = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EWarning);
      CleanupStack::PushL(globalNote);
      globalNote->SetTextL(aMessage);
-     globalNote->SetTimeoutL(0);
+     globalNote->SetTimeout(0);
      globalNote->ExecL();
      CleanupStack::PopAndDestroy(globalNote);
      

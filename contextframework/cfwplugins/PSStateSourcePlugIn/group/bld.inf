@@ -26,9 +26,9 @@ PRJ_EXPORTS
 
 /*
 Copy 10282C74.xml to 
-1. \epoc32\data\z\private\10282BC4\Settings\10282C74\10282C74.xml
-2. \epoc32\release\winscw\udeb\z\private\10282BC4\Settings\10282C74\10282C74.xml
-3. \epoc32\release\winscw\urel\z\private\10282BC4\Settings\10282C74\10282C74.xml
+1. /epoc32/data/z/private/10282BC4/Settings/10282C74/10282C74.xml
+2. /epoc32/release/winscw/udeb/z/private/10282BC4/Settings/10282C74/10282C74.xml
+3. /epoc32/release/winscw/urel/z/private/10282BC4/Settings/10282C74/10282C74.xml
 */
 ../data/10282C74.xml	Z:/private/10282BC4/Settings/10282C74/10282C74.xml
     

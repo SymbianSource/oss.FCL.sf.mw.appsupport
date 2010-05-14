@@ -22,6 +22,9 @@
 */
 
 #include "T_ProcStep.h"
+#include "T_SisFileInstaller.h" 
+
+
 const TInt KTProcTerminatingChildI = 1246;
 const TInt KTProcTerminatingChildII = 1247;
 const TInt KTProcTerminatingChildIII = 1248;
@@ -1375,6 +1378,18 @@ void CT_ProcStep::testChildExistsL(void)
 	TEST(ret==KErrNone);
 	INFO_PRINTF1(_L("End - testIdNotAvailableToChildL ----------- \n"));
 	}
+
+
+TVerdict CT_ProcStep::doTestStepPreambleL()
+    {
+    SetTestStepResult(EPass);
+    return TestStepResult();
+    }
+
+TVerdict CT_ProcStep::doTestStepPostambleL()
+    {
+    return TestStepResult();    
+    }
 
 TVerdict CT_ProcStep::doTestStepL()
 /**

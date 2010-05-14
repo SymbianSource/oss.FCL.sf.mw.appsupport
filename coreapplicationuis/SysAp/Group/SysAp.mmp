@@ -48,7 +48,7 @@ SOURCE SysApProfileObserver.cpp
 SOURCE SysApEtelNetworkBarObserver.cpp
 SOURCE sysapetelnetworkbargetter.cpp
 
-SOURCE CenRepObservers/sysapcenrepfmtxobserver.cpp
+//SOURCE CenRepObservers/sysapcenrepfmtxobserver.cpp
 SOURCE CenRepObservers/SysApCenRepLogsObserver.cpp
 SOURCE CenRepObservers/SysApCenRepBTObserver.cpp
 SOURCE CenRepObservers/SysApCenRepHacSettingObserver.cpp
@@ -217,7 +217,7 @@ LIBRARY sanimctrl.lib
 LIBRARY MediaClientAudio.lib
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 LIBRARY hwrmlightclient.lib
-LIBRARY hwrmfmtxclient.lib
+//LIBRARY hwrmfmtxclient.lib
 LIBRARY	remconcoreapi.lib
 LIBRARY	remconinterfacebase.lib
 LIBRARY aknicon.lib

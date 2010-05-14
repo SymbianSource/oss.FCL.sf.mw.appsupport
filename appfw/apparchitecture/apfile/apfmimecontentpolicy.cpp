@@ -1,4 +1,4 @@
-// Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,18 +18,53 @@
 // INCLUDE FILES
 #include <apfmimecontentpolicy.h>
 #include <f32file.h> // RFs
-#include <barsread.h>
-#include <barsc.h> 
-#include <apfmimecontentpolicy.rsg>
 #include <caf/content.h>
 #include <e32base.h>
 #include <apgcli.h>    // For RApaLsSession 
+#include <centralrepository.h>
+#include <apmstd.h>
 
-// Resource file name.
-_LIT(KCEResourceFile, "z:\\resource\\apps\\apfmimecontentpolicy.rsc"); 
 
-// This is needed for resource reading.
-const TInt KCCMask(0x00000fff);
+/* Closed content and extension information is stored in central repository with UID 0x10003A3F.
+ * Keys of the Closed Content and Extension information repository is divided into two parts.
+ * Most significant byte is used for identifying the type,i.e. whether it is Mimetype or extension, 
+ * and the least significant 3 bytes are used for uniquely identifying the entry within that type. 
+ * 
+ * |-------------------- Key (32-bits) ---------------------|
+ *  --------------------------------------------------------
+ * | type (8-bits)  |            sequence number(24-bits)   |
+ *  --------------------------------------------------------
+ * 
+ *  The type part is used for differentiating Content type and extension keys.
+ *  The value can be 
+ *     0x0 - For content type key
+ *     0x1 - For extension key
+ *     
+ * Sequence number part is used to uniquely identifying the entry within that type. 
+ *  
+ *  Examples: 
+ *  
+ *  0x00000000 - Content type key with sequence number 0x0
+ *  0x00000001 - Content type key with sequence number 0x1
+ *  0x01000000 - Extension type key with sequence number 0x0
+ *  0x01000001 - Extension type key with sequence number 0x1
+ *  0x01000002 - Extension type key with sequence number 0x2
+ */
+
+
+
+//Partial key for finding MIME type keys in the repository
+const TUint32 KClosedContentTypePartialKey=0x0;
+
+//Partial key for finding extension type keys in the repository
+const TUint32 KClosedExtensionTypePartialKey=0x01000000;
+
+//Mask for finding the type (MIME or extension)of a key
+const TUint32 KClosedTypeKeyMask=0xFF000000;
+
+
+//Closed content and extension information repository UID
+const TUid KClosedContentAndExtensionInfoRepositoryUID={0x10003A3F};
 
 
 NONSHARABLE_CLASS(CApfMimeContentPolicyImpl) : public CBase
@@ -52,8 +87,9 @@ private:
 	void ConstructL();
     void ConstructL(RFs& aFs);
 	TBool IsClosedFileL(RFile& aFileHandle, const TDesC& aFileName) const;
-	void ReadResourcesL(RFs& aFs);
-
+	void ReadResourcesL();
+	TBool IsValidExtension(TDesC& extension);	
+    TBool IsValidMimeType(TDesC& extension);
 private:
 	CDesCArrayFlat* iCcl;	// Closed content list.
 	CDesCArrayFlat* iExtList;	// Closed extensions list.
@@ -249,7 +285,7 @@ void CApfMimeContentPolicyImpl::ConstructL()
 	iFsConnected = ETrue;
 	
 	User::LeaveIfError(iFs.ShareProtected());
-	ReadResourcesL(iFs);
+	ReadResourcesL();
 	}
 	
 /**
@@ -260,7 +296,7 @@ void CApfMimeContentPolicyImpl::ConstructL(RFs& aFs)
 	{
 	iFsConnected = EFalse;
 	iFs = aFs;	
-	ReadResourcesL(iFs);
+	ReadResourcesL();
 	}
 
 /**
@@ -490,31 +526,56 @@ Reads closed content list and closed extensions list. Connects to RApaLsSession.
 Called by constructor.
 @param aFs A handle to a shared file server session. 
 */
-void CApfMimeContentPolicyImpl::ReadResourcesL(RFs& aFs)
+void CApfMimeContentPolicyImpl::ReadResourcesL()
 	{
-	TResourceReader reader;	
+    ASSERT(!iCcl);
+    ASSERT(!iExtList);
+    
+	CRepository *cenrep=CRepository::NewL(KClosedContentAndExtensionInfoRepositoryUID);	
+	CleanupStack::PushL(cenrep);
+	
+	RArray<TUint32> keyArray;
+	CleanupClosePushL(keyArray);
+	
+    TBuf<KMaxDataTypeLength> keyData;
+    //Find the extenstion type keys in the repository 
+	cenrep->FindL(KClosedExtensionTypePartialKey, KClosedTypeKeyMask, keyArray);
+	int keyCount=keyArray.Count();
 
-	// Resource reading is done without coe & eikon env.
-	RResourceFile rsFile;
-	rsFile.OpenL(aFs, KCEResourceFile);
-	CleanupClosePushL(rsFile);
+	iExtList=new (ELeave) CDesCArrayFlat(keyCount);
 
-	// Read closed content list.
-	// Remove offset from id
-    HBufC8* rBuffer = rsFile.AllocReadLC(R_COMMONENG_CLOSED_CONTENT_LIST & KCCMask);
-	reader.SetBuffer(rBuffer);
-	ASSERT(!iCcl);
-	iCcl = reader.ReadDesCArrayL();
-	CleanupStack::PopAndDestroy(rBuffer); // rBuffer
-
-	// Read closed extensions list.
-	// Remove offset from id
-    rBuffer = rsFile.AllocReadLC(R_COMMONENG_CLOSED_EXTENSIONS_LIST & KCCMask); 
-	reader.SetBuffer(rBuffer);
-	ASSERT(!iExtList);
-	iExtList = reader.ReadDesCArrayL();
-	CleanupStack::PopAndDestroy(2); // rBuffer, rsFile 
-	    
+	TInt valid;
+	TInt index;
+	//Get each extension type key value and store in iExtList array
+	for(index=0; index<keyCount; index++)
+	    {
+	    cenrep->Get(keyArray[index], keyData);
+        //Check validity of the extension. If its invalid it will not be added to list.	    
+	    valid=IsValidExtension(keyData);
+	    if(valid)
+	        iExtList->AppendL(keyData);
+	    }
+	
+	keyArray.Reset();
+	
+    //Find the content type keys in the repository 	
+    cenrep->FindL(KClosedContentTypePartialKey, KClosedTypeKeyMask, keyArray);
+    keyCount=keyArray.Count();
+    
+    iCcl=new (ELeave) CDesCArrayFlat(keyCount);
+    
+    //Get each content type key value and store in iCcl array
+    for(index=0; index<keyCount; index++)
+        {
+        cenrep->Get(keyArray[index], keyData);  
+        //Check validity of the mime type. If its invalid it will not be added to list.
+        valid=IsValidMimeType(keyData);
+        if(valid)        
+            iCcl->AppendL(keyData);
+        }
+    
+    CleanupStack::PopAndDestroy(2, cenrep);
+	
     // Sort lists to enable binary find
     iCcl->Sort();
     iExtList->Sort();
@@ -524,3 +585,55 @@ void CApfMimeContentPolicyImpl::ReadResourcesL(RFs& aFs)
 	User::LeaveIfError(iLs.Connect());
 	}
 
+
+//Checks the given extension is valid or invalid. The extension should start with a ".".
+TBool CApfMimeContentPolicyImpl::IsValidExtension(TDesC& extension)
+    {
+     TChar dot='.';
+     //Check whether extension should start with "."
+     return(extension.Locate(dot)==0);
+    }
+
+//Checks the given mime type is valid or not.
+//The mime type will be in the following format type/subtype. Ex: "application/vnd.oma.drm.message"
+//Mime type should posses the following properties. Otherewise those are considered as invalid.
+//1. Only one front slash should exist. That should be followed by the type field.
+//2. There should not be any backslashes.
+
+TBool CApfMimeContentPolicyImpl::IsValidMimeType(TDesC& mimeType)
+    {
+    TChar backslash='\\';            
+    TChar forwardslash='/';
+    
+    //Check any backslash is used
+    TBool found=mimeType.Locate(backslash);
+    if(found!=KErrNotFound)
+        return(EFalse);
+
+    //Locate forward slash position
+    found=mimeType.Locate(forwardslash);
+    
+    //There should be at least one forward slash
+    if(found==KErrNotFound)
+        {
+        return EFalse;
+        }
+    else
+        {
+        //Forward slash position should not at first or last position of the mime type
+        if(found==0||(found==mimeType.Length()-1))
+            return EFalse;
+        
+        //There should not be more than one forward slash
+        found=mimeType.Mid(found+1).Locate(forwardslash);
+        if(found!=KErrNotFound)
+            {
+            return(EFalse);       
+            }
+        else
+            {
+            //MIME format is valid
+            return(ETrue);
+            }
+        }
+    }

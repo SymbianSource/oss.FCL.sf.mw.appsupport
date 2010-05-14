@@ -106,10 +106,10 @@
 
 #include "SysApShutdownAnimation.h"
 
-#include <hwrmfmtx.h>
-#include <hwrmfmtxdomainpskeys.h>
-#include <hwrmfmtxdomaincrkeys.h>
-#include "sysapcenrepfmtxobserver.h"
+//#include <hwrmfmtx.h>
+//#include <hwrmfmtxdomainpskeys.h>
+//#include <hwrmfmtxdomaincrkeys.h>
+//#include "sysapcenrepfmtxobserver.h"
 
 #include "SysApKeySndHandler.h"
 
@@ -336,12 +336,12 @@ void CSysApAppUi::ConstructL()
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApCenRepBtObserver::NewL") ) );
     iSysApCenRepBtObserver = CSysApCenRepBtObserver::NewL( *this );
 
-    if ( iSysApFeatureManager->FmTxSupported() )
+/*    if ( iSysApFeatureManager->FmTxSupported() )
         {
         TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApCenRepFmTxObserver::NewL") ) );        
         iSysApCenRepFmTxObserver = CSysApCenRepFmTxObserver::NewL( *this );    
         }
-
+*/
     // Define P&S keys "owned" by SysAp
     RProperty::Define( KPSUidUikon, KUikMMCInserted, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy );
     //initially assuming that the memory card is not inserted
@@ -1212,7 +1212,7 @@ void CSysApAppUi::FreeResources()
     delete iSysApCenRepLightSettingsObserver;
     delete iSysApCenRepLogsObserver;
     delete iSysApCenRepBtObserver;
-    delete iSysApCenRepFmTxObserver;
+//    delete iSysApCenRepFmTxObserver;
     delete iSysApCenRepHacSettingObserver;
     delete iSysApCenRepController;
 
@@ -1319,7 +1319,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
             tone = EAvkonSIDInformationTone;
             secondaryDisplayId = SecondaryDisplay::ECmdShowKeypadActiveNote;
             break;
-        case EFmTxAccessoryStandbyNote:
+/*        case EFmTxAccessoryStandbyNote:
             noteType = EAknGlobalInformationNote; 
             tone = EAvkonSIDInformationTone;
             secondaryDisplayId = SecondaryDisplay::ECmdShowFmTxStandbyInAccessoryConnectionNote;
@@ -1344,7 +1344,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
             tone = EAvkonSIDInformationTone;
             secondaryDisplayId = SecondaryDisplay::ECmdShowFmTxDisabledNote;
             break;
-        case EBatteryFullUnplugChargerNote:
+*/        case EBatteryFullUnplugChargerNote:
             noteType = EAknGlobalBatteryFullUnplugNote;
             tone = EAvkonSIDInformationTone;
             break;
@@ -1420,7 +1420,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
                     }
                 note->SetAnimation( R_QGN_NOTE_KEYGUARD_OPEN_ANIM );
                 break;
-            case EFmTxOnNote:
+/*            case EFmTxOnNote:
                 {
                 const TInt KFrequencyMaxLength(7);
                 // read frequency
@@ -1459,7 +1459,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
                                                        iEikonEnv );
                 break;
                 }
-            case EPowerSaveModeActivated:
+*/            case EPowerSaveModeActivated:
                 noteStringBuf = StringLoader::LoadLC( R_QTN_POWER_SAVING_ACTIVATED_CONF_NOTE, iEikonEnv );
                 break;
             case EPowerSaveModeDeactivated:
@@ -1478,7 +1478,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
         note->SetTone( tone );
 
         // Set secondary display data if necessary
-        if ( iSysApFeatureManager->CoverDisplaySupported() && secondaryDisplayId != SecondaryDisplay::ECmdNoNote)
+/*        if ( iSysApFeatureManager->CoverDisplaySupported() && secondaryDisplayId != SecondaryDisplay::ECmdNoNote)
             {
             TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL - Notifying secondary display") ) );
             CAknSDData* sd;
@@ -1495,7 +1495,7 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
              
             note->SetSecondaryDisplayData(sd); // ownership to notifier client
             }
-
+*/
         if ( noteStringBuf )
             {
             TPtr textBuffer = noteStringBuf->Des();
@@ -2193,7 +2193,7 @@ void CSysApAppUi::GoOfflineL()
 // ----------------------------------------------------------------------------
 void CSysApAppUi::SwitchFromOnlineToOfflineModeL()
     {
-    if ( iSysApFeatureManager->FmTxSupported() )
+/*    if ( iSysApFeatureManager->FmTxSupported() )
         {
         TFmTxState state = static_cast<TFmTxState>(StateOfProperty( KPSUidHWRMFmTx, KHWRMFmTxStatus ));
         switch ( state )
@@ -2209,7 +2209,7 @@ void CSysApAppUi::SwitchFromOnlineToOfflineModeL()
                 break;                
             }
         }
-    iSysApOfflineModeController->SwitchFromOnlineToOfflineModeL();
+*/    iSysApOfflineModeController->SwitchFromOnlineToOfflineModeL();
     }
 
 // ----------------------------------------------------------------------------
@@ -2290,7 +2290,7 @@ TBool CSysApAppUi::DeviceLockState() const
     {
     return iDeviceLockEnabled;
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApAppUi::ChangeFmTxStateL()
 // ----------------------------------------------------------------------------     
@@ -2308,6 +2308,7 @@ void CSysApAppUi::ChangeFmTxStateL( TBool aEnable )
        }
     CleanupStack::PopAndDestroy( fmtx );
     } 
+*/
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::SetIhfIndicatorL()

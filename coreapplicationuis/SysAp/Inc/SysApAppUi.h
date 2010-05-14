@@ -62,7 +62,7 @@ class CSysApConnectionMonitorObserver;
 class CSysApCenRepLightSettingsObserver;
 class CSysApCenRepLogsObserver;
 class CSysApCenRepBtObserver;
-class CSysApCenRepFmTxObserver;
+//class CSysApCenRepFmTxObserver;
 class CSysApCenRepController;
 class CSysApStartupController;
 class CSysApPowerKeyMenuObserver;
@@ -427,7 +427,7 @@ class CSysApAppUi :
          /**
          * Enable or disable FM transmission 
          */
-         void ChangeFmTxStateL( TBool aEnable );
+//         void ChangeFmTxStateL( TBool aEnable );
 
 #ifndef RD_MULTIPLE_DRIVE
     public: // from MAknMemoryCardDialogObserver
@@ -1441,7 +1441,7 @@ class CSysApAppUi :
         CSysApCenRepLogsObserver*                iSysApCenRepLogsObserver;
         CSysApCenRepBtObserver*                  iSysApCenRepBtObserver;
         CSysApCenRepHacSettingObserver* iSysApCenRepHacSettingObserver;
-        CSysApCenRepFmTxObserver*      iSysApCenRepFmTxObserver;
+//        CSysApCenRepFmTxObserver*      iSysApCenRepFmTxObserver;
         CSysApCenRepController*                  iSysApCenRepController;
         CSysApStartupController*        iSysApStartupController;
         CSysApConnectionMonitorObserver*	iSysApConnectionMonitorObserver;

@@ -93,8 +93,8 @@ void CSysApFeatureManager::ConstructL()
     iNoPowerKeySupported = FeatureManager::FeatureSupported( KFeatureIdNoPowerkey );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: No power key supported=%d"), iNoPowerKeySupported ) );
     
-    iFmTxSupported = FeatureManager::FeatureSupported( KFeatureIdFmtx );
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX supported=%d"), iFmTxSupported ) );
+//    iFmTxSupported = FeatureManager::FeatureSupported( KFeatureIdFmtx );
+ //   TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX supported=%d"), iFmTxSupported ) );
 
     iPenEnabled = AknLayoutUtils::PenEnabled();
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Pen enabled=%d"), iPenEnabled ) );
@@ -105,8 +105,8 @@ void CSysApFeatureManager::ConstructL()
     iTouchUnlockStrokeSupported = FeatureManager::FeatureSupported( KFeatureIdFfTouchUnlockStroke );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Touch unlock stroke supported=%d"), iTouchUnlockStrokeSupported ) );
     
-    iFmTxRdsTextSupported = FeatureManager::FeatureSupported( KFeatureIdFfFmtxRdsText );
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX RDS-TEXT supported=%d"), iFmTxRdsTextSupported ) );
+//    iFmTxRdsTextSupported = FeatureManager::FeatureSupported( KFeatureIdFfFmtxRdsText );
+//    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX RDS-TEXT supported=%d"), iFmTxRdsTextSupported ) );
     
     CRepository* repository = NULL;
     
@@ -180,11 +180,11 @@ CSysApFeatureManager::CSysApFeatureManager() : iFeatMgrActive( EFalse ),
                                                iGripNotSupported( ETrue ),
                                                iPowerSaveSupported( EFalse ),
                                                iNoPowerKeySupported( EFalse ),
-                                               iFmTxSupported( EFalse ),
+//                                               iFmTxSupported( EFalse ),
                                                iPenEnabled( EFalse ),
                                                iVmbxCallDivertIconSupported( EFalse ),
-                                               iTouchUnlockStrokeSupported( EFalse ),
-                                               iFmTxRdsTextSupported( EFalse )
+                                               iTouchUnlockStrokeSupported( EFalse )
+//                                               iFmTxRdsTextSupported( EFalse )
 
     {
     }
@@ -369,7 +369,7 @@ TBool CSysApFeatureManager::NoPowerKeySupported() const
     {
     return iNoPowerKeySupported;
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::FmTxSupported()
 // ----------------------------------------------------------------------------
@@ -378,7 +378,7 @@ TBool CSysApFeatureManager::FmTxSupported() const
     {
     return iFmTxSupported;
     }
-
+*/
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::PenEnabled()
 // ----------------------------------------------------------------------------
@@ -405,7 +405,7 @@ TBool CSysApFeatureManager::TouchUnlockStrokeSupported() const
     {
     return iTouchUnlockStrokeSupported;
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::FmTxRdsTextSupported()
 // ----------------------------------------------------------------------------
@@ -414,7 +414,7 @@ TBool CSysApFeatureManager::FmTxRdsTextSupported() const
     {
     return iFmTxRdsTextSupported;
     }
-
+*/
 // End of File
 
 

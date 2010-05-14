@@ -474,7 +474,7 @@ void CRfsConnectionObserver::DismissWaitDialog()
     
     if ( iDialog && iIsWaitForDialogExecuted)
         {
-        iDialog->Cancel();
+        iDialog->Close();
         }
     
     // Sanity Check:

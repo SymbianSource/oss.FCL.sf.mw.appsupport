@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -34,12 +34,13 @@
 
 #include <apgcli.h>
 #include "T_AppListFileUpdateStep.h"
+#include "T_SisFileInstaller.h"
 
-_LIT(KTestAppZPath,"Z:\\ApparcTest\\TestAppInstall_reg.RSC");
+_LIT(KApparcTestAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TApparcTestApp.sis");
+_LIT(KApparcTestAppComponent, "TApparcTestApp");
+
 _LIT(KAppListFileName,"C:\\private\\10003a3f\\AppsListCache\\AppsList.bin");
 _LIT(KAppTimeFormat,"%:0%H%:1%T%:2%S%:3");
-_LIT(KAppDirectory,"C:\\Private\\10003a3f\\Import\\apps\\");
-_LIT(KTestAppObsolutePath1,"C:\\Private\\10003a3f\\Import\\apps\\TestAppInstall_reg.RSC");
 
 const TInt KMaxTimeCount = 18;			// 18 * 10 is 180 Seconds
 
@@ -128,9 +129,6 @@ TVerdict CT_AppListFileUpdateStep::doTestStepL()
  
  void CT_AppListFileUpdateStep::TestTimeStampL()
  	{
-	// Create KAppDirectory
-	TInt err = iUtils.CreateDirectoryL(KAppDirectory);
-	TEST(err == KErrNone || err == KErrAlreadyExists);
 	
 	// Wait until KAppListFileName is present and check that the file has been created indeed
 	TBool present = CheckForFilePresent();
@@ -143,8 +141,11 @@ TVerdict CT_AppListFileUpdateStep::doTestStepL()
 		
 	// Install an application
 	INFO_PRINTF1(_L("Install application..."));
-	InstallApplicationL(KTestAppObsolutePath1);
-
+	
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KApparcTestAppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KApparcTestAppSisFile);
+    
 	// wait 5 seconds for the app to be properly installed
 	User::After(5 * 1000000);
 	
@@ -162,34 +163,10 @@ TVerdict CT_AppListFileUpdateStep::doTestStepL()
 
 	// Uninstall & delete...
 	INFO_PRINTF1(_L("Uninstalling application..."));
-	DeleteApplicationL(KTestAppObsolutePath1);
+	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KApparcTestAppComponent);
  	}
  
  
-/*
-Delete a registration resource file (TestAppInstall.rsc) in the path  "C:\private\10003a3f\import\apps" .
-*/
-void CT_AppListFileUpdateStep::DeleteApplicationL(const TDesC& aAppName)
-	{
-	INFO_PRINTF2(_L("Deleting file '%S'"), &aAppName);
-
-	TInt ret = iUtils.SetReadOnly(aAppName, 0);
-	TEST(ret == KErrNone);
-	ret = iUtils.DeleteFileL(aAppName);
-	TEST(ret == KErrNone);
-	}
-
-
-/*
-Copy a registration resource file (TestAppInstall.rsc) in the path  "c:\private\10003a3f\import\apps" .
-*/
-void CT_AppListFileUpdateStep::InstallApplicationL(const TDesC& aAppName)
-	{
-	INFO_PRINTF3(_L("Copying file '%S' to folder '%S'"), &aAppName, &KTestAppZPath);
-
-	TInt ret = iUtils.CopyFileL(KTestAppZPath, aAppName);
-	TEST(ret == KErrNone);
-	}
 
 
 /*
@@ -247,10 +224,13 @@ void CT_AppListFileUpdateStep::AppsListModifiedTimeL(TTime& aTime)
 	
 	// Do a rescan and check that the file exists again.
 	INFO_PRINTF1(_L("Do a rescan and check that the file exists again...."));
-	RPointerArray<TDesC> dummy;
-	TEST(iSession.ForceRegistration(dummy) == KErrNone);
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KApparcTestAppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KApparcTestAppSisFile);
+    
 	present = CheckForFilePresent();			
 	TEST(present);
+	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KApparcTestAppComponent);
  	}
 
 
