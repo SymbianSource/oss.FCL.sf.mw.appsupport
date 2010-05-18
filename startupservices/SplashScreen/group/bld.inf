@@ -18,6 +18,7 @@
 
 #include <platform_paths.hrh>
 
+#define USE_SF_SPLASH_SVG //comment this to use standard S60 splash icon
 PRJ_PLATFORMS
 DEFAULT
 
@@ -31,3 +32,13 @@ PRJ_EXPORTS
 PRJ_MMPFILES
 splashscreen.mmp
 
+PRJ_EXTENSIONS
+START EXTENSION s60/mifconv
+    OPTION TARGETFILE splashscreen.mif
+    OPTION HEADERFILE splashscreen.mbg
+#ifdef USE_SF_SPLASH_SVG
+		// use the local file (also called qgn_startup_screen to keep the mbg file the same)
+    OPTION SOURCEDIR ../sfimage
+#endif
+    OPTION SOURCES -c8 qgn_startup_screen
+END
