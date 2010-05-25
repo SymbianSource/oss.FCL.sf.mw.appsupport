@@ -21,7 +21,7 @@
 #include "acc_debug.h"
 
 #include <featmgr.h>
-#include <SecondaryDisplay/SecondaryDisplayAccFwAPI.h>
+#include <secondarydisplay/SecondaryDisplayAccFwAPI.h>
 #include <accfwnoteuinotifier.rsg>
 #include <aknlistquerydialog.h> 
 #include <aknlists.h> 

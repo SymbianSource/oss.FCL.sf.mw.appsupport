@@ -99,7 +99,28 @@ void CTzLocalizationDbAccessor::OpenDbL()
 	User::LeaveIfError(iDbsSession.Connect());
 	//Attempt to open the database
 	TInt error = iLocalizedTimeZoneDb.Open(iDbsSession,KTzLocalizationDbName,KTzLocalizationDbSecurityPolicy);
+	if (error == KErrNotFound)
+		{
+		//Database file doesn't exist.  Attempt to create a new one.
+		error = iLocalizedTimeZoneDb.Create(iDbsSession,KTzLocalizationDbName,KTzLocalizationDbSecurityPolicy);
+		if (error == KErrNone)
+			{
+			User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
+			User::LeaveIfError(CreateUserCityTableL());
+			}
+		}
 	User::LeaveIfError(error);
+	// Check if both tables are created.
+	TRAP(error, iLocalizedTimeZoneDb.ColSetL(KCZTableName));
+	if (error)
+		{
+		User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
+		}
+	TRAP(error, iLocalizedTimeZoneDb.ColSetL(KUCTableName));
+	if (error)
+	        {
+		User::LeaveIfError(CreateUserCityTableL());
+		}
 	}
 
 /**

@@ -18,7 +18,7 @@
 
 
 
-#include <ecom\implementationproxy.h>
+#include <ecom/implementationproxy.h>
 #include "dummyplugin2.h"
 
 #define DECLARE_CREATE_INSTANCEV2(UID) CDummyOomPluginV2* CreateInstance##UID() { return CDummyOomPluginV2::NewL(UID); }

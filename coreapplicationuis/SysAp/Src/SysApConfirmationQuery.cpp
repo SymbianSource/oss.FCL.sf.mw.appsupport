@@ -27,7 +27,7 @@
 #include <avkon.hrh>
 #include <avkon.rsg>
 #include <SysAp.rsg>
-#include <SecondaryDisplay/SecondaryDisplaySysApAPI.h>
+#include <secondarydisplay/SecondaryDisplaySysApAPI.h>
 #include <aknSDData.h>
 
 // Constants

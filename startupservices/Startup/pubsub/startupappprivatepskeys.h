@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -37,5 +37,7 @@ enum TPSStartupAppState
     EStartupAppStateFinished          // Startup app has finished playing the animation(s)
                                       // and finished showing country & time queries.
     };
+
+const TUint32 KPSStartupAppStarted = 0x00000002;
 
 #endif // STARTUPAPPPRIVATEPSKEYS_H

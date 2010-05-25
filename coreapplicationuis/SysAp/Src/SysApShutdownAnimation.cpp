@@ -22,7 +22,7 @@
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
 
 #include <aknappui.h>
-#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
+#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
 #include <startupdomaincrkeys.h>
 
 #include "SysApShutdownAnimation.h"

@@ -38,7 +38,7 @@
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
  #include <secondarydisplay/SecondaryDisplaySystemStateAPI.h>
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
+#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
 
 
 // USER INCLUDES

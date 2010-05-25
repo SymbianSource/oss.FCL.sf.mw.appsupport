@@ -21,7 +21,7 @@
 #include <accfwnoteuinotifier.rsg>
 #include <data_caging_path_literals.hrh> 
 #include <aknnotewrappers.h>
-#include <SecondaryDisplay/SecondaryDisplayAccFwAPI.h>
+#include <secondarydisplay/SecondaryDisplayAccFwAPI.h>
 #include <bautils.h>
 
 #include "AccFwUiNoteNotifier.h"

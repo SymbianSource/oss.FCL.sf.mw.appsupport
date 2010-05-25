@@ -19,7 +19,7 @@
 // SYSTEM INCLUDES
 #include <e32property.h>
 #include <AknGlobalNote.h>
-#include <SecondaryDisplay/AknSecondaryDisplayDefs.h>
+#include <secondarydisplay/AknSecondaryDisplayDefs.h>
 #include <aknSDData.h>
 #include <avkon.rsg>
 #include <data_caging_path_literals.hrh>

@@ -131,7 +131,7 @@
 
 #include "SysApMediatorObserver.h"
 
-#include <SecondaryDisplay/SecondaryDisplaySysApAPI.h>
+#include <secondarydisplay/SecondaryDisplaySysApAPI.h>
 #include "aknSDData.h"
 
 #include <AknTaskList.h>
@@ -268,6 +268,9 @@ void CSysApAppUi::ConstructL()
       to other applications. For example it does not get closed when system is asked to close applications
     */
     iEikonEnv->SetSystem( ETrue );
+	// For cdma 
+
+	iTDEnable = FeatureManager::FeatureSupported( KFeatureIdFfTdScdma ); 
 
     iEikonEnv->WsSession().ComputeMode( RWsSession::EPriorityControlDisabled );
 
@@ -3642,8 +3645,17 @@ void CSysApAppUi::AddMmcMenuItemsL( CDesCArray*& aProfileNameCDesCArray, RArray<
 
             // Append memory cards for eject selection
             TInt count( iInsertedMemoryCards.Count() );
+            TInt corruptedMedia = 0;
             for ( TInt i( 0 ); i < count; ++i )
                 {
+                TVolumeInfo info;
+                TInt err = iEikonEnv->FsSession().Volume(info, iInsertedMemoryCards[ i ].iDrive);
+                TRACES( RDebug::Print(_L("CSysApAppUi::AddMmcMenuItemsL: corrupted media, iDrive (%d) Error: %d" ),iInsertedMemoryCards[ i ].iDrive, err ) );
+                if(err != KErrNone)
+                    {
+                    corruptedMedia++;
+                    continue;
+                    }
                 itemStringBuf = iSysApDriveList->GetFormattedDriveNameLC(
                         iInsertedMemoryCards[ i ].iDrive,
                         R_QTN_PWRC_EJECT_MEMORY_STORAGE );
@@ -3656,12 +3668,12 @@ void CSysApAppUi::AddMmcMenuItemsL( CDesCArray*& aProfileNameCDesCArray, RArray<
                             SecondaryDisplay::EPwrMenuItemEjectItemBase + i );
                     }
                 }
-            if ( count > 0 )
+            if ( (count-corruptedMedia) > 0 )
                 {
                 TRACES( RDebug::Print(_L("CSysApAppUi::AddMmcMenuItemsL: added \"Eject\"" ) ) );
                 iPowerkeyMenuEjectShown = ETrue;
                 iPowerkeyMenuEjectSelectionBase = aPowerMenuItemIndex;
-                aPowerMenuItemIndex += count;
+                aPowerMenuItemIndex += (count-corruptedMedia);
                 }
             }
         }
