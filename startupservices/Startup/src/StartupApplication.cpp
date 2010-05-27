@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -21,6 +21,12 @@
 // INCLUDE FILES
 #include "StartupApplication.h"
 #include "StartupDocument.h"
+#include "startupappprivatepskeys.h"
+#include <e32property.h>
+
+//Security policies
+_LIT_SECURITY_POLICY_C1(KReadDeviceDataPolicy, ECapabilityReadDeviceData);
+_LIT_SECURITY_POLICY_C1(KWriteDeviceDataPolicy, ECapabilityWriteDeviceData);
 
 // ========================= MEMBER FUNCTIONS ================================
 
@@ -53,6 +59,12 @@ LOCAL_C CApaApplication* NewApplication()
 
 GLDEF_C TInt E32Main()
     {
+    //Make sure startup app is only started once
+    TInt ret = RProperty::Define(KPSUidStartupApp, KPSStartupAppStarted, RProperty::EInt, KReadDeviceDataPolicy, KWriteDeviceDataPolicy);
+    if(ret!=KErrNone)
+        {
+        return KErrNone;
+        }
     return EikStart::RunApplication(NewApplication);
     }
 

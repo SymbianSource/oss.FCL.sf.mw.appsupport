@@ -35,7 +35,7 @@ PRJ_EXPORTS
 ../conf/GSAccessoriesPlugin_10207194.crml     MW_LAYER_CRML(gsaccessoriesplugin_10207194.crml)
 
 PRJ_MMPFILES
-GSAccessoryPlugin.mmp
+// GSAccessoryPlugin.mmp
 
 PRJ_EXTENSIONS
 START EXTENSION s60/mifconv

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -16,26 +16,33 @@
 */
 
 
-#include "oommonitorplugin.h"
-#include "oommonitor.h"
 #include <apgwgnam.h>
+#include "oommonitorplugin.h"
+#include "oommemorymonitor.h"
+#include "OomTraces.h"
 
 // TLS is used to store the CMemoryMonitor pointer, CMemoryMonitor
 // being the main object in the OOM monitor thread. This allows
 // plugins to access the CMemoryMonitor object easily.
 EXPORT_C void SetMemoryMonitorTls(CMemoryMonitor* aMonitor)
     {
+    FUNC_LOG;
+
     Dll::SetTls(aMonitor);
     }
 
 CMemoryMonitor* MemoryMonitorTls()
     {
+    FUNC_LOG;
+
     return static_cast<CMemoryMonitor*>(Dll::Tls());
     }
 
 
 void OomMonitorPluginPanic(TOomMonitorPluginPanic aReason)
     {
+    FUNC_LOG;
+
     _LIT(KCat, "OomMonitorPlugin");
     User::Panic(KCat, aReason);
     }
@@ -43,32 +50,51 @@ void OomMonitorPluginPanic(TOomMonitorPluginPanic aReason)
 
 EXPORT_C COomMonitorPlugin::COomMonitorPlugin()
 : iMemoryMonitor(MemoryMonitorTls())
-	{
-	__ASSERT_ALWAYS(iMemoryMonitor, OomMonitorPluginPanic(EOomMonitorPluginPanic_PluginConstructedOutsideOomMonitorThread));
-	}
+    {
+    FUNC_LOG;
+
+    __ASSERT_ALWAYS(iMemoryMonitor, OomMonitorPluginPanic(EOomMonitorPluginPanic_PluginConstructedOutsideOomMonitorThread));
+    }
 
 EXPORT_C COomMonitorPlugin::~COomMonitorPlugin()
-	{
-	}
+    {
+    FUNC_LOG;
+    }
 
 EXPORT_C void COomMonitorPlugin::ConstructL()
-	{
-	// CAppOomMonitorPlugin assumes ConstructL is empty
-	}
+    {
+    FUNC_LOG;
+
+    // CAppOomMonitorPlugin assumes ConstructL is empty
+    }
 
 EXPORT_C void COomMonitorPlugin::ExtensionInterface(TUid /*aInterfaceId*/, TAny*& /*aImplementaion*/)
-	{
-	}
+    {
+    FUNC_LOG;
+    }
 
 EXPORT_C RFs& COomMonitorPlugin::FsSession()
     {
+    FUNC_LOG;
+
     return iMemoryMonitor->iFs;
     }
 
 EXPORT_C RWsSession& COomMonitorPlugin::WsSession()
     {
+    FUNC_LOG;
+
     return iMemoryMonitor->iWs;
     }
+
+
+
+EXPORT_C void COomMonitorPluginV2::FreeRam()
+    {
+    // Note that OomMonitorV2 will not call this version of the function
+    // so it does not need to be implemented in derived classes.
+    }
+
 
 
 EXPORT_C CAppOomMonitorPlugin* CAppOomMonitorPlugin::NewL(TUid aAppUid)
@@ -96,18 +122,18 @@ void CAppOomMonitorPlugin::MemoryGood()
 void CAppOomMonitorPlugin::SendMessageToApp(TInt aMessage)
     {
     RWsSession& ws = WsSession();
-	TInt wgId = 0;
+    TInt wgId = 0;
 
     do 
         {
-		CApaWindowGroupName::FindByAppUid(iAppUid, ws, wgId);
-		if (wgId>0)
-			{
-        	TWsEvent event;
-        	event.SetType(aMessage);
-        	event.SetTimeNow();
-			ws.SendEventToWindowGroup(wgId, event);
-			}
+        CApaWindowGroupName::FindByAppUid(iAppUid, ws, wgId);
+        if (wgId>0)
+            {
+            TWsEvent event;
+            event.SetType(aMessage);
+            event.SetTimeNow();
+            ws.SendEventToWindowGroup(wgId, event);
+            }
         }
-	while (wgId>0);
+    while (wgId>0);
     }

@@ -10,12 +10,15 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* NTT DOCOMO, INC - BUG 2365
+* 
 *
 * Description:  Build information file for project SensorSourcePlugin
 *
 */
 
+/*
+*NTT DOCOMO, INC - BUG 2365
+*/
 
 #include <platform_paths.hrh>
 

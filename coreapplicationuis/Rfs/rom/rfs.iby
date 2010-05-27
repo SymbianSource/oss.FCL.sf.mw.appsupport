@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,9 +20,6 @@
 
 file=ABI_DIR\BUILD_DIR\RFS.DLL                      SHARED_LIB_DIR\RFS.DLL
 file=ABI_DIR\BUILD_DIR\RfsServer.exe                PROGRAMS_DIR\RfsServer.exe
-
-ECOM_PLUGIN(GSRFSPlugin.dll,10275117.rsc)
-SCALABLE_IMAGE(APP_BITMAP_DIR,APP_BITMAP_DIR,GSRFSPlugin)
 
 file=ABI_DIR\BUILD_DIR\rfscustcmd.dll               SHARED_LIB_DIR\rfscustcmd.dll
 

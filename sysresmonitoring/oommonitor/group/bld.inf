@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -18,16 +18,15 @@
 
 #include <platform_paths.hrh>
 
+PRJ_PLATFORMS
+DEFAULT
+
 PRJ_EXPORTS
-../rom/oommonitor.iby             CORE_MW_LAYER_IBY_EXPORT_PATH(oommonitor.iby)
+../rom/oommonitor.iby  CORE_MW_LAYER_IBY_EXPORT_PATH(oommonitor.iby)
+../data/oomconfig.xml  /epoc32/RELEASE/winscw/UDEB/Z/private/10207218/oomconfig.xml
+../data/oomconfig.xml  /epoc32/RELEASE/winscw/UREL/Z/private/10207218/oomconfig.xml
+../data/oomconfig.xml  /epoc32/data/Z/private/10207218/oomconfig.xml
 
 PRJ_MMPFILES
-
-#ifndef TOOLS
-
 oommonitor.mmp
-
-#endif
-
-PRJ_TESTMMPFILES
-// ../internal/oomtestplugin/oomtestplugin.mmp
+oommonitorlib.mmp

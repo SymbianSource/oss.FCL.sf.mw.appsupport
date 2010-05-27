@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -523,7 +523,6 @@ EXPORT_C void CTzUserData::DeleteL(const CTzId& aTzId)
 	iTzServer.DeleteUserTimeZoneL(aTzId);
 	}
 
-
 /**
 Returns the time zone identifiers for all existing user-defined time zones.
 
@@ -533,5 +532,19 @@ zones exist the array will be empty.
 */	
 EXPORT_C void CTzUserData::GetTzIdsL(RPointerArray<CTzId>& aTzIds) const
 	{
+	CleanupStack::PushL( TCleanupItem(CleanupPointerArray, &aTzIds) );
 	iTzServer.GetUserTimeZoneIdsL(aTzIds);
+	CleanupStack::Pop();
 	}
+
+void CTzUserData::CleanupPointerArray(TAny* aArray)
+    {
+    RPointerArray<CTzId>* array = static_cast<RPointerArray<CTzId>* >(aArray);
+    if (array)
+        {
+        array->ResetAndDestroy();
+        array->Close();
+        }
+    }
+ 
+

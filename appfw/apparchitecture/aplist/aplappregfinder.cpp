@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -187,8 +187,13 @@ EXPORT_C TBool CApaAppRegFinder::NextL(TApaAppEntry& aAppRegistrationEntry, cons
 			const TDriveName driveName = currentDrive.iUnit.Name();
 			regFileNameParser.Set(entry.iName, &appFolderOnDrive, &driveName);
 
-			// If the appliation is located on a removable drive...
-			if (currentDrive.iAttribs&KDriveAttRemovable)
+			// Apparc will call sidchecker to verify if an application is a valid registered application. 
+			// Apparc will call sidchecker in the following conditions
+			// 1. If the current drive is a removable drive
+			// 2. If the current drive is not 
+			//		a) an internal read-only drive
+			// 		b) the system drive
+			if(currentDrive.iAttribs&KDriveAttRemovable || ((currentDrive.iUnit != iFs.GetSystemDrive()) && (currentDrive.iAttribs&KDriveAttInternal) && !(currentDrive.iAttribs&KDriveAttRom)))
 				{
 				// ...then verify that there is a valid Secure ID (SID) for the appliation
 				// to protect against untrusted applications.

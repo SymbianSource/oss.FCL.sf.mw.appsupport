@@ -32,7 +32,7 @@ PRJ_EXPORTS
 ../rom/gssenpluginresources.iby     LANGUAGE_MW_LAYER_IBY_EXPORT_PATH(gssenpluginresources.iby)
 
 PRJ_MMPFILES
-gssensorplugin.mmp
+// gssensorplugin.mmp
 
 PRJ_EXTENSIONS
 
