@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -17,6 +17,9 @@
 
 
 #include <f32file.h>
+#include <swi/sisregistrysession.h>
+#include <swi/sisregistryentry.h>
+#include <swi/sisregistrypackage.h>
 
 #include "dirstackentry.h"
 #include "selectiveformatter.h"
@@ -24,6 +27,7 @@
 #include "rfsfileman.h"
 #include "trace.h"
 
+_LIT(KZDrive,"z");
 // ================= MEMBER FUNCTIONS =======================
 
 // ---------------------------------------------------------------------------
@@ -124,6 +128,9 @@ void CSelectiveFormatter::ConstructL( const TDesC& aExcludeListFile )
         }
     // Handle app specific files
     HandleAppExcludeListsL();
+    
+    // Handle NR-Applications
+    HandleNrExcludeListsL();
     
     if( !iValidExcludeListFound )
         {
@@ -328,4 +335,131 @@ void CSelectiveFormatter::HandleAppExcludeListsOnDriveL( TPtr aBuf, TChar aDrive
         CleanupStack::PopAndDestroy( dir );
         dir = NULL;
         }
+    }
+
+// ---------------------------------------------------------------------------
+// CSelectiveFormatter::HandleNrExcludeListsL
+// ---------------------------------------------------------------------------
+//
+void CSelectiveFormatter::HandleNrExcludeListsL()
+    {
+    INFO( "CSelectiveFormatter::HandleNrExcludeListsL() START ");
+    
+    Swi::RSisRegistrySession session;
+    CleanupClosePushL(session);
+    User::LeaveIfError(session.Connect());
+    
+    INFO( "In CSelectiveFormatter::HandleNrExcludeListsL() RSisRegistrySession::Connect() established");
+    // Get the installed application UIDs
+    RArray<TUid> uids;
+    CleanupClosePushL(uids);
+    session.InstalledUidsL(uids);
+    TInt uidcount = uids.Count(); 
+    
+    Swi::RSisRegistryEntry regEntry;
+    Swi::RSisRegistryEntry augmentForRegEntry;
+    CleanupClosePushL(regEntry);
+    CleanupClosePushL(augmentForRegEntry);
+    
+    // Array of registry files i.e., .reg and .ctl for the installed apps
+    RPointerArray<HBufC> registryFiles;
+    
+    // Array of registry files i.e., .reg and .ctl for the augmented apps
+    RPointerArray<HBufC> augmentedRegistryFiles;
+    
+    // Array of files installed through package.
+    RPointerArray<HBufC> nonRemovableFiles;
+    
+    // Array of augmented files installed through package.
+    RPointerArray<HBufC> nonRemovableAugmentedFiles;
+    
+    CleanupResetAndDestroyPushL(registryFiles);
+    CleanupResetAndDestroyPushL(augmentedRegistryFiles);
+    CleanupResetAndDestroyPushL(nonRemovableFiles);
+    CleanupResetAndDestroyPushL(nonRemovableAugmentedFiles);
+    
+    TInt count;
+    
+    //Array of augmented packages
+    RPointerArray<Swi::CSisRegistryPackage> augmentationPackages;
+    CleanupResetAndDestroyPushL(augmentationPackages);
+        
+    for ( TInt iter=0; iter<uidcount; iter++)
+     {
+     User::LeaveIfError(regEntry.Open(session,uids[iter]));
+     if(EFalse == regEntry.RemovableL())
+         {
+         INFO( "In CSelectiveFormatter::HandleNrExcludeListsL() get the nonRemovable and registry files");
+         
+         regEntry.FilesL(nonRemovableFiles);
+         regEntry.RegistryFilesL(registryFiles);
+         TInt fileCount = nonRemovableFiles.Count(); 
+         for (TInt nonRemovableFilesCount=fileCount-1; nonRemovableFilesCount>=0;nonRemovableFilesCount--)
+             {
+             TPtr nrFileName(nonRemovableFiles[nonRemovableFilesCount]->Des());
+             if(nrFileName.Left(1) == KZDrive )
+                 {
+                 delete nonRemovableFiles[nonRemovableFilesCount];
+                 nonRemovableFiles.Remove(nonRemovableFilesCount);
+                 }
+             }
+         // Look for augmentations.
+         if(regEntry.IsAugmentationL())
+             {
+             regEntry.AugmentationsL(augmentationPackages);
+             count = regEntry.AugmentationsNumberL();
+             for (TInt augPkgCount=0; augPkgCount < count; ++augPkgCount)
+                 {
+                 User::LeaveIfError(augmentForRegEntry.OpenL(session,*augmentationPackages[augPkgCount]));
+                 if(EFalse == augmentForRegEntry.RemovableL())
+                     {
+                     INFO( "In CSelectiveFormatter::HandleNrExcludeListsL() get the augmented nonRemovable and registry files");
+                     augmentForRegEntry.FilesL(nonRemovableAugmentedFiles);
+                     augmentForRegEntry.RegistryFilesL(augmentedRegistryFiles);
+                     }
+                 augmentForRegEntry.Close();
+                 }
+             }
+         }
+     AppendNrlisttoExcludeListL(nonRemovableFiles);
+     nonRemovableFiles.ResetAndDestroy();
+     regEntry.Close();
+     }
+    INFO( "In CSelectiveFormatter::HandleNrExcludeListsL() append the list of files to the excludelist ");
+    
+    AppendNrlisttoExcludeListL(nonRemovableAugmentedFiles);
+    AppendNrlisttoExcludeListL(augmentedRegistryFiles);
+    AppendNrlisttoExcludeListL(registryFiles);
+    
+    CleanupStack::PopAndDestroy(9,&session);
+    INFO( "CSelectiveFormatter::HandleNrExcludeListsL() End");
+    }
+
+// ---------------------------------------------------------------------------
+// CSelectiveFormatter::HandleNrExcludeListsL
+// ---------------------------------------------------------------------------
+//
+
+void CSelectiveFormatter::AppendNrlisttoExcludeListL(RPointerArray<HBufC> &aFileNameArr)
+    {
+    INFO( "CSelectiveFormatter::AppendNrlisttoExcludeListL() START ");
+    TInt size = aFileNameArr.Count();
+    CExcludeListEntry* entry;
+    TInt err;
+    for ( TInt i=0; i < size; i++)
+        {
+        entry = CExcludeListEntry::NewL( aFileNameArr[i]->Des() );
+        err = iExcludeList.InsertInOrder( entry, CExcludeListEntry::Compare ); // take ownership
+        if( err != KErrNone )
+            {
+            delete entry; // delete entry if ownership not transferred
+            
+            if( err != KErrAlreadyExists )
+                {
+                INFO_1( "CSelectiveFormatter::AppendNrlisttoExcludeListL() leaves with error code %d",err);
+                User::Leave( err );
+                }
+            }            
+        }
+    INFO( "CSelectiveFormatter::AppendNrlisttoExcludeListL() END ");
     }

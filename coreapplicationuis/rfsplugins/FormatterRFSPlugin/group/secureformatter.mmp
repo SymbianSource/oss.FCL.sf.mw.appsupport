@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -23,8 +23,10 @@ TARGET          secureformatter.exe
 TARGETTYPE      exe
 SECUREID        0x20002486
 
-CAPABILITY      ALLFILES TCB // TCB required to delete c:/sys and c:/resource
+CAPABILITY      ALLFILES TCB ReadUserData // TCB required to delete c:/sys and c:/resource
 VENDORID        VID_DEFAULT
+
+EPOCHEAPSIZE    0x1000 0x200000 // if the excludelist entries are more , we need the heapsize of 2MB
 
 SOURCEPATH      ../src
 SOURCE          dirstackentry.cpp
@@ -39,3 +41,4 @@ MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY         efsrv.lib // File Server
 LIBRARY         euser.lib
+LIBRARY			sisregistryclient.lib   // RSisRegistrySession

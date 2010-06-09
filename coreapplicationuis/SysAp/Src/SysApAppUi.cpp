@@ -6890,4 +6890,25 @@ void CSysApAppUi::CancelQuery( TSysApConfirmationQueryIds aQueryId )
             }
         }
     }
+	
+// ----------------------------------------------------------------------------
+// CSysApAppUi::StartChargingBatteryL
+// ----------------------------------------------------------------------------
+//
+void CSysApAppUi::StartChargingBatteryL() 
+	{
+	TRACES( RDebug::Print( _L("CSysApAppUi::StartChargingBatteryL") ) );
+    iBatteryNotify->StartChargingL();
+    }
+	
+// ----------------------------------------------------------------------------
+// CSysApAppUi::StopChargingBatteryL
+// ----------------------------------------------------------------------------
+//
+void CSysApAppUi::StopChargingBatteryL()
+	{
+	TRACES( RDebug::Print( _L("CSysApAppUi::StopChargingBatteryL") ) );
+    iBatteryNotify->StopChargingL();
+    }
+	
 // End of File

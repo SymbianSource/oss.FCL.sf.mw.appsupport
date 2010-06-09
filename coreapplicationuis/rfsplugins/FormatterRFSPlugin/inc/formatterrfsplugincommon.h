@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009-10 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -25,12 +25,6 @@ const TInt KExcludeListPathNameLenExt( 2 );
 * Exclude list path and file
 */
 _LIT( KExcludeList, "\\private\\100059C9\\excludelist.txt" );
-
-/**
-* Exclude list path and file which has the entries of the NR-flagged applications which are installed in c:\ drive and the RFS operation
-* is based on this file itself
-*/
-_LIT( KExcludeListcache, "\\private\\100059C9\\excludelistcache.txt" );
 
 /**
 * Application exclude list path

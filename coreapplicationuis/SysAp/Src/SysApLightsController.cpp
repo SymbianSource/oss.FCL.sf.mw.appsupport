@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -29,6 +29,7 @@
 #endif // RD_LIGHT_CONTROL_CHANGE
 
 #include "SysApFeatureManager.h"
+#include "startupdomainpskeys.h"
 
 // CONSTANTS
 
@@ -216,7 +217,13 @@ void CSysApLightsController::ChargerConnectedL( TBool aConnected )
         {
         iLightPluginHandler->HandleEventNoAction( SysApLightExtension::EChargerConnection, TPckgBuf<TBool>(aConnected) );
         }        
-#endif // RD_LIGHT_CONTROL_CHANGE           
+#endif // RD_LIGHT_CONTROL_CHANGE 
+	TInt state( 0 );
+	TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
+    if ( error == KErrNone && state == ESwStateCharging ) 
+		{
+		EnableActivityManagerL();
+		}		
     }
 
 // ----------------------------------------------------------------------------
@@ -969,16 +976,26 @@ void CSysApLightsController::SetLightsOffL()
         return;
         }
 
-    TInt err(KErrNone);
+	TInt err(KErrNone);
+    TInt state( 0 );
+    TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
     
-#ifdef RD_LIGHT_CONTROL_CHANGE
-    if ( !iLightPluginHandler->HandleCommand( SysApLightExtension::ELightCommandOff ) )
+    if ( error == KErrNone && state != ESwStateCharging ) 
         {
-        TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
-        }
+#ifdef RD_LIGHT_CONTROL_CHANGE
+		if ( !iLightPluginHandler->HandleCommand( SysApLightExtension::ELightCommandOff ) )
+			{
+			TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
+			}
 #else //  RD_LIGHT_CONTROL_CHANGE
-    TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
-#endif // RD_LIGHT_CONTROL_CHANGE            
+		TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
+#endif // RD_LIGHT_CONTROL_CHANGE  
+		}
+	else
+		{
+		TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
+		iSysApAppUi.StopChargingBatteryL();
+		}            
     // Ignore unreserved in use warnings.
     if ( err != KErrNone && err != KErrInUse )
         {
@@ -1078,6 +1095,13 @@ void CSysApLightsController::SetLightsOnL( TBool aBlinking )
                 iLightsCurrentlyOn = ETrue;
                 iLastLightsOnTime.HomeTime(); 
                 }
+				
+			TInt state( 0 );
+			TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
+    		if ( error == KErrNone && state == ESwStateCharging ) 
+				{
+				iSysApAppUi.StartChargingBatteryL();
+				}	
             }
         else
             {

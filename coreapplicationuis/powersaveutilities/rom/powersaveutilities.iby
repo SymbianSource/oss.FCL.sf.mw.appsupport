@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -26,7 +26,6 @@ file=ABI_DIR\BUILD_DIR\batterypopupcontrol.dll  SHARED_LIB_DIR\batterypopupcontr
 ECOM_PLUGIN( batindicatorpaneplugin.dll, batindicatorpaneplugin.rsc )
 
 data=DATAZ_\ECOM_RESOURCE_DIR\batindicatorpaneplugin.rsc   ECOM_RESOURCE_DIR\batindicatorpaneplugin.rsc
-data=DATAZ_\ECOM_RESOURCE_DIR\batindpaneplugin.rsc         ECOM_RESOURCE_DIR\batindpaneplugin.rsc
 data=DATAZ_\APP_RESOURCE_DIR\batterypopupcontrol.mif			 APP_RESOURCE_DIR\batterypopupcontrol.mif
 
 #endif // __POWERSAVEUTILITIES_IBY__

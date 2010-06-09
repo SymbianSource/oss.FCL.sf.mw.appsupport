@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -115,6 +115,16 @@ private:
     */
     void HandleAppExcludeListsOnDriveL( TPtr aBuf, TChar aDrive );
 
+    /**
+    * Handles NR-Application specific exclude list loading.       
+    */
+    void HandleNrExcludeListsL();
+
+    /**
+    * Append the list of nr-files to the excludelist entry.
+    */
+    void AppendNrlisttoExcludeListL(RPointerArray<HBufC> &nrFileList);
+
 private: // Data
 
     /** File server session. */
@@ -135,5 +145,36 @@ private: // Data
     /** ETrue if there is valid exclude list content. */
     TBool iValidExcludeListFound;
     };
+
+/** 
+Template class CleanupResetAndDestroy to clean up the array
+of implementation information from the cleanup stack.
+*/
+
+template <class T>
+class CleanupResetAndDestroy
+    {
+public:
+    /**
+    Puts an item on the cleanup stack.
+
+    @param  aRef 
+            The implementation information to be put on the cleanup stack.
+    */
+    inline static void PushL(T& aRef);
+private:
+    static void ResetAndDestroy(TAny *aPtr);
+    };
+template <class T>
+inline void CleanupResetAndDestroyPushL(T& aRef);
+template <class T>
+inline void CleanupResetAndDestroy<T>::PushL(T& aRef)
+    {CleanupStack::PushL(TCleanupItem(&ResetAndDestroy,&aRef));}
+template <class T>
+void CleanupResetAndDestroy<T>::ResetAndDestroy(TAny *aPtr)
+    {(STATIC_CAST(T*,aPtr))->ResetAndDestroy();}
+template <class T>
+inline void CleanupResetAndDestroyPushL(T& aRef)
+    {CleanupResetAndDestroy<T>::PushL(aRef);}
 
 #endif // C_SELECTIVEFORMATTER_H

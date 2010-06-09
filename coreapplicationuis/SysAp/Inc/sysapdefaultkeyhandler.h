@@ -22,6 +22,7 @@
 #include <e32base.h>
 #include <coedef.h>
 #include <AknCapServerClient.h>
+#include <e32property.h>
 
 class MSysapCallback;
 class RAknKeylock2;
@@ -236,6 +237,11 @@ class CSysApDefaultKeyHandler : public CBase
          */
         CRepository* iSlideRepository;
         TBool iKeypadWasLocked;
+
+        /**
+          * Call status P&S for slide handling
+          */
+        RProperty iCallStateProperty;
     };
 
 #endif // SYSAPDEFAULTKEYHANDLER_H

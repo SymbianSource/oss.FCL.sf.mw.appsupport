@@ -37,6 +37,7 @@
 #include <centralrepository.h> //for CRepository
 #include <settingsinternalcrkeys.h>
 #include <keylockpolicyapi.h>
+#include <ctsydomainpskeys.h>
 #include "sysapdefaultkeyhandler.h"
 #include "sysapcallback.h"
 #include "SysAp.hrh"
@@ -128,6 +129,9 @@ void CSysApDefaultKeyHandler::ConstructL()
     //Load keylock slide handling CR 
     TRAP_IGNORE( iSlideRepository = CRepository::NewL( KCRUidSlideSettings ) );
     iKeylockPolicy = CKeyLockPolicyApi::NewL( EPolicyActivateKeyguard );
+
+    //Load PhoneCallStatus P&S  
+    TInt err = iCallStateProperty.Attach(KPSUidCtsyCallInformation, KCTsyCallState);
     }
 
 // ---------------------------------------------------------------------------
@@ -216,26 +220,41 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
 					}
 				else
 					{ // keylock action is defined by user setting
-					TInt keyGuardSetting;
-					iSlideRepository->Get( KSlideKeyguard, keyGuardSetting );
-					switch( ( TSlideSettingKeyguard ) keyGuardSetting )
-						{
-						case ESlideSettingsKeyguardActivatingOn: 
-						    iKeylock->EnableKeyLock();
-						    break;
-						case ESlideSettingsKeyguardActivatingAskMe: 
-						    iKeylock->OfferKeyLock();
-							break;
-						case ESlideSettingsKeyguardActivatingOff: 
-						    //do nothing
-						    break;
-						case ESlideSettingsKeyguardActivatingAutomatic: 
-						    if( iKeypadWasLocked )
-							    {
-								iKeylock->EnableKeyLock();
-								}
-							break;
-						}
+                    TInt status(0);
+                    TInt err = iCallStateProperty.Get( status );
+                    if (err == KErrNone)
+                        {
+                        switch ( status )
+                            {
+                            case EPSCTsyCallStateUninitialized:
+                            case EPSCTsyCallStateNone:
+                                {
+    
+                                TInt keyGuardSetting;
+                                iSlideRepository->Get( KSlideKeyguard, keyGuardSetting );
+                                switch( ( TSlideSettingKeyguard ) keyGuardSetting )
+                                    {
+                                    case ESlideSettingsKeyguardActivatingOn: 
+                                        iKeylock->EnableKeyLock();
+                                        break;
+                                    case ESlideSettingsKeyguardActivatingAskMe: 
+                                        iKeylock->OfferKeyLock();
+                                        break;
+                                    case ESlideSettingsKeyguardActivatingOff: 
+                                        //do nothing
+                                        break;
+                                    case ESlideSettingsKeyguardActivatingAutomatic: 
+                                        if( iKeypadWasLocked )
+                                            {
+                                            iKeylock->EnableKeyLock();
+                                            }
+                                        break;
+                                    }
+                                }
+                            default: // any other state
+                                break;
+                            }
+                        }
 					}
                 // apply default light control
                 iCallback.ExecCommandL( MSysapCallback::EUpdateLights, TUpdateLightsBuf(EKeyGripClose) );
