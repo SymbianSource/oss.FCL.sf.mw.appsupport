@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -23,9 +23,9 @@ DEFAULT
 
 PRJ_EXPORTS
 ../cenrep/AccessoriesCRKeys.h    MW_LAYER_PLATFORM_EXPORT_PATH( accessoriescrkeys.h )
-../rom/GSAccsPlugin.iby 	     CORE_MW_LAYER_IBY_EXPORT_PATH( gsaccsplugin.iby )
-../rom/GSAccsPluginResources.iby LANGUAGE_MW_LAYER_IBY_EXPORT_PATH( gsaccspluginresources.iby )
-../loc/GSAccsPlugin.loc 	     MW_LAYER_LOC_EXPORT_PATH( gsaccsplugin.loc )
+// ../rom/GSAccsPlugin.iby 	     CORE_MW_LAYER_IBY_EXPORT_PATH( gsaccsplugin.iby )
+// ../rom/GSAccsPluginResources.iby LANGUAGE_MW_LAYER_IBY_EXPORT_PATH( gsaccspluginresources.iby )
+// ../loc/GSAccsPlugin.loc 	     MW_LAYER_LOC_EXPORT_PATH( gsaccsplugin.loc )
 
 // Configurations
 ../conf/GSAccessoriesPlugin.confml            MW_LAYER_CONFML(gsaccessoriesplugin.confml)

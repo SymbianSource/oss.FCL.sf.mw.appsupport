@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -18,8 +18,8 @@
 
 
 // INCLUDE FILES
-#include <RSatRefresh.h>
-#include <RSatSession.h>
+#include <rsatrefresh.h>
+#include <rsatsession.h>
 #include <e32debug.h>
 #include "SysApSatObserver.h"
 #include "SysAp.hrh"
