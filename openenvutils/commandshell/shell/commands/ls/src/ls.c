@@ -172,6 +172,16 @@ void reset_globals()
 }
 #endif
 
+static
+void
+usage_msg()
+{
+        (void)fprintf(stderr,
+                "usage: ls [-1ACFRSWacdfklmpqrstux] [file ...]\n");
+
+        return;
+}
+
 int
 ls_main(argc, argv)
 	int argc;
@@ -305,7 +315,7 @@ ls_main(argc, argv)
 			f_whiteout = 1;
 			break;
 		default:
-			usage();
+                        usage_msg();
 			return 1;
 		}
 	}
@@ -674,13 +684,17 @@ mastercmp(a, b)
 	if (b_info == FTS_ERR)
 		return (0);
 
-	if (a_info == FTS_NS || b_info == FTS_NS)
-		if (b_info != FTS_NS)
-			return (1);
-		else if (a_info != FTS_NS)
-			return (-1);
-		else
-			return (namecmp(*a, *b));
+        if (a_info == FTS_NS || b_info == FTS_NS) {
+            if (b_info != FTS_NS) {
+                return (1);
+            }
+            else if (a_info != FTS_NS) {
+                return (-1);
+            }
+            else {
+                return (namecmp(*a, *b));
+            }
+        }
 
 	if (a_info != b_info &&
 	    (*a)->fts_level == FTS_ROOTLEVEL && !f_listdir) {
@@ -690,15 +704,4 @@ mastercmp(a, b)
 			return (-1);
 	}
 	return (sortfcn(*a, *b));
-}
-
-
-static 
-void
-usage()
-{
-	(void)fprintf(stderr,
-	        "usage: ls [-1ACFRSWacdfklmpqrstux] [file ...]\n");
-	    
-	return;
 }

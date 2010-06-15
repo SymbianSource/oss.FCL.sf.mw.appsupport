@@ -93,6 +93,14 @@ void	usage __P((void));
 #endif
 #endif
 
+static void
+usage_msg()
+{
+        (void)fprintf(stderr,
+            "usage: touch [-acfm] [-r file] [-t time] file ...\n");
+         return;
+}
+
 int
 touch_internal(int argc, char *argv[])
 {
@@ -136,7 +144,7 @@ touch_internal(int argc, char *argv[])
 			break;
 		case '?':
 		default:
-			usage();
+                        usage_msg();
 			return 1;
 		}
 		
@@ -166,7 +174,7 @@ touch_internal(int argc, char *argv[])
 
 	if (*argv == NULL)
 		{
-		usage();
+                usage_msg();
 		return 1;			
 		}
 
@@ -405,12 +413,4 @@ err:			rval = 1;
 		warn("%s: permissions modified", fname);
 	}
 	return (rval);
-}
-
-static void
-usage()
-{
-	(void)fprintf(stderr,
-	    "usage: touch [-acfm] [-r file] [-t time] file ...\n");
-	 return;
 }

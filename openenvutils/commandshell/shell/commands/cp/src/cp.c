@@ -125,6 +125,16 @@ void reset_globals()
 }
 #endif
 
+
+static void
+usage_msg()
+{
+        (void)fprintf(stderr, "%s\n%s\n",
+            "usage: cp [-R ] [-fip] src target",
+            "       cp [-R ] [-fip] src1 ... srcN directory");
+        return;
+}
+
 int
 cp_internal(int argc, char *argv[])
 {
@@ -176,7 +186,7 @@ cp_internal(int argc, char *argv[])
 			rflag = 1;
 			break;
 		default:
-			usage();
+                        usage_msg();
 			return 1;
 		}
 	argc -= optind;
@@ -184,7 +194,7 @@ cp_internal(int argc, char *argv[])
 
 	if (argc < 2)
 		{
-		usage();
+                usage_msg();
 		return 1;
 		}
 
@@ -272,7 +282,7 @@ cp_internal(int argc, char *argv[])
 		 * Case (1).  Target is not a directory.
 		 */
 		if (argc > 1) {
-			usage();
+                        usage_msg();
 			return (1);
 		}
 		/*
@@ -563,13 +573,3 @@ mastercmp(a, b)
 		return (1);
 	return (0);
 }
-
-static void
-usage()
-{
-	(void)fprintf(stderr, "%s\n%s\n",
-	    "usage: cp [-R ] [-fip] src target",
-	    "       cp [-R ] [-fip] src1 ... srcN directory");
-	return;
-}
-
