@@ -737,13 +737,26 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
             TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): aType == EEventKeyUp, PowerKeyIsLockKey = %d, iLastPowerKeyWasShort = %d, iPowerKeyPopupMenuActive = %d, iCharging = %d" ), iSysApFeatureManager->PowerKeyIsLockKey(), iLastPowerKeyWasShort, iPowerKeyPopupMenuActive, iCharging ) );
             if ( iSysApFeatureManager->PowerKeyIsLockKey()
                  && iLastPowerKeyWasShort 
-				 				 && !iPowerKeyPopupMenuActive
+				 && !iPowerKeyPopupMenuActive
                  && !haveStatusPane  
                  && ( aKeyEvent.iScanCode == EStdKeyDevice2 ) )
                 {
                 //if the power key is the lock key && the last keypress was short && the power menu is not active
                 //then lock the phone
-                KeyLock().EnableWithoutNote();
+                TInt alarmState=0, securityQueryState=0;
+         		TInt errorCode = RProperty::Get( KPSUidCoreApplicationUIs, KCoreAppUIsDisableKeyguard, alarmState );
+				TInt errorCode2 = RProperty::Get( KPSUidStartup, KStartupSecurityCodeQueryStatus, securityQueryState);
+            	TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): Reading value of KCoreAppUIsDisableKeyguard - State Value: %d"),alarmState));
+            	TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): Reading value of KStartupSecurityCodeQueryStatus - State Value: %d"),securityQueryState));
+				//Disable keylock if Alarm is active or if a Security code query is active on the display
+				if ( alarmState == ECoreAppUIsDisableKeyguard || securityQueryState == ESecurityQueryActive )
+                 	{
+					KeyLock().DisableWithoutNote();               	
+                 	}
+			    else
+         		 	{
+         			KeyLock().EnableWithoutNote();
+         			}
                 }
             else
                 {
@@ -1688,16 +1701,16 @@ void CSysApAppUi::HandleChargerNotesL( const TInt aValue )
         {
         TRACES( RDebug::Print( _L("SysAp: charger removed") ) );
         iSysApLightsController->ChargerConnectedL( EFalse );    
-        iSysApUsbChargerDetector.Reset();
-        
+                
         if ( !iSysApUsbChargerDetector.HostOnlyUsbChargingUsed() &&
              iSysApFeatureManager->Supported( KSysApFeatureIdChargerReminderNotes ) )
             {
-		if(showNote)
+			if(showNote)
                 {
                 ShowUiNoteL( EUnplugChargerNote );
                 }
             }
+		iSysApUsbChargerDetector.Reset();
         }
     else if ( aValue == EChargingStatusNotCharging )
         {

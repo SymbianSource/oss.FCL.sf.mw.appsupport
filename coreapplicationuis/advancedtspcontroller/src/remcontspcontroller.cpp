@@ -61,6 +61,8 @@ const TInt KRemConMediaBrowseApiUidTemp = 0x10285bbb;
 // LOCAL CONSTANTS AND MACROS
 
 const TUint32 KUid3MusicPlayer = 0x102072C3;
+const TUint32 KUid3PhoneApp = 0x100058B3; 
+const TUint32 KUid3VoiceCmdApp = 0x102818e7;
 
 //#define __MODULE_TEST__
 
@@ -108,9 +110,11 @@ static TUint HexStringToInt( const TDesC& aString )
 // -----------------------------------------------------------------------------
 //
 
-CRemConTspController::CRemConTspController( 
-								MRemConTargetSelectorPluginObserver& aObserver )
-:	CRemConTargetSelectorPlugin( aObserver )
+CRemConTspController::CRemConTspController(MRemConTargetSelectorPluginObserver& aObserver )
+    : CRemConTargetSelectorPlugin( aObserver )
+    , iClientObservers(_FOFF(TClientObserver, iClientObserverQueLink))
+    , iAvailableTargets(_FOFF(TClientInfo, iLink))
+    , iTargetsForAddressing(_FOFF(TClientInfo, iLink2))
 	{
 	}
     
@@ -154,6 +158,24 @@ CRemConTspController::~CRemConTspController()
 	    }
     iArrayOfTables.ResetAndDestroy();
     iArrayOfStoredTables.ResetAndDestroy();
+    
+    TClientInfo* clientInfo;
+    while(!iAvailableTargets.IsEmpty())
+        {
+        clientInfo = iAvailableTargets.First();
+        iAvailableTargets.Remove(*clientInfo);
+        delete clientInfo;
+        }
+
+    TClientObserver* clientObserver;
+    while(!iClientObservers.IsEmpty())
+        {
+        clientObserver = iClientObservers.First();
+        iClientObservers.Remove(*clientObserver);
+        delete clientObserver;
+        }
+    iTargetsForAddressing.Reset(); 
+    delete iTriggerEventsWatcher;
 	COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::~CRemConTspController() - return" );
 	}
 
@@ -186,6 +208,16 @@ TAny* CRemConTspController::GetInterface( TUid aUid )
 		ret = reinterpret_cast<TAny*>(
 			static_cast<MRemConTargetSelectorPluginInterfaceV3*>(this) );
 		}
+    else if ( aUid == TUid::Uid(KRemConTargetSelectorInterface4) )
+        {
+        ret = reinterpret_cast<TAny*>(
+            static_cast<MRemConTargetSelectorPluginInterfaceV4*>(this) );
+        }
+    else if ( aUid == TUid::Uid(KRemConTargetSelectorInterface5) )
+        {
+        ret = reinterpret_cast<TAny*>(
+            static_cast<MRemConTargetSelectorPluginInterfaceV5*>(this) );
+        }
 	COM_TRACE_1( "[REMCONTSPCONTROLLER] CRemConTspController::GetInterface() this=%d", ret );
 	return ret;
 	}
@@ -338,9 +370,7 @@ void CRemConTspController::AddressIncomingCommand(
 #ifdef _DEBUG	
 	TraceRemconTargets( aClients );
 #endif
-	
-	TRAPD( err, GetCorrectClientL( aInterfaceUid, aOperationId, aClients ) );
-	
+	TRAPD( err, GetCorrectClientL( aInterfaceUid, aOperationId, aClients, ETrue ) );
 	Observer().IncomingCommandAddressed( err );
 	
 	COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::AddressIncomingCommand() ends" );
@@ -397,6 +427,228 @@ void CRemConTspController::PermitOutgoingNotifyCommand(
     }
 
 // -----------------------------------------------------------------------------
+// CRemConTspController::PermitIncomingCommand
+// By default, permit all incoming addressed commands.  Check if the command
+// comes from the AVRCP bearer an if so launch the music player.
+// -----------------------------------------------------------------------------
+void CRemConTspController::PermitIncomingCommand(
+    TUid aInterfaceUid,
+    TUint aOperationId, 
+    const TClientInfo& aClient)
+    {
+	(void) aClient;  // Not used. 
+    // Here we need to check the incoming command.  If it is an AVRCP play
+    // command and there is no sensible handler running we should launch the
+    // MPX Music Player.  This is the same as for AddressIncomingCommand.
+    // Check if appropriate handler running
+    if ((aInterfaceUid != TUid::Uid(KRemConCoreApiUid)) ||
+         (aOperationId != ERemConCoreApiPlay) ||
+         GetLocalAddressedClient())
+        {
+        // no action needed, allow commmand
+        Observer().IncomingCommandPermitted(ETrue);
+        }
+     else 
+        {
+        // Launch an appropriate player in playing state. 
+        TRAPD(err, ActivateApplicationL(TUid::Uid(KUid3MusicPlayer)))
+        if(err != KErrNone)
+            {
+
+            }
+
+        //deny this command
+        Observer().IncomingCommandPermitted(EFalse);
+
+        // We will be informed when the MPX music player connects its client 
+        // session.  That will trigger a rules evaluation which will result in
+        // us informing interested bearers of the new local addressed player.
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::PermitIncomingNotify
+// By default, permit all incoming addressed commands.  Check if the command
+// comes from the AVRCP bearer an if so launch the music player.
+// -----------------------------------------------------------------------------
+void CRemConTspController::PermitIncomingNotify(
+    TUid /*aInterfaceUid*/,
+    TUint /*aOperationId*/, 
+    const TClientInfo& /*aClient*/)
+    {
+    // No reason to stop these, just allow all
+    Observer().IncomingNotifyPermitted(ETrue);
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::SetRemoteAddressedClient
+// Ignore this event.  We don't use what the remote has selected to influence
+// our routing policy.
+// -----------------------------------------------------------------------------
+void CRemConTspController::SetRemoteAddressedClient(const TUid& /*aBearerUid*/, 
+        const TClientInfo& /*aClient*/)
+    {
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::TargetClientAvailable
+// A new client has connected.  Trigger a rule evaluation to see if we want to switch
+// to this client.
+// -----------------------------------------------------------------------------
+void CRemConTspController::TargetClientAvailable(const TClientInfo& aClientInfo)
+    {
+    COM_TRACE_1("[REMCONTSPCONTROLLER] CRemConTspController::TargetClientAvailable aClientInfo.SecureId=0x%x", aClientInfo.SecureId().iId);
+
+    TClientInfo* clientInfo;
+    TSglQueIter<TClientInfo> iter(iAvailableTargets);
+    
+    while((clientInfo = iter++) != NULL)
+        {
+        if(clientInfo->SecureId() == aClientInfo.SecureId())
+            {
+            // Found a client and clientInfo points to that now. 
+            break; 
+            }
+        }
+    
+    // If clientInfo was not found, create it and add to the available targets queue. 
+    if(!clientInfo)
+        {
+        TClientInfo* newTarget = new TClientInfo();
+        if(newTarget)
+            {
+            newTarget->ProcessId() = aClientInfo.ProcessId();
+            newTarget->SecureId() = aClientInfo.SecureId();
+            
+            // Add to our list of available targets
+            iAvailableTargets.AddLast(*newTarget);
+            }
+        }
+
+    // Re-evaluate what the default addressed player should be if someone is interested to know 
+    if(!iClientObservers.IsEmpty())
+        {
+        MtrtoEvaluateRoutingRules();
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::TargetClientUnavailable
+// A client has disconnected.  Trigger a rule evaluation to see if our default
+// player has changed.
+// -----------------------------------------------------------------------------
+void CRemConTspController::TargetClientUnavailable(const TClientInfo& aClientInfo)
+    {
+    COM_TRACE_1("[REMCONTSPCONTROLLER] CRemConTspController::TargetClientUnavailable aClientInfo.SecureId=0x%x", aClientInfo.SecureId().iId);
+
+    // Remove this from our list of available targets
+    if(!iAvailableTargets.IsEmpty())
+        {
+        TClientInfo* clientInfo;
+        TSglQueIter<TClientInfo> iter(iAvailableTargets);
+        while((clientInfo = iter++) != NULL)
+            {
+            if(clientInfo->SecureId() == aClientInfo.SecureId())
+                {
+                iAvailableTargets.Remove(*clientInfo);
+                delete clientInfo;
+                break;
+                }
+            }
+        }
+
+    if(!iClientObservers.IsEmpty())
+        {
+        // Re-evaluate what the default addressed player should be if someone is listening. 
+        MtrtoEvaluateRoutingRules();
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::RegisterLocalAddressedClientObserver
+// A bearer is interested in what the local addressed player is.  Start observing.
+// -----------------------------------------------------------------------------
+TInt CRemConTspController::RegisterLocalAddressedClientObserver(const TUid& aBearerUid)
+    {
+    COM_TRACE_1("[REMCONTSPCONTROLLER] CRemConTspController::RegisterLocalAddressedClientObserver aBearerUid.SecureId=0x%x", aBearerUid.iUid);
+    TInt err = KErrNone;
+    // Add this to our list of bearers interested in the default addressed player
+    TClientObserver* clientObserver = new TClientObserver(aBearerUid);
+
+    if(!clientObserver)
+        {
+        err = KErrNoMemory; 
+        }
+
+    // If this is our first interested bearer kick off the trigger events watcher.
+    // This will let us know if any event occurs that should trigger us to re-evaluate
+    // our addressing rules
+    if(!iTriggerEventsWatcher && err == KErrNone)
+        {
+        TRAP(err, iTriggerEventsWatcher = CTspTriggerEventsWatcher::NewL(*this));
+        if(err != KErrNone)
+            {
+            // If we couldn't create the events watcher the client Observer is not needed either.
+            delete clientObserver;
+            }
+        }
+
+    if(err == KErrNone)
+        {
+        // Finally add the observer to the queue if it's not there yet. 
+        TSglQueIter<TClientObserver> iter(iClientObservers);
+        TClientObserver* obsInQueue;
+        while((obsInQueue = iter++) != NULL)
+            {
+            if(obsInQueue->iBearerUid == aBearerUid)
+                {
+                err = KErrAlreadyExists; 
+                break;
+                }
+            }
+
+        if(!obsInQueue)
+            {
+            iClientObservers.AddLast(*clientObserver);
+            MtrtoEvaluateRoutingRules();
+            }
+        }
+
+    return err;
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::UnregisterLocalAddressedClientObserver
+// The bearer is no longer interested in observering default client changes.
+// -----------------------------------------------------------------------------
+TInt CRemConTspController::UnregisterLocalAddressedClientObserver(const TUid& aBearerUid)
+    {
+    COM_TRACE_1("[REMCONTSPCONTROLLER] CRemConTspController::UnregisterLocalAddressedClientObserver aBearerUid.SecureId=0x%x", aBearerUid.iUid);
+    // Remove this from our list of bearers interested in the default addressed player.
+    // If there are no interested bearers left then we can stop watching for rules
+    // triggers.
+    TSglQueIter<TClientObserver> iter(iClientObservers);
+    TClientObserver* clientObserver;
+    while((clientObserver = iter++) != NULL)
+        {
+        if(clientObserver->iBearerUid == aBearerUid)
+            {
+            iClientObservers.Remove(*clientObserver);
+	    delete clientObserver;
+            break;
+            }
+        }
+    
+    if(iClientObservers.IsEmpty())
+        {
+        delete iTriggerEventsWatcher;
+        iTriggerEventsWatcher = NULL;
+        }
+    
+    return KErrNone;
+    }
+
+// -----------------------------------------------------------------------------
 // CRemConTspController::GetCorrectClientL
 // Defines remote targets to which command will be sent.
 // (other items were commented in a header).
@@ -405,10 +657,12 @@ void CRemConTspController::PermitOutgoingNotifyCommand(
 void CRemConTspController::GetCorrectClientL(
     TUid aInterfaceUid,
 	TUint aKeyEvent,
-	TSglQue<TClientInfo>& aClients )
+	TSglQue<TClientInfo>& aClients,
+	TBool aLaunchingNewApplicationAllowed)
 	{
 	COM_TRACE_1( "[REMCONTSPCONTROLLER] CRemConTspController::GetCorrectClientL() Start aInterfaceUid %d", aInterfaceUid );
 	COM_TRACE_1( "[REMCONTSPCONTROLLER] CRemConTspController::GetCorrectClientL() Start aKeyEvent %d", aKeyEvent );
+
     TInt numOfTables = iArrayOfTables.Count();
     RArray<TInt> rulesArray;
     CleanupClosePushL( rulesArray );
@@ -513,6 +767,7 @@ void CRemConTspController::GetCorrectClientL(
             	    TProcessId processId = target->ProcessId();
             	    if( iProcessIdForeground == processId )
             	        {
+                        COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::GetCorrectClientL() Foreground client found" );
             	        aClients.Reset();
             	        aClients.AddFirst( *target );
             	        found = ETrue;
@@ -613,7 +868,7 @@ void CRemConTspController::GetCorrectClientL(
             case CRemConEventTable::ELaunchDefaultApp:
                 {
                 COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::GetCorrectClientL() Launch default application" );                
-                if ( !DeviceLocked() )
+                if ( !DeviceLocked() && aLaunchingNewApplicationAllowed )
                     {
                     TUid defaultLaunchAppUid;
                     
@@ -648,6 +903,9 @@ void CRemConTspController::GetCorrectClientL(
         else if( rulesArray.Count() - 1 == i )
             {
             COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::GetCorrectClientL() No client found");
+            // Reset the list to reflect the fact that no clients were found. 
+            // The possible transparent clients will be added still. 
+            aClients.Reset();
             }
         }
 
@@ -657,7 +915,8 @@ void CRemConTspController::GetCorrectClientL(
         TClientInfo* target = transparentClients[ i ];
         if ( !FindRemconConnection( target->SecureId(), aClients ) ) // Add client only if not already found
             {
-            aClients.AddFirst( *target );
+            // Add to the end of the list, any other client should take priority over the transparent clients. 
+            aClients.AddLast( *target );  
             COM_TRACE_1( "[REMCONTSPCONTROLLER] CRemConTspController::GetCorrectClientL() transparent client 0x%x added", target->SecureId().iId );
             }
         }
@@ -1056,6 +1315,40 @@ void CRemConTspController::HandleContextFrameworkError(
 TAny* CRemConTspController::Extension( const TUid& /*aExtensionUid*/ ) const
     {
     return NULL;
+    }
+
+// -----------------------------------------------------------------------------
+// CRemConTspController::MtrtoEvaluateRoutingRules
+// Evaluates the TSP's routing rules to determine if the local addressed player
+// has changed, and if so informs interested bearers
+// -----------------------------------------------------------------------------
+void CRemConTspController::MtrtoEvaluateRoutingRules()
+    {
+    COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::MtrtoEvaluateRoutingRules() - Enter" ); 
+    TClientInfo* localAddressedClient = GetLocalAddressedClient();
+
+    if(!localAddressedClient)
+        {
+        // If there's no suitable client, then there's nothing to do here.   
+        COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::MtrtoEvaluateRoutingRules() No local addressed client found" ); 
+        return; 
+        }
+
+    if(!iLocalAddressedClient || (localAddressedClient->SecureId() != iLocalAddressedClient->SecureId()))
+        {
+        // Local addressed player has changed (or wasn't set before).  
+        iLocalAddressedClient = localAddressedClient;
+        COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::MtrtoEvaluateRoutingRules() Local addressed client has changed" ); 
+        TSglQueIter<TClientObserver> iter(iClientObservers);
+        TClientObserver* clientObserver;
+        while((clientObserver = iter++) != NULL)
+            {
+            COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::MtrtoEvaluateRoutingRules() - informing observer" ); 
+            Observer().SetLocalAddressedClient(clientObserver->iBearerUid, *iLocalAddressedClient);
+            }
+        }
+    COM_TRACE_1( "[REMCONTSPCONTROLLER] CRemConTspController::MtrtoEvaluateRoutingRules() Local addressed client SID = 0x%x",  iLocalAddressedClient->SecureId().iId);
+    COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::MtrtoEvaluateRoutingRules() - Return" ); 
     }
 
 // -----------------------------------------------------------------------------
@@ -1483,6 +1776,52 @@ TBool CRemConTspController::FindActiveAudioFromCustomIfL( TSglQue<TClientInfo>& 
         }
     array.Close();
     return EFalse;
+    }
+
+//----------------------------------------------------------------------------------
+// CRemConTspController::GetLocalAddressedClient
+// Uses TSP rules to determine what local addressed client should be.
+//-----------------------------------------------------------------------------------
+TClientInfo* CRemConTspController::GetLocalAddressedClient()
+    {
+    COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::GetLocalAddressedClient() Entry");
+    // Create list of available clients to allow re-use of existing rule 
+    // evaluation function, GetCorrectClientL
+    iTargetsForAddressing.Reset();
+    TSglQueIter<TClientInfo> iter(iAvailableTargets);
+    TClientInfo* clientInfo;
+    while((clientInfo = iter++) != NULL)
+        {
+        iTargetsForAddressing.AddLast(*clientInfo);
+        }
+    
+#ifdef _DEBUG   
+    TraceRemconTargets( iTargetsForAddressing );
+#endif
+    
+    TRAPD(err, GetCorrectClientL(TUid::Uid(KRemConCoreApiUid), ERemConCoreApiPlay, iTargetsForAddressing, EFalse));
+    if(iTargetsForAddressing.IsEmpty() || err)
+        {
+        clientInfo = NULL;
+        COM_TRACE_( "[REMCONTSPCONTROLLER] CRemConTspController::GetLocalAddressedClient() No target Found");
+        }
+    else
+        {
+        // We don't want to set the phone application or voice command handler as local addressed client. 
+        // So choose the first item that is neither of those. The clientInfo may be NULL in the end. 
+        TSglQueIter<TClientInfo> localAddressedIter(iTargetsForAddressing);
+        while((clientInfo = localAddressedIter++) != NULL)
+            {
+            if( clientInfo->SecureId() != TSecureId(KUid3PhoneApp) || 
+                clientInfo->SecureId() != TSecureId(KUid3VoiceCmdApp) )
+                {
+                COM_TRACE_1( "[REMCONTSPCONTROLLER] CRemConTspController::GetLocalAddressedClient() Local addressed client SID = %08x",  clientInfo->SecureId().iId);
+                break;
+                }
+            }
+        }
+
+    return clientInfo;
     }
 
 // End of file

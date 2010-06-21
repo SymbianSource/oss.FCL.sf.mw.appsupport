@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -403,11 +403,15 @@ void CDataRecognitionResultArray::SetPath(const TFileName& aPath)
 
 /** Gets the data (MIME) type of data passed by buffer.
 
-@param aBuffer A buffer containing data 
+@param aBuffer A buffer containing data; Provide preferred size of buffer. 
+If MIME type could not be recognized using this buffer, provide a buffer of 
+larger size.
 @param aDataType On return, contains the result of the attempt to recognize 
 data. 
 @return KErrNone, if successful; otherwise one of the other system-wide error 
 codes. 
+
+@see RApaLsSession::GetPreferredBufSize()
 */
 EXPORT_C TInt RApaLsSession::RecognizeData(const TDesC8& aBuffer, TDataRecognitionResult& aDataType) const
     {
@@ -417,12 +421,15 @@ EXPORT_C TInt RApaLsSession::RecognizeData(const TDesC8& aBuffer, TDataRecogniti
 /** Gets the data (MIME) type for data taken from a file with a specified name.
 
 @param aName The full filename, including drive and path, of the file containing the data.
-@param aBuffer A buffer containing data taken from the specified file; typically 
-the data is read from the beginning of the file.
+@param aBuffer A buffer containing data taken from the specified file; Provide preferred size of buffer 
+from beginning of the file. If MIME type could not be recognized using this buffer, provide a buffer of 
+larger size.
 @param aDataType On return, contains the result of the attempt to recognize 
 data. 
 @return KErrNone, if successful; otherwise one of the other system-wide error 
 codes. 
+
+@see RApaLsSession::GetPreferredBufSize()
 */
 EXPORT_C TInt RApaLsSession::RecognizeData(const TDesC& aName, const TDesC8& aBuffer, TDataRecognitionResult& aDataType) const
 	{
@@ -453,15 +460,18 @@ EXPORT_C TInt RApaLsSession::RecognizeData(const RFile& aFile, TDataRecognitionR
 
 
 /** Tests whether data taken from a named file has the specified 
-data (MIME) type.
+ * data (MIME) type.
 
 @param aName The name of the file containing the data.
-@param aBuffer A buffer containing data taken from the specified file; typically 
-the data is read from the beginning of the file.
+@param aBuffer A buffer containing data taken from the specified file; Provide preferred size of buffer 
+from beginning of the file. If MIME type could not be recognized using this buffer, provide a buffer of 
+larger size.
 @param aDataType The data (MIME) type.
 @param aResult On return, contains the result of the test.
 @return KErrNone, if successful; otherwise one of the other system-wide error 
 codes. 
+
+@see RApaLsSession::GetPreferredBufSize()
 */
 EXPORT_C TInt RApaLsSession::RecognizeSpecificData(const TDesC& aName, const TDesC8& aBuffer, const TDataType& aDataType, TBool& aResult) const
 	{

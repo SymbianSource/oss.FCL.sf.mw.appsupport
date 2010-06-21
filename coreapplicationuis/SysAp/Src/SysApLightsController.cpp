@@ -30,6 +30,7 @@
 
 #include "SysApFeatureManager.h"
 #include "startupdomainpskeys.h"
+#include <hal.h>
 
 // CONSTANTS
 
@@ -995,6 +996,8 @@ void CSysApLightsController::SetLightsOffL()
 		{
 		TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
 		iSysApAppUi.StopChargingBatteryL();
+		//To switch off the display 
+		TInt result = HAL::Set( HALData::EDisplayState, 0 );
 		}            
     // Ignore unreserved in use warnings.
     if ( err != KErrNone && err != KErrInUse )
@@ -1101,6 +1104,8 @@ void CSysApLightsController::SetLightsOnL( TBool aBlinking )
     		if ( error == KErrNone && state == ESwStateCharging ) 
 				{
 				iSysApAppUi.StartChargingBatteryL();
+				//To switch on the display 
+				TInt result = HAL::Set( HALData::EDisplayState, 1 );
 				}	
             }
         else

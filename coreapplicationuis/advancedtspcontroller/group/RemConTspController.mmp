@@ -29,7 +29,8 @@ SOURCEPATH      ../src
 SOURCE          remcontspcontrollermain.cpp
 SOURCE          remcontspcontroller.cpp
 SOURCE          remconidlelistener.cpp
-SOURCE          remconeventtable.cpp
+SOURCE          remconeventtable.cpp 
+SOURCE          tsptriggerevents.cpp
 
 START RESOURCE  ../data/10282CD5.rss
 target          AdvancedTspController.rsc
