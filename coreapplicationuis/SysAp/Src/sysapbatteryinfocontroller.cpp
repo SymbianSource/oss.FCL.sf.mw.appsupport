@@ -19,13 +19,8 @@
 #include <e32debug.h>
 #include <e32property.h>
 #include <StringLoader.h>
-#include <SysAp.rsg>
 #include "bsutil.h"
 #include <hwrmpowerstatesdkpskeys.h>
-#include <aknappui.h>
-#include <AknCapServerClient.h>
-#include <AknSgcc.h>
-#include "batterypopupcontrol.h"
 #include "sysapbatteryinfocontroller.h"
 #include "SysAp.hrh"
 
@@ -43,8 +38,8 @@ CSysApBatteryInfoController::CSysApBatteryInfoController( TInt aThreshold)
                                                         : iBsUtil( NULL ),
                                                           iCurrentCapacity( KNotInitialized ),
                                                           iThresholdCapacity( aThreshold  ),
-                                                          iBatteryInfoState( EBatteryInfoAboveThreshold ),
-                                                          iBatteryPopup( NULL )
+                                                          iBatteryInfoState( EBatteryInfoAboveThreshold )
+                                                          // iBatteryPopup( NULL )
     {
     // sanity check, fall back to hard coded default value
     const TInt min(0);
@@ -92,7 +87,7 @@ CSysApBatteryInfoController::~CSysApBatteryInfoController()
     {
     TRACES( RDebug::Print( _L("CSysApBatteryInfoController::~CSysApBatteryInfoController") ) );
     delete iBsUtil;
-    delete iBatteryPopup;
+    // delete iBatteryPopup;
     }
 
 // ---------------------------------------------------------------------------
@@ -183,38 +178,12 @@ void CSysApBatteryInfoController::BatteryStatusUpdated( const TInt aValue )
 // CSysApBatteryInfoController::ShowBatteryPreviewPopupL
 // ---------------------------------------------------------------------------
 //
-void CSysApBatteryInfoController::ShowBatteryPreviewPopupL( TInt aCapacity )
+void CSysApBatteryInfoController::ShowBatteryPreviewPopupL( TInt /* aCapacity */ )
     {
-    TRACES( RDebug::Print( _L("CSysApBatteryInfoController::ShowBatteryPreviewPopupL: aCapacity=%d"), aCapacity ) );
+    // TRACES( RDebug::Print( _L("CSysApBatteryInfoController::ShowBatteryPreviewPopupL: aCapacity=%d"), aCapacity ) );
     
-    delete iBatteryPopup;
-    iBatteryPopup = NULL;
-    HBufC* popupTextBuf = StringLoader::LoadLC( R_QTN_BATTERY_STATUS_POPUP, aCapacity ); 
-    iBatteryPopup = CBatteryPopupControl::NewL( *popupTextBuf, KNullDesC );
-    CleanupStack::PopAndDestroy( popupTextBuf );
-        
-    // switch layout for showing the battery popup
-    CAknAppUi* appUi = static_cast<CAknAppUi*>(CCoeEnv::Static()->AppUi());
-    CEikStatusPane* statusPane = appUi->StatusPane();
-    
-    TInt currLayout = statusPane->CurrentLayoutResId();
-        
-    RAknUiServer* aknSrv = CAknSgcClient::AknSrv();
-    if ( aknSrv )
-        {
-        statusPane->SwitchLayoutL( aknSrv->StatusPaneResourceId()  );	
-        }    
-    // Trap for switching layout back to current.
-    TRAPD( err, iBatteryPopup->ShowPopUpL() );
-    
-    if( err )
-        {
-        TRACES( RDebug::Print( _L("CSysApBatteryInfoController::ShowBatteryPreviewPopupL ShowPopUpL() leaved: %d"), err ) );
-        }
-        
-    // restore layout
-    statusPane->SwitchLayoutL( currLayout );
-    
-    User::LeaveIfError( err );
+    // delete iBatteryPopup;
+    // iBatteryPopup = NULL;
+    // preview battery capacity
     }
 

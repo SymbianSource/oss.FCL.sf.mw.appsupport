@@ -94,9 +94,9 @@ void CSysApFeatureManager::ConstructL()
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: No power key supported=%d"), iNoPowerKeySupported ) );
     
 //    iFmTxSupported = FeatureManager::FeatureSupported( KFeatureIdFmtx );
- //   TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX supported=%d"), iFmTxSupported ) );
+//    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX supported=%d"), iFmTxSupported ) );
 
-    iPenEnabled = AknLayoutUtils::PenEnabled();
+//    iPenEnabled = AknLayoutUtils::PenEnabled();
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Pen enabled=%d"), iPenEnabled ) );
     
     iVmbxCallDivertIconSupported = FeatureManager::FeatureSupported( KFeatureIdVmbxCallDivertIcon );
@@ -180,11 +180,11 @@ CSysApFeatureManager::CSysApFeatureManager() : iFeatMgrActive( EFalse ),
                                                iGripNotSupported( ETrue ),
                                                iPowerSaveSupported( EFalse ),
                                                iNoPowerKeySupported( EFalse ),
-//                                               iFmTxSupported( EFalse ),
+                                               //iFmTxSupported( EFalse ),
                                                iPenEnabled( EFalse ),
                                                iVmbxCallDivertIconSupported( EFalse ),
                                                iTouchUnlockStrokeSupported( EFalse )
-//                                               iFmTxRdsTextSupported( EFalse )
+                                               //iFmTxRdsTextSupported( EFalse )
 
     {
     }
@@ -379,6 +379,7 @@ TBool CSysApFeatureManager::FmTxSupported() const
     return iFmTxSupported;
     }
 */
+
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::PenEnabled()
 // ----------------------------------------------------------------------------

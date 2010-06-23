@@ -131,6 +131,7 @@ class CSysApShutdownImage : public CCoeControl , public MCoeControlObserver
         */
         TKeyResponse OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aType);
 
+        CFbsBitmap* ReadSVGL (TFileName aFileName);
     private:    // Data
 
         //Used for showing user selected image

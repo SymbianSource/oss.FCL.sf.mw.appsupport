@@ -23,7 +23,6 @@
 #include <aknquerydialog.h>
 #include <commondialogs.hrh>
 #include <akncommondialogsdynmem.h>
-#include <f32file.h>
 #include <t_oomtestapp.rsg>
 #include "t_oomtestappcmd.hrh"
 #include "t_oomtestappApplication.h"

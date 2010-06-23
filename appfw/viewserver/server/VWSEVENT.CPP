@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1999-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -127,6 +127,7 @@ void CVwsEventTimer::Start(MVwsEventTimerObserver* aObserver,const TBool& aScree
 		firstDelay=iServerEventTimeOut;
 		}
 
+	LOG3(CVwsLog::EQuiet,_L("CVwsEventTimer::Start : firstDelay [%d] "),firstDelay.Int());
 	TTimeIntervalMicroSeconds32 delay(firstDelay);
 	iPeriodic->Start(delay,delay,TCallBack(TimerCallBack,this));	
 	iScreenDeviceChangeEvent = aScreenDeviceChangeEvent;
@@ -167,7 +168,7 @@ void CVwsEventTimer::DoTimerCallBack()
 			else
 				{
 				//Delay of KTimeoutValueForPreemptedProcess is given after boosting priority of an application
-				TUint8 patchableConst = KTimeoutValueForPreemptedProcess;
+				TInt patchableConst = KTimeoutValueForPreemptedProcess;
 				#ifdef __WINS__
 				// For the emulator allow the constant to be patched via epoc.ini
 				UserSvr::HalFunction(EHalGroupEmulator, EEmulatorHalIntProperty,
@@ -175,8 +176,9 @@ void CVwsEventTimer::DoTimerCallBack()
 				#endif
 				delay = patchableConst;
 				iTimeOutState = EServerEventTimeOut;
+                LOG2(CVwsLog::ELoud,_L("CVwsEventTimer::DoTimerCallBack : iTimeOutState == EIntermediateEventTimeOut"));
 				}
-			
+            LOG3(CVwsLog::EQuiet,_L("CVwsEventTimer::DoTimerCallBack : delay = [%d] "),delay.Int());
             iPeriodic->Start(delay,delay,TCallBack(TimerCallBack,this));
 			}
 		}

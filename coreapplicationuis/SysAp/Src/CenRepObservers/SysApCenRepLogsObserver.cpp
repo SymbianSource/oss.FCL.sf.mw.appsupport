@@ -154,9 +154,9 @@ void CSysApCenRepLogsObserver::UpdateMissedCallsIndicatorL()
     
     if ( iSimChangedCheckDone && iUiReady )
         {
-        TInt newState( iMissedCallsValue > 0 ? EAknIndicatorStateOn : EAknIndicatorStateOff );
+//        TInt newState( iMissedCallsValue > 0 ? EAknIndicatorStateOn : EAknIndicatorStateOff );
         
-        iSysApAppUi.SetIndicatorStateL( EAknIndicatorMissedCalls, newState );
+//        iSysApAppUi.SetIndicatorStateL( EAknIndicatorMissedCalls, newState );
         }
     }
 

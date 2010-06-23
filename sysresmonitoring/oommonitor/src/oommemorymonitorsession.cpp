@@ -60,7 +60,7 @@ CMemoryMonitor& CMemoryMonitorSession::Monitor()
     return Server().Monitor();    
 #endif
     }
-
+#ifndef CLIENT_REQUEST_QUEUE
 TBool CMemoryMonitorSession::IsDataPaged(const RMessage2& aMessage)
     {
     RThread clientThread;
@@ -85,6 +85,7 @@ TBool CMemoryMonitorSession::IsDataPaged(const RMessage2& aMessage)
         }
     return dataPaged;            
     }
+#endif
 
 void CMemoryMonitorSession::ServiceL(const RMessage2& aMessage)
     {

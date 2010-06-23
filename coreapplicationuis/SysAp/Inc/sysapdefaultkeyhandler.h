@@ -21,10 +21,13 @@
 
 #include <e32base.h>
 #include <coedef.h>
-#include <AknCapServerClient.h>
+//#include <AknCapServerClient.h>
 
+class RWindowGroup;
 class MSysapCallback;
-class RAknKeylock2;
+
+//class RAknKeylock2;
+//class CSysApAppUi;
 
 
 /**
@@ -49,7 +52,7 @@ class CSysApDefaultKeyHandler : public CBase
         * @param aCallback reference to System Application callback interface.
         * @return pointer to a new instance of CSysApDefaultKeyHandler.
         */
-        static CSysApDefaultKeyHandler* NewL( MSysapCallback& callback );
+        static CSysApDefaultKeyHandler* NewL(MSysapCallback& callback);
 
         /**
         * Destructor.
@@ -85,7 +88,7 @@ class CSysApDefaultKeyHandler : public CBase
         *
         * @param aCallback reference to System Application callback interface.
         */
-        CSysApDefaultKeyHandler( MSysapCallback& callback );
+        CSysApDefaultKeyHandler(MSysapCallback& callback );
 
     private:
     
@@ -162,7 +165,10 @@ class CSysApDefaultKeyHandler : public CBase
         TBool DoShowKeysLockedNote();
         
     private: // data
-
+        
+        // Our window group from SysappUi
+ //       RWindowGroup& iRootWindowGroup;
+        
         /**
         * Reference to callback object.
         */
@@ -182,7 +188,7 @@ class CSysApDefaultKeyHandler : public CBase
         * Pointer to sysap-owned RAknKeylock2*
         * Not own.
         */
-        RAknKeylock2* iKeylock;
+//        RAknKeylock2* iKeylock;
         
         /**
         * Handle of the captured camera key event.
@@ -222,7 +228,7 @@ class CSysApDefaultKeyHandler : public CBase
         /**
         * Avkon UI Server
         */
-        RAknUiServer iAknUiServer;
+//        RAknUiServer iAknUiServer;
         
     };
 

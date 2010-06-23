@@ -54,9 +54,9 @@ void CSysApOfflineModeController::ConstructL()
     {
     TRACES( RDebug::Print( _L("CSysApOfflineModeController::ConstructL") ) ); 
     // Check the active profile
-    TInt activeProfile( iSysApAppUi.ActiveProfileId() );
-    activeProfile = iSysApAppUi.ActiveProfileId();
-    if ( activeProfile == KOfflineModeProfileId )
+//    TInt activeProfile( iSysApAppUi.ActiveProfileId() );
+//    activeProfile = iSysApAppUi.ActiveProfileId();
+//    if ( activeProfile == KOfflineModeProfileId )
         {
         iOfflineModeActive = ETrue;
         }
@@ -104,7 +104,7 @@ void CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL()
 
     if ( err )
         {
-        iSysApAppUi.RestoreProfileL( EFalse );
+//        iSysApAppUi.RestoreProfileL( EFalse );
         iSysApAppUi.ShowUiNoteL( ECannotActivateOfflineModeNote );
         }
     else
@@ -144,7 +144,7 @@ void CSysApOfflineModeController::SwitchFromOfflineToOnlineModeL()
         
     if ( err )
         {
-        iSysApAppUi.RestoreProfileL( ETrue );
+//        iSysApAppUi.RestoreProfileL( ETrue );
         iSysApAppUi.ShowUiNoteL( ECannotDeactivateOfflineModeNote );
         }
     else
@@ -233,6 +233,7 @@ TBool CSysApOfflineModeController::BtActiveBeforeOfflineMode()
     TInt btToBeActivated = iSysApAppUi.CenRepController().GetInt( KCRUidCoreApplicationUIsSysAp,
                                                                   KSysApBtStatusBeforeOfflineMode,
                                                                   &err );
+
     if ( err )
         {
         TRACES( RDebug::Print( _L("CSysApOfflineModeController::BtActiveBeforeOfflineMode: ERROR: %d" ), err ) );
@@ -241,6 +242,7 @@ TBool CSysApOfflineModeController::BtActiveBeforeOfflineMode()
     else
         {
         return ( TBool ) btToBeActivated;
+        //return ETrue;
         }
 
     }
@@ -252,6 +254,7 @@ TBool CSysApOfflineModeController::MustBtBeActivated()
     {
     return BtActiveBeforeOfflineMode();
     }
+
 
 // End of File
 

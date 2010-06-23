@@ -150,7 +150,7 @@ void CSysApLightsController::AlarmOccuredL( const TBool aAlarmActive )
 
     TBool blinkEnabled = ETrue; 
                 
-    if( iSysApFeatureManager->Supported( KSysApFeatureIdNoFlasUiInSilentMode ) ) 
+    if( iSysApFeatureManager->Supported( KSysApFeatureIdNoFlasUiInSilentMode )) 
         {
         blinkEnabled = EFalse;
         }

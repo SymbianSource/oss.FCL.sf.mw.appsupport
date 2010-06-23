@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -111,12 +111,15 @@ void CTzLocalizationDbAccessor::OpenDbL()
 		}
 	User::LeaveIfError(error);
 	// Check if both tables are created.
-	TRAP(error, iLocalizedTimeZoneDb.ColSetL(KCZTableName));
+	CDbColSet *colSet = NULL;
+	TRAP(error, colSet = iLocalizedTimeZoneDb.ColSetL(KCZTableName));
+	delete colSet;
 	if (error)
 		{
 		User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
 		}
-	TRAP(error, iLocalizedTimeZoneDb.ColSetL(KUCTableName));
+	TRAP(error, colSet = iLocalizedTimeZoneDb.ColSetL(KUCTableName));
+	delete colSet;
 	if (error)
 	        {
 		User::LeaveIfError(CreateUserCityTableL());

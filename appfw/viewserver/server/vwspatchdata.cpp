@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -15,6 +15,6 @@
 
 #include <e32std.h>
 
-EXPORT_C extern const TInt KVwsBoostAppPriorityBeforePanic = 0;
+EXPORT_C extern const TInt KVwsBoostAppPriorityBeforePanic = 1;
 
 EXPORT_C extern const TInt KTimeoutValueForPreemptedProcess = 4*1000*1000; //4 seconds

@@ -38,6 +38,15 @@ class CSysApRemConObserver;
 *  @since 2.X 
 */
 
+enum TSecurityUIsLights
+    {
+    ESecurityUIsLightsUninitialized = 0,
+    ESecurityUIsLightsLockOnRequest,
+    ESecurityUIsLightsQueryOnRequest,
+    ESecurityUIsLightsLockOffRequest,
+    ESecurityUIsLightsLastValue
+    };
+
 class CSysApPubSubObserver : 
               public CBase, 
               public MSysApPropertyResponder
@@ -99,7 +108,7 @@ private:
     /**
     * Handle keys under category KPSUidHWRMFmTx
     */
-//    void HandleHwrmFmTxCategoryL( const TUint aKey, const TInt aValue );
+    // void HandleHwrmFmTxCategoryL( const TUint aKey, const TInt aValue );
     
     /**
     * Handle keys under category KPSUidDataSynchronizationInternalKeys
@@ -134,6 +143,9 @@ private:
     */         
     CSysApPubSubObserver( CSysApAppUi& aSysApAppUi );
     void ConstructL();
+    
+    void HandleLKeylockEventL( const TUint aKey, const TInt aValue  );
+    void HandleLightsOnRequestL( const TUint aKey, const TInt aValue  );
 
 protected: // From MSysApPropertyResponder
 
@@ -151,8 +163,8 @@ private:
     CSysApSubscriber*   iInboxStatusSubscriber;              // KUidInboxStatusValue
     CSysApSubscriber*   iOutboxStatusSubscriber;             // KUidOutboxStatus
     CSysApSubscriber*   iIrdaStatusSubscriber;               // KPSUidIrdaStatus
-    CSysApSubscriber*   iGprsStatusSubscriber;               // KPSUidGprsStatus
-    CSysApSubscriber*   iWcdmaStatusSubscriber;              // KPSUidWcdmaStatus
+//    CSysApSubscriber*   iGprsStatusSubscriber;               // KPSUidGprsStatus
+//    CSysApSubscriber*   iWcdmaStatusSubscriber;              // KPSUidWcdmaStatus
     CSysApSubscriber*   iLocationGlobalPrivacySubscriber;    // KPSUidLocationGlobalPrivacy
     CSysApSubscriber*   iRestoreBackupSubscriber;            // KUidBackupRestoreKey
 
@@ -160,11 +172,11 @@ private:
     CSysApSubscriber*   iSimChangedSubscriber;               // KPSSimChanged
 
     // Category KHWRMFmTxStatus
-//    CSysApSubscriber*   iFmTxStatusSubscriber;   // KPSUidHWRMFmTx
+    // CSysApSubscriber*   iFmTxStatusSubscriber;   // KPSUidHWRMFmTx
     
-//    TInt iPreviousFmTxPSValue;
+    // TInt iPreviousFmTxPSValue;
     
-//    CSysApRemConObserver* iFmTxRemConObserver;
+    // CSysApRemConObserver* iFmTxRemConObserver;
     
     // Category KPSUidCoreApplicationUIs
 
@@ -238,6 +250,13 @@ private:
     * Own.
     */
     CSysApSubscriber* iSmsPhoneStoreSubscriber;
+    
+    CSysApSubscriber* iKeylockEventSubscriber;
+    
+    CSysApSubscriber* iLightsOnRequestSubscriber;
+    
+    CSysApSubscriber* iPowerMenuCustomDialogSubscriber;
+    
 };
 
 #endif // SYSAPPUBSUBOBSERVER_H

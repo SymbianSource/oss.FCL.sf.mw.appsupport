@@ -26,7 +26,7 @@
 #include <btengconnman.h>
 #include <StringLoader.h>
 #include <coemain.h>
-#include <SysAp.rsg>
+//#include <SysAp.rsg>
 
 
 MSysApBtSapController* CreateSysApBtSapControllerL( CSysApAppUi& aSysApAppUi )
@@ -162,7 +162,7 @@ void CSysApBtSapController::SimApplicationsClosed()
         
         // No RF available so signal bars should be same as in offline mode.
         iSysApAppUi.IgnoreZeroNetworkBarNotifications(ETrue);
-        TRAP( err, iSysApAppUi.UpdateSignalBarsL( KAknSignalOffLineMode ) );
+//        TRAP( err, iSysApAppUi.UpdateSignalBarsL( KAknSignalOffLineMode ) );
 
         iSysApAppUi.SetNetworkConnectionAllowed( ECoreAppUIsNetworkConnectionNotAllowed );
 
@@ -183,7 +183,8 @@ void CSysApBtSapController::FinalizeDisconnect()
     iFinalizeDisconnectNeeded = EFalse;
     iSysApAppUi.IgnoreZeroNetworkBarNotifications(EFalse);
 
-    if ( iSysApAppUi.ActiveProfileId() == KOfflineModeProfileId )
+//    if ( iSysApAppUi.ActiveProfileId() == KOfflineModeProfileId )
+      if(0)
         {
         if ( iSwitchingToOffline )
             {
