@@ -30,7 +30,7 @@ PRJ_EXPORTS
 ../Release/TzIdentities.ini		/epoc32/tools/tz/tzidentities.ini
 
 // TzCompiler User Documentation
-"../documentation/SGL.GT0197.232 App-Services Tz  9.1 How-To Create the Tz Database.doc"	"/epoc32/tools/tz/sgl.gt0197.232 app-services tz  9.1 how-to create the tz database.doc"
+//"../documentation/SGL.GT0197.232 App-Services Tz  9.1 How-To Create the Tz Database.doc"	"/epoc32/tools/tz/sgl.gt0197.232 app-services tz  9.1 how-to create the tz database.doc"
 
 // Sample Olson's Tz Database Source Files
 ../Release/Data/africa			/epoc32/tools/tz/data/africa
