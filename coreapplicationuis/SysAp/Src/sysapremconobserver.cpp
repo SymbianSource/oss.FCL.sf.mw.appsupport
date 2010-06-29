@@ -19,7 +19,7 @@
 // INCLUDE FILES
 #include <remconcoreapitarget.h>
 #include <remconinterfaceselector.h>
-#include <aknconsts.h>
+//#include <aknconsts.h>
 #include "sysapremconobserver.h"
 #include "SysApAppUi.h"
 
@@ -102,13 +102,13 @@ void CSysApRemConObserver::MrccatoCommand( TRemConCoreApiOperationId aOperationI
 	        || aOperationId == ERemConCoreApiMute )
 	        {
             // A volume key is pressed down
-/*            TRAPD( err, iSysApAppUi.ShowUiNoteL( EFmTxVolumeDisabledNote ) );
+            TRAPD( err, iSysApAppUi.ShowUiNoteL( EFmTxVolumeDisabledNote ) );
             
             if ( err != KErrNone )
                 {
                 TRACES( RDebug::Print( _L("CSysApRemConObserver::MrccatoCommand: err=%d"), err ) );
                 }
-*/	        }
+	        }
 	    }
 	}
 

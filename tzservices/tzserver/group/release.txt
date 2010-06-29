@@ -300,6 +300,6 @@ Date:	 03/12/2004
 Title : First Release of Timezone Server
 
 * First release of the new Time Zone Server.
-* see ..\tz\documentation folder for how-to use the new component
+* see ..\tzserver\doc_pub folder for how-to use the new component
 ============================
 

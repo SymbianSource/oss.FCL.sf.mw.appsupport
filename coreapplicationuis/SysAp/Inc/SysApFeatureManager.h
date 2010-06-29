@@ -209,7 +209,7 @@ public:
     * @since S60 3.2
     * @return ETrue if feature is supported
     */ 
-//    TBool FmTxSupported() const;
+    // TBool FmTxSupported() const;
 
     /**
     * Returns whether pen is enabled.
@@ -244,7 +244,7 @@ public:
     * @since S60 5.1
     * @return ETrue if feature is supported
     */
-//    TBool FmTxRdsTextSupported() const;
+    // TBool FmTxRdsTextSupported() const;
 
 private:
 
@@ -339,7 +339,7 @@ private:
     /**
     * FM TX supported status
     */
-//    TBool iFmTxSupported;
+    // TBool iFmTxSupported;
     
     /**
     * Pen enabled status.
@@ -359,7 +359,7 @@ private:
     /**
     * FM TX RDS Text support status.
     */
-//    TBool iFmTxRdsTextSupported;
+    // TBool iFmTxRdsTextSupported;
 };
 
 #endif // SYSAPFEATUREMANAGER_H

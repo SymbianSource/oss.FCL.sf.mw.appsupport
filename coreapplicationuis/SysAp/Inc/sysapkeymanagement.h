@@ -88,6 +88,7 @@ class CSysApKeyManagement: public CBase
                 */
                 RArray<TInt32> iUpAndDownKeyHandles; //Handles of keys when capturing them
                 
+                RArray<TInt32> iLongKeyPressHandle ; //Handles long key when capturing them
                 /**
                  * Tells if the plugin is a key provider plugin (plugin version 2)
                  */

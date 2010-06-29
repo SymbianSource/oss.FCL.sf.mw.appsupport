@@ -233,13 +233,13 @@ TBool CApaAppInfoReader::ReadL()
     {
     ReadAppRegistrationInfoL();
     ReadLocalisationInfoL();  
-#ifdef _DEBUG    
+#ifdef APPARC_SHOW_TRACE    
     DisplayAppInfo();
 #endif
     return ETrue;
     }
 
-#ifdef _DEBUG
+#ifdef APPARC_SHOW_TRACE
 void CApaAppInfoReader::DisplayAppInfo()
     { 
     RDebug::Print(_L("[Apparc] Application UID: %X"), iAppUid.iUid);

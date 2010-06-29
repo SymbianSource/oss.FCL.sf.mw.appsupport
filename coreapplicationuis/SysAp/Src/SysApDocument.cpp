@@ -31,7 +31,26 @@
 CSysApDocument::~CSysApDocument()
     {
     }
+/*
+// ---------------------------------------------------------
+// CSysApDocument::ConstructL()
+// ---------------------------------------------------------
+void CSysApDocument::ConstructL()
+    {
+    }
 
+// ---------------------------------------------------------
+// CSysApDocument::NewL()
+// ---------------------------------------------------------
+CSysApDocument* CSysApDocument::NewL(CEikApplication& aApp)     // CSysApp reference
+    {
+    CSysApDocument* self = new (ELeave) CSysApDocument(aApp);
+    CleanupStack::PushL(self);
+    self->ConstructL();
+    CleanupStack::Pop(); // self
+    return self;
+    }
+*/
 // ----------------------------------------------------------------------------
 // CSysApDocument::CreateAppUiL()
 // constructs CSysApUi
@@ -46,7 +65,7 @@ CEikAppUi* CSysApDocument::CreateAppUiL()
 // ----------------------------------------------------------------------------
 void CSysApDocument::UpdateTaskNameL( CApaWindowGroupName* aWgName )
 	{
-	CAknDocument::UpdateTaskNameL( aWgName );
+	CEikDocument::UpdateTaskNameL( aWgName );
 	aWgName->SetHidden( ETrue );
 	}
 

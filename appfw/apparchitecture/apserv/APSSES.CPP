@@ -421,7 +421,7 @@ CApaAppArcServSession::~CApaAppArcServSession()
 
 void CApaAppArcServSession::ServiceL(const RMessage2& aMessage)
 	{
-#ifdef _DEBUG    
+#ifdef APPARC_SHOW_TRACE    
     TFullName* name = new(ELeave) TFullName();
     RThread client;
     if ( aMessage.Client( client ) == KErrNone )
@@ -624,13 +624,13 @@ void CApaAppArcServSession::ServiceL(const RMessage2& aMessage)
 		break;
 	default:
 		iAppListSession->DoServiceL(aMessage);
-#ifdef _DEBUG   
+#ifdef APPARC_SHOW_TRACE   
 		RDebug::Print( _L("[Apparc] CApaAppListServSession::ServiceL(0x%08x) - END - op code: %04d, completeMessage: %d"), this, aMessage.Function(), completeMessage );
 #endif		
 		return;
 		}
 	
-#ifdef _DEBUG 	
+#ifdef APPARC_SHOW_TRACE 	
     RDebug::Print( _L("[Apparc] CApaAppListServSession::ServiceL(0x%08x) - END - op code: %04d, completeMessage: %d"), this, aMessage.Function(), completeMessage );
 #endif	
 	if (completeMessage && !aMessage.IsNull())
@@ -1456,30 +1456,59 @@ void CApaAppListServSession::GetAppInfoL(TUid aUid, TApaAppInfo& aInfo)
 	aInfo.iShortCaption = app->ShortCaption();
 	}
 	
-void CApaAppArcServSession::DoRecognizeUnpackLC(HBufC*& aName, HBufC8*& aBuffer, const RMessage2& aMessage)
-	{
-	ASSERT(aName==NULL);
-	ASSERT(aBuffer==NULL);
-	aName=HBufC::NewLC(User::LeaveIfError(aMessage.GetDesLength(1)));
-	TPtr name(aName->Des());
-	aMessage.ReadL(1, name);
-	aBuffer=HBufC8::NewLC(User::LeaveIfError(aMessage.GetDesLength(2)));
-	TPtr8 buffer(aBuffer->Des());
-	aMessage.ReadL(2, buffer);
-	}
+TPtrC8 CApaAppArcServSession::DoRecognizeUnpackLC(HBufC*& aName, RChunk& aLocalChunk, const RMessage2& aMessage)
+    {
+    ASSERT(aName==NULL);
+    
+    aName=HBufC::NewLC(User::LeaveIfError(aMessage.GetDesLength(1)));
+    TPtr name(aName->Des());
+    aMessage.ReadL(1, name);
+    
+    HBufC8* buffer=NULL;
+    TInt error=KErrNone;
+    TInt bufferSize= aMessage.GetDesLength(2);
+    User::LeaveIfError(bufferSize);
+    //Allocate memory in apparc's process heap.
+    TRAP(error, buffer=HBufC8::NewL(bufferSize));
+
+    if(error==KErrNone)
+        {
+        CleanupStack::PushL(buffer);
+        TPtr8 bufPtr(buffer->Des());
+        aMessage.ReadL(2, bufPtr);   
+        return bufPtr;
+        }
+    else if(error==KErrNoMemory)
+        {
+        //If memory is not available in apparc's process heap, then allocate in kernel heap
+        User::LeaveIfError(aLocalChunk.CreateLocal(bufferSize,bufferSize));
+        CleanupClosePushL(aLocalChunk);
+        TPtr8 bufPtr(aLocalChunk.Base(), bufferSize);
+        aMessage.ReadL(2, bufPtr); 
+        return bufPtr;        
+        }
+    else
+        {
+        User::Leave(error);
+        }
+    
+    TPtrC8 bufPtr(NULL,0); //Never executed. To make compiler happy
+    return bufPtr;
+    }
 
 void CApaAppArcServSession::RecognizeDataL(const RMessage2& aMessage)
 // Recognize the data type of an object
-	{
-	HBufC* name=NULL;
-	HBufC8* buffer=NULL;
-	DoRecognizeUnpackLC(name,buffer,aMessage);
+    {
+    HBufC* name=NULL;
+    RChunk localChunk;
+    
+    TPtrC8 bufPtr=DoRecognizeUnpackLC(name, localChunk, aMessage);
 
-	const TDataRecognitionResult result = iServ.RecognizeDataL(*name, *buffer);
+    const TDataRecognitionResult result = iServ.RecognizeDataL(*name, bufPtr);
 
-	CleanupStack::PopAndDestroy(2); // name & buffer
-	aMessage.WriteL(0,TPckgC<TDataRecognitionResult>(result));
-	}
+    CleanupStack::PopAndDestroy(2); // name & buffer or localChunk
+    aMessage.WriteL(0,TPckgC<TDataRecognitionResult>(result));
+    }
 
 
 void CApaAppArcServSession::RecognizeFilesL(const RMessage2& aMessage)
@@ -1754,16 +1783,17 @@ void CApaAppArcServSession::RecognizeDataPassedByFileHandleL(const RMessage2& aM
 	
 void CApaAppArcServSession::RecognizeSpecificDataL(const RMessage2& aMessage)
 // Determine whether an object is of a specific data type
-	{
-	HBufC* name=NULL;
-	HBufC8* buffer=NULL;
-	DoRecognizeUnpackLC(name,buffer,aMessage);
-	TDataType dataType;
-	{TPckg<TDataType> dataType_asDescriptor(dataType);
-	aMessage.ReadL(0, dataType_asDescriptor);}
-	aMessage.Complete(iServ.RecognizeDataL(*name,*buffer,dataType));
-	CleanupStack::PopAndDestroy(2); // name & buffer
-	}
+    {
+    HBufC* name=NULL;
+    RChunk localChunk;
+    
+    TPtrC8 bufPtr=DoRecognizeUnpackLC(name, localChunk, aMessage);
+    TDataType dataType;
+    {TPckg<TDataType> dataType_asDescriptor(dataType);
+    aMessage.ReadL(0, dataType_asDescriptor);}
+    aMessage.Complete(iServ.RecognizeDataL(*name,bufPtr,dataType));
+    CleanupStack::PopAndDestroy(2); // name & buffer or localChunk
+    }
 
 void CApaAppArcServSession::RecognizeSpecificDataPassedByFileHandleL(const RMessage2& aMessage)
 	{

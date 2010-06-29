@@ -1,19 +1,22 @@
 /*
-* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  CSysApOfflineModeController implementation
+ * Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
  *
-*/
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:
+ * CSysApOfflineModeController controls the offline mode.
+ * It turns OFF RF, BT and WLAN when offline mode is enabled and turns them ON when
+ * Offline mode is disabled
+ *
+ */
 
 
 // INCLUDES
@@ -23,8 +26,10 @@
 #include "SysAp.hrh"
 #include "DosSvrServices.h"
 #include "SysApCenRepController.h"
+#include "sysapcenrepofflinemodeobserver.h"
 #include <startupdomainpskeys.h>
 #include <PSVariables.h>
+#include <wlandevicesettingsinternalcrkeys.h> // For Turning ON/OFF WLAN
 
 
 MSysApOfflineModeController* CreateSysApOfflineModeControllerL( CSysApAppUi& aSysApAppUi )
@@ -53,22 +58,18 @@ CSysApOfflineModeController* CSysApOfflineModeController::NewL( CSysApAppUi& aSy
 void CSysApOfflineModeController::ConstructL()
     {
     TRACES( RDebug::Print( _L("CSysApOfflineModeController::ConstructL") ) ); 
-    // Check the active profile
-    TInt activeProfile( iSysApAppUi.ActiveProfileId() );
-    activeProfile = iSysApAppUi.ActiveProfileId();
-    if ( activeProfile == KOfflineModeProfileId )
-        {
-        iOfflineModeActive = ETrue;
-        }
+    
+    // create an observer for Offline Mode
+    TRACES( RDebug::Print( _L("CSysApOfflineModeController::ConstructL: trying CSysApCenRepOfflineModeObserver::NewL") ) );
+    iSysApCenRepOfflineModeObserver = CSysApCenRepOfflineModeObserver::NewL(*this );         
+    iOfflineModeActive = iSysApCenRepOfflineModeObserver->IsOffline();
     }
 
 // ----------------------------------------------------------------------------
 // CSysApOfflineModeController::CSysApOfflineModeController() 
 // ----------------------------------------------------------------------------
 CSysApOfflineModeController::CSysApOfflineModeController( CSysApAppUi& aSysApAppUi ) :
-  iSysApAppUi( aSysApAppUi ),
-  iOfflineModeActive( EFalse ),
-  iDoNotActivateRF( EFalse )
+  iSysApAppUi( aSysApAppUi )
     {
 
     }
@@ -79,6 +80,7 @@ CSysApOfflineModeController::CSysApOfflineModeController( CSysApAppUi& aSysApApp
 
 CSysApOfflineModeController::~CSysApOfflineModeController()
     {
+    delete iSysApCenRepOfflineModeObserver;
     }
 
 // ----------------------------------------------------------------------------
@@ -87,6 +89,7 @@ CSysApOfflineModeController::~CSysApOfflineModeController()
 
 TBool CSysApOfflineModeController::OfflineModeActive()
     {
+    TRACES( RDebug::Print( _L("CSysApOfflineModeController::OfflineModeActive returns %d"), iOfflineModeActive ) );
     return iOfflineModeActive;
     }
 
@@ -97,6 +100,7 @@ TBool CSysApOfflineModeController::OfflineModeActive()
 void CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL()
     {
     TRACES( RDebug::Print( _L("CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL") ) ); 
+        
     TInt err ( 0 );
 
     // Set state to starter. Note that if state is same as the current state, then nothing happens.
@@ -104,7 +108,6 @@ void CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL()
 
     if ( err )
         {
-        iSysApAppUi.RestoreProfileL( EFalse );
         iSysApAppUi.ShowUiNoteL( ECannotActivateOfflineModeNote );
         }
     else
@@ -119,8 +122,22 @@ void CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL()
             SetBtActiveBeforeOfflineMode( ETrue );       // Update "BT active" setting
             TRACES( RDebug::Print( _L("CSysApOfflineModeController SetBtPowerStateL returned %d"), err ) );
             }
-        
-        iSysApAppUi.OfflineModeChangedL();
+        /* Turn OFF WLAN */        
+        TInt err( KErrNone );
+        CRepository* repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId );
+        err = repository->Set(KWlanOnOff, 0);
+        delete repository;
+        if(err) 
+		{
+           TRACES( RDebug::Printf("CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL Could not disable WLAN") );
+		    User::Leave(err);
+        }
+        else 
+		{
+            TRACES( RDebug::Printf("CSysApOfflineModeController::SwitchFromOnlineToOfflineModeL WLAN Disabled" ) );
+        }
+		
+		iSysApAppUi.OfflineModeChangedL();
         }
     }
 
@@ -144,7 +161,6 @@ void CSysApOfflineModeController::SwitchFromOfflineToOnlineModeL()
         
     if ( err )
         {
-        iSysApAppUi.RestoreProfileL( ETrue );
         iSysApAppUi.ShowUiNoteL( ECannotDeactivateOfflineModeNote );
         }
     else
@@ -159,11 +175,25 @@ void CSysApOfflineModeController::SwitchFromOfflineToOnlineModeL()
             TRACES( RDebug::Print( _L("CSysApOfflineModeController SetBtPowerStateL returned %d"), err ) );
             }
         
-        iSysApAppUi.OfflineModeChangedL();
+		        /* Turn ON WLAN */    
+           TInt err( KErrNone );
+           CRepository* repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId );
+           err = repository->Set(KWlanOnOff, 1);
+           delete repository;
+           if(err)
+		   {
+               TRACES( RDebug::Printf("CSysApOfflineModeController::SwitchFromOfflineToOnlineModeL Could not enable WLAN") );
+		       User::Leave(err);
+           }
+           else
+		   {
+               TRACES( RDebug::Printf("CSysApOfflineModeController::SwitchFromOfflineToOnlineModeL WLAN Enabled") );
+           }
 
-        iSysApAppUi.SetNetworkConnectionAllowed( ECoreAppUIsNetworkConnectionAllowed );
-        }
-    }
+        iSysApAppUi.OfflineModeChangedL();
+		iSysApAppUi.SetNetworkConnectionAllowed( ECoreAppUIsNetworkConnectionAllowed );
+		}
+	}
 
 // ----------------------------------------------------------------------------
 // CSysApOfflineModeController::CheckOfflineModeInitialStatusesL()
@@ -204,10 +234,12 @@ void CSysApOfflineModeController::GoOnlineIfOkL()
          ( iSysApAppUi.BtSapEnabled() && simStatus != ESimNotPresent ) ||     
          simStatus == ESimUsable )
         {
-        iSysApAppUi.ShowQueryL( ESysApLeaveOfflineModeQuery );
+        TRACES( RDebug::Printf("CSysApOfflineModeController::GoOnlineIfOkL SIM check PASSED") );
+        SwitchFromOfflineToOnlineModeL();
         }
     else    
         {
+        TRACES( RDebug::Printf("CSysApOfflineModeController::GoOnlineIfOkL SIM check FALIED" ) );
         iSysApAppUi.ShowUiNoteL( EInsertSimNote );
         }
     }
@@ -233,6 +265,7 @@ TBool CSysApOfflineModeController::BtActiveBeforeOfflineMode()
     TInt btToBeActivated = iSysApAppUi.CenRepController().GetInt( KCRUidCoreApplicationUIsSysAp,
                                                                   KSysApBtStatusBeforeOfflineMode,
                                                                   &err );
+
     if ( err )
         {
         TRACES( RDebug::Print( _L("CSysApOfflineModeController::BtActiveBeforeOfflineMode: ERROR: %d" ), err ) );
@@ -241,6 +274,7 @@ TBool CSysApOfflineModeController::BtActiveBeforeOfflineMode()
     else
         {
         return ( TBool ) btToBeActivated;
+        //return ETrue;
         }
 
     }
@@ -252,6 +286,7 @@ TBool CSysApOfflineModeController::MustBtBeActivated()
     {
     return BtActiveBeforeOfflineMode();
     }
+
 
 // End of File
 

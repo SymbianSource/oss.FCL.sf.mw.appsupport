@@ -19,8 +19,9 @@
 #include <e32property.h>
 #include <eikon.hrh>
 #include <coemain.h>
-#include <aknkeylock.h>
-#include <AknTaskList.h>
+//#include <aknkeylock.h>
+//#include <AknTaskList.h>
+#include "SysApTaskList.h"
 #include <apgtask.h>
 #include <apgcli.h>
 #include <apgwgnam.h>
@@ -33,11 +34,13 @@
 #include <startupdomainpskeys.h>
 #include <hwrmdomainpskeys.h>
 #include <u32hal.h>
-#include <SysAp.rsg>
+//#include <SysAp.rsg>
 #include "sysapdefaultkeyhandler.h"
 #include "sysapcallback.h"
 #include "SysAp.hrh"
-#include "AknSgcc.h"
+#include <AknSgcc.h>
+//#include "sysapappui.h"
+#include <w32std.h>
 
 
 const TInt KModifierMask( 0 );
@@ -48,18 +51,18 @@ const TInt KModifierMask( 0 );
 // CSysApDefaultKeyHandler::CSysApDefaultKeyHandler
 // ---------------------------------------------------------------------------
 //
-CSysApDefaultKeyHandler::CSysApDefaultKeyHandler( MSysapCallback& aCallback ) :
+CSysApDefaultKeyHandler::CSysApDefaultKeyHandler( MSysapCallback& aCallback ):                                                      
                                                      iCallback(aCallback),
                                                      iCameraSupported(EFalse),
                                                      iCoverDisplaySupported(EFalse),
-                                                     iKeylock(NULL),
+//                                                     iKeylock(NULL),
                                                      iCapturedEKeyCamera(0),
                                                      iCapturedEKeyTwistOpen(0),
                                                      iCapturedEKeyTwistClose(0),
                                                      iCapturedEKeyGripOpen(0),
                                                      iCapturedEKeyGripClose(0),
-                                                     iCapturedEKeyPoC(0),
-                                                     iAknUiServerConnected(EFalse)
+                                                     iCapturedEKeyPoC(0)
+//                                                     iAknUiServerConnected(EFalse)
     {
     }
 
@@ -73,63 +76,23 @@ void CSysApDefaultKeyHandler::ConstructL()
     
     RWindowGroup groupWin = CCoeEnv::Static()->RootWin();
     User::LeaveIfError ( iCapturedEKeyCamera = groupWin.CaptureKey( EKeyCamera, KModifierMask, KModifierMask ) );
-    User::LeaveIfError ( iCapturedEKeyTwistOpen = groupWin.CaptureKey( EKeyTwistOpen, KModifierMask, KModifierMask ) );
-    User::LeaveIfError ( iCapturedEKeyTwistClose = groupWin.CaptureKey( EKeyTwistClose, KModifierMask, KModifierMask ) );   
-    User::LeaveIfError ( iCapturedEKeyGripOpen = groupWin.CaptureKey( EKeyGripOpen, KModifierMask, KModifierMask ) ); 
-    User::LeaveIfError ( iCapturedEKeyGripClose = groupWin.CaptureKey( EKeyGripClose, KModifierMask, KModifierMask ) ); 
-    User::LeaveIfError ( iCapturedEKeyPoC = groupWin.CaptureKey( EKeyPoC, KModifierMask, KModifierMask ) ); 
-    
-    // flip key events don't need to be captured, because in current setup they are not real events but simulated by SysAp
-    // according to notifications received from P&S key that stores flip information
     
     FeatureManager::InitializeLibL();
     iCameraSupported = FeatureManager::FeatureSupported( KFeatureIdCamera );
     iCoverDisplaySupported = FeatureManager::FeatureSupported( KFeatureIdCoverDisplay );
     FeatureManager::UnInitializeLib();
-    
-    TKeyLockBuf lockBuf;
-    iCallback.ExecQueryL( MSysapCallback::EGetKeylock, lockBuf );  
-    iKeylock = lockBuf();
-    
-    __ASSERT_DEBUG( iKeylock, User::Panic( _L("CSysApDefaultKeyHandler::ConstructL: iKeylock not initialized"), KErrBadHandle ) );
-    
-    if ( iCoverDisplaySupported ) // if flip status is monitored, set the initial flip status now
-        {
-        TInt flipValue;
-        TInt err = RProperty::Get( KPSUidHWRM, KHWRMFlipStatus, flipValue );
-
-        TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::ConstructL: flipValue=%d, err=%d"), flipValue, err ) );
-        
-        if ( err == KErrNone )
-            {
-            switch ( flipValue )
-                {
-                case EPSHWRMFlipOpen:
-                    SetDisplayState( ETrue );
-                    break;
-                    
-                case EPSHWRMFlipClosed:
-                    SetDisplayState( EFalse );
-                    break;
-                    
-                case EPSHWRMFlipStatusUninitialized:
-                default:
-                    // set display state only if the current flip position is known
-                    break;
-                }
-            }
-        }
+ 
     }
 
 // ---------------------------------------------------------------------------
 // CSysApDefaultKeyHandler::NewL
 // ---------------------------------------------------------------------------
 //
-CSysApDefaultKeyHandler* CSysApDefaultKeyHandler::NewL( MSysapCallback& aCallback )
+CSysApDefaultKeyHandler* CSysApDefaultKeyHandler::NewL(MSysapCallback& aCallback )
     {
     TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::NewL()") ) );
     
-    CSysApDefaultKeyHandler* self = new( ELeave ) CSysApDefaultKeyHandler( aCallback) ;
+    CSysApDefaultKeyHandler* self = new( ELeave ) CSysApDefaultKeyHandler(aCallback) ;
     CleanupStack::PushL( self );
     self->ConstructL();
     CleanupStack::Pop( self );
@@ -144,17 +107,8 @@ CSysApDefaultKeyHandler* CSysApDefaultKeyHandler::NewL( MSysapCallback& aCallbac
 CSysApDefaultKeyHandler::~CSysApDefaultKeyHandler()
     {
     TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::~CSysApDefaultKeyHandler()") ) );
-    
-    iAknUiServer.Close();
-    
     RWindowGroup groupWin = CCoeEnv::Static()->RootWin();
-    groupWin.CancelCaptureKey( iCapturedEKeyCamera );
-    groupWin.CancelCaptureKey( iCapturedEKeyTwistOpen );
-    groupWin.CancelCaptureKey( iCapturedEKeyTwistClose );
-    groupWin.CancelCaptureKey( iCapturedEKeyGripOpen );
-    groupWin.CancelCaptureKey( iCapturedEKeyGripClose );
-    groupWin.CancelCaptureKey( iCapturedEKeyPoC );
-    
+    groupWin.CancelCaptureKey( iCapturedEKeyCamera );    
     }
     
 
@@ -176,58 +130,7 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
         response = EKeyWasConsumed; // set again in default case if not consumed
         
         switch ( aKeyEvent.iCode )
-            {
-            case EKeyGripOpen:
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyGripOpen") ) );
-                RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripOpen );
-                if (!IsDeviceLocked())
-                    {
-                    iCallback.ExecCommandL( MSysapCallback::EResetKeyguardState );
-                    iKeylock->DisableKeyLock();
-                    iCallback.ExecCommandL( MSysapCallback::ECancelPowermenu );
-                    }
-                // apply default light control
-                iCallback.ExecCommandL( MSysapCallback::EUpdateLights, TUpdateLightsBuf(EKeyGripOpen) );
-                break;
-            
-            case EKeyGripClose:
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyGripClosed") ) );
-                RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripClosed );
-                iCallback.ExecCommandL( MSysapCallback::ECancelPowermenu );
-                if ( !IsDeviceLocked() && UiReady() )
-                    {
-                    iKeylock->OfferKeyLock();
-                    }
-                // apply default light control
-                iCallback.ExecCommandL( MSysapCallback::EUpdateLights, TUpdateLightsBuf(EKeyGripClose) );
-                break;
-            
-            case EKeyFlipOpen: // simulated key event
-                {
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyFlipOpen") ) );
-                SetDisplayState( ETrue );
-                // apply default light control
-                iCallback.ExecCommandL( MSysapCallback::EUpdateLights, TUpdateLightsBuf(EKeyFlipOpen) );
-                }
-                break;
-            
-            case EKeyFlipClose: // simulated key event
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyFlipClose") ) );
-                SetDisplayState( EFalse );
-                // apply default light control
-                iCallback.ExecCommandL( MSysapCallback::EUpdateLights, TUpdateLightsBuf(EKeyFlipClose) );
-                break;
-                
-            case EKeyTwistOpen:
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyTwistOpen") ) );
-                RProperty::Set( KPSUidHWRM, KHWRMTwistStatus, EPSHWRMTwistOpen );
-                break;
-                
-            case EKeyTwistClose:
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyTwistClose") ) );
-                RProperty::Set( KPSUidHWRM, KHWRMTwistStatus, EPSHWRMTwistClose );
-                break;                
-
+            {                              
             case EKeyCamera:
                 TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyCamera") ) );
                 if ( iCameraSupported && !IsDeviceLocked() && !DoShowKeysLockedNote() )
@@ -235,17 +138,10 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
                     ActivateApplicationL( KSysApCamcorderUid );
                     }
                 break;
-                
-            case EKeyPoC:
-                TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyPoC") ) );
-                LaunchPocL();
-                break;                
-             
             default:
                 response = EKeyWasNotConsumed;
                 TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::CSysApDefaultKeyHandler: key was not consumed.") ) ); 
-                break;
-                    
+                break;               
             }
         }
     
@@ -318,15 +214,17 @@ TBool CSysApDefaultKeyHandler::UiReady() const
 //
 void CSysApDefaultKeyHandler::ActivateApplicationL( const TUid aUid ) const
     {
+    TUid check = aUid;
+    
     TRACES( RDebug::Print( _L( "CSysApDefaultKeyHandler::ActivateApplicationL") ) );
     
     // Applications must not be activated before reaching normal system operation state
     if ( UiReady() )
         {
-        CAknTaskList* apaTaskList = CAknTaskList::NewL( CCoeEnv::Static()->WsSession() );
+        CSysApTaskList* apaTaskList = CSysApTaskList::NewLC( CCoeEnv::Static()->WsSession() );
         TApaTask apaTask = apaTaskList->FindRootApp( aUid ); // only root application should not be activated
-        delete apaTaskList;
-        
+        CleanupStack::PopAndDestroy( apaTaskList );
+                
         if ( apaTask.Exists() )
             {
             TRACES( RDebug::Print( _L( "CSysApDefaultKeyHandler::ActivateApplicationL: application brought to foreground") ) );
@@ -336,8 +234,8 @@ void CSysApDefaultKeyHandler::ActivateApplicationL( const TUid aUid ) const
                 {
                 TRACES( RDebug::Print( _L("e_CAM_PRI_OFF_TO_ON 1") ) );
                 }
-#endif // _DEBUG            
-            CAknSgcClient::MoveApp ( apaTask.WgId(), ESgcMoveAppToForeground );
+#endif // _DEBUG                        
+            apaTask.BringToForeground();
             }
         else
             {
@@ -380,20 +278,8 @@ void CSysApDefaultKeyHandler::ActivateApplicationL( const TUid aUid ) const
 void CSysApDefaultKeyHandler::LaunchPocL()
     {
     TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::LaunchPocL") ) );
-    
-    if ( UiReady() && !IsDeviceLocked() && !DoShowKeysLockedNote() )
-        {
-        CAiwServiceHandler* serviceHandler = CAiwServiceHandler::NewLC();
-        serviceHandler->AttachL( R_POC_AIW_INTEREST );
-            
-        CAiwGenericParamList* inParams = CAiwGenericParamList::NewLC();
-        inParams->AppendL(TAiwGenericParam( EGenericParamPoCLaunchView, TAiwVariant(EAiwPoCMainView)));
-        serviceHandler->ExecuteServiceCmdL( KAiwCmdPoC, *inParams, serviceHandler->OutParamListL());
-        
-        CleanupStack::PopAndDestroy( inParams );
-        CleanupStack::PopAndDestroy( serviceHandler);
-        }
-    }
+    // not supported
+  }
     
 // ----------------------------------------------------------------------------
 // CSysApDefaultKeyHandler::IsDeviceLocked()
@@ -451,25 +337,25 @@ TBool CSysApDefaultKeyHandler::DoShowKeysLockedNote()
     
     if ( !iAknUiServerConnected )
         {
-        err = iAknUiServer.Connect();
+/*        err = iAknUiServer.Connect();
         
         if ( err != KErrNone )
             {
-            TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::DoShowKeysLockedNote: RAknUiServer::Connect failed, err=%d"), err ) );
+ //           TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::DoShowKeysLockedNote: RAknUiServer::Connect failed, err=%d"), err ) );
             return ETrue; // assume that keypad/device is locked
             }
         iAknUiServerConnected = ETrue;            
-        }
+  */      }
     
-    TBool keysLocked;
-    err = iAknUiServer.ShowKeysLockedNote( keysLocked );
+    TBool keysLocked = EFalse;
+/*    err = iAknUiServer.ShowKeysLockedNote( keysLocked );
     
     if ( err != KErrNone )
         {
         TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::DoShowKeysLockedNote: RAknUiServer::ShowKeysLockedNote failed, err=%d"), err ) );
         keysLocked = ETrue; // assume that keypad/device is locked
         }
-        
+ */       
     return keysLocked;        
     }
 
@@ -500,3 +386,6 @@ TBool CSysApDefaultKeyHandler::IsDeviceModeKey( const TKeyEvent& aKeyEvent )
     
     return response;        
     }
+
+
+

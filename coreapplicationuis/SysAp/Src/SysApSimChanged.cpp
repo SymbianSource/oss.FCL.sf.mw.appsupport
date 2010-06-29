@@ -117,13 +117,13 @@ void CSysApSimChanged::ClearLogsL()
     dateTime.Set( 2100, EJanuary, 1, 0, 0, 0, 0 );
     TTime date(dateTime);
     
-    TRACES( RDebug::Print( _L("CSysApSimChanged::ClearLogsL(): trying CLogClient::NewL") ) );
+/*    TRACES( RDebug::Print( _L("CSysApSimChanged::ClearLogsL(): trying CLogClient::NewL") ) );
     CLogClient* logClient = CLogClient::NewL( iFs );    
     logClient->ClearLog( date, active->iStatus );
-    
+*/    
     CActiveScheduler::Start();
 
-    delete logClient;
+//    delete logClient;
     CleanupStack::PopAndDestroy( active );
     }
     
@@ -136,7 +136,7 @@ void CSysApSimChanged::ClearSsSettingsL()
     TRACES( RDebug::Print( _L("CSysApSimChanged::ClearSsSettingsL()") ) );
     
     // Reset SSSettings values
-    RSSSettings ssSettings;
+/*    RSSSettings ssSettings;
     User::LeaveIfError( ssSettings.Open( iSysApAppUi.GetTelServer() ) );
     
     TRACES( RDebug::Print( _L("CSysApSimChanged::ClearSsSettingsL(): trying RSSSettings::HandleSIMChanged") ) );
@@ -144,6 +144,7 @@ void CSysApSimChanged::ClearSsSettingsL()
     ssSettings.Close();    
     
     User::LeaveIfError( err );
+*/
     }
 
 // -----------------------------------------------------------------------------
@@ -170,7 +171,7 @@ void CSysApSimChanged::HandleSimChangedL()
     if ( simNotOwned )
         {
         ClearRepositoriesL();
-        ClearLogsL();
+//        ClearLogsL();
         }
     }
 // =============== CShareActive MEMBER FUNCTIONS ===============================

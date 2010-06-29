@@ -31,6 +31,7 @@ public:
     CMemoryMonitorSession();
 #ifndef CLIENT_REQUEST_QUEUE
     void CloseAppsFinished(TInt aBytesFree, TBool aMemoryGood);
+    TBool IsDataPaged(const RMessage2& aMessage);
 #endif
     
 private:
@@ -41,7 +42,6 @@ private:
 #endif
     CMemoryMonitor& Monitor();
     void ServiceL(const RMessage2& aMessage);
-    TBool IsDataPaged(const RMessage2& aMessage);
 private:
     RMessagePtr2 iRequestFreeRam;
 #ifndef CLIENT_REQUEST_QUEUE

@@ -22,9 +22,9 @@ xmlns:cep="http://www.nokia.com/ns/cep/1.0/">
             />
             
             <Tsp
-            routingTable='01'            
+            routingTable='01'           
+	    ruleActiveAudio='00' 
             ruleForeground='01'
-            ruleActiveAudio='00'
             ruleLastPlayedAudio='03'
             ruleDefaultApp='02'
             defaultApplicationPhone='100058B3'
@@ -113,9 +113,8 @@ xmlns:cep="http://www.nokia.com/ns/cep/1.0/">
             ruleActiveAudio='00'
             ruleLastPlayedAudio='03'
             ruleForeground='01' 
-            ruleDefaultApp='02'
-            defaultApplicationPhone='100058B3'
-            transparentApplicationBTAudioMan='10208971'
+	    ruleLaunchDefaultApp='04'
+            defaultLaunchApp='102072C3'
             />
             
             <Tsp
@@ -130,7 +129,6 @@ xmlns:cep="http://www.nokia.com/ns/cep/1.0/">
             ruleLastPlayedAudio='03'
             ruleDefaultApp='02'
             defaultApplicationPhone='100058B3'
-            transparentApplicationBTAudioMan='10208971'
 	    />
             
             <Tsp

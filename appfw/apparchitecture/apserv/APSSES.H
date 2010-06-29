@@ -178,7 +178,7 @@ private:
 	void RecognizeDataPassedByFileHandleL(const RMessage2& aMessage);
 	void RecognizeSpecificDataL(const RMessage2& aMessage);
 	void RecognizeSpecificDataPassedByFileHandleL(const RMessage2& aMessage);
-	static void DoRecognizeUnpackLC(HBufC*& aName, HBufC8*& aBuffer, const RMessage2& aMessage);
+    static TPtrC8 DoRecognizeUnpackLC(HBufC*& aName, RChunk& aLocalChunk, const RMessage2& aMessage);
 
 	void AppForDataTypeL(const RMessage2& aMessage);
 	TUid AppForDataTypeL(const TDataType& aDataType, const TUid* aServiceUid);

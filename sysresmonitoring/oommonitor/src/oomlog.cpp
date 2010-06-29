@@ -22,6 +22,7 @@
 #include <hal.h>
 #include <w32std.h>
 #include <e32std.h>
+#include <e32hal.h>
 #include <apgwgnam.h>
 #include <flogger.h>
 
