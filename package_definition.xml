@@ -145,7 +145,7 @@
         <unit mrp="commonappservices/coreappstest/Group/app-services_CoreAppsTest.mrp" bldFile="commonappservices/coreappstest/Group"/>
       </component>
       <component id="appservicesdocs" name="Application Services Documentation" purpose="development" class="doc">
-        <unit mrp="commonappservices/appservicesdocs/app-services_documentation.mrp"/>
+        <unit mrp="commonappservices/doc_pub/app-services_documentation.mrp"/>
       </component>
       <component id="backuprestorenotification" name="Backup Restore Notification" introduced="8.1" purpose="optional">
         <unit bldFile="commonappservices/backuprestorenotification/group" mrp="commonappservices/backuprestorenotification/group/app-services_BackupRestoreNotification.mrp"/>

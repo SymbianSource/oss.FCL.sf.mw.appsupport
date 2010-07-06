@@ -263,6 +263,13 @@ const TUint32 KShutdownToneVolume = 0x00000015;
 */
 const TUint32 KStartupDefaultTime = 0x00000016;
 
+/**
+ * Enables or disables the FTU StartupSequence. This key is modified by ftu when user accepts the eterms
+ * Possible values true or false
+ */
+const TUint32 KFtuStartupEnabled = 0x0000001A;
+
+
 #endif // STARTUPDOMAINCRKEYS_H
 
 // End of File

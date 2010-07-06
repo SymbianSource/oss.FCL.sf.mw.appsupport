@@ -32,6 +32,7 @@
 #include <HbDeviceNotificationDialogSymbian.h>
 //#include <HbDeviceInputDialogSymbian.h>
 #include <hbsymbianvariant.h>
+//#include <hbtextresolversymbian.h>
 #include <UikonInternalPSKeys.h>
 
 //#include "SysApWsClient.h"
@@ -52,8 +53,12 @@
 #include "MSysApBtSapController.h"
 #include "MSysApBtController.h"
 #include "MSysApUsbIndicator.h"
+//#include <hbindicatorsymbian.h>
+//#include <psmclient.h>
+//#include <psmsettings.h>
 #include "sysapkeymanagement.h"
 #include "SysApShutdownImage.h"
+#include "SysApKeySndHandler.h"
 
 #include <settingsinternalcrkeys.h>
 #include <keyguardaccessapi.h>
@@ -65,6 +70,16 @@ const TInt KModifierMask( 0 );
 _LIT_SECURITY_POLICY_PASS(KAlwaysPassPolicy);
 _LIT_SECURITY_POLICY_C1(KWriteDeviceDataPolicy, ECapabilityWriteDeviceData);
 const TInt KDelayBeforeNextScanningRound( 1000000 );
+/*
+_LIT(KPsmPlugin,"com.nokia.hb.powersavemodeplugin/1.0");
+_LIT(KPsm,"PSM");
+_LIT(KCharging,"Charging");
+_LIT(KPsmlocalisationfile, "powermanagement_");
+_LIT(KtsfilePath, "z:/resource/qt/translations/");
+_LIT(KlowbatteryIcon,"qtg_small_bt_low_battery.svg");
+_LIT(KbatteryFullIcon,"qtg_status_battery.svg");
+
+*/
 
 // ============================ MEMBER FUNCTIONS ==============================
 
@@ -204,6 +219,7 @@ void CSysApAppUi::ConstructL()
     iActiveProfileBeforeOfflineMode = iSysApCenRepController->GetInt( KCRUidCoreApplicationUIsSysAp, KSysApProfileBeforeOfflineMode );    
            
     iSysApFeatureManager->FeatureVariationCheckDone();        
+    // iHbIndicatorSymbian = CHbIndicatorSymbian::NewL();
     
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApLightsController::NewL()") ) );
     iSysApLightsController = CSysApLightsController::NewL( *this,
@@ -228,12 +244,23 @@ void CSysApAppUi::ConstructL()
         TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL : CSysApKeyManagement::NewL returns error=%d"), keyManagementErr ) );
         }
     
+    // Initialize animdll for handling side volume keys
+    // (needed before normal mode in case emergency number is dialed from PIN query)
+    iSysApKeySndHandler = CSysApKeySndHandler::NewL(iEikonEnv->WsSession());
     iKeyguardController = CKeyguardAccessApi::NewL();
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApShutdownImage::NewL()") ) );
     iSysApShutdownImage = CSysApShutdownImage::NewL();//NULL; //
     
+    // Initialize nsps handler. Needed for proper lights control during PIN query.
+    TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApNspsHandler::NewL") ) );
+    iSysApNspsHandler = CSysApNspsHandler::NewL( iEikonEnv->WsSession(), iSysApShutdownImage->ShutdownCoeControlWindow() );
+
     RProperty::Define( KPSUidCoreApplicationUIs,KCoreAppUIsPowerMenuCustomDialogStatus, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy );
     RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogUninitialized );
+    
+
+                    
+    // TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
     
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );    
     }
@@ -247,6 +274,8 @@ void CSysApAppUi::FreeResources()
     TRACES( RDebug::Print( _L("CSysApAppUi::FreeResources") ) );
     delete iSysApBatteryInfoController;
     delete iSysApPsmController;
+    //delete iVariantAccState; 
+
     delete iSysApAudioRoutingObserver;
 
     if ( iSapTimer )
@@ -282,7 +311,7 @@ void CSysApAppUi::FreeResources()
     
     delete iSysApUsbIndicatorController;
     delete iKeyguardController;
-    
+    // delete iHbIndicatorSymbian; 
     delete iSysApKeyManagement;
     iSysApKeyManagement = NULL;
     
@@ -377,15 +406,20 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
 
     UpdateBatteryBarsL( state );   
     DoSwStateNormalConstructionL();
-    HandleAccessoryProfileInStartupL();
+    HandleAccessoryProfileInStartupL();       
+   
+    if ( !iSysApPsmController ) // created here if first state change has not occurred yet
+       {
+       iSysApPsmController = CSysApPsmController::NewL( *this );        
+       }
 
     if ( iSysApPsmController )
-        {
+       {
         if ( iCharging ) // if charger is connected on boot PSM queries may need to be shown
-            {
-            HandleChargingStatusL( StateOfProperty( KPSUidHWRMPowerState, KHWRMChargingStatus ) );
-            }
+        {
+         HandleChargingStatusL( StateOfProperty( KPSUidHWRMPowerState, KHWRMChargingStatus ) );
         }
+       }
     
     TInt batteryStatus = StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryStatus );
     TRACES( RDebug::Print(_L("CSysApAppUi::HandleUiReadyAfterBootL: batteryStatus %d" ), batteryStatus ) );
@@ -434,11 +468,11 @@ void CSysApAppUi::DoStateChangedL(const RStarterSession::TGlobalState aSwState)
             iSysApPsmController = CSysApPsmController::NewL( *this );        
             }
 
-        // in charger boot explicitly disable partial power save mode
+        // in charger boot explicitly disable  power save mode
         if ( aSwState == RStarterSession::ECharging )
             {
             iSysApPsmController->ChargerConnected();
-            iSysApPsmController->DoEnablePartialPsm( EFalse ); // disable partial power save now
+            iSysApPsmController->DoEnablePartialPsm( EFalse ); // disable  power save now
             }
         }
 
@@ -496,6 +530,7 @@ CSysApAppUi::~CSysApAppUi()
       {
         FreeResources();
       }
+    delete iSysApStartupController;
     }
         
 TBool CSysApAppUi::ResourcesFreed() const
@@ -768,7 +803,9 @@ void CSysApAppUi::OfflineModeChangedL()
         }
 #endif // SYSAP_USE_STARTUP_UI_PHASE
 
+#if 0 // Not used as of now
     SetHacIndicatorL();
+#endif //0	
     }
 
 // ----------------------------------------------------------------------------
@@ -1582,14 +1619,14 @@ void CSysApAppUi::NotifyPowerSaveModeL( TSysApPsmStatus aStatus )
     switch ( aStatus )
         {
         case MSysApPsmControllerNotifyCallback::EPsmActivationComplete:
-            UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
-            ShowUiNoteL( EPowerSaveModeActivated );
-            break;
+             UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
+             ShowUiNoteL( EPowerSaveModeActivated );
+             break;
         
         case MSysApPsmControllerNotifyCallback::EPsmDeactivationComplete:
-            UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
-            ShowUiNoteL( EPowerSaveModeDeactivated );
-            break;
+             UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
+             ShowUiNoteL( EPowerSaveModeDeactivated );
+             break;
             
         case MSysApPsmControllerNotifyCallback::EPsmActivationFailed:
             ShowUiNoteL( ECannotActivatePowerSaveMode );
@@ -1807,6 +1844,7 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
             {
             iSysApPsmController->BatteryLow( ETrue );
             
+                       
             if ( iSysApPsmController->ShowActivateQuery())
                 {
                 // show activation query, replaces the first battery low query
@@ -1823,16 +1861,16 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
         else
             {
             //Display Battery Low note.
-            ShowUiNoteL( EBatteryLowNote );    
+            ShowUiNoteL( EBatteryLowNote );     
             }            
         }
-    
+        
     if ( iSysApBatteryInfoController )
-        {
-        iSysApBatteryInfoController->BatteryStatusUpdated( aValue );
-        }
-            
+    {
+     iSysApBatteryInfoController->BatteryStatusUpdated( aValue );
     }
+      
+   }
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
@@ -1895,14 +1933,24 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
                 break;
             case EBatteryFullUnplugChargerNote:
                 {
-                  iSysApLightsController->BatteryEmptyL( ETrue );
-                  _LIT(KPowerPressKey,"Charging complete. Unplug charger to save energy.");
-                  HBufC* aString = HBufC16::NewLC(200);
+                /*	
+                TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) ); 
+                iSysApLightsController->BatteryEmptyL( ETrue );
+                 _LIT(KunplugCharger,"txt_power_dpopinfo_unplug_charger_to_save_energy");                 
+                 HBufC* unplugCharger = HbTextResolverSymbian::LoadL(KunplugCharger);
+                 _LIT(KbatteryFull,"txt_power_management_dpophead_100_full");
+                 HBufC* batteryFull = HbTextResolverSymbian::LoadL(KbatteryFull);
+                 CHbDeviceNotificationDialogSymbian::NotificationL(KbatteryFullIcon,*unplugCharger,*batteryFull);  
+                 */
+                 
+                 iSysApLightsController->BatteryEmptyL( ETrue );
+                 _LIT(KPowerPressKey,"Charging complete. Unplug charger to save energy.");
+                 HBufC* aString = HBufC16::NewLC(200);
                  TPtrC aStringPointer = aString->Des();
-                  aStringPointer.Set(KPowerPressKey);
+                 aStringPointer.Set(KPowerPressKey);
                  TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
                  ShowExampleUiNoteL( aStringPointer );
-                 CleanupStack::PopAndDestroy(); // aString
+                 CleanupStack::PopAndDestroy(); // aString     
                  }
                 break;
             case EUnplugChargerNote:
@@ -1963,7 +2011,6 @@ void CSysApAppUi::HandleChargingStatusL( const TInt aValue )
         if ( iCharging && !iSysApPsmController->ChargerConnected() ) // first time after charger connection
             {
             iSysApPsmController->ConnectCharger( ETrue );
-            
             if ( iSysApPsmController->ShowDeactivateQuery() )
                 {
                 ShowQueryL( ESysApBattChargingPowerSavingQuery );
@@ -1973,7 +2020,7 @@ void CSysApAppUi::HandleChargingStatusL( const TInt aValue )
             else
                 {
                 iSysApPsmController->DoEnablePartialPsm( EFalse );
-                }                
+                }              
             }
         else if ( aValue == EChargingStatusNotConnected )
             {
@@ -2103,11 +2150,12 @@ void CSysApAppUi::UpdateBatteryBarsL( const TInt  /* aState */)
             }            
         }
         
-    if ( iSysApBatteryInfoController )        
+       if ( iSysApBatteryInfoController )        
         {
-        iSysApBatteryInfoController->BatteryLevelUpdatedL();
+         iSysApBatteryInfoController->BatteryLevelUpdatedL();
         }
-    }
+        
+     }
 
 
 
@@ -2132,6 +2180,13 @@ void CSysApAppUi::ShowChargingNoteL()
         TRACES( RDebug::Print( _L("CSysApAppUi::ShowChargingNoteL KCTsyCallState=%d"), StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) ) );
         if ( showNote ) // Power Mgmt UI spec defines that no Charging note is shown while the phone is ringing/alerting
             {
+            /* 
+            TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+            _LIT(KChargingNote,"txt_power_management_dblist_charging");
+            HBufC* chargingNote = HbTextResolverSymbian::LoadL(KChargingNote);
+            CHbDeviceNotificationDialogSymbian::NotificationL(KNullDesC,*chargingNote);     
+            */
+             
             _LIT(KChargingNote,"Charging");
             HBufC* aString = HBufC16::NewLC(50);
             TPtrC aStringPointer = aString->Des();
@@ -2539,7 +2594,11 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
             }
 #endif // _DEBUG
 
-        TKeyResponse response( EKeyWasNotConsumed );
+        TKeyResponse response(EKeyWasNotConsumed);
+        if (response)
+            {
+            //Do nothing:: To supress warning
+            }
         if (iSysApKeyManagement && aKeyEvent.iCode != EKeyPowerOff && aKeyEvent.iCode != 'E')
             {
             response = iSysApKeyManagement->HandleKeyEventL(aKeyEvent, aType );

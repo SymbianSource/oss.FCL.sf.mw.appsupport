@@ -51,6 +51,7 @@ QString KShutDown("ShutDown");
 qreal KVerticalX = 175;
 //width of PowerMenu
 qreal KPMWidth = 360;
+
 /**
  * Constructor
  */
@@ -87,8 +88,7 @@ HbDevicePowerMenuWidget::HbDevicePowerMenuWidget(const QVariantMap &parameters)
 HbDevicePowerMenuWidget::~HbDevicePowerMenuWidget()
     {
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::Destructor()") ) );
-	delete mLoader;
-	delete mHbTranslator;
+    cleanupMemory();
     }
 
 /**
@@ -266,18 +266,8 @@ void HbDevicePowerMenuWidget::constructDialog(const QVariantMap &parameters)
         mDialogWidget->setTimeout(HbPopup::NoTimeout);
         mDialogWidget->setDismissPolicy(HbPopup::TapOutside);
         mDialogWidget->setPreferredWidth(KPMWidth);
-        //Sets Dialog position on screen
-/*        
-        HbInstance* instance = HbInstance::instance();
-        mMainWindow = instance->allMainWindows().first();
-        ok = connect(mMainWindow , SIGNAL(orientationChanged(Qt::Orientation)), this, SLOT(setDialogWidget(Qt::Orientation)));
-        //This is required to launch menu in right place for very first time
-        setDialogWidget(mMainWindow->orientation());
         
-        Q_ASSERT_X(ok, "Orientation", "Invalid Orientation");
-*/
         connect(mDialogWidget,SIGNAL(aboutToClose()),this, SLOT(closedialog()));
-        
 	    TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::constructDialog:dialogLoaded:End") ) );
 		}
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::constructDialog:End") ) );
@@ -338,33 +328,15 @@ void HbDevicePowerMenuWidget::customizeVolumeSlider()
 	}
 
 /**
- * Widget is about to hide. 
- * This method is dervied from HBpopUp
- * 
+ * Slot
+ * Widget is about to Close. 
  */
-void HbDevicePowerMenuWidget::hideEvent(QHideEvent *event)
-	{
-	TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::hideEvent:Begin") ) );
-    Q_UNUSED(event);
-    //emit deviceDialogClosed();
-    TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::hideEvent:End") ) );
-	}
-
 void HbDevicePowerMenuWidget::closedialog()
     {
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::closedialog:Begin") ) );
     emit deviceDialogClosed();
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::closedialog:Begin") ) );
     }
-/**
- * Widget is about to show
- * This method is dervied from HBpopUp
- */
-void HbDevicePowerMenuWidget::showEvent(QShowEvent *event)
-	{
-	TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::showEvent") ) );
-    Q_UNUSED(event);
-	}
 
 /**
  * Slot
@@ -447,6 +419,9 @@ void HbDevicePowerMenuWidget::handleVibrationToggled(int aVibrationToggel)
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::handleVibrationToggled:End") ) );
 	}
 
+/**
+ * Cleans up memory allocations
+ */
 void HbDevicePowerMenuWidget::cleanupMemory()
     {
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::cleanupMemory:Begin") ) );
@@ -460,22 +435,4 @@ void HbDevicePowerMenuWidget::cleanupMemory()
         }
     TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::cleanupMemory:End") ) );
     }
-
-/**
- * Slot
- * Sets Dialog position on screen
- */
-/*void HbDevicePowerMenuWidget::setDialogWidget(Qt::Orientation aOrientation)
-    {
-    TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::setDialogWidget:Begin") ) );
-    if (aOrientation == Qt::Vertical)
-        {
-        mDialogWidget->setPreferredPos(QPointF(0,0),HbPopup::TopLeftCorner);
-        }
-    else
-        {
-        mDialogWidget->setPreferredPos(QPointF(KVerticalX,0),HbPopup::TopLeftCorner);
-        }
-    TRACES( RDebug::Print( _L("HbDevicePowerMenuWidget::setDialogWidget:End") ) );
-    }*/
 

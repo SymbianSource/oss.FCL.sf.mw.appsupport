@@ -29,9 +29,10 @@
 #include <cfclient.h>
 #include <cflistener.h>
 #include <AudioClientsListPSData.h>
+#include <remcon/clientinfo.h>
 #include "remconidlelistener.h"
 #include "remconeventtable.h"
-
+#include "tsptriggerevents.h"
 // CONSTANTS
 
 // MACROS
@@ -57,7 +58,10 @@ class TClientInfo;
 class CRemConTspController : public CRemConTargetSelectorPlugin,
                  public MRemConTargetSelectorPluginInterfaceV2,
                  public MRemConTargetSelectorPluginInterfaceV3,
-			     public MCFListener
+                 public MRemConTargetSelectorPluginInterfaceV4,
+                 public MRemConTargetSelectorPluginInterfaceV5,
+			     public MCFListener,
+                 public MTspRulesTriggerObserver
 	{
 	public:		// Constructors and destructor
 		
@@ -243,6 +247,85 @@ class CRemConTspController : public CRemConTargetSelectorPlugin,
                 const TClientInfo& aSender,
                 const TRemConAddress& aConnection);
         
+        /**
+        Called by RemCon to get the TSP to permit an incoming command. This is called
+        if the bearer has provided a target client for the command.  
+        
+        The implementor should decide if they wish to allow this command and then call
+        IncomingCommandPermitted on the observer with a suitable error. 
+        
+        @param aInterfaceUid The UID of the client interface.
+        @param aOperationId The operation ID of the command.
+        @param aClient a TClientInfo referring to the selected client
+        */
+        virtual void PermitIncomingCommand(
+            TUid aInterfaceUid,
+            TUint aOperationId, 
+            const TClientInfo& aClient);
+        
+        /**
+        Called by RemCon to get the TSP to permit an incoming Notify. This is called
+        if the bearer has provided a target client for the Notify.  
+        
+        The implementor should decide if they wish to allow this Notify and then call
+        IncomingNotifyPermitted on the observer with a suitable error. 
+        
+        @param aInterfaceUid The UID of the client interface.
+        @param aOperationId The operation ID of the Notify.
+        @param aClient a TClientInfo referring to the selected client
+        */
+        virtual void PermitIncomingNotify(
+            TUid aInterfaceUid,
+            TUint aOperationId, 
+            const TClientInfo& aClient);
+
+        /** 
+        Called by RemCon when a bearer that can address commands wishes to
+        inform the system that there has been a remote user action to 
+        select a different addressed client.
+        
+        The bearer will then route addressed commands to this client until
+        such time as SetRemoteAddressedClient is called again or the TSP
+        calls SetLocalAddressedClient.
+        
+        @param aBearerUid The bearer that has changed its addressed client
+        @param aClient The RemCon client that is now selected by the bearer
+        */
+        virtual void SetRemoteAddressedClient(const TUid& aBearerUid, 
+                const TClientInfo& aClient);
+        /** Called by RemCon when a new target client has connected.
+         
+         @aClientInfo The information about the new client.
+         */
+        void TargetClientAvailable(const TClientInfo& aClientInfo);
+        
+        /** Called by RemCon when a target client has disconnected. 
+         
+         @aClientInfo The information about the client that has disconnected.
+         */
+        void TargetClientUnavailable(const TClientInfo& aClientInfo);
+        
+        /** Called by RemCon when a bearer wishes to begin being informed when
+        the locally addressed player changes.  Once this function has been called
+        the TSP should inform RemCon via SetLocalAddressedPlayer each time the
+        player to which incoming commands from aBearer would be routed changes.
+        This might occur for example if a new application is launched, or if the
+        foreground application changes, depending on what the TSP's rules are
+        for deciding the target of the incoming message.  These updates should
+        occur until UnregisterLocalAddressedClientObserver is called.
+        
+        @param aBearerUid The bearer that wishes to be informed of updates
+        */
+        TInt RegisterLocalAddressedClientObserver(const TUid& aBearerUid);
+
+        /** Called by RemCon when a bearer wishes to stop being informed of 
+        changes to the local addresse client.
+        
+        @param aBearerUid The bearer that no longer wishes to be informed of updates
+        */
+        TInt UnregisterLocalAddressedClientObserver(const TUid& aBearerUid);
+
+        
 	    // From MCFListener
 	    
 	    /**
@@ -291,6 +374,8 @@ class CRemConTspController : public CRemConTargetSelectorPlugin,
             const TDesC& aSource,
             const TDesC& aType );
             
+        // from MTspRulesTriggerObserver
+        void MtrtoEvaluateRoutingRules();
         /**
         * Gets the foreground application.
         * 
@@ -329,8 +414,9 @@ class CRemConTspController : public CRemConTargetSelectorPlugin,
 	    void GetCorrectClientL(
             TUid aInterfaceUid,
         	TUint aKeyEvent,
-        	TSglQue<TClientInfo>& aClients );
-        
+        	TSglQue<TClientInfo>& aClients,
+        	TBool aLaunchingNewApplicationAllowed);
+
         void SetKeyEventTableL( const CCFActionIndication& aActionToExecute );        
 
         void ActivateApplicationL( const TUid aUid ) const;
@@ -352,12 +438,26 @@ class CRemConTspController : public CRemConTargetSelectorPlugin,
         */
         TBool DeviceLocked() const;
 
-	private:    // Data
-	    
-	    // owned
-		CRemConIdleListener* iIdle;
-		
-		// Interface to P&S key that returns call state
+        /**
+         * Decide if locally addressed client should be updated.
+         */
+        TClientInfo* GetLocalAddressedClient();
+
+private:
+        NONSHARABLE_STRUCT(TClientObserver)
+            {
+        public:
+            TClientObserver(TUid aBearerUid) : iBearerUid(aBearerUid) {};
+        public:
+            TUid iBearerUid;
+            TSglQueLink iClientObserverQueLink;
+            };
+
+private:    // Data
+        // owned
+        CRemConIdleListener* iIdle;
+
+        // Interface to P&S key that returns call state
         RProperty iProperty;
         
         CCFClient* iCFClient;
@@ -371,6 +471,16 @@ class CRemConTspController : public CRemConTargetSelectorPlugin,
         TProcessId iProcessIdActive;
 
         RPointerArray<CRemConEventTable> iArrayOfStoredTables;
+        
+        TSglQue<TClientObserver> iClientObservers;
+        
+        TSglQue<TClientInfo> iAvailableTargets;
+        
+        TSglQue<TClientInfo> iTargetsForAddressing;
+        
+        TClientInfo* iLocalAddressedClient;
+        
+        CTspTriggerEventsWatcher* iTriggerEventsWatcher;
 	
 	public:     // Friend classes
 	

@@ -318,9 +318,7 @@ class CSysApAppUi : public CAknAppUi,
 
 #endif // SYSAP_USE_STARTUP_UI_PHASE
 
-//        RFs iFsSession;
-//        RWsSession iWsSession;
-        
+     
      private:
          /**
          * Frees SysAp's reserved memory, closes connections to servers etc.
@@ -372,6 +370,7 @@ class CSysApAppUi : public CAknAppUi,
           
           CSysApAudioRoutingObserver* iSysApAudioRoutingObserver;
           CSysApPsmController* iSysApPsmController;
+		  CHbSymbianVariant* iVariantAccState ;
           CSysApSsSettingsObserver*       iSysApSsSettingsObserver;
           CSystemLock*                    iSysApSystemLock;
           CSysApCenRepCallForwardingObserver* iSysApCenRepCallForwardingObserver;

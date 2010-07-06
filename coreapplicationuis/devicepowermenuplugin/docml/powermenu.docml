@@ -1,56 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <hbdocument context="pwr_grid" version="1.1">
     <widget name="maindialog" type="HbDialog">
-        <rect height="51.79105un" name="geometry" width="49.73134un" x="1.19403un" y="0.44776un"/>
-        <sizehint height="61.79105un" type="PREFERRED" width="49.55224un"/>
-        <widget name="container_1" role="HbDialog:headingWidget" type="HbWidget">
+        <point name="pos" x="1.19403un" y="0.44776un"/>
+        <widget name="container_1" role="HbDialog:contentWidget" type="HbWidget">
             <widget name="Silence" type="HbPushButton">
                 <real name="z" value="2"/>
-                <sizehint height="10.44776un" type="PREFERRED" width="53.5un"/>
                 <string locid="txt_pm_button_silence" name="text" value="Silence"/>
                 <bool name="visible" value="TRUE"/>
                 <string name="state" value="normal"/>
+                <sizepolicy horizontalPolicy="MinimumExpanding" />
             </widget>
             <widget name="label" type="HbLabel">
                 <real name="z" value="4"/>
-                <sizehint height="3.888un" type="PREFERRED" width="53.5un"/>
                 <string locid="txt_pm_setlabel_ringing_volume" name="plainText" value="Ringing volume"/>
+                <sizepolicy horizontalPolicy="MinimumExpanding" />
             </widget>
             <widget name="Volume" type="HbSlider">
                 <integer name="majorTickInterval" value="5"/>
                 <real name="z" value="3"/>
-                <sizehint height="7.61194un" type="PREFERRED" width="53.5un"/>
                 <enums name="orientation" value="Horizontal"/>
                 <integer name="minorTickInterval" value="2"/>
                 <integer name="value" value="30"/>
+                <sizepolicy horizontalPolicy="MinimumExpanding" />
             </widget>
             <widget name="Vibrate" type="HbCheckBox">
-                <sizehint height="9.55224un" type="PREFERRED" width="53.5un"/>
                 <string locid="txt_pm_list_vibrate" name="text" value="Vibrate"/>
+                <sizepolicy horizontalPolicy="MinimumExpanding" />
             </widget>
             <widget name="Offline" type="HbCheckBox">
-                <sizehint height="9.70149un" type="PREFERRED" width="53.5un"/>
                 <string locid="txt_pm_list_offline_airplane_mode" name="text" value="Offline (Airplane Mode)"/>
+                <sizepolicy horizontalPolicy="MinimumExpanding" />
             </widget>
             <widget name="PowerOff" type="HbPushButton">
-                <sizehint height="10.44776un" type="PREFERRED" width="53.5un"/>
                 <string locid="txt_pm_button_power_off" name="text" value="Power Off"/>
                 <string name="state" value="normal"/>
+                <sizepolicy horizontalPolicy="MinimumExpanding" />
             </widget>
             <real name="z" value="0"/>
             <layout type="anchor">
-                <anchoritem dst="Silence" dstEdge="LEFT" spacing="-0un" src="" srcEdge="LEFT"/>
-                <anchoritem dst="Silence" dstEdge="TOP" spacing="-0un" src="" srcEdge="TOP"/>
-                <anchoritem dst="label" dstEdge="LEFT" spacing="-0un" src="" srcEdge="LEFT"/>
-                <anchoritem dst="label" dstEdge="TOP" spacing="10.29851un" src="" srcEdge="TOP"/>
-                <anchoritem dst="Volume" dstEdge="LEFT" spacing="-0un" src="" srcEdge="LEFT"/>
-                <anchoritem dst="Volume" dstEdge="TOP" spacing="14.02985un" src="" srcEdge="TOP"/>
-                <anchoritem dst="Vibrate" dstEdge="LEFT" spacing="-0un" src="" srcEdge="LEFT"/>
-                <anchoritem dst="Vibrate" dstEdge="TOP" spacing="21.9403un" src="" srcEdge="TOP"/>
-                <anchoritem dst="Offline" dstEdge="LEFT" spacing="-0un" src="" srcEdge="LEFT"/>
-                <anchoritem dst="Offline" dstEdge="TOP" spacing="31.49254un" src="" srcEdge="TOP"/>
-                <anchoritem dst="PowerOff" dstEdge="LEFT" spacing="-0un" src="" srcEdge="LEFT"/>
-                <anchoritem dst="PowerOff" dstEdge="TOP" spacing="41.04478un" src="" srcEdge="TOP"/>
+                <anchoritem dst="" dstEdge="LEFT" spacing="-0un" src="Silence" srcEdge="LEFT"/>
+                <anchoritem dst="" dstEdge="RIGHT" spacing="0un" src="Silence" srcEdge="RIGHT"/>
+                <anchoritem dst="" dstEdge="TOP" spacing="0un" src="Silence" srcEdge="TOP"/>
+                
+                <anchoritem dst="" dstEdge="LEFT" spacing="-0un" src="label" srcEdge="LEFT"/>
+                <anchoritem dst="" dstEdge="RIGHT" spacing="0un" src="label" srcEdge="RIGHT"/>
+                <anchoritem dst="Silence" dstEdge="BOTTOM" spacing="-1un" src="label" srcEdge="TOP"/>
+
+
+                <anchoritem dst="" dstEdge="LEFT" spacing="-0un" src="Volume" srcEdge="LEFT"/>
+                <anchoritem dst="" dstEdge="RIGHT" spacing="0un" src="Volume" srcEdge="RIGHT"/>
+                <anchoritem dst="label" dstEdge="BOTTOM" spacing="-1un" src="Volume" srcEdge="TOP"/>
+
+                <anchoritem dst="" dstEdge="LEFT" spacing="-0un" src="Vibrate" srcEdge="LEFT"/>
+                <anchoritem dst="" dstEdge="RIGHT" spacing="0un" src="Vibrate" srcEdge="RIGHT"/>
+                <anchoritem dst="Volume" dstEdge="BOTTOM" spacing="-0un" src="Vibrate" srcEdge="TOP"/>
+
+                <anchoritem dst="" dstEdge="LEFT" spacing="-0un" src="Offline" srcEdge="LEFT"/>
+                <anchoritem dst="" dstEdge="RIGHT" spacing="0un" src="Offline" srcEdge="RIGHT"/>
+                <anchoritem dst="Vibrate" dstEdge="BOTTOM" spacing="-0un" src="Offline" srcEdge="TOP"/>
+
+                <anchoritem dst="" dstEdge="LEFT" spacing="-0un" src="PowerOff" srcEdge="LEFT"/>
+                <anchoritem dst="" dstEdge="RIGHT" spacing="0un" src="PowerOff" srcEdge="RIGHT"/>
+                <anchoritem dst="Offline" dstEdge="BOTTOM" spacing="-1un" src="PowerOff" srcEdge="TOP"/>
+
+                <anchoritem dst="" dstEdge="BOTTOM" spacing="0un" src="PowerOff" srcEdge="BOTTOM"/>
+                                
             </layout>
         </widget>
     </widget>

@@ -29,7 +29,7 @@ PRJ_EXPORTS
 // specify the source file followed by its destination here
 // copy will be used to copy the source file to its destination
 // If there's no destination then the source file will be copied
-// to the same name in \epoc32\include
+// to the same name in /epoc32/include
 
 // Files from aincc.prj
 ../inc/APACLN.H SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(apacln.h)
@@ -95,7 +95,7 @@ PRJ_EXPORTS
 
 ../group/apparc.iby /epoc32/rom/include/apparc.iby
 
-// File from ..\inc (which is relocated from app-framework\aiftool\inc)
+// File from ../inc (which is relocated from app-framework/aiftool/inc)
 ../inc/AIFTOOL.RH /epoc32/include/aiftool.rh
 
 //Backup and restore exports
@@ -199,13 +199,13 @@ PRJ_TESTMMPFILES
 
 // testupdregappuninstallation is used in t_serviceregistry test. If any changes done to
 // this application, uncomment testupdregappuninstallation.mmp file and build it.
-// Then comment it and copy the testupdregappuninstallation_reg.rsc file to ..\tdata folder.
+// Then comment it and copy the testupdregappuninstallation_reg.rsc file to ../tdata folder.
 // Delete any testupdregappuninstallation* files from epoc32 directory.
 //../tef/testapp/testupdregappuninstallation/testupdregappuninstallation.mmp
 
 // testupgradeupdregappuninstallation is used in t_serviceregistry test. If any changes done to
 // this application, uncomment testupdregappuninstallation.mmp file and build it.
-// Then comment it and copy the testupgradeupdregappuninstallation_reg.rsc file to ..\tdata folder.
+// Then comment it and copy the testupgradeupdregappuninstallation_reg.rsc file to ../tdata folder.
 // Delete any testupdregappuninstallation* files from epoc32 directory.
 //../tef/testapp/testupgradeupdregappuninstallation/testupgradeupdregappuninstallation.mmp
 
@@ -245,7 +245,7 @@ PRJ_TESTMMPFILES
 
 //*****************************************************************************************************************************************************************************************************
 //recupgrade_1 plug-in is used to upgrade the mime type recognizer during runtime in T_RecUpgrade test.  
-//              It is build for armv5 and rename to recupgrade_armv5_rel.dll and copied to apparc\Tdata before actual code builds.  If you are making any change in recupgrade_1.cpp then uncomment 
+//              It is build for armv5 and rename to recupgrade_armv5_rel.dll and copied to apparc/Tdata before actual code builds.  If you are making any change in recupgrade_1.cpp then uncomment 
 //              “recupgrade_1.MMP” , build , rename (.dll) and copy as mentioned above .
 //*****************************************************************************************************************************************************************************************************
 //../tef/TRecUpgrade_1/recupgrade_1.MMP
@@ -253,7 +253,7 @@ PRJ_TESTMMPFILES
 
 // ***************************************************************************************************************************************************************************************************
 // recupgrade_2 plug-in is used to upgrade the mime type recognizer during runtime in T_RecUpgrade test.  
-//              It is build for armv5 and rename to recupgrade2_armv5_rel.dll and copied to apparc\Tdata before actual code builds.  If you are making any change in recupgrade_2.cpp then uncomment 
+//              It is build for armv5 and rename to recupgrade2_armv5_rel.dll and copied to apparc/Tdata before actual code builds.  If you are making any change in recupgrade_2.cpp then uncomment 
 //              “recupgrade_2.MMP” , build , rename (.dll) and copy as mentioned above .
 // ***************************************************************************************************************************************************************************************************
 //../tef/TRecUpgrade_2/recupgrade_2.MMP
@@ -378,7 +378,7 @@ PRJ_TESTEXPORTS
 
 ../tef/tupgradeiconapp/tupgradeiconapp.mbm					/epoc32/release/winscw/udeb/z/apparctestregfiles/tupgradeiconapp.mbm
 
-// epoc32\data
+// epoc32/data
 
 // export certificates for creating sis files
 ../tef/testpkg/Nokia_RnDCert_02.der							/epoc32/tools/Nokia_RnDCert_02.der

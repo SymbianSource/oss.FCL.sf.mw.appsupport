@@ -27,11 +27,11 @@ source	 ./testforceregistrationapp1.cpp
 
 
 START RESOURCE      testforceregistrationapp1_reg.rss
-    TARGETPATH      \apparctest
+    TARGETPATH      /apparctest
 END
 
 START RESOURCE      testforceregistrationapp1_loc.rss
-    TARGETPATH      \apparctest
+    TARGETPATH      /apparctest
 END
 
 library  euser.lib

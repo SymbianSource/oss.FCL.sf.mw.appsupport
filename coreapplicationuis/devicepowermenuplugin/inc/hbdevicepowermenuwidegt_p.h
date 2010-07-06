@@ -52,8 +52,6 @@ public:
 private:    
     bool preConstructDialog();
     void constructDialog(const QVariantMap &parameters);
-    void hideEvent(QHideEvent *event);
-    void showEvent(QShowEvent *event);
     void cleanupMemory();
     
 private:
@@ -67,7 +65,6 @@ private slots:
     void handleVibrationToggled(int aVibrationToggel);
     void handleOfflineToggled(int aOfflineToggel);
     void handlePowerOff(bool aState);
-    //void setDialogWidget(Qt::Orientation);
     void closedialog();
     
 signals:
@@ -92,7 +89,6 @@ private:
     HbCheckBox*			mOffline;                         //Handle for Offline CheckBox
     HbPushButton *		mPowerOffButton;                //Handle for PowerOff Button
     HbDocumentLoader* 	mLoader;                         //Hnadle for Documnet Loader to load docml 
-    //HbMainWindow*       mMainWindow;                    //Handle for mainWindow, used to Catch Orientation changes
     HbTranslator*       mHbTranslator;                  //Translator used for localization; loads translation files
 };
 

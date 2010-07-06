@@ -153,6 +153,8 @@ SOURCE CenRepObservers/SysApCenRepBTObserver.cpp
 SOURCE CenRepObservers/SysApCenRepHacSettingObserver.cpp
 SOURCE CenRepObservers/sysapcenreplightsettingsobserver.cpp
 SOURCE CenRepObservers/SysApCenRepLogsObserver.cpp
+SOURCE CenRepObservers/sysapcenrepofflinemodeobserver.cpp
+
 LIBRARY centralrepository.lib
 LIBRARY cenrepnotifhandler.lib
 
@@ -199,7 +201,7 @@ LIBRARY lockclient.lib
 
 SOURCEPATH ../Src
 SOURCE sysapkeymanagement.cpp SysApTaskList.cpp
-
+SOURCE SysApKeySndHandler.cpp SysApKeySndAnim.cpp SysApAnimKeySndControl.cpp
 
 //For Shutdown
 LIBRARY	    SVGEngine.lib

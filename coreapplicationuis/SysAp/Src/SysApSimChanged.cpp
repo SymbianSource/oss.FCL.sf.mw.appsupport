@@ -171,7 +171,7 @@ void CSysApSimChanged::HandleSimChangedL()
     if ( simNotOwned )
         {
         ClearRepositoriesL();
-        ClearLogsL();
+//        ClearLogsL();
         }
     }
 // =============== CShareActive MEMBER FUNCTIONS ===============================
