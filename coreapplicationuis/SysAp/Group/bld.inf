@@ -21,11 +21,17 @@
 PRJ_PLATFORMS
 DEFAULT
 
+#define USE_SF_SPLASH_SVG //comment this to use standard S60 splash icon
+
 PRJ_EXTENSIONS
 START EXTENSION s60/mifconv
   OPTION TARGETFILE sysap.mif
   OPTION HEADERFILE sysap.mbg
-  OPTION SOURCES -c8 qgn_startup_screen
+#ifdef USE_SF_SPLASH_SVG
+		// use the local file (also called qgn_startup_screen to keep the mbg file the same)
+    OPTION SOURCEDIR ../../../startupservices/SplashScreen/sfimage
+#endif
+    OPTION SOURCES -c8 qgn_startup_screen
 END
 
 
