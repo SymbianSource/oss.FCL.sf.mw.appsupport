@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -99,15 +99,18 @@ void CCFApplicationStateSettings::AddViewSettingsL(
 // CCFApplicationStateSettings::AddViewSettingsL
 //-----------------------------------------------------------------------------
 //
-void CCFApplicationStateSettings::GetViewName( const TUid& aUid, 
+TBool CCFApplicationStateSettings::GetViewName( const TUid& aUid, 
     TPtrC& aName ) const
     {
+    TBool matchFound = EFalse;
     for ( TInt i = 0; i < iViewInfo.Count(); ++i )
         {
         if ( aUid == iViewInfo[ i ]->Uid() )
             {
             aName.Set( iViewInfo[ i ]->Name() );
+            matchFound = ETrue;
             break;
             }
         }
+    return matchFound;
     }

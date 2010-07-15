@@ -38,6 +38,7 @@
 #include <settingsinternalcrkeys.h>
 #include <keylockpolicyapi.h>
 #include <ctsydomainpskeys.h>
+#include <hwrmdomainpskeys.h>
 #include "sysapdefaultkeyhandler.h"
 #include "sysapcallback.h"
 #include "SysAp.hrh"
@@ -220,39 +221,45 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
 					}
 				else
 					{ // keylock action is defined by user setting
-                    TInt status(0);
-                    TInt err = iCallStateProperty.Get( status );
-                    if (err == KErrNone)
+                    TInt value = 0;
+                    RProperty::Get(KPSUidStartup, KPSStartupUiPhase, value);
+                    TBool startupOver = (value == EStartupUiPhaseAllDone);
+                    if(startupOver)
                         {
-                        switch ( status )
-                            {
-                            case EPSCTsyCallStateUninitialized:
-                            case EPSCTsyCallStateNone:
-                                {
+						TInt status(0);
+						TInt err = iCallStateProperty.Get( status );
+						if (err == KErrNone)
+							{
+							switch ( status )
+								{
+								case EPSCTsyCallStateUninitialized:
+								case EPSCTsyCallStateNone:
+									{
     
-                                TInt keyGuardSetting;
-                                iSlideRepository->Get( KSlideKeyguard, keyGuardSetting );
-                                switch( ( TSlideSettingKeyguard ) keyGuardSetting )
-                                    {
-                                    case ESlideSettingsKeyguardActivatingOn: 
-                                        iKeylock->EnableKeyLock();
-                                        break;
-                                    case ESlideSettingsKeyguardActivatingAskMe: 
-                                        iKeylock->OfferKeyLock();
-                                        break;
-                                    case ESlideSettingsKeyguardActivatingOff: 
-                                        //do nothing
-                                        break;
-                                    case ESlideSettingsKeyguardActivatingAutomatic: 
-                                        if( iKeypadWasLocked )
-                                            {
-                                            iKeylock->EnableKeyLock();
-                                            }
-                                        break;
-                                    }
-                                }
+									TInt keyGuardSetting;
+									iSlideRepository->Get( KSlideKeyguard, keyGuardSetting );
+									switch( ( TSlideSettingKeyguard ) keyGuardSetting )
+										{
+										case ESlideSettingsKeyguardActivatingOn: 
+											iKeylock->EnableKeyLock();
+											break;
+										case ESlideSettingsKeyguardActivatingAskMe: 
+											iKeylock->OfferKeyLock();
+											break;
+										case ESlideSettingsKeyguardActivatingOff: 
+											//do nothing
+											break;
+										case ESlideSettingsKeyguardActivatingAutomatic: 
+											if( iKeypadWasLocked )
+												{
+												iKeylock->EnableKeyLock();
+												}
+											break;
+										}
+									}
                             default: // any other state
                                 break;
+								}
                             }
                         }
 					}

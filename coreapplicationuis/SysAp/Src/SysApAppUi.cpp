@@ -685,7 +685,7 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                         {
                         TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, Short powerkey") ) );
                         iLastPowerKeyWasShort = ETrue;
-                        if ( iPowerKeyPopupMenuActive || !iSysApFeatureManager->PowerKeyIsLockKey() || (iSysApFeatureManager->PowerKeyIsLockKey() && haveStatusPane ))
+                        if ( IsDefaultPowerKeyBehavior() )
                             {
                             //do this only if the power key menu is active (handles item navigation)
                             //or if the power key is not the lock key (default)
@@ -701,7 +701,7 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                         iKeyBoardRepeatCount = -1;
                         TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, Long powerkey") ) );
                         iLastPowerKeyWasShort = EFalse;
-                        if ( !haveStatusPane && !iPowerKeyPopupMenuActive && iSysApFeatureManager->PowerKeyIsLockKey() && !iIgnoreNextPowerKeyRepeats )
+                        if (! IsDefaultPowerKeyBehavior() && !iIgnoreNextPowerKeyRepeats )
                             {
                             if ( !iGlobalListQuery )
                                 {
@@ -735,14 +735,13 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
         else if ( aType == EEventKeyUp )
             {
             TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): aType == EEventKeyUp, PowerKeyIsLockKey = %d, iLastPowerKeyWasShort = %d, iPowerKeyPopupMenuActive = %d, iCharging = %d" ), iSysApFeatureManager->PowerKeyIsLockKey(), iLastPowerKeyWasShort, iPowerKeyPopupMenuActive, iCharging ) );
-            if ( iSysApFeatureManager->PowerKeyIsLockKey()
-                 && iLastPowerKeyWasShort 
-				 && !iPowerKeyPopupMenuActive
-                 && !haveStatusPane  
-                 && ( aKeyEvent.iScanCode == EStdKeyDevice2 ) )
+            if ( !IsDefaultPowerKeyBehavior() && 
+                 iLastPowerKeyWasShort && 
+                 ( aKeyEvent.iScanCode == EStdKeyDevice2 ))
                 {
-                //if the power key is the lock key && the last keypress was short && the power menu is not active
-                //then lock the phone
+                // if the power key is the lock key && the last keypress was 
+                // short && the power menu is not active && an alarm is not
+                // currently being shown, then lock the phone
                 TInt alarmState=0, securityQueryState=0;
          		TInt errorCode = RProperty::Get( KPSUidCoreApplicationUIs, KCoreAppUIsDisableKeyguard, alarmState );
 				TInt errorCode2 = RProperty::Get( KPSUidStartup, KStartupSecurityCodeQueryStatus, securityQueryState);
@@ -2230,7 +2229,6 @@ void CSysApAppUi::HandleGprsNotesL()
                 }
             else if ( iGprsSuspendedNoteShown && !iGprsSuspended )
                 {
-                ShowUiNoteL( EGprsResumedNote );
                 iGprsSuspendedNoteShown = EFalse;
                 iGprsSuspended = EFalse;
                 iCallActivated = EFalse;
@@ -2728,7 +2726,6 @@ TInt CSysApAppUi::ShowGprsSuspendedNoteAfterCallBack( TAny* aObject )
     if ( EPSCTsyCallTypeCSVoice == callType && ENWNetworkModeWcdma != networkMode )
         {
         appUi->iGprsSuspendedNoteShown = ETrue;
-        TRAP_IGNORE( appUi->ShowUiNoteL( EGprsSuspendedNote ) );
         }
     return KErrNone;
     }
@@ -6902,6 +6899,38 @@ void CSysApAppUi::CancelQuery( TSysApConfirmationQueryIds aQueryId )
             iSysApConfirmationQuery->Cancel();
             }
         }
+    }
+
+TBool CSysApAppUi::IsDefaultPowerKeyBehavior()
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::IsDefaultPowerKeyBehavior" ) ) );
+    TBool powerKeyIsLockKey = iSysApFeatureManager->PowerKeyIsLockKey();
+    if ( !powerKeyIsLockKey )
+        return ETrue; //no need for further processing
+    TInt securityDialogStatus = StateOfProperty( KPSUidStartup, KStartupSecurityCodeQueryStatus );
+    TRACES( RDebug::Printf( "CSysApAppUi::IsDefaultPowerKeyBehavior: securityDialogStatus = %d", securityDialogStatus ) );
+    if ( securityDialogStatus == ESecurityQueryActive  )
+        {
+        // handle the exception from the exception. Currently used only when a long power key press is detected
+        return ETrue; 
+        }
+    //make sure we can turn off device when 'sim invalid' dlg is displayed
+    TInt simStatus = StateOfProperty( KPSUidStartup, KStartupSimSecurityStatus ); 
+    TBool simBogus = ( simStatus == ESimRejected ) || ( simStatus == ESimUnaccepted ) || (simStatus == ESimInvalid );
+    
+    // check if the phone has fully booted into idle  
+    TInt startupPhase = StateOfProperty ( KPSUidStartup, KPSStartupUiPhase );
+    TBool bootCompleted = (EStartupUiPhaseAllDone == startupPhase);
+    
+	// Another exception from the exception:
+    // check if we're in charging or alert mode (only then we have a status pane instance)    
+    TBool haveStatusPane = ( StatusPane()== NULL ) ? EFalse : StatusPane()->IsVisible();
+    TBool defaultPowerKeyBehaviour = !bootCompleted || simBogus || haveStatusPane || iPowerKeyPopupMenuActive || !powerKeyIsLockKey;
+    
+    TRACES( RDebug::Printf( "CSysApAppUi::IsDefaultPowerKeyBehavior: Sim Status = %d, haveStatusPane = %d, power key menu active? %d" , simStatus, haveStatusPane, iPowerKeyPopupMenuActive  ) );       
+    TRACES( RDebug::Printf( "CSysApAppUi::IsDefaultPowerKeyBehavior returns %d", defaultPowerKeyBehaviour ) );   
+    TRACES( RDebug::Printf( "CSysApAppUi::IsDefaultPowerKeyBehavior: startupPhase = %d", startupPhase ) );
+    return defaultPowerKeyBehaviour;
     }
 	
 // ----------------------------------------------------------------------------

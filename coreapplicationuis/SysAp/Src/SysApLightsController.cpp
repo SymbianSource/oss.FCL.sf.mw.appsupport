@@ -31,6 +31,7 @@
 #include "SysApFeatureManager.h"
 #include "startupdomainpskeys.h"
 #include <hal.h>
+#include <hwrmpowerstatesdkpskeys.h>
 
 // CONSTANTS
 
@@ -1103,9 +1104,17 @@ void CSysApLightsController::SetLightsOnL( TBool aBlinking )
 			TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
     		if ( error == KErrNone && state == ESwStateCharging ) 
 				{
-				iSysApAppUi.StartChargingBatteryL();
-				//To switch on the display 
-				TInt result = HAL::Set( HALData::EDisplayState, 1 );
+				TInt value = iSysApAppUi.StateOfProperty( KPSUidHWRMPowerState, KHWRMChargingStatus );
+				if (value == EChargingStatusChargingComplete )
+					{
+					iSysApAppUi.StopChargingBatteryL();
+					}
+				else
+					{
+					iSysApAppUi.StartChargingBatteryL();
+					//To switch on the display 
+					TInt result = HAL::Set( HALData::EDisplayState, 1 );
+					}
 				}	
             }
         else

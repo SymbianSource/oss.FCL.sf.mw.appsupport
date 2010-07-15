@@ -1540,6 +1540,8 @@ void CRemConTspController::ActivateApplicationL( const TUid aUid ) const
             CApaCommandLine* apaCommandLine = CApaCommandLine::NewLC();
             apaCommandLine->SetExecutableNameL( appInfo.iFullName );
             apaCommandLine->SetCommandL( EApaCommandRun );            
+            _LIT8(Kparam, "play");
+            apaCommandLine->SetTailEndL( Kparam );
             apaLsSession.StartApp( *apaCommandLine );
             CleanupStack::PopAndDestroy( apaCommandLine );
             }

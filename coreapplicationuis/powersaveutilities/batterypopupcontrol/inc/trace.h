@@ -51,7 +51,8 @@
 /**
 * Prefix macro for strings
 */
-#define _PREFIX_CHAR( aMsg ) (const char*)"[BatteryPopupControl]: " ##aMsg
+#define _PREFIX_CHAR( aMsg ) (const char*)"[BatteryPopupControl]: " aMsg
+
 
 /**
 * Define needed directories if TRACE_INTO_FILE macro in use

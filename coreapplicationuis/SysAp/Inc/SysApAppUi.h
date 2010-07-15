@@ -1691,6 +1691,7 @@ private:
     TInt iProfileItemsOffset;
     //Flag to record if the TD network is enalbed.
 		TBool iTDEnable;
+		TBool IsDefaultPowerKeyBehavior();
 
     };
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -452,8 +452,8 @@ void CApplicationStateSourcePlugIn::DoHandleViewEventL(
         if ( !fgFound && aEvent.iViewOneId.iAppUid == appSettings->Uid() )
             {
             fgApp.Set( appSettings->Name() );
-            appSettings->GetViewName( aEvent.iViewOneId.iViewUid, fgView );
-            fgFound = ETrue;
+            //Check for flag returned by GetViewName, don't directly set the Flag to ETrue
+            fgFound = appSettings->GetViewName( aEvent.iViewOneId.iViewUid, fgView );
             }
         if ( !bgFound && aEvent.iViewTwoId.iAppUid == appSettings->Uid() )
             {
