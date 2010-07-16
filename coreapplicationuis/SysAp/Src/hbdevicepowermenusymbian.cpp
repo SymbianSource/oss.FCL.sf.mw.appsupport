@@ -18,6 +18,7 @@
 #include <hbdevicedialogsymbian.h>
 #include <hbsymbianvariant.h>
 #include <coreapplicationuisdomainpskeys.h>
+#include <CoreApplicationUIsSDKCRKeys.h>
 #include "hbdevicepowermenusymbian.h"
 
 
@@ -247,8 +248,9 @@ void CHbDevicePowerMenuPrivate::DataReceived(CHbSymbianVariantMap& aData)
 		TBool* OfflineValue = OfflineVariant->Value<TBool>();
 		if(OfflineValue)
 			{
-			iOfflineEnable = *OfflineValue;
-			User::LeaveIfError( iPowerMenuManager->iCenrepOffline->Set(  KSettingsAirplaneMode, iOfflineEnable )  ); 
+                        iOfflineEnable = *OfflineValue;
+                        // negate the value before storing in cen rep as the n/w conn allowed key is complement of offline mode
+                        User::LeaveIfError( iPowerMenuManager->iCenrepOffline->Set(KCoreAppUIsNetworkConnectionAllowed, !iOfflineEnable )  );
 			}
         TRACES( RDebug::Print( _L("CHbDevicePowerMenuPrivate::DataReceived: OfflineVariant::End") ) );
 		}
@@ -405,25 +407,32 @@ void CHbDevicePowerMenuSymbian::ConstructL()
     {
     TRACES( RDebug::Print( _L("CHbDevicePowerMenuSymbian::ConstructL: START") ) ); 
     iProfileEngine = ::CreateProfileEngineExtended2L();
-    iCenrepOffline = CRepository::NewL( KCRUidCommunicationSettings );
+    iCenrepOffline = CRepository::NewL( KCRUidCoreApplicationUIs );
     iCenrepProfile = CRepository::NewL( KCRUidProfileEngine );
 	iPowerMenuPrivate = CHbDevicePowerMenuPrivate::NewL(this);
 
     //To Sync with Contro panel 
-	TBool airplaneMode(0);
-	User::LeaveIfError( iCenrepOffline->Get( KSettingsAirplaneMode, airplaneMode ) );
-	SetOfflineMode(airplaneMode);
+    TBool networkConnectionAllowed(EFalse);
+    TInt error = iCenrepOffline->Get( KCoreAppUIsNetworkConnectionAllowed, networkConnectionAllowed );
+    TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: KCoreAppUIsNetworkConnectionAllowed = %d"), error ) );    
+ 
+    // The value of KCoreAppUIsNetworkConnectionAllowed is Inverted status of Offline mode
+    // Hence negate the value and use as Offline mode
+    SetOfflineMode(!networkConnectionAllowed);
 	
 	TInt masterVolume(0);
-	User::LeaveIfError( iCenrepProfile->Get( KProEngMasterVolume, masterVolume ) );
-	SetVolume(masterVolume);
+    error = iCenrepProfile->Get( KProEngMasterVolume, masterVolume );
+    TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: KProEngMasterVolume = %d"), error ) );    
+    SetVolume(masterVolume);
 	
 	TBool masterVibrate(0);
-	User::LeaveIfError( iCenrepProfile->Get( KProEngMasterVibra, masterVibrate ) );
+    error = iCenrepProfile->Get( KProEngMasterVibra, masterVibrate );
+    TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: KProEngMasterVibra = %d"), error ) );	
 	SetVibrationEnabled(masterVibrate);
 	
 	TBool silenceMode(EFalse);
-	User::LeaveIfError( iCenrepProfile->Get( KProEngSilenceMode, silenceMode ) );
+    error = iCenrepProfile->Get( KProEngSilenceMode, silenceMode );
+    TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: KProEngSilenceMode = %d"), error ) );   
 	SetSilenceMode(silenceMode);
 	
 	//Cypheroff is True when No encryption/Decryption is happening

@@ -191,8 +191,9 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
           CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
                 CleanupStack::PushL(note);
                 note->SetTextL(*prompt);
-                note->ShowL();
-                 CleanupStack::PopAndDestroy(note);
+                //could have used show() but it is aynchronous and execution proceeds before note is seen so have used synchronous API exec()
+                note->ExecL();
+                CleanupStack::PopAndDestroy(note);
                 CleanupStack::PopAndDestroy( prompt );
                 	
                 	              

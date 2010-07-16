@@ -52,6 +52,7 @@
 const TUint KCoreAppUIsMmcRemovedWithoutEjectCmdMask = 0xFFFF;
 const TUint KCoreAppUIsMmcRemovedWithoutEjectValShift = 16;
 
+_LIT(KGpsIndicatorPlugin, "PositioningIndicator");
 const TUid KPSUidSecurityUIs = { 0x100059b5 };
 const TUint32 KSecurityUIsLights  = 0x00000308;
 
@@ -396,12 +397,12 @@ void CSysApPubSubObserver::HandleCoreAppUIsCategoryL( const TUint aKey, const TI
  //           iSysApAppUi.HandleMessageTonePlayingQuitability( aValue );
             break;
         case KCoreAppUIsNspsRawKeyEvent:
- //           iSysApAppUi.HandleNspsRawKeyEventL();
+            iSysApAppUi.HandleNspsRawKeyEventL();
             break;
         case KCoreAppUIsLightsRawKeyEvent:
             if ( aValue == ECoreAppUIsKeyEvent )
                 {
-  //              iSysApAppUi.HandleRawKeyEventLightsRequireL();
+                iSysApAppUi.HandleRawKeyEventLightsRequireL();
                 }
             break;
         case KCoreAppUIsMmcRemovedWithoutEject:
@@ -908,10 +909,12 @@ void CSysApPubSubObserver::HandlePosIndicatorCategoryL( const TUint aKey, const 
         case KPosIntGpsHwStatus:
             if ( aValue == EPosIntGpsHwOff )
                 {
+                iSysApAppUi.iHbIndicatorSymbian->Deactivate(KGpsIndicatorPlugin);
  //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOff );
                 }
             else if ( aValue == EPosIntGpsHwOn )    
                 {
+                iSysApAppUi.iHbIndicatorSymbian->Activate(KGpsIndicatorPlugin);
  //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOn );
                 }
             else if ( aValue == EPosIntGpsHwIntermediate )

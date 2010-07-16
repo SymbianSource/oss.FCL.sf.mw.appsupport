@@ -27,9 +27,10 @@ CpRfsPlugin::CpRfsPlugin()
 CpRfsPlugin::~CpRfsPlugin()
     {
     }
-CpSettingFormItemData *CpRfsPlugin::createSettingFormItemData(CpItemDataHelper &itemDataHelper) const
+QList<CpSettingFormItemData*> CpRfsPlugin::createSettingFormItemData(CpItemDataHelper &itemDataHelper) const
     {
-    return new CpSettingFormEntryItemDataImpl<CpRfsView>(itemDataHelper,tr("Restore Factory Settings"));
+    return QList<CpSettingFormItemData*>() 
+                << new CpSettingFormEntryItemDataImpl<CpRfsView>(itemDataHelper,tr("Restore Factory Settings"));
     }
 
 Q_EXPORT_PLUGIN2(cprfsplugin, CpRfsPlugin);

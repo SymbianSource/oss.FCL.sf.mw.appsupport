@@ -211,10 +211,10 @@ void CSysApEtelSmsStoreObserver::CStoreStatusReader::RunL()
         if ( info.iTotalEntries > 0 && info.iUsedEntries >= info.iTotalEntries )
             {
             // Blink the Envelope indicator
-            iObserver.iSysApAppUi.SetIndicatorStateL(
+/*            iObserver.iSysApAppUi.SetIndicatorStateL(
                 EAknIndicatorEnvelope, EAknIndicatorStateAnimate );
             iObserver.iStoreFull = ETrue;
-            }
+*/            }
         }
 
     TRACES( RDebug::Print(

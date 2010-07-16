@@ -38,7 +38,7 @@ SOURCEPATH      ../src
 
 SOURCE          AccFwUiNotifierProxy.cpp
 SOURCE          AccFwUiNoteNotifier.cpp
-//SOURCE          AccFwUiDialogNotifier.cpp
+
 						
 USERINCLUDE     ../inc
 

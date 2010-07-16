@@ -360,7 +360,7 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
 
     // Check for keypadlock if the events are from device keypad
     // If events are from accessory device,then do not check for keypadlock
-    if (aKeyType != EAccessoryVolumeKeys)
+    if (aKeyType != EAccessoryVolumeKeys && aKeyType != ESideVolumeKeys )
         {
                
         TInt err=iKeyguardAccess->ShowKeysLockedNote();
@@ -370,10 +370,7 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
             // Device is locked , Discard the key event
 
             //Start the listener once again
-            if (aKeyType == ESideVolumeKeys)
-                {
-                iMMKeyBearerObserver->Start();
-                }
+            
             if (aKeyType == EMediaKeys)
                 {
                 iMediaKeyObserver->Start();

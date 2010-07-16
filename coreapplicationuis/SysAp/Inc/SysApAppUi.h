@@ -28,12 +28,16 @@
 #include <e32property.h>
 #include <sysapcallback.h>
 #include <starterclient.h>
+#include <rmmcustomapi.h>
+
+
 #include "SysApTimer.h"
 #include "SysApLightsController.h"
 #include "coreapplicationuisprivatecrkeys.h"
 #include "sysapusbchargerdetector.h"
 #include "SysApAccessoryObserver.h"
 #include <hbsymbianvariant.h>
+#include <hbindicatorsymbian.h>
 //For Powermenu--CHbDevicePowerMenuSymbian
 #include "hbdevicepowermenusymbian.h"
 
@@ -78,7 +82,11 @@ class MSysApBtController;
 class CSysApCenRepLogsObserver;
 class MSysApUsbIndicator;
 class CKeyguardAccessApi;
+class CHbIndicatorSymbian;	
+class CSysApShutdownAnimation;
 
+class CSysApDefaultKeyHandler;
+class CSysApEtelConnector;
 
 const TInt KBluetoothModulePowerModeOn ( 1 );
 const TInt KDummyReason( -1 );
@@ -176,6 +184,16 @@ class CSysApAppUi : public CAknAppUi,
         * @param None
         * @return void
         */
+        
+#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+    void
+#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
+    TBool
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+    ShowAnimationL();
+    
+    void PrepareForShutdownAnimation();
+        
     public: 
         void ConstructL();
         
@@ -204,6 +222,7 @@ class CSysApAppUi : public CAknAppUi,
         * @return TKeyResponse
         */
         TKeyResponse HandleKeyEventL( const TKeyEvent& aKeyEvent, TEventCode aType );
+        void HandleApplicationSpecificEventL(TInt aType,const TWsEvent& aEvent);
       
      public:
      	//	void CallFromMain();
@@ -267,7 +286,7 @@ class CSysApAppUi : public CAknAppUi,
         void SetUsbAttachStatus( const TBool aUsbAttached );
         TSysApUsbChargerDetector& UsbChargerDetector();
         
-        void HandleAccessoryConnectedL( TAccMode aAccessoryState );
+        void HandleAccessoryConnectedL( TAccMode aAccessoryState, TInt aPhysicalConnectionType );
 
         void HandleAccessoryDisconnectedL();
         void DoLightsTimeoutChangedL( const TInt aTimeout );
@@ -309,6 +328,9 @@ class CSysApAppUi : public CAknAppUi,
         void SetLightsOnSecurityQueryL();  
         TBool CheckLongPowerKeyPressed();
         TBool ReleasePowerMenuCustomDialogMemory();
+//        TBool ReleaseMemoryCardCustomDialogMemory();
+        static TInt DoStopAnimTiming( TAny* aObject );
+        CEikStatusPane* StatusPane();
         
 #ifdef SYSAP_USE_STARTUP_UI_PHASE        
         /**
@@ -318,7 +340,20 @@ class CSysApAppUi : public CAknAppUi,
 
 #endif // SYSAP_USE_STARTUP_UI_PHASE
 
-     
+
+        
+        void HandleNspsRawKeyEventL();
+
+        void HandleNetworkNspsNotification( RMmCustomAPI::TNspsStatus aNspsStatus );
+        
+        void HandleRawKeyEventLightsRequireL() const;
+        
+        void HandleSmsStorageNotificationL( TBool aSimStoreFull );
+        
+        void UpdateSignalBarsL();
+        
+
+        
      private:
          /**
          * Frees SysAp's reserved memory, closes connections to servers etc.
@@ -345,6 +380,7 @@ class CSysApAppUi : public CAknAppUi,
          void HandleAccessoryProfileInStartupL( );
          
          CSysApCenRepLogsObserver& CSysApAppUi::LogsObserverL();
+         void ContinueShutdown();
 
         
      private:
@@ -362,6 +398,7 @@ class CSysApAppUi : public CAknAppUi,
           TSysApUsbChargerDetector        iSysApUsbChargerDetector;
           CSysApAccessoryObserver*        iSysApAccessoryObserver;
           CSysApShutdownImage*            iSysApShutdownImage;
+          CSysApShutdownAnimation*        iSysApShutdownAnimation;
           CSysApKeySndHandler*            iSysApKeySndHandler;
           CSysApCenRepController*                  iSysApCenRepController;
           CSysApCenRepLightSettingsObserver*  iSysApCenRepLightSettingsObserver;
@@ -383,8 +420,12 @@ class CSysApAppUi : public CAknAppUi,
 		  CKeyguardAccessApi*             iKeyguardController;
 		  CHbDevicePowerMenuSymbian*            iPowerMenuDialog;
 	      CSysApKeyManagement*            iSysApKeyManagement;
+
+	      CSysApEtelConnector*            iSysApEtelConnector;
 		  
-//	      CSysApDriveList* iSysApDriveList;
+	public:		  
+		  CHbIndicatorSymbian* 			  iHbIndicatorSymbian;
+		  
 
      private:         
         TBool                           iPowerKeyPopupMenuActive;   
@@ -420,6 +461,10 @@ class CSysApAppUi : public CAknAppUi,
         
         TBool                           iIgnoreAccessorySpecificProfileChanges;
         TBool                           iCheckLongPowerKeyEvent;
+        TInt                            iCapturedAppskey;
+        TInt                            iCapturedAppskeyUpAndDowns;
+        TBool                           iShutdownContinued;
+        TBool                           iNsps;
         
 //        friend class CSysApWsClient;
 	};

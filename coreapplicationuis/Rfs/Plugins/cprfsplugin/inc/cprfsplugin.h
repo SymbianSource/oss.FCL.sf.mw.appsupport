@@ -18,16 +18,16 @@
 #define	CPRFSPLUGIN_H
 
 #include <qobject.h>
-#include <cppluginplatinterface.h>
+#include <cpplugininterface.h>
 
-class CpRfsPlugin : public QObject, public CpPluginPlatInterface
+class CpRfsPlugin : public QObject, public CpPluginInterface
 {
 Q_OBJECT
-    Q_INTERFACES(CpPluginPlatInterface)
+    Q_INTERFACES(CpPluginInterface)
 public:
     CpRfsPlugin();
     ~CpRfsPlugin();
-    virtual CpSettingFormItemData *createSettingFormItemData(CpItemDataHelper &itemDataHelper) const;
+    virtual QList<CpSettingFormItemData*> createSettingFormItemData(CpItemDataHelper &itemDataHelper) const;
 };
 
 #endif	//CPRFSPLUGIN_H

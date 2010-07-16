@@ -32,7 +32,7 @@ CpRfsSettingsForm::CpRfsSettingsForm(QGraphicsItem *parent) :
     //initialize the form model
     initRfsSettingModel();
 
-    connect(this, SIGNAL(activated(QModelIndex)),this, SLOT(onItemActivated(QModelIndex)));
+    connect(this, SIGNAL(itemShown(QModelIndex)),this, SLOT(onItemActivated(QModelIndex)));
     }
 
 CpRfsSettingsForm::~CpRfsSettingsForm()
@@ -44,16 +44,12 @@ void CpRfsSettingsForm::initRfsSettingModel()
     HbDataFormModel *model = new HbDataFormModel(0);
 
 		// Create the custom items because HbPushButton cannot be added to the HbDataFormModelItem
-    HbDataFormModelItem::DataItemType customItem = static_cast<HbDataFormModelItem::DataItemType>(HbDataFormModelItem::CustomItemBase + 1);
-                    
-    mNormalRfs = model->appendDataFormItem(customItem, QString(), model->invisibleRootItem());
-    mNormalRfs->setData(HbDataFormModelItem::KeyRole, tr("Restore"));
-
     HbDataFormModelItem::DataItemType customItem1 = static_cast<HbDataFormModelItem::DataItemType>(HbDataFormModelItem::CustomItemBase + 1);
-                    
-    mDeepRfs = model->appendDataFormItem(customItem1, QString(), model->invisibleRootItem());
-    mDeepRfs->setData(HbDataFormModelItem::KeyRole,tr("Delete Data and Restore"));
-
+                 
+    mNormalRfs = model->appendDataFormItem(customItem1, QString(), model->invisibleRootItem());
+    HbDataFormModelItem::DataItemType customItem2 = static_cast<HbDataFormModelItem::DataItemType>(HbDataFormModelItem::CustomItemBase + 2);
+                
+    mDeepRfs = model->appendDataFormItem(customItem2, QString(), model->invisibleRootItem());
     this->setModel(model);
     }
 
@@ -65,8 +61,8 @@ void CpRfsSettingsForm::onItemActivated(const QModelIndex &index)
     if (itemData->type() > HbDataFormModelItem::GroupPageItem)
         {
         //get the widget of setting item
-        HbWidget* widget = this->dataFormViewItem(index)->dataItemContentWidget();
-
+        HbAbstractViewItem* viewitem  = static_cast<HbAbstractItemView*>(this)->itemByIndex(index);
+        HbWidget* widget =static_cast<HbDataFormViewItem*>(viewitem)->dataItemContentWidget(); 
 		if (itemData == mNormalRfs)
             {
             activateNormalRfs(widget);

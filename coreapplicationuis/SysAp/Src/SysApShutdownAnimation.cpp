@@ -21,13 +21,21 @@
 
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
 
-#include <aknappui.h>
+//#include <aknappui.h>
+#include <sysapappui.h>
 #include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
 #include <startupdomaincrkeys.h>
 
 #include "SysApShutdownAnimation.h"
 #include "SysApShutdownImage.h"
 #include "SysAp.hrh"
+#include <eikdef.h>
+#include <eikenv.h>
+#include <coemain.h>
+#include <coecntrl.h>
+#include <coeaui.h>
+
+#define iSysApUiHandle ((CSysApAppUi*)CEikonEnv::Static()->EikAppUi())
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -99,8 +107,11 @@ void CSysApShutdownAnimation::Play( const TCallBack& aCallBack )
             iCtrl = NULL;
             }
 
-        iAvkonAppUi->StatusPane()->MakeVisible( EFalse );
-        iView.SetRect( iAvkonAppUi->ApplicationRect() );
+//        iAvkonAppUi->StatusPane()->MakeVisible( EFalse );
+//        iView.SetRect( iAvkonAppUi->ApplicationRect() );
+//      iAvkonAppUi->StatusPane()->MakeVisible( EFalse );
+//        iSysApUiHandle->StatusPane()->MakeVisible( EFalse );
+        iView.SetRectForAnimation(); 
         iState = ELoading;
 
         TRAPD( errorCode, iCtrl = CSAnimStartupCtrl::NewL( iView.Rect(), iView ) );

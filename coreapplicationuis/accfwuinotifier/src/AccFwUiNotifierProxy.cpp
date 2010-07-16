@@ -19,9 +19,7 @@
 // INCLUDE FILES
 #include <e32std.h>
 #include <ecom/implementationproxy.h>
-
 #include "AccFwUiNoteNotifier.h"
-#include "AccFwUiDialogNotifier.h"
 #include "acc_debug.h"
 
 // EXTERNAL DATA STRUCTURES

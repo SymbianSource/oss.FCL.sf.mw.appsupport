@@ -56,6 +56,8 @@ class CSysApShutdownImage : public CCoeControl , public MCoeControlObserver
         void ShowShutdownImageL(TInt aBitmapId);
 
         RWindow& ShutdownCoeControlWindow();
+        
+        void SetRectForAnimation();
 
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
         /**

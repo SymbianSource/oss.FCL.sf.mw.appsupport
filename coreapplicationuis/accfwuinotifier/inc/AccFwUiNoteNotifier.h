@@ -100,8 +100,6 @@ class CAccFwUiNoteNotifier : public CActive, public MEikSrvNotifierBase2
         // Indication whether notifier cancelled
         TBool iIsCancelled;
 	    
-	    // Indication whether to show not supported note in cover display
-        TBool iPublishNote;
 	    // Text to show in note
         HBufC* iNoteText;
         

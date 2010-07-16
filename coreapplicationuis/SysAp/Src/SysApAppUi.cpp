@@ -32,7 +32,7 @@
 #include <HbDeviceNotificationDialogSymbian.h>
 //#include <HbDeviceInputDialogSymbian.h>
 #include <hbsymbianvariant.h>
-//#include <hbtextresolversymbian.h>
+#include <hbtextresolversymbian.h>
 #include <UikonInternalPSKeys.h>
 
 //#include "SysApWsClient.h"
@@ -53,24 +53,41 @@
 #include "MSysApBtSapController.h"
 #include "MSysApBtController.h"
 #include "MSysApUsbIndicator.h"
-//#include <hbindicatorsymbian.h>
-//#include <psmclient.h>
-//#include <psmsettings.h>
+
 #include "sysapkeymanagement.h"
 #include "SysApShutdownImage.h"
 #include "SysApKeySndHandler.h"
+
+#include "SysApShutdownAnimation.h"
+#include "SysApEtelConnector.h"
+
+
 
 #include <settingsinternalcrkeys.h>
 #include <keyguardaccessapi.h>
 #include <eikdef.h>
 #include <eikenv.h>
+#include <UsbWatcherInternalPSKeys.h> // USB transfer modes
+#include <usbpersonalityids.h>
+#include "sysap.rsg"
+#include <hbindicatorsymbian.h>
 
 class CHbSymbianVariant;
 const TInt KModifierMask( 0 );
 _LIT_SECURITY_POLICY_PASS(KAlwaysPassPolicy);
 _LIT_SECURITY_POLICY_C1(KWriteDeviceDataPolicy, ECapabilityWriteDeviceData);
 const TInt KDelayBeforeNextScanningRound( 1000000 );
-/*
+
+/* ENABLE ANIMATION: Add id of background image.
+   Example: const TInt KBackgroundImageID = EMbmSysapQgn_graf_startup_bg;
+   If there is no image defined, clear screen is used.*/
+const TInt KBackgroundImageID = 0;
+
+
+_LIT(KAccesoryPlugin,"com.nokia.accessory.indicatorplugin/1.0");
+_LIT(KAccMode, "AccMode");
+_LIT(KAccPhyConType, "AccType");
+
 _LIT(KPsmPlugin,"com.nokia.hb.powersavemodeplugin/1.0");
 _LIT(KPsm,"PSM");
 _LIT(KCharging,"Charging");
@@ -79,7 +96,7 @@ _LIT(KtsfilePath, "z:/resource/qt/translations/");
 _LIT(KlowbatteryIcon,"qtg_small_bt_low_battery.svg");
 _LIT(KbatteryFullIcon,"qtg_status_battery.svg");
 
-*/
+
 
 // ============================ MEMBER FUNCTIONS ==============================
 
@@ -219,7 +236,6 @@ void CSysApAppUi::ConstructL()
     iActiveProfileBeforeOfflineMode = iSysApCenRepController->GetInt( KCRUidCoreApplicationUIsSysAp, KSysApProfileBeforeOfflineMode );    
            
     iSysApFeatureManager->FeatureVariationCheckDone();        
-    // iHbIndicatorSymbian = CHbIndicatorSymbian::NewL();
     
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApLightsController::NewL()") ) );
     iSysApLightsController = CSysApLightsController::NewL( *this,
@@ -244,6 +260,9 @@ void CSysApAppUi::ConstructL()
         TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL : CSysApKeyManagement::NewL returns error=%d"), keyManagementErr ) );
         }
     
+    TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApEtelConnector::NewL()") ) );
+    iSysApEtelConnector = CSysApEtelConnector::NewL( *this );
+    
     // Initialize animdll for handling side volume keys
     // (needed before normal mode in case emergency number is dialed from PIN query)
     iSysApKeySndHandler = CSysApKeySndHandler::NewL(iEikonEnv->WsSession());
@@ -258,10 +277,11 @@ void CSysApAppUi::ConstructL()
     RProperty::Define( KPSUidCoreApplicationUIs,KCoreAppUIsPowerMenuCustomDialogStatus, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy );
     RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogUninitialized );
     
-
-                    
-    // TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
-    
+	TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CHbIndicatorSymbian::NewL()") ) );
+    iHbIndicatorSymbian = CHbIndicatorSymbian::NewL();
+	
+	// TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
+	
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );    
     }
 
@@ -274,7 +294,7 @@ void CSysApAppUi::FreeResources()
     TRACES( RDebug::Print( _L("CSysApAppUi::FreeResources") ) );
     delete iSysApBatteryInfoController;
     delete iSysApPsmController;
-    //delete iVariantAccState; 
+    delete iVariantAccState; 
 
     delete iSysApAudioRoutingObserver;
 
@@ -311,7 +331,7 @@ void CSysApAppUi::FreeResources()
     
     delete iSysApUsbIndicatorController;
     delete iKeyguardController;
-    // delete iHbIndicatorSymbian; 
+    delete iHbIndicatorSymbian; 
     delete iSysApKeyManagement;
     iSysApKeyManagement = NULL;
     
@@ -325,7 +345,7 @@ void CSysApAppUi::FreeResources()
 // ---------------------------------------------------------------------------
 void CSysApAppUi::PrepareToExit()
     {
-    TRACES("CSysApAppUi::PrepareToExit()");
+    TRACES(RDebug::Print( _L("CSysApAppUi::PrepareToExit()")));
     CEikAppUi::PrepareToExit();
     }
 
@@ -406,7 +426,11 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
 
     UpdateBatteryBarsL( state );   
     DoSwStateNormalConstructionL();
-    HandleAccessoryProfileInStartupL();       
+    HandleAccessoryProfileInStartupL();
+          
+
+      
+       
    
     if ( !iSysApPsmController ) // created here if first state change has not occurred yet
        {
@@ -415,10 +439,22 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
 
     if ( iSysApPsmController )
        {
-        if ( iCharging ) // if charger is connected on boot PSM queries may need to be shown
+	   if ( iCharging ) // if charger is connected on boot PSM queries may need to be shown
         {
          HandleChargingStatusL( StateOfProperty( KPSUidHWRMPowerState, KHWRMChargingStatus ) );
         }
+		
+       if ( iSysApPsmController->FullPsmEnabled() )
+           {
+           // activate psm indicator 
+            iVariantAccState = CHbSymbianVariant::NewL(&KPsm, CHbSymbianVariant::EDes);
+            if (!iHbIndicatorSymbian->Activate(KPsmPlugin,iVariantAccState)) 
+               {
+               int error = iHbIndicatorSymbian->Error();
+               //use the errorcode...
+               }
+           }
+     
        }
     
     TInt batteryStatus = StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryStatus );
@@ -472,7 +508,7 @@ void CSysApAppUi::DoStateChangedL(const RStarterSession::TGlobalState aSwState)
         if ( aSwState == RStarterSession::ECharging )
             {
             iSysApPsmController->ChargerConnected();
-            iSysApPsmController->DoEnablePartialPsm( EFalse ); // disable  power save now
+            iSysApPsmController->DoEnableFullPsm(EFalse); // disable  power save now
             }
         }
 
@@ -529,8 +565,35 @@ CSysApAppUi::~CSysApAppUi()
     if( !iResourcesFreed )
       {
         FreeResources();
-      }
+
+        iStarterSession.Close();
+
+        }
+
+    delete iSysApShutdownImage;
+
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+    if (iSysApShutdownAnimation)
+        {
+        RemoveFromStack( iSysApShutdownAnimation );
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+        delete iSysApShutdownAnimation;
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+        }
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
+//    delete iProfileNote;
+
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+    if( iAnimTimer )
+        {
+        iAnimTimer->Cancel();
+        }
+    delete iAnimTimer;
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
     delete iSysApStartupController;
+    TRACES( RDebug::Print( _L("~CSysApAppUi() completed") ) );
     }
         
 TBool CSysApAppUi::ResourcesFreed() const
@@ -882,10 +945,10 @@ void CSysApAppUi::DoShutdownL( const TBool aReset, const TInt aResetReason )
         if( !aReset )
             {
     #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
-//            TRAPD( err, ShowAnimationL() );
-//            if ( err )
+            TRAPD( err, ShowAnimationL() );
+            if ( err )
                 {
-     //           TRACES( RDebug::Print(_L("CSysApAppUi::DoShutdownL ShowAnimationL() leaved: %d" ), err ) );
+                TRACES( RDebug::Print(_L("CSysApAppUi::DoShutdownL ShowAnimationL() leaved: %d" ), err ) );
                 CompleteShutdown(aReset, aResetReason);
                 }
             }
@@ -1201,6 +1264,9 @@ void CSysApAppUi::HandleAccessoryDisconnectedL()
 
     if ( accessoryState == EAccModeHandPortable )
         {
+        TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryDisconnectedL:Before Deactivating accessory Plugin")));
+        iHbIndicatorSymbian->Deactivate(KAccesoryPlugin);
+        TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryDisconnectedL:After  Deactivating accessory Plugin")));
         iSysApLightsController->AccessoryConnectedL( EFalse );
         iSysApCenRepController->SetInt( KCRUidCoreApplicationUIsSysAp, KSysApAccessoryConnected, 0 );
         }
@@ -1231,30 +1297,22 @@ void CSysApAppUi::HandleAccessoryDisconnectedL()
 // CSysApAppUi::HandleAccessoryConnectedL()
 // ----------------------------------------------------------------------------
 
-void CSysApAppUi::HandleAccessoryConnectedL( TAccMode aAccessoryState )
+void CSysApAppUi::HandleAccessoryConnectedL( TAccMode aAccessoryState, TInt aPhysicalConnectionType )
     {
-    TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryConnectedL( aAccessoryState: %d ) "), aAccessoryState ) );
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryConnectedL( aAccessoryState: %d )(aPhysicalConnectionType: %d "), aAccessoryState, aPhysicalConnectionType ) );
 
-    if ( aAccessoryState == EAccModeWirelessHeadset ||
-         aAccessoryState == EAccModeWiredHeadset ||
-         aAccessoryState == EAccModeHeadphones )
-        {
-        }
-    else if ( aAccessoryState == EAccModeLoopset )
-        {
-        }
-    else if ( aAccessoryState == EAccModeTextDevice )
-        {
-        }
-    else if ( aAccessoryState == EAccModeWirelessCarKit || aAccessoryState == EAccModeWiredCarKit )
-        {
-        }
-    else if ( aAccessoryState == EAccModeTVOut )
-        {
-        }
-    else if (aAccessoryState == EAccModeHDMI )
-            {
-            }
+    CHbSymbianVariantMap* iAccVariantMap = CHbSymbianVariantMap::NewL();
+    CleanupStack::PushL(iAccVariantMap);
+    CHbSymbianVariant* variantAccState = CHbSymbianVariant::NewL(&aAccessoryState, CHbSymbianVariant::EInt);
+    iAccVariantMap->Add(KAccMode,variantAccState);
+    CHbSymbianVariant* variantAccType = CHbSymbianVariant::NewL(&aPhysicalConnectionType, CHbSymbianVariant::EInt);
+    iAccVariantMap->Add(KAccPhyConType,variantAccType);
+    
+    
+    CHbSymbianVariant* iAccVariant = CHbSymbianVariant::NewL(iAccVariantMap, CHbSymbianVariant::EVariantMap ); 
+    CleanupStack::PushL(iAccVariant);
+    iHbIndicatorSymbian->Activate(KAccesoryPlugin, iAccVariant);
+
 
     TInt swState( StateOfProperty( KPSUidStartup, KPSGlobalSystemState ) );
     TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryConnectedL: swState: %d"), swState ) );
@@ -1290,6 +1348,7 @@ void CSysApAppUi::HandleAccessoryConnectedL( TAccMode aAccessoryState )
         }
     SetIhfIndicatorL();
     SetHacIndicatorL();
+    CleanupStack::PopAndDestroy(2);
     }
 
 
@@ -1620,13 +1679,22 @@ void CSysApAppUi::NotifyPowerSaveModeL( TSysApPsmStatus aStatus )
         {
         case MSysApPsmControllerNotifyCallback::EPsmActivationComplete:
              UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
-             ShowUiNoteL( EPowerSaveModeActivated );
+             iVariantAccState = CHbSymbianVariant::NewL(&KPsm, CHbSymbianVariant::EDes);
+             if (!iHbIndicatorSymbian->Activate(KPsmPlugin,iVariantAccState)) 
+                {
+                int error = iHbIndicatorSymbian->Error();
+                //use the errorcode...
+                }
              break;
         
         case MSysApPsmControllerNotifyCallback::EPsmDeactivationComplete:
              UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
-             ShowUiNoteL( EPowerSaveModeDeactivated );
-             break;
+             if (!iHbIndicatorSymbian->Deactivate(KPsmPlugin)) 
+                {
+                int error = iHbIndicatorSymbian->Error();
+                 //use the errorcode...
+                }
+            break;
             
         case MSysApPsmControllerNotifyCallback::EPsmActivationFailed:
             ShowUiNoteL( ECannotActivatePowerSaveMode );
@@ -1716,6 +1784,16 @@ void CSysApAppUi::HandleForcedLightsATCRequireL( const TInt aLightsParameter ) c
 void CSysApAppUi::HandleLightsRequireL() const
     {
     iSysApLightsController->HandleLightsRequireL();
+    }
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::HandleRawKeyEventLightsRequireL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::HandleRawKeyEventLightsRequireL() const
+    {
+    iSysApLightsController->HandleRawKeyEventLightsRequireL();
     }
 
 
@@ -1832,6 +1910,26 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::HandleBatteryStatusL aValue: %d"), aValue ) );
     
+    TBool enableAutoPsm(EFalse);
+    CRepository* repository( NULL );
+    TRAPD( err, repository = CRepository::NewL( KCRUidDeviceManagementSettings ) );
+        
+    if ( err == KErrNone )
+       {
+       TInt value( 0 );
+       err = repository->Get( KSettingsPowerSavingQuery, value );
+            
+       if ( err == KErrNone )
+          {
+          enableAutoPsm = value ? EFalse: ETrue;
+          }
+       }
+      
+     _LIT(Klowbattery, "txt_power_management_dpopinfo_low_battery");
+     // returns the string "low battery"
+     HBufC* lowBattery = HbTextResolverSymbian::LoadL(Klowbattery);    
+    
+    
     if ( aValue == EBatteryStatusEmpty )
         {
         //Display Recharge Battery note
@@ -1845,23 +1943,30 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
             iSysApPsmController->BatteryLow( ETrue );
             
                        
-            if ( iSysApPsmController->ShowActivateQuery())
+            if ( enableAutoPsm)
                 {
-                // show activation query, replaces the first battery low query
-                ShowQueryL( ESysApBattLowPowerSavingQuery );
+                iSysApPsmController->DoEnableFullPsm( ETrue );
+                          
+                _LIT(KPsmOn, "txt_power_management_dpopinfo_psm_activated_automa");
+                // returns the string "power saving mode  on"
+                HBufC* psmOn = HbTextResolverSymbian::LoadL(KPsmOn);
+                             
+               _LIT(Kicon, "qgn_indi_battery_ps_activate");
+               // returns the power save mode icon
+               HBufC* psmIcon = HbTextResolverSymbian::LoadL(Kicon);                  
+            
+               CHbDeviceNotificationDialogSymbian::NotificationL(*psmIcon,*psmOn,*lowBattery);       
                 }
             else // default low warning note must be shown
                 {
-                // activate partial power save mode on first low warning
-                iSysApPsmController->DoEnablePartialPsm( ETrue ); // activated on first warning note
                 //Display Battery Low note.
-                ShowUiNoteL( EBatteryLowNote );    
+                CHbDeviceNotificationDialogSymbian::NotificationL(KlowbatteryIcon,KNullDesC,*lowBattery);   
                 }                
             }
         else
             {
             //Display Battery Low note.
-            ShowUiNoteL( EBatteryLowNote );     
+            CHbDeviceNotificationDialogSymbian::NotificationL(KlowbatteryIcon,KNullDesC,*lowBattery);     
             }            
         }
         
@@ -1870,6 +1975,7 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
      iSysApBatteryInfoController->BatteryStatusUpdated( aValue );
     }
       
+ delete repository;  
    }
 
 // ----------------------------------------------------------------------------
@@ -1933,24 +2039,13 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
                 break;
             case EBatteryFullUnplugChargerNote:
                 {
-                /*	
                 TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) ); 
                 iSysApLightsController->BatteryEmptyL( ETrue );
                  _LIT(KunplugCharger,"txt_power_dpopinfo_unplug_charger_to_save_energy");                 
                  HBufC* unplugCharger = HbTextResolverSymbian::LoadL(KunplugCharger);
                  _LIT(KbatteryFull,"txt_power_management_dpophead_100_full");
                  HBufC* batteryFull = HbTextResolverSymbian::LoadL(KbatteryFull);
-                 CHbDeviceNotificationDialogSymbian::NotificationL(KbatteryFullIcon,*unplugCharger,*batteryFull);  
-                 */
-                 
-                 iSysApLightsController->BatteryEmptyL( ETrue );
-                 _LIT(KPowerPressKey,"Charging complete. Unplug charger to save energy.");
-                 HBufC* aString = HBufC16::NewLC(200);
-                 TPtrC aStringPointer = aString->Des();
-                 aStringPointer.Set(KPowerPressKey);
-                 TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-                 ShowExampleUiNoteL( aStringPointer );
-                 CleanupStack::PopAndDestroy(); // aString     
+                 CHbDeviceNotificationDialogSymbian::NotificationL(KbatteryFullIcon,*unplugCharger,*batteryFull);       
                  }
                 break;
             case EUnplugChargerNote:
@@ -2011,20 +2106,25 @@ void CSysApAppUi::HandleChargingStatusL( const TInt aValue )
         if ( iCharging && !iSysApPsmController->ChargerConnected() ) // first time after charger connection
             {
             iSysApPsmController->ConnectCharger( ETrue );
-            if ( iSysApPsmController->ShowDeactivateQuery() )
-                {
-                ShowQueryL( ESysApBattChargingPowerSavingQuery );
-                // Query is on the display. Don't show the note.
-                showNote = EFalse;               
-                }
-            else
-                {
-                iSysApPsmController->DoEnablePartialPsm( EFalse );
-                }              
+            iSysApPsmController->DoEnableFullPsm(EFalse);             
+            iVariantAccState = CHbSymbianVariant::NewL(&KCharging, CHbSymbianVariant::EDes);
+               
+            if (!iHbIndicatorSymbian->Activate(KPsmPlugin,iVariantAccState)) 
+               {
+               int error = iHbIndicatorSymbian->Error();
+               //use the errorcode...
+               }
+              
+                           
             }
         else if ( aValue == EChargingStatusNotConnected )
             {
             iSysApPsmController->ConnectCharger( EFalse );
+            if (!iHbIndicatorSymbian->Deactivate(KPsmPlugin)) 
+               {
+               int error = iHbIndicatorSymbian->Error();
+               //use the errorcode...
+               }
             }            
         }
     if( showNote )
@@ -2180,20 +2280,11 @@ void CSysApAppUi::ShowChargingNoteL()
         TRACES( RDebug::Print( _L("CSysApAppUi::ShowChargingNoteL KCTsyCallState=%d"), StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) ) );
         if ( showNote ) // Power Mgmt UI spec defines that no Charging note is shown while the phone is ringing/alerting
             {
-            /* 
             TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
             _LIT(KChargingNote,"txt_power_management_dblist_charging");
             HBufC* chargingNote = HbTextResolverSymbian::LoadL(KChargingNote);
             CHbDeviceNotificationDialogSymbian::NotificationL(KNullDesC,*chargingNote);     
-            */
-             
-            _LIT(KChargingNote,"Charging");
-            HBufC* aString = HBufC16::NewLC(50);
-            TPtrC aStringPointer = aString->Des();
-            aStringPointer.Set(KChargingNote);
-            TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-            ShowExampleUiNoteL( aStringPointer );
-            CleanupStack::PopAndDestroy(); // aString            
+                    
             }
         }
     }
@@ -2431,9 +2522,11 @@ void CSysApAppUi::HandleAccessoryProfileInStartupL()
         TBool accessoryConnectedNow ( EFalse );
 
         TAccMode accessoryState(EAccModeHandPortable);
+        TInt physicalConnectionType = 0;
         if ( iSysApAccessoryObserver )
             {
             accessoryState = iSysApAccessoryObserver->GetAccessoryMode();
+            physicalConnectionType = iSysApAccessoryObserver->GetAccessoryConnectionType();
             }
 
         if ( accessoryState != EAccModeHandPortable )
@@ -2449,7 +2542,7 @@ void CSysApAppUi::HandleAccessoryProfileInStartupL()
             }
         else if ( !accessoryConnectedInShutdown && accessoryConnectedNow )
             {
-            HandleAccessoryConnectedL( accessoryState );
+            HandleAccessoryConnectedL( accessoryState, physicalConnectionType );
             }
         else if ( !accessoryConnectedNow )
             {
@@ -2728,10 +2821,339 @@ TBool CSysApAppUi::ReleasePowerMenuCustomDialogMemory()
         //PowerMenu already exist
         delete iPowerMenuDialog;
         iPowerMenuDialog = NULL;
+        TRACES( RDebug::Print(_L("CSysApAppUi::ReleasePowerMenuCustomDialogMemory True") ) );                            
         return ETrue;
         }
+    TRACES( RDebug::Print(_L("CSysApAppUi::ReleasePowerMenuCustomDialogMemory false") ) );                            
     return EFalse;
     }
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::ShowAnimationL()
+// ----------------------------------------------------------------------------
+
+#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+void
+#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
+TBool
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+CSysApAppUi::ShowAnimationL()
+    {
+    TRACES( RDebug::Print(_L("CSysApAppUi::ShowAnimationL(): START" ) ) );
+
+    TRACES( RDebug::Print( _L("CSysApAppUi::ShowAnimationL: Initialise shutdown animation") ) );
+
+#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+
+    PrepareForShutdownAnimation();
+
+    iSysApShutdownAnimation = CSysApShutdownAnimation::NewL( *iSysApShutdownImage );
+    iSysApShutdownAnimation->Play( TCallBack( DoStopAnimTiming, this ) );
+
+    TRACES( RDebug::Print(_L("CSysApAppUi::ShowAnimationL(): End" ) ) );
+
+#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
+    iSysApShutdownAnimation = CSysApShutdownAnimation::NewL( this );
+    AddToStackL( iSysApShutdownAnimation );
+    iAnimationShowingTime = iSysApShutdownAnimation->ShowingTime();
+    TRACES( RDebug::Print( _L("CSysApAppUi::ShowAnimationL: Shutdown animation initialised. Animation time = %d") ,iAnimationShowingTime) );
+
+    TBool ret_val( EFalse );
+
+    if ( iAnimationShowingTime )
+        {
+        if ( iSysApFeatureManager->CoverDisplaySupported() )
+            {
+            // Construct mediator observer
+            iSysApMediatorObserver = CSysApMediatorObserver::NewL( this );
+
+            // Sync animation
+            TInt err = iSysApMediatorObserver->SyncShutdownAnimation();
+
+            if ( err != KErrNone )
+                {
+                // Pretend coverUI synced instantly if error in issuing command.
+                ShutdownAnimationSyncOK();
+                }
+            }
+        else
+            {
+            // Pretend coverUI synced instantly when it is not supported.
+            ShutdownAnimationSyncOK();
+            }
+
+        ret_val = ETrue;
+        }
+
+    TRACES( RDebug::Print(_L("CSysApAppUi::ShowAnimationL(): returns: %d" ),ret_val ) );
+    return ret_val;
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+    }
+
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::PrepareForShutdownAnimation()
+// ----------------------------------------------------------------------------
+void CSysApAppUi::PrepareForShutdownAnimation()
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::PrepareForShutdownAnimation() begin") ) );
+
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+    TRACES( RDebug::Print( _L("CSysApAppUi::PrepareForShutdownAnimation() showtime = %d"), iAnimationShowingTime ) );
+    if ( iAnimationShowingTime )
+        {
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+        
+        if (iPowerMenuDialog!=NULL)
+            {
+            //PowerMenu already exist
+            delete iPowerMenuDialog;
+            iPowerMenuDialog = NULL;
+            } 
+
+        RWindowGroup groupWin = iCoeEnv->RootWin();
+        iCapturedAppskey = groupWin.CaptureKey( EKeyApplication, KModifierMask, KModifierMask );
+        iCapturedAppskeyUpAndDowns = groupWin.CaptureKeyUpAndDowns( EStdKeyApplication0, KModifierMask, KModifierMask );
+        iEikonEnv->RootWin().SetOrdinalPosition(0, ECoeWinPriorityAlwaysAtFront );
+
+        TRACES( RDebug::Print( _L("CSysApAppUi::PrepareForShutdownAnimation() Draw background image" ) ) );
+
+        ShowShutdownImage( KBackgroundImageID );
+
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+        TRACES( RDebug::Print( _L("CSysApAppUi::PrepareForShutdownAnimation() Show Shutdown animation" ) ) );
+        TInt err(0);
+        TRAP( err, iSysApShutdownAnimation->StartL( iLastPowerKeyWasShort ) );
+        if ( err )
+            {
+            TRACES( RDebug::Print( _L("SysAp: Shutdown animation fails. Error code: %d" ), err ) );
+            // Start animation timing immediatily if animation starting fails.
+            // Otherwise animation will call StartAnimTiming when it is ready.
+            StartAnimTiming();
+            }
+        }
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
+    TRACES( RDebug::Print( _L("CSysApAppUi::PrepareForShutdownAnimation() end") ) );
+    }
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::DoStopAnimTiming( TAny* aObject )
+// ----------------------------------------------------------------------------
+
+TInt CSysApAppUi::DoStopAnimTiming( TAny* aObject )
+    {
+    TInt err(KErrNone);
+    CSysApAppUi* appUi = STATIC_CAST( CSysApAppUi*, aObject );
+
+    // This method could theoretically be called by two timers (iAnimTimer and one in CSysApShutdownAnimation),
+    // so a check is needed to prevent multiple executions.
+    if ( !(appUi->iShutdownContinued) )
+        {
+        appUi->iShutdownContinued = ETrue;
+
+        TRACES( RDebug::Print( _L("CSysApAppUi::DoStopAnimTiming() Animation timer completed or animation skipped" ) ) );
+
+#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
+        if ( appUi->iAnimTimer )
+            {
+            appUi->iAnimTimer->Cancel();
+            }
+#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
+        TRACES( RDebug::Print( _L("CSysApAppUi::DoStopAnimTiming() Call ContinueShutdown(...)" ) ) );
+        appUi->ContinueShutdown();
+        TRACES( RDebug::Print( _L("CSysApAppUi::DoStopAnimTiming() end") ) );
+        }
+
+    return err;
+    }
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::ContinueShutdown()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::ContinueShutdown()
+    {
+    TRACES( RDebug::Print(_L("CSysApAppUi::ContinueShutdown() started" ) ) );
+    CompleteShutdown();
+    TRACES( RDebug::Print(_L("CSysApAppUi::ContinueShutdown() completed" ) ) );
+    }
+
+CEikStatusPane* CSysApAppUi::StatusPane()
+{
+return iEikonEnv->AppUiFactory()->StatusPane();
+}
+ 
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::ShowEjectWaitNoteL
+// ----------------------------------------------------------------------------
+
+//void CSysApAppUi::ShowEjectWaitNoteL( TInt /* aDriveToEject */ )
+ /*{
+   if ( iSysApWaitNote )
+        {
+        return;
+        }
+    HBufC* text = iSysApDriveList->GetFormattedDriveNameLC(
+        aDriveToEject,
+        0, // Not used
+        R_QTN_EJECTING_MEMORY_NAME_WAIT );
+    iSysApWaitNote = CSysApWaitNote::NewL(
+        iSysApFeatureManager->CoverDisplaySupported() );
+    iSysApWaitNote->ShowNoteL( EClosingApplicationsNote, text );
+    CleanupStack::PopAndDestroy( text );
+    }*/
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::HandleApplicationSpecificEventL(TInt aType,const TWsEvent& aEvent)
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::HandleApplicationSpecificEventL(TInt aType,const TWsEvent& aEvent)
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandleApplicationSpecificEventL: aType:%d"), aType ) );
+
+    CEikAppUi::HandleApplicationSpecificEventL(aType, aEvent);
+    
+    if ( ResourcesFreed() )
+        {
+        TRACES( RDebug::Print( _L("CSysApAppUi::HandleApplicationSpecificEventL: discarded, shutting down") ) );
+        return;
+        }
+    
+    switch( aType )
+        {
+        case EEikKeyLockEnabled:
+            iKeyLockEnabled = ETrue;
+            iSysApCenRepController->SetInt( KCRUidCoreApplicationUIsSysAp, KSysApKeyguardActive, 1 );
+//            SetIndicatorStateL( EAknIndicatorKeyguard, EAknIndicatorStateOn );
+            iSysApLightsController->KeylockStateChangedL( ETrue );
+            break;
+        case EEikKeyLockDisabled:
+            iKeyLockEnabled = EFalse;
+            iSysApCenRepController->SetInt( KCRUidCoreApplicationUIsSysAp, KSysApKeyguardActive, 0 );
+//            SetIndicatorStateL( EAknIndicatorKeyguard, EAknIndicatorStateOff );
+            if (! iDeviceLockEnabled )
+                {
+                iSysApLightsController->KeylockStateChangedL( EFalse );
+                if ( iSysApFeatureManager->MmcHotSwapSupported() )
+                    {
+                    if ( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) !=  EPSCTsyCallStateRinging && StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) !=  EPSCTsyCallStateAlerting )
+                        {
+                        //RunUnlockNotifierL();
+                        }
+                    }
+                }
+            break;
+        case EEikKeyLockPowerKeyPressed: //sent when power key is captured by keylockserver
+//            HandleShortPowerKeyPressedL();
+            break;
+
+        case EEikKeyLockLightsOnRequest:
+            iSysApLightsController->SetLightsOnUnlockNoteL();
+            break;
+
+        case EEikEcsQueryLights: // emergency note is shown
+            iSysApLightsController->SetLightsOnEcsQueryL();
+            break;
+
+        case EEikSecurityQueryLights: // for device lock security query
+            iSysApLightsController->SetLightsOnSecurityQueryL();
+            break;
+
+        default:
+            break;
+            }
+    }
+
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::HandleNspsRawKeyEventL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::HandleNspsRawKeyEventL()
+    {
+#ifdef __SYSAP_MODULE_TEST
+    ModuleTestShowUiNoteL( _L("Network wakeup from NSPS") );
+#endif
+
+    if ( iSysApEtelConnector )
+        {
+        iSysApEtelConnector->CommandNetCsWakeupOnNsps();
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::UpdateSignalBarsL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::UpdateSignalBarsL()
+    {
+//    UpdateSignalBarsL(iSysApEtelConnector->GetSignalBars());
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::HandleSmsStorageNotificationL( TBool aSimStoreFull )
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::HandleSmsStorageNotificationL( TBool aSimStoreFull )
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandleSmsStorageNotificationL: aSimStoreFull: %d "), aSimStoreFull ) );
+
+    if ( aSimStoreFull )
+        {
+/*        HBufC* noteStringBuf;
+        noteStringBuf = StringLoader::LoadLC( R_QTN_MEMLO_MEMORY_LOW_SIM_MES, iEikonEnv );
+        TPtr textBuffer = noteStringBuf->Des();
+        iSysApMsgSimMemLowQuery->StartL( textBuffer );
+        CleanupStack::PopAndDestroy();
+*/        }
+
+//    SetEnvelopeIndicatorL();
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::HandleNetworkNspsNotification( RMmCustomAPI::TNspsStatus aNspsStatus )
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::HandleNetworkNspsNotification( RMmCustomAPI::TNspsStatus aNspsStatus )
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandleNetworkNspsNotification aNspsStatus:%d, iNsps:%d )" ), aNspsStatus, iNsps ) );
+    if( iSysApNspsHandler )
+        {
+        if( aNspsStatus == RMmCustomAPI::ENspsOn )
+            {
+            if( !iNsps )
+                {
+#ifdef __SYSAP_MODULE_TEST
+                TRAPD( err, ModuleTestShowUiNoteL( _L("Setting NSPS on") ) );
+#endif
+                iSysApNspsHandler->SetNspsOn();
+                iNsps = ETrue;
+                }
+            }
+        else if( aNspsStatus == RMmCustomAPI::ENspsOff )
+            {
+            if( iNsps )
+                {
+#ifdef __SYSAP_MODULE_TEST
+                TRAPD( err, ModuleTestShowUiNoteL( _L("Setting NSPS off") ) );
+#endif
+                iSysApNspsHandler->SetNspsOff();
+                iNsps = EFalse;
+                }
+            }
+        }
+    }
+
 
 
 //end of file

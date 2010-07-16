@@ -74,6 +74,7 @@ CSysApShutdownImage::CSysApShutdownImage()
 void CSysApShutdownImage::ShowShutdownImageL(TInt aBitmapId)
     {
     TRACES( RDebug::Print(_L("CSysApShutdownImage::ShowShutdownImageL:start" ) ) );
+    
     TInt err ( 0 );
     TRect rect(iCoeEnv->ScreenDevice()->SizeInPixels());
     SetRect(rect);
@@ -350,6 +351,12 @@ void CSysApShutdownImage::HandleControlEventL(
 TKeyResponse CSysApShutdownImage::OfferKeyEventL(const TKeyEvent& /*aKeyEvent*/, TEventCode /*aType*/)
     {
     return EKeyWasNotConsumed;
+    }
+
+void CSysApShutdownImage::SetRectForAnimation()
+    {
+    TRect rect(iCoeEnv->ScreenDevice()->SizeInPixels());
+    SetRect(rect);
     }
 
 // End of File

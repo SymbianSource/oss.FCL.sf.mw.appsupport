@@ -45,7 +45,7 @@ public:
 *  @lib None
 *  @since S60 3.2
 */
-NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public CActive
+NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public MHbDeviceMessageBoxObserver
     {
     public:
         COutOfDiskGlobalNote( COutOfDiskMonitor* aOutOfDiskMonitor, RFs& aFs  );    
@@ -53,19 +53,21 @@ NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public CActive
         ~COutOfDiskGlobalNote();        
         void DisplayL(const TDesC& aMessage);
         void ShowGlobalQueryL(TInt aStatus, TInt aDrive);
-        void CancelNoteL();
         TBool NoteOnDisplay();
         TNoteInfo GetNoteInfo();
+                                   
+        void MessageBoxClosed(const CHbDeviceMessageBoxSymbian* aMessageBox,
+                CHbDeviceMessageBoxSymbian::TButtonId aButton);
+
     private:
         void ConstructL();
         HBufC* FormatStringL(const TDesC& aSource, const MDesCArray& aStrings);
-    private: // From CActive    
-    	void DoCancel();
-    	void RunL();                
+       	         
     private: // Data
         COutOfDiskMonitor*  iOutOfDiskMonitor; //uses
         RFs&                iFs;
         RResourceFile       iOODResourceFile;
         TNoteInfo           iNoteInfo;
+        CHbDeviceMessageBoxSymbian *iNote;
     };
 #endif //__OUTOFDISKGLOBALNOTE_H__

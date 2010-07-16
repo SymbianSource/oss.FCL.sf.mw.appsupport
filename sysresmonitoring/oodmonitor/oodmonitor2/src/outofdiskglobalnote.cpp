@@ -57,8 +57,8 @@ COutOfDiskGlobalNote::~COutOfDiskGlobalNote()
     {
     TRACES("COutOfDiskGlobalNote::~COutOfDiskGlobalNote");
     iOODResourceFile.Close();
-    Cancel(); // Cancel active object    
-    TRACES("COutOfDiskGlobalNote::~COutOfDiskGlobalNote: End");
+    delete iNote;
+    iNote=NULL;
     }
 
 // ---------------------------------------------------------
@@ -66,12 +66,10 @@ COutOfDiskGlobalNote::~COutOfDiskGlobalNote()
 // ---------------------------------------------------------
 //
 COutOfDiskGlobalNote::COutOfDiskGlobalNote( COutOfDiskMonitor* aOutOfDiskMonitor, RFs& aFs ) :
-    CActive( EPriorityStandard ),
     iOutOfDiskMonitor( aOutOfDiskMonitor ),
     iFs( aFs )
     {
     TRACES("COutOfDiskGlobalNote::COutOfDiskGlobalNote");
-    CActiveScheduler::Add( this );
     TRACES("COutOfDiskGlobalNote::COutOfDiskGlobalNote: End");    
     }
 
@@ -85,7 +83,7 @@ void COutOfDiskGlobalNote::ConstructL()
     iNoteInfo.iNoteId = KErrNotFound;
     iNoteInfo.iStatus = DISK_SPACE_OK;
     iNoteInfo.iDrive = KErrNotFound;
-
+    iNote= CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EWarning);
     TRACES("COutOfDiskGlobalNote::ConstructL: Open OOD resource file");
     TFileName OODFileName;
     OODFileName.Append(_L("Z"));
@@ -106,14 +104,12 @@ void COutOfDiskGlobalNote::DisplayL(const TDesC& aMessage)
     {
     TRACES("COutOfDiskGlobalNote::DisplayL");
        
-     TRACES("COutOfDiskGlobalNote::COutOfDiskGlobalNote::DisplayL: Create iQuery");        
-     CHbDeviceMessageBoxSymbian* globalNote = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EWarning);
-     CleanupStack::PushL(globalNote);
-     globalNote->SetTextL(aMessage);
-     globalNote->SetTimeout(0);
-     globalNote->ExecL();
-     CleanupStack::PopAndDestroy(globalNote);
-     
+     TRACES("COutOfDiskGlobalNote::COutOfDiskGlobalNote::DisplayL: set text and observer for the note");        
+     iNote->SetTextL(aMessage);
+     iNote->SetObserver(this);
+     iNote->SetTimeout(0);
+     iNote->ShowL();
+          
     TRACES("COutOfDiskGlobalNote::DisplayL: End");
     }
 
@@ -288,21 +284,13 @@ HBufC* COutOfDiskGlobalNote::FormatStringL(
     }
 
 // -----------------------------------------------------------------------------
-// COutOfDiskGlobalNote::DoCancel
+// COutOfDiskGlobalNote::MessageBoxClosed
 // -----------------------------------------------------------------------------
 //
-void COutOfDiskGlobalNote::DoCancel()
+void COutOfDiskGlobalNote::MessageBoxClosed(const CHbDeviceMessageBoxSymbian* aMessageBox,
+                CHbDeviceMessageBoxSymbian::TButtonId aButton)
     {
-    TRACES("COutOfDiskGlobalNote::DoCancel");
-    }
-
-// -----------------------------------------------------------------------------
-// COutOfDiskGlobalNote::RunL
-// -----------------------------------------------------------------------------
-//
-void COutOfDiskGlobalNote::RunL()
-    {
-    TRACES("COutOfDiskGlobalNote::RunL");
+    TRACES("COutOfDiskGlobalNote::closed");
     iNoteInfo.iNoteId = KErrNotFound;
     iNoteInfo.iStatus = DISK_SPACE_OK;
     iNoteInfo.iDrive = KErrNotFound;
@@ -316,17 +304,6 @@ void COutOfDiskGlobalNote::RunL()
     TRACES("COutOfDiskGlobalNote::RunL: End");    
     }
 
-// -----------------------------------------------------------------------------
-// COutOfDiskGlobalNote::CancelNoteL
-// -----------------------------------------------------------------------------
-//
-void COutOfDiskGlobalNote::CancelNoteL()
-    {
-    TRACES("COutOfDiskGlobalNote::CancelNoteL");
-    
-    Cancel();
-    TRACES("COutOfDiskGlobalNote::CancelNoteL: End");    
-    }    
 
 // -----------------------------------------------------------------------------
 // COutOfDiskGlobalNote::NoteOnDisplay

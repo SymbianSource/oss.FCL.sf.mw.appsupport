@@ -201,10 +201,18 @@ LIBRARY lockclient.lib
 
 SOURCEPATH ../Src
 SOURCE sysapkeymanagement.cpp SysApTaskList.cpp
-SOURCE SysApKeySndHandler.cpp SysApKeySndAnim.cpp SysApAnimKeySndControl.cpp
+SOURCE SysApKeySndHandler.cpp SysApKeySndAnim.cpp SysApAnimKeySndControl.cpp SysApShutdownAnimation.cpp
 
 //For Shutdown
 LIBRARY	    SVGEngine.lib
 LIBRARY	    gdi.lib
 
 LIBRARY avkon.lib
+
+LIBRARY customapi.lib
+
+SOURCE SysApEtelNetworkStatusNspsObserver.cpp SysApEtelConnector.cpp SysApEtelNetworkBarObserver.cpp SysApEtelSmsStoreObserver.cpp sysapeteldatabearerobserver.cpp sysapetelnetworkbargetter.cpp sysapetelnetworkinfoobserver.cpp
+
+LIBRARY etelpckt.lib
+
+

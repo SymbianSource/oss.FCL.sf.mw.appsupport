@@ -20,6 +20,9 @@
 
 #include <hbdataformviewitem.h>
 
+
+class HbPushButton;
+
 class CpRfsSettingsDataFormCustomItem : public HbDataFormViewItem
 {
 Q_OBJECT
@@ -27,6 +30,14 @@ Q_OBJECT
 public:
     CpRfsSettingsDataFormCustomItem(QGraphicsItem *parent);
     ~CpRfsSettingsDataFormCustomItem();
+    virtual  bool canSetModelIndex(const QModelIndex &index) const;
+    virtual HbAbstractViewItem* createItem();
+protected:
+    //Override createCustomWidget API
+    virtual HbWidget* createCustomWidget();   
+public:
+    HbPushButton *mButton;
+
 };
 
 #endif // CP_RFS_SETTINGS_DATAFORM_CUSTOMITEM_H

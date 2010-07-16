@@ -111,13 +111,13 @@ void CSysApEtelNetworkInfoObserver::RunL()
         if ( hsdpaAvailable != iHsdpaAvailable )
             {
             iHsdpaAvailable = hsdpaAvailable;
-            TRAPD( err, iSysApAppUi.SetSignalIndicatorL() );
+/*            TRAPD( err, iSysApAppUi.SetSignalIndicatorL() );
             
             if ( err != KErrNone )
                 {
                 TRACES( RDebug::Print( _L("CSysApEtelNetworkInfoObserver::RunL: err=%d"), err ) );
                 }
-            }
+*/            }
         }
     
     OrderNotification();    

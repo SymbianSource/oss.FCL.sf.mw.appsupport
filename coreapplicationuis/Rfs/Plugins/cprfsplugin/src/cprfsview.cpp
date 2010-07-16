@@ -28,9 +28,13 @@ CpBaseSettingView(0,parent)
         
     //custom prototype
     CpRfsSettingsDataFormCustomItem* customPrototype = new CpRfsSettingsDataFormCustomItem(settingForm);
-    settingForm->setItemPrototype(customPrototype);
     
-    this->setSettingForm(settingForm);
+    QList <HbAbstractViewItem*> protos = settingForm->itemPrototypes();
+    protos.append(customPrototype);
+    settingForm->setItemPrototypes(protos);    
+    //function from hbview
+    setWidget(settingForm);
+    
 	}
 CpRfsView::~CpRfsView()
     {

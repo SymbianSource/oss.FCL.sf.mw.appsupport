@@ -1,6 +1,0 @@
-EXPORTS
-	?NewL@CBatteryPopupControl@@SAPAV1@ABVTDesC16@@0@Z @ 1 NONAME ; class CBatteryPopupControl * CBatteryPopupControl::NewL(class TDesC16 const &, class TDesC16 const &)
-	?SetCommandObserver@CBatteryPopupControl@@QAEXAAVMEikCommandObserver@@@Z @ 2 NONAME ; void CBatteryPopupControl::SetCommandObserver(class MEikCommandObserver &)
-	?ShowPopUpL@CBatteryPopupControl@@QAEXXZ @ 3 NONAME ; void CBatteryPopupControl::ShowPopUpL(void)
-	??1CBatteryPopupControl@@QAE@XZ @ 4 NONAME ; CBatteryPopupControl::~CBatteryPopupControl(void)
-

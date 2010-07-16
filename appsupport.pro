@@ -23,4 +23,6 @@ symbian: {
 SUBDIRS += coreapplicationuis\devicepowermenuplugin
 SUBDIRS += systemsettings\accindicatorplugin
 SUBDIRS += systemsettings\accindicatorplugin\accindicatorsettings
+SUBDIRS += coreapplicationuis\powersaveutilities
+SUBDIRS += coreapplicationuis\Rfs\Plugins\cprfsplugin
 }

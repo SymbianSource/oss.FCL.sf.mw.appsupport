@@ -32,7 +32,6 @@ PRJ_MMPFILES
 #include "../accfwuinotifier/group/bld.inf"
 #include "../kefmapper/group/bld.inf"
 #include "../advancedtspcontroller/group/bld.inf"
-#include "../powersaveutilities/group/bld.inf"
 #include "../gsserverenginestub/group/bld.inf"
 #include "../GSServerEngine/group/bld.inf"
 #include "../sensordatacompensatorplugin/group/bld.inf"
