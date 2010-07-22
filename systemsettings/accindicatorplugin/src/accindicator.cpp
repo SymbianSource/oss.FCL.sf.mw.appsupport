@@ -27,7 +27,7 @@ QString KAccType = "AccType";
 
 AccIndicatorPlugin::AccIndicatorPlugin() :
 HbIndicatorInterface(IndicatorType,
-        HbIndicatorInterface::GroupPriorityLow,
+        HbIndicatorInterface::SettingCategory,
         InteractionActivated)
     {
     mIndicatorTypes << "com.nokia.accessory.indicatorplugin/1.0";
@@ -75,8 +75,7 @@ int AccIndicatorPlugin::error() const
 // this plugin it always returns true.
 // ----------------------------------------------------------------------------
 
-bool AccIndicatorPlugin::accessAllowed(const QString &indicatorType,
-    const HbSecurityInfo *securityInfo) const
+bool AccIndicatorPlugin::accessAllowed(const QString &indicatorType,const QVariantMap &securityInfo) const
     {
     Q_UNUSED(indicatorType)
     Q_UNUSED(securityInfo)
@@ -129,7 +128,7 @@ QVariant AccIndicatorPlugin::indicatorData(int role) const
             return type;
             }
         //for displaying the icon in indicator.
-        case DecorationNameRole:
+        case MonoDecorationNameRole:
             {
             QString iconName;
             if(mAccType == KPCWired || mAccType == KPCUSB)

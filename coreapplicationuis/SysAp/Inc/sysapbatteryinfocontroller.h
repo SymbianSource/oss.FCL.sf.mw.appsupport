@@ -22,7 +22,7 @@
 #include <e32base.h>
 
 class CBSUtil;
-class CBatteryPopupControl;
+// class CBatteryPopupControl;
 
 /**
  *  Controller for enhanced battery information.
@@ -151,7 +151,7 @@ private: // data
     * Battery popup control.
     * Own.
     */
-    CBatteryPopupControl* iBatteryPopup;
+    // CBatteryPopupControl* iBatteryPopup;
     };
 
 

@@ -172,7 +172,7 @@ private:
     void ReadMimeTypesSupportedL(const RPointerArray<Usif::CDataType>& dataTypes, CArrayFixFlat<TDataTypeWithPriority>& aMimeTypesSupported);    
     void ReadLocalisationInfoL();
     void ReadViewInfoL(const RPointerArray<Usif::CAppViewData>& aViewData);    
-#ifdef _DEBUG   
+#ifdef APPARC_SHOW_TRACE   
     void DisplayAppInfo();
 #endif
     

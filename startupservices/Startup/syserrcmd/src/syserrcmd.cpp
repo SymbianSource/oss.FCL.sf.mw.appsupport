@@ -22,7 +22,7 @@
 
 #include <data_caging_path_literals.hrh>
 #include <featmgr.h>
-#include <secondarydisplay/secondarydisplaystartupapi.h>
+#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
 #include <StringLoader.h>
 #include <startup.rsg>
 #include <stringresourcereader.h>

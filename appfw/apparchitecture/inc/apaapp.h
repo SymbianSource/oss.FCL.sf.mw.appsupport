@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,11 +19,6 @@
 #ifndef __APAAPP_H__
 #define __APAAPP_H__
 
-#ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
-#if !defined(__APAID_PARTNER_H__)
-#include "apaidpartner.h"
-#endif
-#endif //SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <e32std.h>
 #include <e32base.h>
 #include <apadef.h>

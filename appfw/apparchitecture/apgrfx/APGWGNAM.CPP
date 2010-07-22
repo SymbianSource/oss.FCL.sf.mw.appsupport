@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -9,6 +9,7 @@
 // Nokia Corporation - initial contribution.
 //
 // Contributors:
+// NTT DOCOMO, INC. -- Fix CApaWindowGroupName::AppUid() cannot handle UID with 0 prefix
 //
 // Description:
 //
@@ -513,7 +514,7 @@ is not recognized, then this is zero. */
 		{
 		start++;
 		TInt end=FindDelimiter(EEndUid);
-		if ((end-start) == KUidBufLength)
+		if (0<end && (end-start)<=KUidBufLength)
 			{
 			TBuf<KUidBufLength> uidBuf=iBuf->Mid(start, end-start);
 			TLex lex(uidBuf);

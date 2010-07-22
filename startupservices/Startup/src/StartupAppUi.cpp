@@ -30,6 +30,7 @@
 #include <starterclient.h>
 #include <hbdevicemessageboxsymbian.h>
 #include "sanimstartupctrl.h"
+#include <apgtask.h>
 
 // USER INCLUDES
 #include "StartupAppUi.h"
@@ -98,6 +99,9 @@ CStartupAppUi::CStartupAppUi() :
 // ---------------------------------------------------------------------------
 void CStartupAppUi::ConstructL()
     {
+    RThread thread; //increase the thread priority to smooth the animation
+    thread.SetPriority(EPriorityAbsoluteForeground);
+    thread.Close();
     TRACES("CStartupAppUi::ConstructL()");
     TInt flags = EStandardApp;
    BaseConstructL( flags );
@@ -609,12 +613,24 @@ void CStartupAppUi::DoStartupEndPart()
     {
     TRACES("CStartupAppUi::DoStartupEndPart()");
     TRACES("CStartupAppUi::DoStartupEndPart(): STARTUP OK");
-
-
-
-  
-    UpdateStartupUiPhase( EStartupUiPhaseAllDone );
-
+    
+    TBool ftuenabled=EFalse;
+    TInt err=KErrNone;
+#ifndef __WINSCW__
+    TRAP(err,
+            TInt enabled=0;
+            //open cenrep;
+            CRepository *cenrep=CRepository::NewLC(KCRUidStartupConf);
+            //check if ftu is enabled or not
+            User::LeaveIfError(cenrep->Get(KFtuStartupEnabled,enabled));
+            ftuenabled=!!enabled; //make sure we only have a boolean value here
+            CleanupStack::PopAndDestroy(cenrep);
+            );
+#endif     
+    if(!ftuenabled)
+        {
+        UpdateStartupUiPhase( EStartupUiPhaseAllDone );
+        }
 
     TRACES("CStartupAppUi::DoStartupEndPart(): Exit application.");
     iExitTimer->Start( 100000, 100000, TCallBack( DoExitApplication, this ) );
@@ -1244,9 +1260,9 @@ void CStartupAppUi::DoNextStartupPhaseL( TStartupInternalState toState )
             switch( toState )
                 {
                 case EStartupStartupOK:
-                    iInternalState = EStartupStartupOK;
-                    TRACES("CStartupAppUi::DoNextStartupPhaseL(): InternalState : EStartupStartupOK");
-                    DoStartupEndPart();
+                        iInternalState = EStartupStartupOK;
+                        TRACES("CStartupAppUi::DoNextStartupPhaseL(): InternalState : EStartupInvokeAndWaitForFtu");
+                        DoStartupEndPart();
                     break;
                 case EStartupSystemFatalError:
                     SystemFatalErrorL();

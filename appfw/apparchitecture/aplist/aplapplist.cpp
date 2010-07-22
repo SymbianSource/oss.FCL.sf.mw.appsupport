@@ -830,7 +830,7 @@ EXPORT_C void CApaAppList::InitListL(MApaAppListObserver* aObserver)
 @param aObserver Observer to be notified when the update has finished. */
 	{
     
-#if _DEBUG    
+#ifdef APPARC_SHOW_TRACE    
     RDebug::Printf("[Apparc] *****************START CREATING APPLIST ****************************");
 #endif    
     
@@ -1225,7 +1225,7 @@ TInt CApaAppList::FindAndDeleteApp(TUid aAppUid)
             iAppData=appData->iNext;
             }
 
-#if _DEBUG  
+#ifdef APPARC_SHOW_TRACE  
         if(appData)
             {
             RDebug::Print(_L("[Apparc] Application with UID: %X is deleted from applist"), appData->iUidType[2]);
@@ -1547,7 +1547,7 @@ void CApaAppList::AddToList( CApaAppData* aAppData )
 	aAppData->iNext=iAppData;
 	iAppData=aAppData;
 	
-#if _DEBUG	
+#ifdef APPARC_SHOW_TRACE	
     RDebug::Print(_L("[Apparc] Application with UID: %X is added to applist"), aAppData->iUidType[2]);
 #endif
     
@@ -1809,7 +1809,7 @@ void CApaAppList::ScanComplete()
 	iScrAppInfo=NULL;
     iScr.Close();
 #endif
-#if _DEBUG    
+#ifdef APPARC_SHOW_TRACE    
     RDebug::Printf("[Apparc] *****************END CREATING APPLIST ****************************");
 #endif    
 	}

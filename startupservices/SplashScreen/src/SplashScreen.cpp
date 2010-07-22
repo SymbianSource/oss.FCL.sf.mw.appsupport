@@ -24,7 +24,7 @@
 #include <startupdomainpskeys.h>
 #include <SVGEngineInterfaceImpl.h>
 #include <gdi.h>
-#include <COEMAIN.H> 
+#include <coemain.h> 
 
 // USER INCLUDES
 #include "SplashScreen.h"

@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -99,7 +99,31 @@ void CTzLocalizationDbAccessor::OpenDbL()
 	User::LeaveIfError(iDbsSession.Connect());
 	//Attempt to open the database
 	TInt error = iLocalizedTimeZoneDb.Open(iDbsSession,KTzLocalizationDbName,KTzLocalizationDbSecurityPolicy);
+	if (error == KErrNotFound)
+		{
+		//Database file doesn't exist.  Attempt to create a new one.
+		error = iLocalizedTimeZoneDb.Create(iDbsSession,KTzLocalizationDbName,KTzLocalizationDbSecurityPolicy);
+		if (error == KErrNone)
+			{
+			User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
+			User::LeaveIfError(CreateUserCityTableL());
+			}
+		}
 	User::LeaveIfError(error);
+	// Check if both tables are created.
+	CDbColSet *colSet = NULL;
+	TRAP(error, colSet = iLocalizedTimeZoneDb.ColSetL(KCZTableName));
+	delete colSet;
+	if (error)
+		{
+		User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
+		}
+	TRAP(error, colSet = iLocalizedTimeZoneDb.ColSetL(KUCTableName));
+	delete colSet;
+	if (error)
+	        {
+		User::LeaveIfError(CreateUserCityTableL());
+		}
 	}
 
 /**

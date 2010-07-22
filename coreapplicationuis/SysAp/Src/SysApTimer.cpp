@@ -18,8 +18,8 @@
 
 // INCLUDES
 
-#include <avkon.hrh>
-#include <avkon.rsg>
+//#include <avkon.hrh>
+//#include <avkon.rsg>
 #include "SysAp.hrh"
 #include "SysApTimer.h"
 

@@ -17,15 +17,20 @@
 
 
 // INCLUDE FILES
-#include <aknappui.h>
-#include <AknIconUtils.h>
-#include <AknUtils.h>
+//#include <aknappui.h>
+//#include <AknIconUtils.h>
+//#include <AknUtils.h>
+#include <eikenv.h>
 #include <coemain.h>
 #include <barsread.h> //use of TResourceReader
-#include <sysap.mbg>
+//#include <sysap.mbg>
 #include "SysApShutdownImage.h"
 #include "SysAp.hrh"
 #include <data_caging_path_literals.hrh>
+#include <HbDeviceMessageBoxSymbian.h>
+#include <SVGEngineInterfaceImpl.h>
+
+//_LIT(KDC_APP_BITMAP_DIR,"\\resource\\apps\\"); 
 
 // ============================ MEMBER FUNCTIONS ==============================
 
@@ -70,13 +75,16 @@ void CSysApShutdownImage::ShowShutdownImageL(TInt aBitmapId)
     {
     TRACES( RDebug::Print(_L("CSysApShutdownImage::ShowShutdownImageL:start" ) ) );
     TInt err ( 0 );
-
-    SetRect(iAvkonAppUi->ApplicationRect());
+    TRect rect(iCoeEnv->ScreenDevice()->SizeInPixels());
+    SetRect(rect);
+    TRACES( RDebug::Print(_L("CSysApShutdownImage::After:SetRect --Minus one" ) ) );
     ActivateL();
+
+    TRACES( RDebug::Print(_L("CSysApShutdownImage::After:ActivateL --Zero" ) ) );
 
     if ( aBitmapId )
         {
-        _LIT( KDirAndFile, "z:sysap.mif" );
+        _LIT( KDirAndFile, "z:qgn_sysap_screen.svg" );
         TParse* fp = new (ELeave) TParse();
         CleanupStack::PushL(fp);
         fp->Set( KDirAndFile, &KDC_APP_BITMAP_DIR, NULL );
@@ -99,27 +107,35 @@ void CSysApShutdownImage::ShowShutdownImageL(TInt aBitmapId)
                 delete iBitmap;
                 iBitmap = NULL;
                 // Ownership of bitmap is transferred to CSysApShutdownImage in CreateIconL
-                iBitmap = AknIconUtils::CreateIconL( fp->FullName(), aBitmapId );
-                TAknLayoutRect bitmapRect;
-                bitmapRect.LayoutRect( Rect(), AKN_LAYOUT_WINDOW_screen );
-                AknIconUtils::SetSize( iBitmap, bitmapRect.Rect().Size(), EAspectRatioPreservedAndUnusedSpaceRemoved );
+                iBitmap = ReadSVGL(fp->FullName());
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:ReadSVGL --First" ) ) );
                 TInt xDelta=0; // for x coordinates
                 TInt yDelta=0; // for y coordinates
                 TSize bmpSizeInPixels = iBitmap->SizeInPixels();
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:SizeInPixels --Second" ) ) );
                 //center image to the center of the screen
                 TRect rect = Rect();
                 xDelta=( rect.Width() - bmpSizeInPixels.iWidth ) / 2;
                 yDelta=( rect.Height() - bmpSizeInPixels.iHeight ) / 2;
                 TPoint pos = TPoint( xDelta , yDelta ); // displacement vector
                 //pos += rect.iTl; // bitmap top left corner position
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:TPoint --Three" ) ) );
                 CWindowGc& gc = SystemGc();
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:SystemGc --Four" ) ) );
                 ActivateGc();
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:ActivateGc --Five" ) ) );
                 Window().Invalidate( rect );
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:Invalidate --Six" ) ) );
                 Window().BeginRedraw( rect );
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:BeginRedraw --Seven" ) ) );
                 gc.Clear();
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:gc.Clear --Eight" ) ) );
                 gc.BitBlt( pos, iBitmap ); // CWindowGc member function
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:gc.BitBlt --Nine" ) ) );
                 Window().EndRedraw();
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:gc.EndRedraw --Ten" ) ) );
                 DeactivateGc();
+                TRACES( RDebug::Print(_L("CSysApShutdownImage::After:gc.DeactivateGc --Eleven" ) ) );
                 ControlEnv()->WsSession().Flush(); // force draw of the context
                 TRACES( RDebug::Print(_L("CSysApShutdownImage::ShowShutdownImageL:end" ) ) );
                 }
@@ -144,7 +160,60 @@ void CSysApShutdownImage::ShowShutdownImageL(TInt aBitmapId)
         ControlEnv()->WsSession().Flush(); // force draw of the context
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
         }
+    }
 
+// ----------------------------------------------------------------------------
+// CSysApShutdownImage::ShowShutdownImage()
+// ----------------------------------------------------------------------------
+CFbsBitmap* CSysApShutdownImage::ReadSVGL (TFileName aFileName)
+    {
+    TRACES( RDebug::Print(_L("CSysApShutdownImage::ReadSVGL:start" ) ) );    
+    TFontSpec fontspec;
+    TDisplayMode mode = EColor16MA;
+    TInt SIZE_X(360), SIZE_Y(360);
+    TSize size(SIZE_X, SIZE_Y);
+
+    //if ( mode >= (TDisplayMode)13 )  { mode = EColor16MA; }
+
+    CFbsBitmap* frameBuffer = new ( ELeave ) CFbsBitmap;
+    CleanupStack::PushL( frameBuffer );
+    frameBuffer->Create( size, mode );
+    
+    CSvgEngineInterfaceImpl* svgEngine = NULL;
+    svgEngine = CSvgEngineInterfaceImpl::NewL(frameBuffer, NULL, fontspec );    
+    
+    if (svgEngine == NULL)
+        {
+        TRACES( RDebug::Print(_L("CSysApShutdownImage::ReadSVGL:SVG engine creation failed" ) ) );   
+        }
+    
+    CleanupStack::PushL( svgEngine );
+    TInt domHandle = 0;
+    svgEngine->PrepareDom( aFileName, domHandle ) ;
+    if (domHandle == 0)
+        {
+        TRACES( RDebug::Print(_L("CSysApShutdownImage::ReadSVGL():DOM handle creation failed" ) ) );
+        }
+
+    CFbsBitmap* bitmap = new(ELeave) CFbsBitmap;    
+    CleanupStack::PushL( bitmap );
+    User::LeaveIfError( bitmap->Create( size, EColor64K ) );
+
+    svgEngine->UseDom( domHandle, bitmap, NULL ) ;
+    
+    MSvgError* err;
+    svgEngine->Start( err );
+    if (err->HasError())
+        {
+        TRACES( RDebug::Print(_L("CSysApShutdownImage::ReadSVGL(): SVG Engine Start failed" ) ) );
+        }
+
+    svgEngine->DeleteDom( domHandle );
+    CleanupStack::Pop( bitmap );
+    CleanupStack::PopAndDestroy( svgEngine );
+    CleanupStack::PopAndDestroy( frameBuffer );
+    TRACES( RDebug::Print(_L("CSysApShutdownImage::ReadSVGL:End" ) ) );   
+    return bitmap;
     }
 
 // ----------------------------------------------------------------------------

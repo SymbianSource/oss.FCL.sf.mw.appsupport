@@ -21,7 +21,7 @@
 #define COREAPPLICATIONUISPRIVATECRKEYS_H
 
 // INCLUDES
-#include <coreapplicationuissdkcrkeys.h>
+#include <CoreApplicationUIsSDKCRKeys.h>
 
 // =============================================================================
 // CoreAppUIs Configuration API

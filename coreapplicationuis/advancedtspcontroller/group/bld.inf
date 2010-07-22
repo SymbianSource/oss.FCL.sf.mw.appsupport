@@ -10,7 +10,7 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* NTT DOCOMO, INC - BUG 2365
+* 
 *
 * Description:  Bld.inf file for Symbian's Remote Control framework related 
 *				 plug-ins that are used to deliver messages (e.g. accessory key 
@@ -18,6 +18,9 @@
 *
 */
 
+/*
+*NTT DOCOMO, INC - BUG 2365
+*/
 
 #include <platform_paths.hrh>
 

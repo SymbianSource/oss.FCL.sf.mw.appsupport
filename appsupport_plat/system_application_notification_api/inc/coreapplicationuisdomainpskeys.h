@@ -215,6 +215,17 @@ enum TCoreAppUIsVideoSharingIndicator
      ECoreAppUIsVideoSharingIndicatorOff,
      ECoreAppUIsVideoSharingIndicatorOn
      };
+     
+/**
+* Used for notifying SysAp for releasing memory of power menu custom dialog
+*/
+const TUint32 KCoreAppUIsPowerMenuCustomDialogStatus= 0x00000207;
+enum TCoreAppUIsPowerMenuCustomDialog
+     {
+     ECoreAppUIsPowerMenuCustomDialogUninitialized = 0,
+     ECoreAppUIsPowerMenuCustomDialogOff,
+     ECoreAppUIsPowerMenuCustomDialogOn
+     };
 
 // =============================================================================
 // Contacts Database Recovery Status API

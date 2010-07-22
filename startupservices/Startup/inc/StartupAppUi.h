@@ -27,7 +27,7 @@
 #ifndef STARTUPAPPUI_H
 #define STARTUPAPPUI_H
 
-#include <secondarydisplay/secondarydisplaystartupapi.h>
+#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
 
 
 // USER INCLUDES

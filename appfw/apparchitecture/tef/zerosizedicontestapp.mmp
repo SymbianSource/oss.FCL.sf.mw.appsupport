@@ -14,6 +14,8 @@
 // zerosizedicontestapp.mmp
 //
 
+#include <platform_paths.hrh>
+
 target		zerosizedicontestapp.exe
 TARGETTYPE 	exe
 	
@@ -27,7 +29,7 @@ SOURCE		zerosizedicontestapp.cpp
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 USERINCLUDE   	.
-SYSTEMINCLUDE 	/epoc32/include
+MW_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE 	/epoc32/include/techview
 
 // Application exe specific resource which is localised to the application

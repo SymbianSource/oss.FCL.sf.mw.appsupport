@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -201,6 +201,16 @@ void CT_WgnamStep::testWgNamesL()
 	TEST(apaWindowGroupName->AppUid()==uid);
 	INFO_PRINTF1(_L("\n"));
 	// User::After(2000000);
+	
+	// RDebug::Print(_L("Block 5a"));
+	INFO_PRINTF1(_L("Test setting appUid starting with 0"));
+	const TUid uid1={ 0x00000111 };
+	PrintWindowGroupName(apaWindowGroupName->WindowGroupName());
+	INFO_PRINTF2(_L("Setting app uid to %x\n"), uid1.iUid);
+	apaWindowGroupName->SetAppUid(uid1);
+	PrintWindowGroupName(apaWindowGroupName->WindowGroupName());
+	TEST(apaWindowGroupName->AppUid()==uid1);
+	INFO_PRINTF1(_L("\n"));
 
 	// test setting caption
 	// RDebug::Print(_L("Block 6"));
