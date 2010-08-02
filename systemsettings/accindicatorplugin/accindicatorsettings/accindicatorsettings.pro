@@ -6,6 +6,7 @@ TARGET =
 DEPENDPATH += . inc resources src
 INCLUDEPATH += .
 CONFIG += Hb
+CONFIG += no_icon
 INCLUDEPATH += $$MW_LAYER_SYSTEMINCLUDE
 
 # Input

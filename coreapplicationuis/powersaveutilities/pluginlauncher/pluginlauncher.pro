@@ -23,6 +23,7 @@ HEADERS += src/*.h
 SOURCES += src/*.cpp
 
 CONFIG += hb
+CONFIG += no_icon
 
 MOC_DIR = moc
 OBJECT_DIR = obj

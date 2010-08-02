@@ -49,6 +49,7 @@ SOURCE rfsHandler.cpp
 SOURCE rfsShutdown.cpp
 SOURCE rfsCompleter.cpp
 SOURCE rfsConnectionObserver.cpp
+SOURCE rfscontimer.cpp
 
 START RESOURCE  ../src/rfs.rss
 TARGETPATH      RESOURCE_FILES_DIR

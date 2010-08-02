@@ -21,13 +21,22 @@
 
 #include <hbdeviceprogressdialogsymbian.h>
 
+// P&S KEYS FROM SIP & PDP CONNECTION
+#include <e32property.h>
+#include <pdpcontextmanagerpskeys.h>
+#include <sipsystemstatemonitorpskeys.h>
+
+#include "rfscontimer.h"
+
+class CRfsConTimer;
+
 enum TRfsConnectionCloseState
     {
     ESipConnectionClose,
     EPdpConnectionClose // this should be the last enum
     };
 
-NONSHARABLE_CLASS( CRfsConnectionObserver ): CActive,public MHbDeviceProgressDialogObserver
+NONSHARABLE_CLASS( CRfsConnectionObserver ): public CActive,public MHbDeviceProgressDialogObserver
     {      
 public:
     
@@ -68,13 +77,22 @@ public:
     void ReOpenPDPConnection();
     void ReportRfsFailureToSip();
     void ReportRfsCompletionToSip();
+     /**
+      * Subscribes PDP property
+      *
+      * @since S60 v3.1
+      */
+     void Subscribe();
+         
+
     
-private:
+protected:
     
     /**
      * From base class CActive
      */
-
+    void DoCancel();
+         
     /**
      * From CActive
      *
@@ -82,25 +100,13 @@ private:
      */
     void RunL();
     
-    /**
-     * From CActive
-     *
-     * @since S60 v3.1
-     */
-    void DoCancel();
-
+    
 private:
     
     /**
      * New methods
      */
 
-    /**
-     * Subscribes PDP property
-     *
-     * @since S60 v3.1
-     */
-    void Subscribe();
         
     /**
      * Dismisses closing connections dialog
@@ -166,16 +172,19 @@ private:
      */
     TBool iAllConnectionClosed;
     TBool iIsWaitForDialogExecuted;
-    TInt  iIsPDPFeatureEnabled;
     TBool iIsSIPConnectionsPresent;
     TBool iIsDialogNeedToBeDisplayed;
     TBool iIsSipInformedForClosingAllConnection;
     TBool iIsPDPInformedforClosingAllConnection;
     TBool iIsClosingConnectionsApplicable;
-    
-    TRfsConnectionCloseState iState;
     //for synchronous dialog handling
     CActiveSchedulerWait *iWait;
+    
+    
+public:
+    TRfsConnectionCloseState iState;
+    TInt  iIsPDPFeatureEnabled;        
+    CRfsConTimer* iRfsConTimer;
     };
     
 #endif    //RFSPDPOBSERVER_H
