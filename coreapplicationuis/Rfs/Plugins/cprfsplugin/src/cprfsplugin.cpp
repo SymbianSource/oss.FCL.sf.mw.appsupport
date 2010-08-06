@@ -19,6 +19,7 @@
 #include "cprfsview.h"
 #include <cpsettingformentryitemdataimpl.h>
 #include <cpitemdatahelper.h>
+#include <hbtranslator.h>
 
 CpRfsPlugin::CpRfsPlugin()
     {
@@ -29,8 +30,9 @@ CpRfsPlugin::~CpRfsPlugin()
     }
 QList<CpSettingFormItemData*> CpRfsPlugin::createSettingFormItemData(CpItemDataHelper &itemDataHelper) const
     {
+    HbTranslator trans("control_panel");
     return QList<CpSettingFormItemData*>() 
-                << new CpSettingFormEntryItemDataImpl<CpRfsView>(itemDataHelper,tr("Restore Factory Settings"));
+                << new CpSettingFormEntryItemDataImpl<CpRfsView>(itemDataHelper,hbTrId("txt_cp_dblist_reset"),hbTrId("txt_cp_dblist_reset_val_reset_your_device"),QString("qtg_large_reset"));
     }
 
 Q_EXPORT_PLUGIN2(cprfsplugin, CpRfsPlugin);

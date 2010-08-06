@@ -280,7 +280,7 @@ void CSysApAppUi::ConstructL()
 	TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CHbIndicatorSymbian::NewL()") ) );
     iHbIndicatorSymbian = CHbIndicatorSymbian::NewL();
 	
-	// TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
+	  TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
 	
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );    
     }

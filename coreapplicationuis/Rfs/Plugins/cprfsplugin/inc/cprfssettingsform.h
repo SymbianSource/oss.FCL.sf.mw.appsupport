@@ -19,6 +19,7 @@
 #define CP_RFS_SETTINGSFORM_H
 
 #include <hbdataform.h>
+#include <hbtranslator.h>
 
 class HbDataFormModelItem;
 
@@ -44,6 +45,7 @@ private:
     //DataForm List Items
     HbDataFormModelItem *mNormalRfs;
     HbDataFormModelItem *mDeepRfs;
+    HbTranslator mTrans;
 
 };
 #endif // CP_RFS_SETTINGSFORM_H

@@ -25,9 +25,9 @@
 #include <rfsHandler.h>
 
 CpRfsSettingsForm::CpRfsSettingsForm(QGraphicsItem *parent) :
-    HbDataForm(parent)
+    HbDataForm(parent),mTrans("control_panel")
     {
-    this->setHeading(tr("Restore Factory Settings"));
+    this->setHeading(hbTrId("txt_cp_subhead_reset"));
 
     //initialize the form model
     initRfsSettingModel();
@@ -37,6 +37,7 @@ CpRfsSettingsForm::CpRfsSettingsForm(QGraphicsItem *parent) :
 
 CpRfsSettingsForm::~CpRfsSettingsForm()
     {
+    
     }
 
 void CpRfsSettingsForm::initRfsSettingModel()
@@ -45,11 +46,15 @@ void CpRfsSettingsForm::initRfsSettingModel()
 
 		// Create the custom items because HbPushButton cannot be added to the HbDataFormModelItem
     HbDataFormModelItem::DataItemType customItem1 = static_cast<HbDataFormModelItem::DataItemType>(HbDataFormModelItem::CustomItemBase + 1);
-                 
+    
     mNormalRfs = model->appendDataFormItem(customItem1, QString(), model->invisibleRootItem());
+    mNormalRfs->setLabel(hbTrId("txt_cp_setlabel_settings_reset"));
+    mNormalRfs->setDescription(hbTrId("txt_cp_info_original_settings_will_be_restored_no"));
     HbDataFormModelItem::DataItemType customItem2 = static_cast<HbDataFormModelItem::DataItemType>(HbDataFormModelItem::CustomItemBase + 2);
-                
+               
     mDeepRfs = model->appendDataFormItem(customItem2, QString(), model->invisibleRootItem());
+    mDeepRfs->setLabel(hbTrId("txt_cp_setlabel_device_reset"));
+    mDeepRfs->setDescription(hbTrId("txt_cp_info_all_data_will_be_deleted_and_factory_s")); 
     this->setModel(model);
     }
 

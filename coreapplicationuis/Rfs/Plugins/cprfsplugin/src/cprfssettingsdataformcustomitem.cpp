@@ -18,6 +18,7 @@
 #include <cprfssettingsdataformcustomitem.h>
 #include <hbdataformmodelitem.h>
 #include <hbpushbutton.h>
+#include <hbtranslator.h>
 
 CpRfsSettingsDataFormCustomItem::CpRfsSettingsDataFormCustomItem(QGraphicsItem *parent) :
 HbDataFormViewItem(parent)
@@ -52,20 +53,21 @@ HbWidget* CpRfsSettingsDataFormCustomItem::createCustomWidget()
          {
          HbDataFormModelItem::DataItemType itemType = static_cast<HbDataFormModelItem::DataItemType>(
          modelIndex().data(HbDataFormModelItem::ItemTypeRole).toInt());
+         HbTranslator trans("control_panel");
          switch(itemType)
                  {
                  case HbDataFormModelItem::CustomItemBase + 1:
                  	   {
                      //Create 1st button 
                      mButton = new HbPushButton();
-                     mButton->setText(tr("Restore"));
+                     mButton->setText(hbTrId("txt_cp_setlabel_settings_reset_val_reset_settings"));
                      return mButton;
                      }
                  case HbDataFormModelItem::CustomItemBase + 2:
                  	   {
                      //Create 2nd button
                      mButton = new HbPushButton();
-                     mButton->setText(tr("Delete Data and Restore"));
+                     mButton->setText(hbTrId("txt_cp_setlabel_device_reset_val_reset_device"));
                      return mButton;
                      }
                  //Some other cases can also be added if there are more than 2 custom data item
