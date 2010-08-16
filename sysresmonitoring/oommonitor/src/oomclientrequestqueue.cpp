@@ -193,13 +193,17 @@ void COomClientRequestQueue::StartClientRequestL()
         {
         RProcess processName;
         err = clientThread.Process(processName);
-        dataPaged = processName.DefaultDataPaged();
+        if(err == KErrNone)
+            {
+            dataPaged = processName.DefaultDataPaged();
+            processName.Close();
+            }
+        clientThread.Close();
         }
     else
         {
         OomMonitorPanic(KInvalidClientRequestType);
-        }
-    
+        }    
     
     switch (request->iClientRequestType)
         {

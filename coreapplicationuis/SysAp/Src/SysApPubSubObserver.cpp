@@ -52,7 +52,7 @@
 const TUint KCoreAppUIsMmcRemovedWithoutEjectCmdMask = 0xFFFF;
 const TUint KCoreAppUIsMmcRemovedWithoutEjectValShift = 16;
 
-_LIT(KGpsIndicatorPlugin, "PositioningIndicator");
+_LIT(KGpsIndicatorPlugin, "com.nokia.positioning.indicatorplugin/1.0");
 const TUid KPSUidSecurityUIs = { 0x100059b5 };
 const TUint32 KSecurityUIsLights  = 0x00000308;
 

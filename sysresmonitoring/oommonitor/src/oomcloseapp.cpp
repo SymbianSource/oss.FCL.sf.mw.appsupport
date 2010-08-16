@@ -59,15 +59,20 @@ void COomCloseApp::FreeMemory(TInt, TBool aIsDataPaged)
     
     RThread thread;
     TInt err=thread.Open(iCurrentTask.ThreadId());
-    if (!err)
+    if (err == KErrNone)
         {
         RProcess process;
-        thread.Process(process);
-        TBool isDataPaged = process.DefaultDataPaged();
-        if((aIsDataPaged && isDataPaged) || (!aIsDataPaged && !isDataPaged ))
+        err = thread.Process(process);
+        if(err == KErrNone)
             {
-            iCurrentTask.EndTask();
+            TBool isDataPaged = process.DefaultDataPaged();
+            if((aIsDataPaged && isDataPaged) || (!aIsDataPaged && !isDataPaged ))
+                {
+                iCurrentTask.EndTask();
+                }                    
+            process.Close();
             }
+        thread.Close();
         }
     }
 
