@@ -108,7 +108,7 @@ void CSysApRemConObserver::MrccatoCommand( TRemConCoreApiOperationId aOperationI
 /**
  * Reserve the volume keys
  */
-void CSysApRemConObserver::StartRemconInterface()
+void CSysApRemConObserver::StartRemconInterfaceL()
     {
     TRACES( RDebug::Print( _L("CSysApRemConObserver::BlockKeys")));
     if(!iInterfaceSelector)

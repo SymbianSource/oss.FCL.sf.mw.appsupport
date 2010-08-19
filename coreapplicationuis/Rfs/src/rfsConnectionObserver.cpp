@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,17 +20,12 @@
 // SYSTEM INCLUDES
 #include <rfs.rsg>                      
 #include <PSVariables.h>
-#include <AknWaitDialog.h>
+
 #include <featmgr.h>
 #include <centralrepository.h>
-#include <AknWaitDialog.h>
 #include <pdpcontextmanagerpskeys.h>
 #include <pdpcontextmanagerinternalcrkeys.h>
 
-// P&S KEYS FROM SIP & PDP CONNECTION
-#include <e32property.h>
-#include <pdpcontextmanagerpskeys.h>
-#include <sipsystemstatemonitorpskeys.h>
 
 // USER INCLUDES
 #include "rfsConnectionObserver.h"
@@ -141,6 +136,9 @@ void CRfsConnectionObserver::ConstructL()
         Subscribe();
         }
     
+    // Create the Timer Active Object
+    iRfsConTimer = CRfsConTimer :: NewL(this);
+    
     TRACES("CRfsConnectionObserver::ConstructL(): End");
     }
 
@@ -170,6 +168,11 @@ CRfsConnectionObserver::CRfsConnectionObserver():CActive( EPriorityStandard )
 CRfsConnectionObserver::~CRfsConnectionObserver()
     {
     TRACES("CRfsConnectionObserver::~CRfsConnectionObserver()");
+    
+    if(iRfsConTimer)
+        {
+        delete iRfsConTimer;
+        }
     Cancel();
     TRACES("CRfsConnectionObserver::~CRfsConnectionObserver(): End");
     }
@@ -190,16 +193,21 @@ TBool CRfsConnectionObserver::CloseAlwaysOnConnectionL()
     // only perform the following operation if the 'iIsClosingConnectionsApplicable' is ETrue 
     iAllConnectionClosed = EFalse;
       
-    // Send P&S notification to SIP that RFS has started
     TInt err(KErrNone);
     if (iIsSIPConnectionsPresent && iState == ESipConnectionClose)
         {
+        // Send P&S notification to SIP that RFS has started and start the timer
+   
         err = iSIPProperty.Set(KPSSipRfsUid, KSipRfsState, ESipRfsStarted );
+        iRfsConTimer->IssueTimerRequest();
         iIsSipInformedForClosingAllConnection = ETrue;
         }
     else if (iIsPDPFeatureEnabled && iState == EPdpConnectionClose)
         {
+        // Send P&S notification to PDP that RFS has started and start the timer
+    
         err = iPDPProperty.Set(KPDPContextManager2,KPDPContextManagerFactorySettingsReset,EPDPContextManagerFactorySettingsResetStart );
+        iRfsConTimer->IssueTimerRequest();
         iIsPDPInformedforClosingAllConnection = ETrue;
         }
     
@@ -207,12 +215,6 @@ TBool CRfsConnectionObserver::CloseAlwaysOnConnectionL()
     // Leave from here is there is any error setting the intial handshake information
     // This means that RFS has failed as there was some problem setting the P&S keys
     User::LeaveIfError(err);
-    if(err != KErrNone)
-        {
-        TRACES1("CRfsConnectionObserver::CloseAlwaysOnConnectionL(): Err = %d", err);
-        // This means that the RFS has failed
-        return EFalse; 
-        }
     
     // we set the flag to indicate ExecuteLD is called and the dialog needs to be
     // dismissed from within the RunL()
@@ -235,6 +237,11 @@ TBool CRfsConnectionObserver::CloseAlwaysOnConnectionL()
         if (iIsPDPInformedforClosingAllConnection)
             {
             iPDPProperty.Set(KPDPContextManager2,KPDPContextManagerFactorySettingsReset,EPDPContextManagerFactorySettingsResetStop);
+            }
+        if(iRfsConTimer)
+            {
+            // Cancel the Active timer if the user cancel the Rfs operation
+            iRfsConTimer->Cancel();
             }
         }
     return iAllConnectionClosed;
@@ -316,7 +323,9 @@ void CRfsConnectionObserver::RunL()
                     {
                     // set the information that we have closed all the active connections
                     // here itself because the PDP connection/feature doen't exist
+                    // Cancel the outstanding timer request
                     iAllConnectionClosed = ETrue;
+                    iRfsConTimer->Cancel();
                     DismissWaitDialog();
                     }
                 
@@ -325,7 +334,14 @@ void CRfsConnectionObserver::RunL()
                     iPDPProperty.Set(KPDPContextManager2,KPDPContextManagerFactorySettingsReset,EPDPContextManagerFactorySettingsResetStart );
                     
                     // change the state to the next from within this as we are done with closing the SIP connection
-                    iState = EPdpConnectionClose;
+                    // Cancel the Outstanding SIP  and timer request
+                    // Subscribe to PDP  and start the timer
+                    Cancel();
+                    iRfsConTimer->Cancel();
+                    iState = EPdpConnectionClose;                                        
+                    Subscribe(); 
+                    iRfsConTimer->IssueTimerRequest();
+                                        
                     //
                     // Under following cases the 'iIsPDPInformedforClosingAllConnection' will be set
                     //
@@ -366,8 +382,9 @@ void CRfsConnectionObserver::RunL()
                 // Now we may proceed to dsmiss the dialog and also set the state to the True for 
                 // all active connections closed
                 iAllConnectionClosed = ETrue;
+                iRfsConTimer->Cancel();                                    
                 DismissWaitDialog();
-                }
+                }                        
             }
         } // end switch-case block
     }
@@ -400,17 +417,19 @@ void CRfsConnectionObserver::DoCancel()
     {
     TRACES("CRfsConnectionObserver::DoCancel()");
     
-    if(iIsPDPFeatureEnabled)
-        {
-        iPDPProperty.Cancel();
-        }
-    if(iIsSIPConnectionsPresent)
+    if(iIsSIPConnectionsPresent && iState == ESipConnectionClose)
         {
         iSIPProperty.Cancel();
+        if(!iIsPDPFeatureEnabled)
+            {
+            DismissWaitDialog();
+            }
         }
-
-    DismissWaitDialog();
-    
+    if(iIsPDPFeatureEnabled && iState == EPdpConnectionClose)
+        {
+        iPDPProperty.Cancel();
+        DismissWaitDialog();            
+        }
     TRACES("CRfsConnectionObserver::DoCancel(): End");
     }
 

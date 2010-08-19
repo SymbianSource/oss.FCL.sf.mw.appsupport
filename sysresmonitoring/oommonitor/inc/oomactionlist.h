@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -139,9 +139,10 @@ public:
      * occurs
      * 
      * @since S60 5.0
-     * @param aCurrentTarget the prio
+     * @param aCurrentRamTarget the desired amount of free unpaged memory
+	 * @param aCurrentSwapTarget the desired amount of free paged memory
      */    
-    inline void SetCurrentTarget(TUint aCurrentTarget);
+    inline void SetCurrentTargets(TUint aCurrentRamTarget, TUint aCurrentSwapTarget);
     
     /**
      * Switch all plugins to Off (Memory Good) state
@@ -202,7 +203,9 @@ private: //data
     
     TInt iCurrentActionIndex;
         
-    TUint iCurrentTarget;
+    TUint iCurrentRamTarget;
+    TBool iSwapUsageMonitored;
+    TUint iCurrentSwapTarget;
 
     /*
      * Flag specifying that a OomMonitor event is in progress.

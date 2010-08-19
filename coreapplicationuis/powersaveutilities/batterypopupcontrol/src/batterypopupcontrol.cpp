@@ -341,7 +341,7 @@ void CBatteryPopupControl::Draw( const TRect& /*aRect*/ ) const
          
         TInt textBaseLineOffset = 0;
         textBaseLineOffset = (rect.Height() - font->FontMaxHeight())/2;
-        gc.DrawText( *(iText->Text()), rect, textBaseLineOffset, CGraphicsContext::ELeft );
+        gc.DrawText( *(iText->Text()), rect, textBaseLineOffset, iAlign );
         //gc.Reset();
        
         }
@@ -397,7 +397,7 @@ void CBatteryPopupControl::Draw( const TRect& /*aRect*/ ) const
         baselineOffset = font->AscentInPixels() +
             ( rect.Height() - font->AscentInPixels() ) / 2;
         gc.DrawText( ptr, rect, baselineOffset, 
-            CGraphicsContext::ELeft );
+            iAlign );
         delete visualText; 
         }
     }
@@ -475,12 +475,8 @@ void CBatteryPopupControl::SizeChanged()
         TAknTextComponentLayout textLayout =
         AknLayoutScalable_Avkon::popup_battery_window_t1( iVariant );
     
-        TAknLayoutText textRect;
-        textRect.LayoutText( rectPopUpWindow, textLayout );
-    
-        iText->SetRect( textRect.TextRect() );    
-        // Set text font
-        iText->SetFont( textRect.Font() );
+        AknLayoutUtils::LayoutLabel(iText, rectPopUpWindow, textLayout);
+
         }
         
     // Set link text rect
@@ -490,6 +486,8 @@ void CBatteryPopupControl::SizeChanged()
         // popup_battery_window_t2 doesn't have other variants as EVariantIconTextLink
         linkLayoutText.LayoutText( rectPopUpWindow,
             AknLayoutScalable_Avkon::popup_battery_window_t2( EVariantIconTextLink ) );
+       
+       iAlign = linkLayoutText.Align();
        
         iFont = linkLayoutText.Font();
         
@@ -508,7 +506,17 @@ void CBatteryPopupControl::SizeChanged()
   
             tempRect = TRect( linkLayout.Rect() );            
             }
-        tempRect.SetWidth( tempWidth );
+
+        if(  iAlign == CGraphicsContext::ERight )
+            {
+            tempRect.iTl.iX = tempWidth - tempRect.iBr.iX; 
+            }
+        else
+            {
+            tempRect.SetWidth( tempWidth );
+            }
+
+
         iLinkRect = tempRect;
         }
     }

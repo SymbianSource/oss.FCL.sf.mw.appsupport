@@ -1,5 +1,5 @@
 <!--
- Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+ Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
  All rights reserved.
  This component and the accompanying materials are made available
  under the terms of the License "Eclipse Public License v1.0"
@@ -41,7 +41,7 @@ defines an OOM policy where RAM is released in the following order.
 	actions are needed. This value is meaningful only when "check" or "estimate" sync mode is
 	used with plugins.
 -->
-	<global_settings low_ram_threshold="3637" good_ram_threshold="4900" max_app_close_batch="3" default_wait_after_plugin="10" max_app_exit_time="2000">
+	<global_settings low_ram_threshold="3637" good_ram_threshold="4900" swap_usage_monitored="true" low_swap_threshold="15000" good_swap_threshold="25000" max_app_close_batch="3" default_wait_after_plugin="10" max_app_exit_time="2000">
 	</global_settings>
 
 <!--	Application specific low RAM and good RAM thresholds are defined here. The higher values of

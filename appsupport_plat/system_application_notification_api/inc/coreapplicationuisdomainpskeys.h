@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -331,5 +331,32 @@ enum TCoreAppUIsProfileActivatedNote
       ECoreAppUIsProfileActivatedNoteNotShown = 0,
       ECoreAppUIsProfileActivatedNoteShown = 1 
      };
+
+
+
+// =============================================================================
+// GAN Mode API
+// =============================================================================
+
+// Use TUid KPSUidCoreApplicationUIs = { 0x101F8767 }
+
+const TUint32 KCoreAppUIsGanPropertyGanMode = 0x00000601;
+
+/** GANmode (actual network mode) */
+enum TCoreAppUIsGanMode
+    {
+	EGanModeUnspecified     = 0,     // We are not aware of MS GAN/GERAN state
+    EGanModeGAN             = 1,    // MS is in GAN
+    EGanModeGeran           = 2    // MS is in GERAN
+    };
+
+
+// =============================================================================
+// GAN Signal strength
+// =============================================================================
+
+// Use TUid KPSUidCoreApplicationUIs = { 0x101F8767 }
+
+const TUint32 KCoreAppUIsGanPropertySignalLevel = 0x00000602;
 
 #endif // COREAPPLICATIONUISDOMAINPSKEYS_H

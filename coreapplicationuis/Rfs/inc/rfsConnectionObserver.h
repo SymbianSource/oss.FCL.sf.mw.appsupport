@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,16 @@
 #ifndef __RFSPDPOBSERVER_H
 #define __RFSPDPOBSERVER_H
 
+#include <AknWaitDialog.h>
+
+// P&S KEYS FROM SIP & PDP CONNECTION
+#include <e32property.h>
+#include <pdpcontextmanagerpskeys.h>
+#include <sipsystemstatemonitorpskeys.h>
+
+#include "rfsConTimer.h"
+
+class CRfsConTimer;
 
 enum TRfsConnectionCloseState
     {
@@ -26,7 +36,7 @@ enum TRfsConnectionCloseState
     EPdpConnectionClose // this should be the last enum
     };
 
-NONSHARABLE_CLASS( CRfsConnectionObserver ): CActive
+NONSHARABLE_CLASS( CRfsConnectionObserver ): public CActive
     {      
 public:
     
@@ -62,13 +72,22 @@ public:
     void ReOpenPDPConnection();
     void ReportRfsFailureToSip();
     void ReportRfsCompletionToSip();
+     /**
+      * Subscribes PDP property
+      *
+      * @since S60 v3.1
+      */
+     void Subscribe();
+         
+
     
-private:
+protected:
     
     /**
      * From base class CActive
      */
-
+    void DoCancel();
+         
     /**
      * From CActive
      *
@@ -76,25 +95,13 @@ private:
      */
     void RunL();
     
-    /**
-     * From CActive
-     *
-     * @since S60 v3.1
-     */
-    void DoCancel();
-
+    
 private:
     
     /**
      * New methods
      */
 
-    /**
-     * Subscribes PDP property
-     *
-     * @since S60 v3.1
-     */
-    void Subscribe();
         
     /**
      * Dismisses closing connections dialog
@@ -161,14 +168,17 @@ private:
      */
     TBool iAllConnectionClosed;
     TBool iIsWaitForDialogExecuted;
-    TInt  iIsPDPFeatureEnabled;
     TBool iIsSIPConnectionsPresent;
     TBool iIsDialogNeedToBeDisplayed;
     TBool iIsSipInformedForClosingAllConnection;
     TBool iIsPDPInformedforClosingAllConnection;
     TBool iIsClosingConnectionsApplicable;
     
+    
+public:
     TRfsConnectionCloseState iState;
+    TInt  iIsPDPFeatureEnabled;        
+    CRfsConTimer* iRfsConTimer;
     };
     
 #endif    //RFSPDPOBSERVER_H

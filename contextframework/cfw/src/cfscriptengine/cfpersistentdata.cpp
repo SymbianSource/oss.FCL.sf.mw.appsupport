@@ -183,7 +183,7 @@ void CCFPersistentData::ProcessPendingTasksL()
     {
     FUNC_LOG;
     
-    for (TInt i = iPendingTasks.Count(); i > 0; i--)
+    for (TInt i = iPendingTasks.Count()-1; i >= 0; i--)
     	{
     	CCFPendingPersistencyTask* iTask = iPendingTasks[i];
     	if ( iTask->Mode() == CCFPendingPersistencyTask::EStore )

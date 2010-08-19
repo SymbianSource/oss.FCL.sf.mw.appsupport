@@ -718,7 +718,7 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
             if(iFmTxRemConObserver)
                 {
                 //Open Remcon and reserve the volume keys
-                iFmTxRemConObserver->StartRemconInterface();
+                iFmTxRemConObserver->StartRemconInterfaceL();
                 }
             }
         else 

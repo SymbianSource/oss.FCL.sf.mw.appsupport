@@ -147,6 +147,9 @@ SOURCE sysapremconobserver.cpp
 SOURCE powersavemode/sysappsmcontroller.cpp
 SOURCE sysapbatteryinfocontroller.cpp
 
+SOURCE gan\sysapganpropertylistener.cpp
+SOURCE gan\sysapganhandler.cpp
+
 SOURCE SysApSatObserver.cpp
 LIBRARY	    satclient.lib       // for sat refresh
 
@@ -180,6 +183,8 @@ USERINCLUDE        ../../inc // subsystem headers
 USERINCLUDE        ../../../inc // ado headers
 USERINCLUDE        ../CenRep
 USERINCLUDE        ../PubSub
+
+USERINCLUDE ../src/gan
 
 APP_LAYER_SYSTEMINCLUDE // used instead of MW_LAYER_SYSTEMINCLUDE due to dependencies to APP layer
 

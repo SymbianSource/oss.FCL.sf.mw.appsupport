@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -342,6 +342,12 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
     INFO_3( "Received key: enumValue = %d, keyType = %d, usbFileTransfer = %d",
         aEnumValue, aKeyType, iUSBFileTransfer );
 
+	//Start the listener once again
+    if (aKeyType == ESideVolumeKeys)
+        {
+        iMMKeyBearerObserver->Start();
+        }
+
     // Mediakeys must be disabled when MTP (Music Transfer) is happening.
     if (aKeyType == EFileTransferStatus)
         {
@@ -412,11 +418,7 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
     TInt aError = Observer().NewCommand(addr);
 
     //Start the listener once again
-    if (aKeyType == ESideVolumeKeys)
-        {
-        iMMKeyBearerObserver->Start();
-        }
-    else if (aKeyType == EMediaKeys)
+    if (aKeyType == EMediaKeys)
         {
         iMediaKeyObserver->Start();
         }

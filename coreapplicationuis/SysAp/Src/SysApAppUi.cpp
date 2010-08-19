@@ -59,6 +59,7 @@
 #include <secui.h>
 #include <settingsinternalcrkeys.h>
 
+#include "sysapganhandler.h"
 #include <AknNotifierController.h>
 #include <eikappui.h>
 #include <es_enum.h>
@@ -247,7 +248,8 @@ CSysApAppUi::CSysApAppUi() :
     iSysApAudioRoutingObserver( NULL ),
     iSysApCenRepCallForwardingObserver( NULL ),
     iSysApCenRepMsgWaitingObserver( NULL ),
-	iKeyBoardRepeatCount(-1)
+    iSysApGanHandler( NULL ),
+  	iKeyBoardRepeatCount(-1)
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::CSysApAppUi()") ) );
     }
@@ -490,6 +492,15 @@ void CSysApAppUi::ConstructL()
     
     DeactivatePSMifBatteryNotLowL ();
     
+    if( iSysApFeatureManager->GanSupported() )
+        {
+
+
+				RProperty::Define( KPSUidCoreApplicationUIs, KCoreAppUIsGanPropertyGanMode, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy  );
+				RProperty::Define( KPSUidCoreApplicationUIs, KCoreAppUIsGanPropertySignalLevel, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy  );
+        iSysApGanHandler = CSysApGanHandler::NewL( *this );
+        }
+
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );
     }
 
@@ -569,6 +580,8 @@ CSysApAppUi::~CSysApAppUi()
     delete iSysApPowerKeyMenuObserver;
 
     delete iSysApStartupController;
+
+    delete iSysApGanHandler;
 
 #ifdef RD_MULTIPLE_DRIVE
     iInsertedMemoryCards.Close();
@@ -747,6 +760,7 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
 				TInt errorCode2 = RProperty::Get( KPSUidStartup, KStartupSecurityCodeQueryStatus, securityQueryState);
             	TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): Reading value of KCoreAppUIsDisableKeyguard - State Value: %d"),alarmState));
             	TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): Reading value of KStartupSecurityCodeQueryStatus - State Value: %d"),securityQueryState));
+            	TInt callState( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) );
 				//Disable keylock if Alarm is active or if a Security code query is active on the display
 				if ( alarmState == ECoreAppUIsDisableKeyguard || securityQueryState == ESecurityQueryActive )
                  	{
@@ -754,7 +768,10 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                  	}
 			    else
          		 	{
-         			KeyLock().EnableWithoutNote();
+                    if( callState != EPSCTsyCallStateConnected && !iDeviceLockEnabled)
+                        {
+                        KeyLock().EnableWithoutNote();
+                        }
          			}
                 }
             else
@@ -1888,8 +1905,11 @@ void CSysApAppUi::UpdateSignalBarsL()
 void CSysApAppUi::UpdateSignalBarsL( const TInt aState )
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::UpdateSignalBarsL aState: %d"), aState ) );
-
-    if( aState == KAknSignalOffLineMode || (iSysApOfflineModeController->OfflineModeActive() && !iEmergencyCallActive) )
+    if( iSysApGanHandler && iSysApGanHandler->IsInGanMode() )
+        {
+        iSignalNotify->SetSignalLevelL( iSysApGanHandler->GanSignalLevel() );
+        }
+	else if( aState == KAknSignalOffLineMode || (iSysApOfflineModeController->OfflineModeActive() && !iEmergencyCallActive) )
         {
         iSignalNotify->SetSignalLevelL( KAknSignalOffLineMode );
         }
@@ -1942,22 +1962,39 @@ void CSysApAppUi::SetSignalIndicatorL()
             }
         iSignalNotify->SetWcdmaStateL( EAknSignalWcdmaIndicatorOff );
         iSignalNotify->SetHsdpaStateL( EAknSignalHsdpaIndicatorOff);
+        TRACES( RDebug::Print(_L("CSysApAppUi::SetSignalIndicatorL: gan off" ) ) );
+        iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorOff );
         }
     else
         {
-        // The device is in Online Mode
-        switch ( networkMode )
+        if( iSysApGanHandler && iSysApGanHandler->IsInGanMode() )
             {
-            case ESysApGSM:
-                SetSignalIndicatorGsmL();
-                break;
+            // Enter GAN: set GAN signal bar
+            SetSignalIndicatorGanL();
+            iGanEnabled = ETrue;
+            }
+        else
+            {
+            if( iGanEnabled )
+                {
+                UpdateSignalBarsL();
+                iGanEnabled = EFalse;
+                }
 
-            case ESysApWCDMA:
-                SetSignalIndicatorWcdmaL();
-                break;
+            // The device is in Online Mode
+            switch ( networkMode )
+                {
+                case ESysApGSM:
+                    SetSignalIndicatorGsmL();
+                    break;
 
-            default:
-                break;
+                case ESysApWCDMA:
+                    SetSignalIndicatorWcdmaL();
+                    break;
+
+                default:
+                    break;
+                }
             }
         }
     }
@@ -2205,6 +2242,47 @@ void CSysApAppUi::SetSignalIndicatorWcdmaL()
         {
         iSignalNotify->SetHsdpaStateL( EAknSignalHsdpaIndicatorOff );
         iSignalNotify->SetWcdmaStateL( signalWcdmaIndicatorState );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::SetSignalIndicatorGanL()
+// ----------------------------------------------------------------------------
+void CSysApAppUi::SetSignalIndicatorGanL()
+    {
+    TRACES( RDebug::Print(_L("CSysApAppUi::SetSignalIndicatorGanL: available" ) ) );
+
+    TInt gprsStatus( 0 );
+    gprsStatus = StateOfProperty( KUidSystemCategory, KPSUidGprsStatusValue );
+
+    TRACES( RDebug::Print( _L("CSysApAppUi::SetSignalIndicatorGanL gprsStatus: %d" ), gprsStatus ) );
+
+    switch ( gprsStatus )
+        {
+        case EPSGprsContextActive:
+            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorContext );
+            break;
+
+        case EPSGprsContextActivating:
+            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorEstablishingContext );
+            break;
+
+        case EPSGprsSuspend:
+            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorSuspended );
+            break;
+
+        case EPSGprsAttach:
+            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorAttached );
+            break;
+
+        case EPSGprsMultibleContextActive:
+            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorMultipdp );
+            break;
+
+        case EPSGprsUnattached:
+        default:
+            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorAvailable );
+            break;
         }
     }
 

@@ -35,6 +35,7 @@
 #include <startupdomaincrkeys.h>
 #include <CoreApplicationUIsSDKCRKeys.h>
 #include <starterclient.h>
+#include "StartupWelcomeCrKeys.h"
 
 #ifdef RD_UI_TRANSITION_EFFECTS_PHASE2
 // Transition effects
@@ -939,7 +940,21 @@ void CStartupAppUi::DoStartupEndPart()
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION    
-    UpdateStartupUiPhase( EStartupUiPhaseAllDone );
+    TBool fTUDone = ETrue;
+    TRAP_IGNORE(IsFTUAvailableL(fTUDone));
+    
+    if(fTUDone)
+    	{
+    	UpdateStartupUiPhase( EStartupUiPhaseAllDone );
+    	}
+	else
+        {
+        UpdateStartupUiPhase(EStartupUiPhaseAllDone+1);
+        }
+
+    //UpdateStartupUiPhase( EStartupUiPhaseAllDone );
+    
+    
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
     TRACES("CStartupAppUi::DoStartupEndPart(): Exit application.");
@@ -947,6 +962,15 @@ void CStartupAppUi::DoStartupEndPart()
     TRACES("CStartupAppUi::DoStartupEndPart(): DoExitApplication-timer called.");
     TRACES("CStartupAppUi::DoStartupEndPart(): End");
     }
+
+void CStartupAppUi::IsFTUAvailableL(TBool& aFTUAvailable)
+    {
+    	//From Startupwelcomecrkeys.h
+    	CRepository* repo = CRepository::NewLC(KCRUidWelcome6);
+			repo->Get(KPhoneActicationCompleted, aFTUAvailable);
+			CleanupStack::PopAndDestroy(repo);
+    }
+
 
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
 // ---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -185,17 +185,32 @@ void COomClientRequestQueue::StartClientRequestL()
     iClientRequestActive = ETrue;
 
     TClientRequest* request = iQueue.First();
-
+    
+    RThread clientThread;
+    TInt err =  (request->iRequestFreeRamMessage).Client(clientThread);
+    TBool dataPaged = EFalse;
+    if(err == KErrNone)
+        {
+        RProcess processName;
+        err = clientThread.Process(processName);
+        dataPaged = processName.DefaultDataPaged();
+        }
+    else
+        {
+        OomMonitorPanic(KInvalidClientRequestType);
+        }
+    
+    
     switch (request->iClientRequestType)
         {
         case EClientServerRequestOptionalRam:
             {
             TInt pluginId = request->iRequestFreeRamMessage.Int2();
-            iMonitor.FreeOptionalRamL(request->iBytesRequested, pluginId);
+            iMonitor.FreeOptionalRamL(request->iBytesRequested, pluginId, dataPaged);
             break;
             }
         case EClientServerRequestFreeMemory:
-            iMonitor.RequestFreeMemoryL(request->iBytesRequested);
+            iMonitor.RequestFreeMemoryL(request->iBytesRequested, dataPaged);
             break;
         case EPublishAndSubscribe:
             iMonitor.RequestFreeMemoryPandSL(request->iBytesRequested);
@@ -258,7 +273,7 @@ void COomClientRequestQueue::ActionsCompleted(TInt aBytesFree, TBool aMemoryGood
                 message = request->iRequestFreeRamMessage;
                 if (!message.IsNull())
                     {
-                    TInt memoryAvailable = aBytesFree - iMonitor.GoodThreshold();
+                    TInt memoryAvailable = aBytesFree - iMonitor.GoodRamThreshold();
                     TInt minimumNeeded = message.Int1();
                     if (memoryAvailable >= minimumNeeded)
                         {

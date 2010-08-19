@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@
 #ifndef OOMMEMORYMONITOR_H
 #define OOMMEMORYMONITOR_H
 
+#include <u32hal.h>
 #include <e32property.h>
 #include <f32file.h>
 #include <w32std.h>
@@ -69,9 +70,9 @@ public:
 public: // event handlers
     void FreeMemThresholdCrossedL();
     void AppNotExiting(TInt aWgId);
-    void StartFreeSomeRamL(TInt aTargetFree);
-    void StartFreeSomeRamL(TInt aTargetFree, TInt aMaxPriority);
-    void FreeOptionalRamL(TInt aBytesRequested, TInt aPluginId); // The ID of the plugin that will clear up the allocation, used to determine the priority of the allocation
+    void StartFreeSomeRamL(TInt aFreeRamTarget, TInt aFreeSwapSpaceTarget);
+    void StartFreeSomeRamL(TInt aFreeRamTarget, TInt aFreeSwapSpaceTarget, TInt aMaxPriority);
+    void FreeOptionalRamL(TInt aBytesRequested, TInt aPluginId, TBool aDataPaged); // The ID of the plugin that will clear up the allocation, used to determine the priority of the allocation
     void HandleFocusedWgChangeL();
     static const COomGlobalConfig& GlobalConfig();
     void SetPriorityBusy(TInt aWgId);
@@ -80,13 +81,14 @@ public: // event handlers
     void ResetTargets();
     void RequestTimerCallbackL();
     void GetFreeMemory(TInt& aCurrentFreeMemory);
+    void GetFreeSwapSpace(TInt& aCurrentFreeSwapSpace);
     TActionTriggerType ActionTrigger() const;
 #ifdef CLIENT_REQUEST_QUEUE
     void ActionsCompleted(TInt aBytesFree, TBool aMemoryGood);
-    TInt GoodThreshold() const;
-    TInt LowThreshold() const;
+    TInt GoodRamThreshold() const;
+    TInt LowRamThreshold() const;
 #endif
-    void RequestFreeMemoryL(TInt aBytesRequested);
+    void RequestFreeMemoryL(TInt aBytesRequested, TBool aDataPaged);
     void RequestFreeMemoryPandSL(TInt aBytesRequested);
     
     /*
@@ -115,12 +117,20 @@ public:
     RFs iFs;
     RWsSession iWs;
 
+    TBool iDataPaged;
+    
 private: //data
 
     // parameters for OOM watcher.
-    TInt iLowThreshold;
-    TInt iGoodThreshold;
-    TInt iCurrentTarget;
+    TInt iLowRamThreshold;
+    TInt iGoodRamThreshold;
+    TInt iLowSwapThreshold;
+    TInt iGoodSwapThreshold;
+    TInt iCurrentRamTarget;
+    TInt iCurrentSwapTarget;
+    
+   
+    
 #ifdef CLIENT_REQUEST_QUEUE
     TInt iClientBytesRequested;
 #endif        

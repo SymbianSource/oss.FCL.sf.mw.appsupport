@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -33,7 +33,8 @@ class CMemoryMonitor;
 NONSHARABLE_CLASS(COutOfMemoryWatcher) : public CActive
     {
 public:
-    static COutOfMemoryWatcher* NewL(CMemoryMonitor& aLafShutdown, TInt aLowThreshold, TInt aGoodThreshold);
+    static COutOfMemoryWatcher* NewL(CMemoryMonitor& aMonitor, TInt aLowRamThreshold, TInt aGoodRamThreshold,
+        TBool aSwapUsageMonitored, TInt aLowSwapThreshold, TInt aGoodSwapThreshold);
     ~COutOfMemoryWatcher();
     void Start();
     
@@ -43,16 +44,17 @@ public:
      * @param aLowThreshold If Ram Level drops below the low threshold Oom Monitor actions are started.
      * @param aGoodThreshold When memory returns above the Good threshold then Oom Monitor stops freeing memory.
      */
-    void UpdateThresholds(TInt aLowThreshold, TInt aGoodThreshold);
+    void UpdateThresholds(TInt aLowRamThreshold, TInt aGoodRamThreshold, TInt aLowSwapThreshold, TInt aGoodSwapThreshold);
 private:
-    COutOfMemoryWatcher(CMemoryMonitor& aLafShutdown);
-    void ConstructL(TInt aLowThreshold, TInt aGoodThreshold);
+    COutOfMemoryWatcher(CMemoryMonitor& aMonitor, TBool aSwapUsageMonitored);
+    void ConstructL(TInt aLowRamThreshold, TInt aGoodRamThreshold, TInt aLowSwapThreshold, TInt aGoodSwapThreshold);
 private: // from CActive
     void DoCancel();
     void RunL();
 private: // data
     RChangeNotifier iChangeNotifier;
-    CMemoryMonitor& iLafShutdown;
+    CMemoryMonitor& iMemoryMonitor;
+    TBool iSwapUsageMonitored;
     };
 
 #endif /*OOMOUTOFMEMORYWATCHER_H*/

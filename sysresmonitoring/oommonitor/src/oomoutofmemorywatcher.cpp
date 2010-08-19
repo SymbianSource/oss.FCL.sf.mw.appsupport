@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -30,13 +30,13 @@
 //
 // ---------------------------------------------------------
 //
-COutOfMemoryWatcher* COutOfMemoryWatcher::NewL(CMemoryMonitor& aMonitor, TInt aLowThreshold, TInt aGoodThreshold)
+COutOfMemoryWatcher* COutOfMemoryWatcher::NewL(CMemoryMonitor& aMonitor, TInt aLowRamThreshold, TInt aGoodRamThreshold, TBool aSwapUsageMonitored, TInt aLowSwapThreshold, TInt aGoodSwapThreshold)
     {
     FUNC_LOG;
 
-    COutOfMemoryWatcher* self = new (ELeave) COutOfMemoryWatcher(aMonitor);
+    COutOfMemoryWatcher* self = new (ELeave) COutOfMemoryWatcher(aMonitor, aSwapUsageMonitored);
     CleanupStack::PushL(self);
-    self->ConstructL(aLowThreshold, aGoodThreshold);
+    self->ConstructL(aLowRamThreshold, aGoodRamThreshold, aLowSwapThreshold, aGoodSwapThreshold);
     CleanupStack::Pop(self);
     return self;
     }
@@ -56,9 +56,10 @@ COutOfMemoryWatcher::~COutOfMemoryWatcher()
 //
 // ---------------------------------------------------------
 //
-COutOfMemoryWatcher::COutOfMemoryWatcher(CMemoryMonitor& aMonitor)
+COutOfMemoryWatcher::COutOfMemoryWatcher(CMemoryMonitor& aMonitor, TBool aSwapUsageMonitored)
 :   CActive(CActive::EPriorityStandard),
-    iLafShutdown(aMonitor)
+    iMemoryMonitor(aMonitor),
+    iSwapUsageMonitored(aSwapUsageMonitored)
     {
     FUNC_LOG;
 
@@ -69,19 +70,33 @@ COutOfMemoryWatcher::COutOfMemoryWatcher(CMemoryMonitor& aMonitor)
 //
 // ---------------------------------------------------------
 //
-void COutOfMemoryWatcher::ConstructL(TInt aLowThreshold, TInt aGoodThreshold)
+void COutOfMemoryWatcher::ConstructL(TInt aLowRamThreshold, TInt aGoodRamThreshold, TInt aLowSwapThreshold, TInt aGoodSwapThreshold)
     {
     FUNC_LOG;
 
-    UserSvr::SetMemoryThresholds(aLowThreshold,aGoodThreshold);
+    UserSvr::SetMemoryThresholds(aLowRamThreshold,aGoodRamThreshold);
+    if (iSwapUsageMonitored)
+        {
+        SVMSwapThresholds thresholds;
+        thresholds.iLowThreshold = aLowSwapThreshold;
+        thresholds.iGoodThreshold = aGoodSwapThreshold;
+        UserSvr::HalFunction(EHalGroupVM, EVMHalSetSwapThresholds, &thresholds, 0);
+        }
     User::LeaveIfError(iChangeNotifier.Create());
     }
 
-void COutOfMemoryWatcher::UpdateThresholds(TInt aLowThreshold, TInt aGoodThreshold)
+void COutOfMemoryWatcher::UpdateThresholds(TInt aLowRamThreshold, TInt aGoodRamThreshold, TInt aLowSwapThreshold, TInt aGoodSwapThreshold)
     {
     FUNC_LOG;
 
-    UserSvr::SetMemoryThresholds(aLowThreshold,aGoodThreshold);
+    UserSvr::SetMemoryThresholds(aLowRamThreshold,aGoodRamThreshold);
+    if (iSwapUsageMonitored)
+        {
+        SVMSwapThresholds thresholds;
+        thresholds.iLowThreshold = aLowSwapThreshold;
+        thresholds.iGoodThreshold = aGoodSwapThreshold;
+        UserSvr::HalFunction(EHalGroupVM, EVMHalSetSwapThresholds, &thresholds, 0);
+        }
     }
 
 // ---------------------------------------------------------
@@ -128,7 +143,7 @@ void COutOfMemoryWatcher::RunL()
     // Check for memory status change.
     if (status & EChangesFreeMemory)
         {
-        iLafShutdown.FreeMemThresholdCrossedL();
+        iMemoryMonitor.FreeMemThresholdCrossedL();
         }
 
     // We are not active until FreeMemThresholdCrossedL returns.

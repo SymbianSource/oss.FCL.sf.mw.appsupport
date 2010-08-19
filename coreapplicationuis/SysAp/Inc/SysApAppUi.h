@@ -98,6 +98,8 @@ class CSysApDefaultKeyHandler;
 class CSysApDriveUnlockHandler;
 class CSysApDriveEjectHandler;
 
+class CSysApGanHandler;
+
 class CSysApBatteryInfoController;
 
 //CONSTANTS
@@ -734,6 +736,13 @@ class CSysApAppUi :
         * @return void
         */
         void SetSignalIndicatorWcdmaL();
+
+        /**
+        * Gets called by SetSignalIndicatorL() when in Gan network
+        * @param None
+        * @return void
+        */
+        void SetSignalIndicatorGanL();
 
         /**
         * Handles GPRS suspend/resume notes if feature supported.
@@ -1430,7 +1439,7 @@ class CSysApAppUi :
         * @since S60 3.2
         * @return reference to CSysApCenRepLogsObserver object
         */
-        CSysApCenRepLogsObserver& CSysApAppUi::LogsObserverL();
+        CSysApCenRepLogsObserver& LogsObserverL();
 
     /**
      * Adds MMC removal item(s) to power menu.
@@ -1692,6 +1701,12 @@ private:
     //Flag to record if the TD network is enalbed.
 		TBool iTDEnable;
 		TBool IsDefaultPowerKeyBehavior();
+		
+    // Are we in GAN mode
+    TBool iGanEnabled;
+        
+    // Handler for GAN events
+    CSysApGanHandler* iSysApGanHandler;
 
     };
 

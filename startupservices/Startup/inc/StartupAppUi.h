@@ -393,6 +393,8 @@ class CStartupAppUi : public CAknAppUi
         * @param aType The type of resources that have changed.
         */
         void HandleResourceChangeL( TInt aType );
+        
+        void IsFTUAvailableL(TBool& aFTUAvailable);
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
         /**

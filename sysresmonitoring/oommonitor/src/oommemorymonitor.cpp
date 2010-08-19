@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -17,6 +17,7 @@
 
 
 #include <hal.h>
+
 
 #include <UikonInternalPSKeys.h>
 
@@ -162,7 +163,7 @@ void CMemoryMonitor::ConstructL()
 #endif
     
     
-    iOOMWatcher = COutOfMemoryWatcher::NewL(*this, iLowThreshold, iGoodThreshold);
+    iOOMWatcher = COutOfMemoryWatcher::NewL(*this, iLowRamThreshold, iGoodRamThreshold, iConfig->GlobalConfig().iSwapUsageMonitored, iLowSwapThreshold, iGoodSwapThreshold);
     iOOMWatcher->Start();
 
     iWservEventReceiver = new(ELeave) CWservEventReceiver(*this, iWs);
@@ -185,61 +186,86 @@ void CMemoryMonitor::FreeMemThresholdCrossedL()
     FUNC_LOG;
 
     iActionTrigger = ERamRotation;
-    StartFreeSomeRamL(iGoodThreshold);
+    StartFreeSomeRamL(iGoodRamThreshold, iGoodSwapThreshold);
     }
 
 void CMemoryMonitor::HandleFocusedWgChangeL()
     {
     FUNC_LOG;
 
-    TInt oldGoodThreshold = iGoodThreshold;
-    TInt oldLowThreshold = iLowThreshold;
-    
+    TInt oldGoodRamThreshold = iGoodRamThreshold;
+    TInt oldLowRamThreshold = iLowRamThreshold;
+    TInt oldGoodSwapThreshold = iGoodSwapThreshold;
+    TInt oldLowSwapThreshold = iLowSwapThreshold;
+        
     // Refresh the low and good memory thresholds as they may have changed due to the new foreground application
     RefreshThresholds();
        
-    if ((oldGoodThreshold != iGoodThreshold)
-            || (oldLowThreshold != iLowThreshold))
+    if ((oldGoodRamThreshold != iGoodRamThreshold)
+            || (oldLowRamThreshold != iLowRamThreshold)
+            || (oldGoodSwapThreshold != iGoodSwapThreshold)
+            || (oldLowSwapThreshold != iLowSwapThreshold))
         // If the thresholds have changed then update the memory watched
         {
-        iOOMWatcher->UpdateThresholds(iLowThreshold, iGoodThreshold);
+        iOOMWatcher->UpdateThresholds(iLowRamThreshold, iGoodRamThreshold, iLowSwapThreshold, iGoodSwapThreshold);
         }
     
     // If the available memory is less than the low memory threshold then free some RAM
     User::CompressAllHeaps();
-    TInt current = 0;
-    HAL::Get( HALData::EMemoryRAMFree, current );
+    TInt currentFreeRam = 0;
+    HAL::Get( HALData::EMemoryRAMFree, currentFreeRam );
+	TInt currentFreeSwap = 0;
+	if (iConfig->GlobalConfig().iSwapUsageMonitored)
+		{
+        SVMSwapInfo swapInfo;
+		UserSvr::HalFunction(EHalGroupVM, EVMHalGetSwapInfo, &swapInfo, 0);
+		currentFreeSwap = swapInfo.iSwapFree;
+		}
     
-    if (current < iLowThreshold)
+    if ((currentFreeRam < iLowRamThreshold) ||
+		(iConfig->GlobalConfig().iSwapUsageMonitored && (currentFreeSwap < iLowSwapThreshold)))
         {
         iActionTrigger = ERamRotation;
-        StartFreeSomeRamL(iGoodThreshold);
+        StartFreeSomeRamL(iGoodRamThreshold, iGoodSwapThreshold);
         }
     }
 
-void CMemoryMonitor::StartFreeSomeRamL(TInt aTargetFree)
+void CMemoryMonitor::StartFreeSomeRamL(TInt aFreeRamTarget, TInt aFreeSwapTarget)
     {
-    StartFreeSomeRamL(aTargetFree, KOomPriorityInfinate - 1);
+    StartFreeSomeRamL(aFreeRamTarget, aFreeSwapTarget, KOomPriorityInfinate - 1);
     }
 
-void CMemoryMonitor::StartFreeSomeRamL(TInt aTargetFree, TInt aMaxPriority) // The maximum priority of action to run
+void CMemoryMonitor::StartFreeSomeRamL(TInt aFreeRamTarget, TInt aFreeSwapTarget, TInt aMaxPriority) // The maximum priority of action to run
     {
     FUNC_LOG;
 
-    TRACES2("MemoryMonitor::StartFreeSomeRamL: aTargetFree = %d, iCurrentTarget = %d", aTargetFree, iCurrentTarget);
+    TRACES4("MemoryMonitor::StartFreeSomeRamL: aFreeRamTarget = %d, iCurrentRamTarget = %d, aFreeSwapSpaceTarget = %d, iCurrentSwapTarget = %d", aFreeRamTarget, iCurrentRamTarget, aFreeSwapTarget, iCurrentSwapTarget);
     
     // Update the target if new target is higher. If the target is lower than the current target and memory 
     // is currently being freed then we do not want to reduce the amount of memory this operation frees.
-    if (aTargetFree > iCurrentTarget)
-        iCurrentTarget = aTargetFree;
+    if (aFreeRamTarget > iCurrentRamTarget)
+        {
+        iCurrentRamTarget = aFreeRamTarget;
+        }
+    
+    if (aFreeSwapTarget > iCurrentSwapTarget)
+        {
+        iCurrentSwapTarget = aFreeSwapTarget;
+        }
 
     // check if there is enough free memory already.
-    TInt freeMemory;
+    TInt freeMemory = 0;
     GetFreeMemory(freeMemory);
+    TInt freeSwap = 0;
+    if (iConfig->GlobalConfig().iSwapUsageMonitored)
+        {
+        GetFreeSwapSpace(freeSwap);
+        }
 
-    TRACES1("MemoryMonitor::StartFreeSomeRamL, freeMemory = %d", freeMemory);
+    TRACES2("MemoryMonitor::StartFreeSomeRamL, freeMemory = %d, freeSwap = %d", freeMemory, freeSwap);
     
-    if (freeMemory >= iCurrentTarget)
+    if ((freeMemory >= iCurrentRamTarget) &&
+        ((!iConfig->GlobalConfig().iSwapUsageMonitored) || (freeSwap >= iCurrentSwapTarget)))
         {
         if (iLastMemoryMonitorStatusProperty != EFreeingMemory)
             {
@@ -262,7 +288,7 @@ void CMemoryMonitor::StartFreeSomeRamL(TInt aTargetFree, TInt aMaxPriority) // T
     // Build the list of memory freeing actions
     iOomActionList->BuildActionListL(*iOomWindowGroupList, *iConfig);
     
-    iOomActionList->SetCurrentTarget(iCurrentTarget);
+	iOomActionList->SetCurrentTargets(iCurrentRamTarget, iCurrentSwapTarget);
     
     // Run the memory freeing actions
     iOomActionList->FreeMemory(aMaxPriority);
@@ -273,27 +299,30 @@ void CMemoryMonitor::RequestFreeMemoryPandSL(TInt aBytesRequested)
     FUNC_LOG;
     
     iActionTrigger = EPublishAndSubscribe;
-    StartFreeSomeRamL(aBytesRequested + iLowThreshold);
+    StartFreeSomeRamL(aBytesRequested + iLowRamThreshold, iLowSwapThreshold);
     }
 
-void CMemoryMonitor::RequestFreeMemoryL(TInt aBytesRequested)
+void CMemoryMonitor::RequestFreeMemoryL(TInt aBytesRequested, TBool aDataPaged)
     {
     FUNC_LOG;
     
     iActionTrigger = EClientServerRequestFreeMemory;
-    StartFreeSomeRamL(aBytesRequested + iLowThreshold);
+    iDataPaged = aDataPaged;
+    StartFreeSomeRamL(iLowRamThreshold, aBytesRequested + iLowSwapThreshold);
     }
 
-void CMemoryMonitor::FreeOptionalRamL(TInt aBytesRequested, TInt aPluginId) // The ID of the plugin that will clear up the allocation, used to determine the priority of the allocation
+void CMemoryMonitor::FreeOptionalRamL(TInt aBytesRequested, TInt aPluginId, TBool aDataPaged) // The ID of the plugin that will clear up the allocation, used to determine the priority of the allocation
     {
     FUNC_LOG;
     
     iActionTrigger = EClientServerRequestOptionalRam;
 
+    iDataPaged = aDataPaged;
+       
     // Calculate the priority of the allocation (the priority of the plugin that will clear it up - 1)
     TInt priorityOfAllocation = iConfig->GetPluginConfig(aPluginId).CalculatePluginPriority(*iOomWindowGroupList) - 1;
    
-    StartFreeSomeRamL(aBytesRequested + iGoodThreshold, priorityOfAllocation);
+    StartFreeSomeRamL(aBytesRequested + iGoodRamThreshold, iLowSwapThreshold, priorityOfAllocation);
     }
 
 void CMemoryMonitor::GetFreeMemory(TInt& aCurrentFreeMemory)
@@ -306,6 +335,17 @@ void CMemoryMonitor::GetFreeMemory(TInt& aCurrentFreeMemory)
     HAL::Get( HALData::EMemoryRAMFree, aCurrentFreeMemory );
 
     TRACES1("CMemoryMonitor::GetFreeMemory: Free RAM now %d", aCurrentFreeMemory);
+    }
+
+void CMemoryMonitor::GetFreeSwapSpace(TInt& aCurrentFreeSwapSpace)
+    {
+    FUNC_LOG;
+    
+    SVMSwapInfo swapInfo;
+    UserSvr::HalFunction(EHalGroupVM, EVMHalGetSwapInfo, &swapInfo, 0);
+    aCurrentFreeSwapSpace = swapInfo.iSwapFree;
+        
+    TRACES1("CMemoryMonitor::GetFreeSwapSpace: Free swap space now %d", aCurrentFreeSwapSpace);
     }
 
 #ifndef CLIENT_REQUEST_QUEUE 
@@ -358,9 +398,11 @@ void CMemoryMonitor::RefreshThresholds()
     iOomWindowGroupList->Refresh();
     
     // Calculate the desired good threshold, this could be the globally configured value...
-    iGoodThreshold = CMemoryMonitor::GlobalConfig().iGoodRamThreshold;
-    iLowThreshold = CMemoryMonitor::GlobalConfig().iLowRamThreshold;
-    TRACES2("CMemoryMonitor::RefreshThresholds: Global Good Threshold = %d, Global Low Threshold = %d", iGoodThreshold, iLowThreshold);
+    iGoodRamThreshold = CMemoryMonitor::GlobalConfig().iGoodRamThreshold;
+    iLowRamThreshold = CMemoryMonitor::GlobalConfig().iLowRamThreshold;
+    iGoodSwapThreshold = CMemoryMonitor::GlobalConfig().iGoodSwapThreshold;
+    iLowSwapThreshold = CMemoryMonitor::GlobalConfig().iLowSwapThreshold;
+    TRACES4("CMemoryMonitor::RefreshThresholds: Global Good Ram Threshold = %d, Global Low Ram Threshold = %d, Global Good Swap Threshold = %d, Global Low Swap Threshold = %d", iGoodRamThreshold, iLowRamThreshold, iGoodSwapThreshold, iLowSwapThreshold);
 
 #ifdef _DEBUG
     TRACES("CMemoryMonitor::RefreshThresholds: Dumping Window Group List");
@@ -393,16 +435,27 @@ void CMemoryMonitor::RefreshThresholds()
         // If this application configuration overrides the good_ram_threshold then set it
         if (iConfig->GetApplicationConfig(foregroundAppId).iGoodRamThreshold != KOomThresholdUnset)
             {
-            iGoodThreshold = iConfig->GetApplicationConfig(foregroundAppId).iGoodRamThreshold;
-            TRACES2("CMemoryMonitor::RefreshThresholds: For foreground app %x, Good Threshold = %d", foregroundAppId, iGoodThreshold);
+            iGoodRamThreshold = iConfig->GetApplicationConfig(foregroundAppId).iGoodRamThreshold;
+            TRACES2("CMemoryMonitor::RefreshThresholds: For foreground app %x, Good Ram Threshold = %d", foregroundAppId, iGoodRamThreshold);
             }
         // If this application configuration overrides the low_ram_threshold then set it
         if (iConfig->GetApplicationConfig(foregroundAppId).iLowRamThreshold != KOomThresholdUnset)
             {
-            iLowThreshold = iConfig->GetApplicationConfig(foregroundAppId).iLowRamThreshold;
-            TRACES2("CMemoryMonitor::RefreshThresholds: For foreground app %x, Low Threshold = %d", foregroundAppId, iLowThreshold);
+            iLowRamThreshold = iConfig->GetApplicationConfig(foregroundAppId).iLowRamThreshold;
+            TRACES2("CMemoryMonitor::RefreshThresholds: For foreground app %x, Low Ram Threshold = %d", foregroundAppId, iLowRamThreshold);
             }
 
+        if (iConfig->GetApplicationConfig(foregroundAppId).iGoodSwapThreshold != KOomThresholdUnset)
+            {
+            iGoodSwapThreshold = iConfig->GetApplicationConfig(foregroundAppId).iGoodSwapThreshold;
+            TRACES2("CMemoryMonitor::RefreshThresholds: For foreground app %x, Good Swap Threshold = %d", foregroundAppId, iGoodSwapThreshold);
+            }
+        // If this application configuration overrides the low_swap_threshold then set it
+        if (iConfig->GetApplicationConfig(foregroundAppId).iLowSwapThreshold != KOomThresholdUnset)
+            {
+            iLowSwapThreshold = iConfig->GetApplicationConfig(foregroundAppId).iLowSwapThreshold;
+            TRACES2("CMemoryMonitor::RefreshThresholds: For foreground app %x, Low Swap Threshold = %d", foregroundAppId, iLowSwapThreshold);
+            }
         }
     }
 
@@ -423,8 +476,9 @@ void CMemoryMonitor::ResetTargets()
 
     //we reset the target when a memory free operation completes, to deal with the case 
     //where the operation was initiated with a target larger than the current good threshold
-    iCurrentTarget = iGoodThreshold;
-    iOomActionList->SetCurrentTarget(iCurrentTarget);   
+    iCurrentRamTarget = iGoodRamThreshold;
+    iCurrentSwapTarget = iGoodSwapThreshold;
+    iOomActionList->SetCurrentTargets(iCurrentRamTarget, iCurrentSwapTarget);
     }
 
 void CMemoryMonitor::SetPriorityBusy(TInt aWgId)
@@ -452,14 +506,14 @@ TActionTriggerType CMemoryMonitor::ActionTrigger() const
     }
 
 #ifdef CLIENT_REQUEST_QUEUE 
-TInt CMemoryMonitor::GoodThreshold() const
+TInt CMemoryMonitor::GoodRamThreshold() const
     {
-    return iGoodThreshold;
+    return iGoodRamThreshold;
     }
 
-TInt CMemoryMonitor::LowThreshold() const
+TInt CMemoryMonitor::LowRamThreshold() const
     {
-    return iLowThreshold;
+    return iLowRamThreshold;
     }
 
 void CMemoryMonitor::ActionsCompleted(TInt aBytesFree, TBool aMemoryGood)

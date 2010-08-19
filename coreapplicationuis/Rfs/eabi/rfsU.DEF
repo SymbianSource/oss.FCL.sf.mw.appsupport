@@ -33,4 +33,6 @@ EXPORTS
 	_ZTV12CRfsShutdown @ 32 NONAME ; #<VT>#
 	_ZTV13CRfsCompleter @ 33 NONAME ; #<VT>#
 	_ZTV9CRfsAppUi @ 34 NONAME ; #<VT>#
+	_ZTI12CRfsConTimer @ 35 NONAME
+	_ZTV12CRfsConTimer @ 36 NONAME
 

@@ -404,7 +404,9 @@ RESOURCE CBA r_gs_sen_softkeys_ok_back__change
 //
 RESOURCE AVKON_VIEW r_gs_checkbox_view
     {
-    cba = r_gs_sen_softkeys_ok_back__change;
+    //cba = r_gs_sen_softkeys_ok_back__change;  ou1cimx1#467503
+    menubar = r_gs_sen_menubar_change_exit;
+    cba =R_GS_SOFTKEYS_OPTIONS_BACK_CHANGE;
     }
 
 // ***   SENSOR ACTIVE STATUS  ***
