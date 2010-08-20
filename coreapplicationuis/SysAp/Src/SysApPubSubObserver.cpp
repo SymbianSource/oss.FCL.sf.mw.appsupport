@@ -410,16 +410,16 @@ void CSysApPubSubObserver::HandleCoreAppUIsCategoryL( const TUint aKey, const TI
             TUint cmd( aValue & KCoreAppUIsMmcRemovedWithoutEjectCmdMask );
             if ( cmd == ECoreAppUIsEjectCommandUsed )
                 {
- //               iSysApAppUi.EjectStarted( ETrue );
+                iSysApAppUi.EjectStarted( ETrue );
                 }
             else if ( cmd == ECoreAppUIsEjectCommandNotUsed )
                 {
- //               iSysApAppUi.EjectStarted( EFalse );
+                iSysApAppUi.EjectStarted( EFalse );
                 }
             else if ( cmd == ECoreAppUIsEjectCommandUsedToDrive )
                 {
                 TInt drive( aValue >> KCoreAppUIsMmcRemovedWithoutEjectValShift );
- //               iSysApAppUi.EjectUsed( drive );
+                iSysApAppUi.EjectUsed( drive );
                 }
             break;
             }
@@ -519,6 +519,26 @@ void CSysApPubSubObserver::HandleCoreAppUIsCategoryL( const TUint aKey, const TI
                     {
                     RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogOff );
                     }
+                }
+            else if(aValue == ECoreAppUIsMemoryCardCustomDialogOk)
+                {
+                TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOk") ) );
+                TBool memoryCardStatus = EFalse;
+                memoryCardStatus = iSysApAppUi.NotifiedDialogIfRequiredAndReleaseMemory();
+                if(memoryCardStatus)
+                    {
+                    TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOn: memoryCardStatus Begin") ) );                                       
+                    RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogOff );
+                    TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOn: memoryCardStatus end") ) );
+                    }
+                TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOn: memoryCardStatus final end") ) );
+                                    
+                }
+            else if(aValue == ECoreAppUIsMemoryCardCustomDialogCancel)
+                {
+                TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogCancel") ) );
+                iSysApAppUi.ReleaseMemoryForMemoryCardDialog();
+                RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogOff );
                 }
             else if ( aValue == ECoreAppUIsPowerMenuCustomDialogOff || aValue == ECoreAppUIsPowerMenuCustomDialogUninitialized )
                 {

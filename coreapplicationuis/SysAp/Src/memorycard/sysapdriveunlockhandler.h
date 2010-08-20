@@ -22,14 +22,14 @@
 // INCLUDES
 #include <e32std.h>
 #include <aknmemorycarddialog.h>
+#include "hbdeviceinputdialogsymbian.h"
 
 // FORWARD DECLARATIONS
 class CSysApDriveList;
 class CSysApAppUi;
 
 // CLASS DECLARATION
-class CSysApDriveUnlockHandler : public CBase,
-                                 public MAknMemoryCardDialogObserver
+class CSysApDriveUnlockHandler : public CBase                             
 {
 public:
     /**
@@ -57,6 +57,17 @@ public: // New methods
      * @param aDrive Drive to stop unlock notifier if ongoing
      */
     void StopUnlock( TInt aDrive );
+    
+    void ReleaseMemoryForInputCardDialog();
+    TInt CheckMemoryDialogIfNeeded();
+    void ConvertCharactersToPwd(TDesC& aWord, TDes8& aConverted);
+    
+    /**
+    * Shows unlock query.
+    */
+    void ShowUnlockQueryL();
+    HBufC8* Convert16to8L(TDesC16& aStr);
+    void UnlockComplete( TInt aResult );
 
 private:
     /**
@@ -66,16 +77,11 @@ private:
         CSysApDriveList& aSysApDriveList,
         CSysApAppUi& aSysApAppUi,
         const TBool aMemoryCardLockSupported );
-
+    
     /**
     * Handles query show from CAsyncCallBack.
     */
     static TInt QueryShowCB( TAny* aPtr );
-
-    /**
-    * Shows unlock query.
-    */
-    void ShowUnlockQueryL();
 
     /**
     * Checks is unlock query ongoing.
@@ -97,9 +103,6 @@ private:
     */
     void DoStopUnlock( TInt aError );
 
-private: // From MAknMemoryCardDialogObserver
-    void UnlockComplete( TInt aResult );
-
 private: // Data
     // Reference to the drive list
     CSysApDriveList& iSysApDriveList;
@@ -109,19 +112,16 @@ private: // Data
 
     // Indicates if memory card locking is supported
     TBool iMemoryCardLockSupported;
-
-    // Pointer to unlock query. Own,
-    CAknMemoryCardDialog* iMemoryCardDialog;
-
-    // Current drive to be unlocked
+	
+	CHbDeviceInputDialogSymbian* iMemCardPwdDialog;
+    
+	// Current drive to be unlocked
     TInt iDriveToUnlock;
-
-    // Pointer to the callback. Own.
-    CAsyncCallBack* iQueryShowCB;
 
     // Indicates if the query result can be ignored i.e. query was canceled
     TBool iIgnoreQueryResult;
-
+    
+    TMediaPassword iPassword;
 };
 
 #endif // SYSAPDRIVEUNLOCKHANDLER_H

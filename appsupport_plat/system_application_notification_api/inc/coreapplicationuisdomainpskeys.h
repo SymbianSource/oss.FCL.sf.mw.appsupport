@@ -224,7 +224,9 @@ enum TCoreAppUIsPowerMenuCustomDialog
      {
      ECoreAppUIsPowerMenuCustomDialogUninitialized = 0,
      ECoreAppUIsPowerMenuCustomDialogOff,
-     ECoreAppUIsPowerMenuCustomDialogOn
+     ECoreAppUIsPowerMenuCustomDialogOn,
+     ECoreAppUIsMemoryCardCustomDialogOk,
+     ECoreAppUIsMemoryCardCustomDialogCancel
      };
 
 // =============================================================================

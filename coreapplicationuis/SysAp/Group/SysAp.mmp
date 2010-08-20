@@ -52,6 +52,7 @@ SOURCE SysApPubSubObserver.cpp SysApSubscriber.cpp sysapremconobserver.cpp
 SOURCE sysapdefaultkeyhandler.cpp SysApStartupController.cpp
 SOURCE SysApShutdownImage.cpp
 SOURCE hbdevicepowermenusymbian.cpp
+SOURCE hbdeviceinputdialogsymbian.cpp
 
 #ifdef __OFFLINE_MODE
 SOURCE OfflineModeController/SysApOfflineModeControllerImpl.cpp
@@ -60,8 +61,9 @@ SOURCE OfflineModeController/SysApOfflineModeControllerImpl.cpp
 
 SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
 SYSTEMINCLUDE		/epoc32/include/mw/hb/hbcore
-//SYSTEMINCLUDE		/epoc32/include/mw/QtCore
-SYSTEMINCLUDE      /epoc32/include/mw
+
+SYSTEMINCLUDE      	/epoc32/include/mw
+
 
 USERINCLUDE        . 
 USERINCLUDE        ../Inc
@@ -72,9 +74,10 @@ USERINCLUDE        ../../inc // subsystem headers
 USERINCLUDE        ../../../inc // ado headers
 USERINCLUDE        ../CenRep
 USERINCLUDE        ../PubSub
+USERINCLUDE        ../Src/memorycard
 
 MW_LAYER_SYSTEMINCLUDE 
-
+APP_LAYER_SYSTEMINCLUDE
 
 START RESOURCE ../Data/SysAp.rss
 HEADER
@@ -123,7 +126,6 @@ LIBRARY ecom.lib
 LIBRARY hbwidgets.lib
 //LIBRARY qtcore.lib
 
-//LIBRARY HbDeviceInputDialogWidget.lib
 
 //For CHbIndicatorSymbian and for CHbPowereMenusymbian
 LIBRARY hbcore.lib
@@ -178,8 +180,7 @@ SOURCE sysapbatteryinfocontroller.cpp SysApSimChanged.cpp
 
 LIBRARY secui.lib
 LIBRARY bsutil.lib
-//LIBRARY batterypopupcontrol.lib
-//LIBRARY CommonEngine.lib
+LIBRARY CommonEngine.lib
 SOURCEPATH ../Src/Bt
 SOURCE SysApBtControllerImpl.cpp
 SOURCEPATH ../Src/BtSap
@@ -206,6 +207,21 @@ SOURCE SysApKeySndHandler.cpp SysApKeySndAnim.cpp SysApAnimKeySndControl.cpp Sys
 //For Shutdown
 LIBRARY	    SVGEngine.lib
 LIBRARY	    gdi.lib
+
+SOURCEPATH  ../Src
+
+SOURCE memorycard/SysApMMCObserver.cpp
+#ifdef RD_MULTIPLE_DRIVE
+SOURCE memorycard/sysapdrivelist.cpp
+SOURCE memorycard/sysapdriveunlockhandler.cpp
+SOURCE memorycard/sysapdriveejecthandler.cpp
+#endif // RD_MULTIPLE_DRIVE
+
+#ifdef RD_MULTIPLE_DRIVE
+LIBRARY platformenv.lib
+LIBRARY disknotifyhandler.lib
+#endif // RD_MULTIPLE_DRIVE
+
 
 LIBRARY avkon.lib
 

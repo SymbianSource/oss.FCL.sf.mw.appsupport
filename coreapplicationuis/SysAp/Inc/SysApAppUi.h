@@ -17,9 +17,7 @@
 
 #ifndef SYSAPAPPUI_H
 #define SYSAPAPPUI_H
-//#include <QObject>
-//#include <aknappui.h>
-//#include <hbmessagebox.h>
+
 #include <aknappui.h>
 #include "SysAp.hrh"
 #include <f32file.h> 
@@ -42,22 +40,15 @@
 #include "hbdevicepowermenusymbian.h"
 
 #include "sysappsmcontroller.h"
+#include "SysApMMCObserver.h"
 
-//CLASS DECLARATION
-/**
-*  CSysApAppUi class. This class serves as a link between the other
-*  SysAp classes and performs the most UI specific operations on SysAp's
-*  responsibility.
-*
-*  @lib   sysap
-*  @since 1.0
-*/
+#ifdef RD_MULTIPLE_DRIVE
+#include "sysapdrivelist.h"
+#endif // RD_MULTIPLE_DRIVE
+
 #include <eikappui.h>
 
 
-//class CAknAppUiBase;
-//class CSysApKeySndHandler;
-//class  CSysApWsClient;
 class CSysApFeatureManager;
 class CSysApNspsHandler;
 class CSysApPubSubObserver;
@@ -86,14 +77,27 @@ class CHbIndicatorSymbian;
 class CSysApShutdownAnimation;
 
 class CSysApDefaultKeyHandler;
+class CSysApDriveUnlockHandler;
+class CSysApDriveEjectHandler;
+class CHbDeviceInputDialogSymbian;
 class CSysApEtelConnector;
 
 const TInt KBluetoothModulePowerModeOn ( 1 );
 const TInt KDummyReason( -1 );
 
-//class HbMessageBox;
+
+//CLASS DECLARATION
+/**
+*  CSysApAppUi class. This class serves as a link between the other
+*  SysAp classes and performs the most UI specific operations on SysAp's
+*  responsibility.
+*
+*  @lib   sysap
+*  @since 1.0
+*/
 
 class CSysApAppUi : public CAknAppUi,
+                    public MSysApMemoryCardObserver,
                     public MSysApTimerResponder,
                     public MSysapCallback,
                     public MSysApPsmControllerNotifyCallback
@@ -328,9 +332,96 @@ class CSysApAppUi : public CAknAppUi,
         void SetLightsOnSecurityQueryL();  
         TBool CheckLongPowerKeyPressed();
         TBool ReleasePowerMenuCustomDialogMemory();
-//        TBool ReleaseMemoryCardCustomDialogMemory();
+        TBool NotifiedDialogIfRequiredAndReleaseMemory();
         static TInt DoStopAnimTiming( TAny* aObject );
         CEikStatusPane* StatusPane();
+        
+        void EjectUsed( TInt aDrive );
+        
+        void EjectMMCL();
+        
+#ifndef RD_MULTIPLE_DRIVE
+        /**
+        * Mounts MMC drive
+        * @param None
+        * @return TInt : error value from RFs::MountFileSystem()
+        */
+        TInt MountMMC();
+
+        /**
+        * Dismounts MMC drive
+        * @param None
+        * @return TInt : error value from RFs::MountFileSystem()
+        */
+        TInt DismountMMC();
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifndef RD_MULTIPLE_DRIVE
+        /**
+        * Unlocks MMC
+        * @param None
+        * @return void
+        */
+        void RunUnlockNotifierL( TSysApMemoryCardStatus aMemoryCardStatus = ESysApMemoryCardStatusNotKnown );
+
+        /**
+        * From MSysApMemoryCardObserver.
+        * Gets called by CSysApMMCObserver when an MMC is inserted/removed
+        * @return void
+        */
+        void MMCStatusChangedL();
+
+        /**
+        * Shows "MMC removed..." dialogs
+        * @param None
+        * @return void
+        */
+        void ShowMMCDismountedDialogL();
+#else // RD_MULTIPLE_DRIVE
+
+        /**
+        * Updates PS key during boot
+        * @return void
+        */
+        void MMCInsertedL();
+
+        /**
+        * Unlocks MMC
+        * @param None
+        * @return void
+        */
+        void RunUnlockNotifierL();
+
+        /**
+        * From MSysApMemoryCardObserver.
+        * Gets called by CSysApMMCObserver when an MMC is inserted/removed
+        * @param aDrive Changed drive
+        * @return void
+        */
+        void MMCStatusChangedL( TInt aDrive );
+
+        /**
+        * Shows "MMC removed..." dialogs
+        * @param aDrive Drive to dismount
+        * @param aEjectType Eject type used for the drive
+        * @return void
+        */
+        TBool ShowMMCDismountedDialogL(
+            TInt aDrive, CSysApDriveList::TDriveEjectType aEjectType );
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifdef RD_MULTIPLE_DRIVE
+        /*
+        * Starts wait note for eject
+        */
+        void ShowEjectWaitNoteL(  TInt aDriveToEject );
+
+        /*
+        * Checks is eject query visible
+        */
+        TBool IsEjectQueryVisible();
+#endif // RD_MULTIPLE_DRIVE
+        
         
 #ifdef SYSAP_USE_STARTUP_UI_PHASE        
         /**
@@ -340,7 +431,12 @@ class CSysApAppUi : public CAknAppUi,
 
 #endif // SYSAP_USE_STARTUP_UI_PHASE
 
-
+       
+        void MMCDismountedDialogConfirmed();
+        
+        void EjectStarted( TBool ejectStarted );
+        
+        void EjectMMCCanceled();
         
         void HandleNspsRawKeyEventL();
 
@@ -352,7 +448,7 @@ class CSysApAppUi : public CAknAppUi,
         
         void UpdateSignalBarsL();
         
-
+        void ReleaseMemoryForMemoryCardDialog();
         
      private:
          /**
@@ -381,7 +477,10 @@ class CSysApAppUi : public CAknAppUi,
          
          CSysApCenRepLogsObserver& CSysApAppUi::LogsObserverL();
          void ContinueShutdown();
-
+         
+#ifdef RD_MULTIPLE_DRIVE
+        void UpdateInsertedMemoryCardsL();
+#endif // RD_MULTIPLE_DRIVE
         
      private:
 //          CSysApWsClient*                 iSysApWsClient;
@@ -420,7 +519,7 @@ class CSysApAppUi : public CAknAppUi,
 		  CKeyguardAccessApi*             iKeyguardController;
 		  CHbDevicePowerMenuSymbian*            iPowerMenuDialog;
 	      CSysApKeyManagement*            iSysApKeyManagement;
-
+	      CSysApMMCObserver*              iSysApMMCObserver;
 	      CSysApEtelConnector*            iSysApEtelConnector;
 		  
 	public:		  
@@ -466,7 +565,69 @@ class CSysApAppUi : public CAknAppUi,
         TBool                           iShutdownContinued;
         TBool                           iNsps;
         
-//        friend class CSysApWsClient;
+        
+        //CPeriodic*                      iTimer;
+#ifndef RD_MULTIPLE_DRIVE
+        TInt                            iPowerkeyMenuEjectSelection;
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifndef RD_MULTIPLE_DRIVE
+        TBool                           iHideFirstBeep;
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifndef RD_MULTIPLE_DRIVE
+        TBool                           iTimeToKill;                     // MMC Hot Swap
+        TInt                            iApplicationScanningRoundNumber; // MMC Hot Swap
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifndef RD_MULTIPLE_DRIVE
+        TBool                           iMMCPowerMenuEjectUsed;
+        TBool                           iMMCInserted;
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifndef RD_MULTIPLE_DRIVE
+        TBool iHideNextBeep; // Prevents double beep when USB file transfer gets activated
+        TBool iFileManagerCloseDisabled; // Prevents File Manager to close on hotswap
+#endif // RD_MULTIPLE_DRIVE
+        
+#ifdef RD_MULTIPLE_DRIVE
+        // First power menu index used for eject
+        TInt iPowerkeyMenuEjectSelectionBase;
+
+        /**
+        * Drive list container
+        * Own.
+        */
+        CSysApDriveList* iSysApDriveList;
+
+        /**
+        * Drive unlock handler.
+        * Own.
+        */
+        CSysApDriveUnlockHandler* iSysApDriveUnlockHandler;
+
+        /**
+        * Drive eject handler.
+        * Own.
+        */
+        CSysApDriveEjectHandler* iSysApDriveEjectHandler;
+
+        /**
+        * Array for storing inserted memory cards.
+        * Own.
+        */
+        RArray< CSysApDriveList::TMemoryCardEntry > iInsertedMemoryCards;
+
+        // Stores drive for dismount query
+        TInt iDriveToDismount;
+
+        // Stores drive for eject query
+        TInt iDriveToEject;
+#endif // RD_MULTIPLE_DRIVE
+        
+        TBool                           iMMCEjectUsed;
+        CHbDeviceInputDialogSymbian* iMemCardPwdDialog;
+        
 	};
 	
 #endif

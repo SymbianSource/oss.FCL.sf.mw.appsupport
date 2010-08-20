@@ -214,7 +214,6 @@ TBool CSysApDefaultKeyHandler::UiReady() const
 //
 void CSysApDefaultKeyHandler::ActivateApplicationL( const TUid aUid ) const
     {
-    TUid check = aUid;
     
     TRACES( RDebug::Print( _L( "CSysApDefaultKeyHandler::ActivateApplicationL") ) );
     
@@ -333,7 +332,7 @@ TBool CSysApDefaultKeyHandler::DoShowKeysLockedNote()
     {
     TRACES( RDebug::Print( _L("CSysApDefaultKeyHandler::DoShowKeysLockedNote: iAknUiServerConnected=%d"), iAknUiServerConnected ) );
     
-    TInt err(KErrNone);
+//    TInt err(KErrNone);
     
     if ( !iAknUiServerConnected )
         {

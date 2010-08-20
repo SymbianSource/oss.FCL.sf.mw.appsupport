@@ -25,4 +25,5 @@ SUBDIRS += systemsettings\accindicatorplugin
 SUBDIRS += systemsettings\accindicatorplugin\accindicatorsettings
 SUBDIRS += coreapplicationuis\powersaveutilities
 SUBDIRS += coreapplicationuis\Rfs\Plugins\cprfsplugin
+SUBDIRS += coreapplicationuis\hbdeviceinputdialogplugin
 }

@@ -30,7 +30,6 @@
 #include <hwrmpowerstatesdkpskeys.h>
 #include <wlaninternalpskeys.h> 
 #include <HbDeviceNotificationDialogSymbian.h>
-//#include <HbDeviceInputDialogSymbian.h>
 #include <hbsymbianvariant.h>
 #include <hbtextresolversymbian.h>
 #include <UikonInternalPSKeys.h>
@@ -53,7 +52,6 @@
 #include "MSysApBtSapController.h"
 #include "MSysApBtController.h"
 #include "MSysApUsbIndicator.h"
-
 #include "sysapkeymanagement.h"
 #include "SysApShutdownImage.h"
 #include "SysApKeySndHandler.h"
@@ -61,7 +59,12 @@
 #include "SysApShutdownAnimation.h"
 #include "SysApEtelConnector.h"
 
-
+#ifdef RD_MULTIPLE_DRIVE
+#include "sysapdrivelist.h"
+#include "sysapdriveunlockhandler.h"
+#include "sysapdriveejecthandler.h"
+#include "hbdeviceinputdialogsymbian.h"
+#endif // RD_MULTIPLE_DRIVE
 
 #include <settingsinternalcrkeys.h>
 #include <keyguardaccessapi.h>
@@ -120,7 +123,9 @@ CSysApAppUi::CSysApAppUi()
      iSysApUsbIndicatorController(NULL),
      iKeyguardController (NULL),
      iKeyLockOnBeforeCall (EFalse),
-     iCheckLongPowerKeyEvent (EFalse)
+     iCheckLongPowerKeyEvent (EFalse),
+     iMMCEjectUsed( EFalse ),               
+     iMemCardPwdDialog(NULL)
 	{
 	TRACES( RDebug::Print( _L("CSysApAppUi::CSysApAppUi()") ) );
     }
@@ -251,6 +256,24 @@ void CSysApAppUi::ConstructL()
     TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepHacSettingObserver::NewL") ) );
     iSysApCenRepHacSettingObserver = CSysApCenRepHacSettingObserver::NewL( *this ); 
     
+#ifndef RD_MULTIPLE_DRIVE
+    if ( iSysApFeatureManager->MmcSupported() )
+        {
+        iSysApMMCObserver = CSysApMMCObserver::NewL( this, &iEikonEnv->FsSession(), iSysApFeatureManager->MmcHotSwapSupported() );
+        }
+#else // RD_MULTIPLE_DRIVE
+    iSysApDriveList = CSysApDriveList::NewL( iEikonEnv->FsSession() );
+    if ( iSysApFeatureManager->MmcSupported() )
+        {
+        iSysApMMCObserver = CSysApMMCObserver::NewL(
+            iEikonEnv->FsSession(), *iSysApDriveList, *this, iSysApFeatureManager->MmcHotSwapSupported() );
+        iSysApDriveUnlockHandler = CSysApDriveUnlockHandler::NewL(
+            *iSysApDriveList, *this, iSysApFeatureManager->MemoryCardLockSupported() );
+        iSysApDriveEjectHandler = CSysApDriveEjectHandler::NewL(
+            *iSysApDriveList, *this, iEikonEnv->FsSession() );
+        }
+#endif // RD_MULTIPLE_DRIVE
+    
     //Instantiate the KEF plugin manager
     //Trap constuction, since Sysap may live without iSysApKeyManagement
     TRAPD(keyManagementErr, iSysApKeyManagement=CSysApKeyManagement::NewL(CCoeEnv::Static()->RootWin(), *this));
@@ -297,7 +320,14 @@ void CSysApAppUi::FreeResources()
     delete iVariantAccState; 
 
     delete iSysApAudioRoutingObserver;
-
+    
+    if (iMemCardPwdDialog!=NULL)
+        {
+        //PowerMenu already exist
+        delete iMemCardPwdDialog;
+        iMemCardPwdDialog = NULL;
+        }
+    
     if ( iSapTimer )
         {
         iSapTimer->Cancel();
@@ -428,9 +458,22 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
     DoSwStateNormalConstructionL();
     HandleAccessoryProfileInStartupL();
           
-
-      
-       
+    if ( iSysApFeatureManager->MmcSupported() )
+        {
+#ifndef RD_MULTIPLE_DRIVE
+        MountMMC();
+        MMCStatusChangedL();
+        iHideFirstBeep = EFalse;
+#else // RD_MULTIPLE_DRIVE
+        iSysApDriveList->MountDrive( iSysApDriveList->DefaultMemoryCard() );
+        UpdateInsertedMemoryCardsL();
+#endif // RD_MULTIPLE_DRIVE
+        }
+		
+	if ( iSysApFeatureManager->MmcHotSwapSupported() )
+        {
+        iSysApMMCObserver->StartMountObserver();
+        }    
    
     if ( !iSysApPsmController ) // created here if first state change has not occurred yet
        {
@@ -522,7 +565,23 @@ void CSysApAppUi::DoStateChangedL(const RStarterSession::TGlobalState aSwState)
     if( IsStateNormal() )
         {
         TRACES( RDebug::Print(_L("CSysApAppUi::DoStateChangedL to normal state.") ) );
-
+        
+        if ( iSysApFeatureManager->MmcSupported() )
+            {
+#ifndef RD_MULTIPLE_DRIVE
+            MountMMC();
+            MMCStatusChangedL();
+            iHideFirstBeep = EFalse;
+#else // RD_MULTIPLE_DRIVE
+            iSysApDriveList->MountDrive( iSysApDriveList->DefaultMemoryCard() );
+            UpdateInsertedMemoryCardsL();
+#endif // RD_MULTIPLE_DRIVE
+            }
+        if ( iSysApFeatureManager->MmcHotSwapSupported() )
+            {
+            iSysApMMCObserver->StartMountObserver();
+            }
+        
         iSysApBtController = CreateSysApBtControllerL( *this );
         iSysApBtSapController = CreateSysApBtSapControllerL( *this );
 
@@ -559,6 +618,10 @@ void CSysApAppUi::DoStateChangedL(const RStarterSession::TGlobalState aSwState)
 
 #endif // SYSAP_USE_STARTUP_UI_PHASE
 
+// ----------------------------------------------------------------------------
+// CSysApAppUi::~CSysApAppUi()
+// ----------------------------------------------------------------------------
+
 CSysApAppUi::~CSysApAppUi()
     {
     TRACES( RDebug::Print( _L("~CSysApAppUi() started") ) );
@@ -593,6 +656,14 @@ CSysApAppUi::~CSysApAppUi()
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
     delete iSysApStartupController;
+
+#ifdef RD_MULTIPLE_DRIVE
+    iInsertedMemoryCards.Close();
+    delete  iSysApDriveEjectHandler;
+    delete iSysApDriveUnlockHandler;
+    delete iSysApDriveList;
+#endif // RD_MULTIPLE_DRIVE
+
     TRACES( RDebug::Print( _L("~CSysApAppUi() completed") ) );
     }
         
@@ -603,15 +674,12 @@ TBool CSysApAppUi::ResourcesFreed() const
 
 void CSysApAppUi::ShowExampleUiNoteL( const TDesC& noteText )const
     {          
-    //   QString msg  = QString::fromUtf16(aStringPointer.Ptr(),aStringPointer.Length());
  	TRACES( RDebug::Print( _L("CSysApAppUi::ShowExampleUiNoteL:: constructing CHbDeviceMessageBoxSymbian:BeGIN") ) );    
     CHbDeviceMessageBoxSymbian *note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
  	CleanupStack::PushL(note);
     TRACES( RDebug::Print( _L("CSysApAppUi::ShowExampleUiNoteL:: construction of CHbDeviceMessageBoxSymbian:END") ) ); 
-	//	HbMessageBox *note = new HbMessageBox (HbMessageBox ::MessageTypeInformation);
     note->SetTextL(noteText);
-    //  note->SetTimeout(HbPopup::NoTimeout);
-	note->SetTimeout(5);
+	note->SetTimeout(300);
  	TRACES( RDebug::Print( _L("CSysApAppUi:: Display of  CHbDeviceMessageBoxSymbian::Begin") ) );    
     note->ShowL();
 	TRACES( RDebug::Print( _L("CSysApAppUi:: Display of  CHbDeviceMessageBoxSymbian::End") ) );
@@ -1229,10 +1297,9 @@ void CSysApAppUi::SetUsbAttachStatus( const TBool aUsbAttached )
     if ( aUsbAttached )
         {
           // For ignoring extra beeps caused by USB file transfer
-/*        iSysApDriveList->ResetDrivesInsertBeepIgnored();
+        iSysApDriveList->ResetDrivesInsertBeepIgnored();
         iSysApDriveList->MarkDrivesInsertBeepIgnored( iInsertedMemoryCards );
-        // Will take care in next sub
-*/        }
+        }
     }
 #endif // RD_MULTIPLE_DRIVE
 
@@ -1486,6 +1553,20 @@ void CSysApAppUi::SetIhfIndicatorL()
         // do nothing
         }
     }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::EjectStarted()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::EjectStarted( TBool ejectStarted )
+    {
+    TRACES( RDebug::Print( _L( "CSysApAppUi::EjectStarted" ) ) );
+    iMMCEjectUsed = ejectStarted;
+    
+#ifndef RD_MULTIPLE_DRIVE
+    iFileManagerCloseDisabled = ejectStarted;
+#endif // RD_MULTIPLE_DRIVE
+}
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::DoLightsTimeoutChangedL
@@ -1895,7 +1976,7 @@ void CSysApAppUi::SetDeviceLockEnabledL( const TBool aLockEnabled )
         // Memory card needs to be unlocked when device is unlocked
         if ( iSysApFeatureManager->MmcHotSwapSupported() )
             {
-            // RunUnlockNotifierL();
+             RunUnlockNotifierL();
             // Need to handle feature for unlocking the MMC card
             }
         }
@@ -2640,7 +2721,7 @@ void CSysApAppUi::SetKeyLockDisabledL()
             {
             if ( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) !=  EPSCTsyCallStateRinging && StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) !=  EPSCTsyCallStateAlerting )
                 {
-                // RunUnlockNotifierL();
+                 RunUnlockNotifierL();
                 // need to handle MMC unlock query in next sub
                 }
             }
@@ -2715,15 +2796,15 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                         iLastPowerKeyWasShort = ETrue;
                         TRACES( RDebug::Print( _L("CSysApAppUi::Key was consumed by pressing short power") ) );          
                         //Powermenu
-                        if (iPowerMenuDialog != NULL)
+                        if (iPowerMenuDialog!=NULL)
                             {
                             //PowerMenu already exist
                             delete iPowerMenuDialog;
                             iPowerMenuDialog = NULL;
-                            } 
-                            
-                        iPowerMenuDialog = CHbDevicePowerMenuSymbian::NewL(*this);
-                        iPowerMenuDialog->ShowL();                        
+                            }                                               
+                        iPowerMenuDialog = CHbDevicePowerMenuSymbian::NewL(*this);  
+                        iPowerMenuDialog->ShowL();           
+                                         
                         iIgnoreNextPowerKeyRepeats = EFalse;
                         }
                     //Long power key press
@@ -2828,6 +2909,32 @@ TBool CSysApAppUi::ReleasePowerMenuCustomDialogMemory()
     return EFalse;
     }
 
+TBool CSysApAppUi::NotifiedDialogIfRequiredAndReleaseMemory()
+    {
+    TRACES( RDebug::Print(_L("CSysApAppUi::NotifiedDialogIfRequiredAndReleaseMemory(): Begin") ) );
+    TRACES( RDebug::Print(_L("CSysApAppUi::NotifiedDialogIfRequiredAndReleaseMemory(): Enter for popping another dialog") ) );
+    TInt popUpError = iSysApDriveUnlockHandler->CheckMemoryDialogIfNeeded();
+    
+    //Deside if dialog required again !!    
+    if(popUpError)
+        {
+        iSysApDriveUnlockHandler->ReleaseMemoryForInputCardDialog();  // check memory has released.
+        iSysApDriveUnlockHandler->UnlockComplete(KErrNone);
+        }
+    else
+        {
+        iSysApDriveUnlockHandler->StartUnlock();// pop up the dialog again !!        
+        }
+    
+    TRACES( RDebug::Print(_L("CSysApAppUi::NotifiedDialogIfRequiredAndReleaseMemory(): End")) );    
+    return popUpError;
+    }
+
+void CSysApAppUi::ReleaseMemoryForMemoryCardDialog()
+    {
+    TRACES( RDebug::Print(_L("CSysApAppUi::CSysApAppUi::ReleaseMemoryForMemoryCardDialog()")) );                                    
+    iSysApDriveUnlockHandler->ReleaseMemoryForInputCardDialog();
+    }
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::ShowAnimationL()
@@ -2990,14 +3097,25 @@ return iEikonEnv->AppUiFactory()->StatusPane();
 }
  
 
+#ifndef RD_MULTIPLE_DRIVE
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::EjectUsed
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::EjectUsed( TInt /*aDrive*/ )
+    {
+    }
+
+#else // RD_MULTIPLE_DRIVE
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::ShowEjectWaitNoteL
 // ----------------------------------------------------------------------------
 
-//void CSysApAppUi::ShowEjectWaitNoteL( TInt /* aDriveToEject */ )
- /*{
-   if ( iSysApWaitNote )
+void CSysApAppUi::ShowEjectWaitNoteL( TInt /* aDriveToEject */ )
+    {
+ /*   if ( iSysApWaitNote )
         {
         return;
         }
@@ -3009,7 +3127,801 @@ return iEikonEnv->AppUiFactory()->StatusPane();
         iSysApFeatureManager->CoverDisplaySupported() );
     iSysApWaitNote->ShowNoteL( EClosingApplicationsNote, text );
     CleanupStack::PopAndDestroy( text );
-    }*/
+ */   }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::IsEjectQueryVisible
+// ----------------------------------------------------------------------------
+
+TBool CSysApAppUi::IsEjectQueryVisible()
+    {
+//    if ( !iSysApConfirmationQuery )
+        {
+        return EFalse;
+        }
+//    TInt queryId( iSysApConfirmationQuery->CurrentQuery() );
+//    return ( queryId == ESysApEjectMmcQuery || queryId == ESysApRemoveMmcNote );
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::UpdateInsertedMemoryCardsL
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::UpdateInsertedMemoryCardsL()
+    {
+    // Update inserted memory cards
+    iSysApDriveList->GetMemoryCardsL(
+        iInsertedMemoryCards, CSysApDriveList::EIncludeInserted );
+
+    // Update memory card indicator status
+//    SetMemoryCardIndicatorL();
+
+    // Handle unlock
+    RunUnlockNotifierL();
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::EjectUsed
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::EjectUsed( TInt aDrive )
+    {
+    // Check drive inserted before starting eject confirm query
+    TInt insertedIndex( CSysApDriveList::Find( iInsertedMemoryCards, aDrive ) );
+
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::EjectUsed: drive: %d, index: %d" ),
+        aDrive, insertedIndex ) );
+
+    if ( insertedIndex == KErrNotFound )
+        {
+        return;
+        }
+
+    iMMCEjectUsed = ETrue;
+    iDriveToEject = aDrive;
+    iSysApDriveList->ResetDrivesToEject();
+    TRAPD( err, EjectMMCL() );
+    if ( err != KErrNone )
+        {
+        TRACES( RDebug::Print(
+            _L( "CSysApAppUi::EjectUsed: err: %d" ), err ) );
+        iMMCEjectUsed = EFalse;
+        }
+    }
+#endif // RD_MULTIPLE_DRIVE
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::EjectMMCCanceled
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::EjectMMCCanceled()
+    {
+    // Called from eject confirm query, reset eject status
+#ifdef RD_MULTIPLE_DRIVE
+    iMMCEjectUsed = EFalse;
+#endif // RD_MULTIPLE_DRIVE
+    }
+
+
+
+#ifndef RD_MULTIPLE_DRIVE
+// ----------------------------------------------------------------------------
+// CSysApAppUi::MountMMC()
+// ----------------------------------------------------------------------------
+
+TInt CSysApAppUi::MountMMC()
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::MountMMC") ) );
+    TInt err ( KErrNotSupported );
+    if ( iSysApFeatureManager->MmcSupported() )
+        {
+#ifdef __WINS__ // Let's sleep a second in WINS
+        User::After( 1000000 );
+#endif
+        err = iEikonEnv->FsSession().MountFileSystem( KFSName, KMMCDrive );
+        TRACES( RDebug::Print( _L("CSysApAppUi::MountMMC: RFs::MountFileSystem() returned: %d"), err ) );
+        if ( err == KErrInUse )
+            {
+            User::After( 1000000 );
+            err = iEikonEnv->FsSession().MountFileSystem( KFSName, KMMCDrive );
+            TRACES( RDebug::Print( _L("CSysApAppUi::MountMMC: RFs::MountFileSystem() returned: %d"), err ) );
+            }
+        }
+    return err;
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::DismountMMC()
+// ----------------------------------------------------------------------------
+
+TInt CSysApAppUi::DismountMMC()
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::DismountMMC") ) );
+#ifdef __WINS__ // Let's sleep a second in WINS
+        User::After( 1000000 );
+#endif
+
+    TInt err ( KErrNotSupported );
+    if ( iSysApFeatureManager->MmcSupported() )
+        {
+        err = iEikonEnv->FsSession().DismountFileSystem( KFSName, KMMCDrive );
+        TRACES( RDebug::Print( _L("CSysApAppUi::DismountMMC: RFs::DismountFileSystem() returned: %d"), err ) );
+        }
+    return err;
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::EjectMMCL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::EjectMMCL()
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::EjectMMCL") ) );
+    iMMCEjectUsed = ETrue;
+    iMMCPowerMenuEjectUsed = ETrue;
+    iTimeToKill = EFalse;
+    iApplicationScanningRoundNumber = 0;
+    CloseUIAppsInHotSwapL();
+    }
+
+#else // RD_MULTIPLE_DRIVE
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::EjectMMCL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::EjectMMCL()
+    {
+    // Called from eject confirm query, check drive inserted before start
+    TInt insertedIndex( CSysApDriveList::Find(
+        iInsertedMemoryCards, iDriveToEject ) );
+
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::EjectMMCL: iMMCEjectUsed: %d, drive: %d, index: %d "),
+        iMMCEjectUsed, iDriveToEject, insertedIndex ) );
+
+    if ( insertedIndex != KErrNotFound )
+        {
+        iSysApDriveList->MarkDriveToEject(
+            iDriveToEject, CSysApDriveList::EEjectFromMenu );
+        iSysApDriveEjectHandler->StartEject();
+        }
+    iMMCEjectUsed = EFalse;
+    }
+
+#endif // RD_MULTIPLE_DRIVE
+
+#ifndef RD_MULTIPLE_DRIVE
+// ----------------------------------------------------------------------------
+// CSysApAppUi::RunUnlockNotifierL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::RunUnlockNotifierL( TSysApMemoryCardStatus aMemoryCardStatus )
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL: START") ) );
+    if ( iSysApFeatureManager->MmcSupported() )
+        {
+        if ( UiReady() )
+            {
+            TSysApMemoryCardStatus memoryCardStatus;
+            if ( aMemoryCardStatus == ESysApMemoryCardStatusNotKnown )
+                {
+                memoryCardStatus = iSysApMMCObserver->MemoryCardStatus();
+                }
+            else
+                {
+                memoryCardStatus = aMemoryCardStatus;
+                }
+
+            TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL: memoryCardStatus=%d"), memoryCardStatus ) );
+
+            switch ( memoryCardStatus )
+                {
+                case ESysApMemoryCardInserted:
+                    TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL MMC inserted") ) );
+                    if ( aMemoryCardStatus == ESysApMemoryCardInserted )
+                        {
+                        RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
+                        }
+                    break;
+                case ESysApMemoryCardLocked:
+                    {
+                    TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL MMC locked") ) );
+                    RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                    TInt callState = StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState );
+
+                    if (  (! ( iDeviceLockEnabled || iKeyLockEnabled ) ) &&
+                          callState != EPSCTsyCallStateRinging && // We don't want to see the MMC passwd query
+                          callState != EPSCTsyCallStateAlerting ) // when the user is e.g. making an emergency call
+                        {
+                        if ( iSysApFeatureManager->MemoryCardLockSupported() )
+                            {
+                            if ( ! iMemoryCardDialog )
+                                {
+                                TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL: ACTIVATE MMC passwd query") ) );
+                                CAknMemoryCardDialog* mmcDialog = CAknMemoryCardDialog::NewLC( this );
+                                iMemoryCardDialog = mmcDialog; // temporary variable used for hiding codescanner error 
+                                iMemoryCardDialog->SetSelfPointer( &iMemoryCardDialog );
+                                iMemoryCardDialog->UnlockCardLD(); // when UnlockCardLD completes it calls UnlockComplete()
+                                }
+                            }
+                        else
+                            {
+                            // Since locked cards are not supported, notify user that card is locked.
+                            ShowQueryL( ESysApMemoryCardLockedNote );
+                            }
+                        }
+                    }
+                    break;
+
+                case ESysApMemoryCardNotInserted:
+                default:
+                    TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL MMC not inserted") ) );
+                    if ( aMemoryCardStatus == ESysApMemoryCardNotInserted )
+                        {
+                        RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                        }
+                }
+            }
+        }
+    TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL: END") ) );
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::UnlockComplete() from MAknMemoryCardDialogObserver
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::UnlockComplete( TInt aResult )
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::UnlockComplete result: %d"), aResult ) );
+    if ( aResult == KErrNone )
+        {
+        RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::MMCStatusChangedL() from MSysApMemoryCardObserver
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::MMCStatusChangedL()
+    {
+    TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL START: iMMCInserted: %d, iMMCEjectUsed: %d, iHideFirstBeep: %d, iHideNextBeep: %d" ), iMMCInserted, iMMCEjectUsed, iHideFirstBeep, iHideNextBeep ) );
+
+    if ( iSysApFeatureManager->MmcSupported() && !iShutdownStarted )
+        {
+        TSysApMemoryCardStatus memoryCardStatus = iSysApMMCObserver->MemoryCardStatus();
+        TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL memoryCardStatus=%d" ), memoryCardStatus ) );
+
+        switch ( memoryCardStatus )
+            {
+            case ESysApMemoryCardInserted:
+            case ESysApMemoryCardLocked:
+                TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL: MMC drive mounted" ) ) );
+                if ( ! iMMCInserted ) // MMC was not inserted before
+                    {
+                    TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL: MMC newly inserted" ) ) );
+                    CancelWaitNote(); // just to be sure, the user might keep on closing and opening the MMC latch
+                    // An MMC has been newly inserted, so play a sound and check if its password protected
+
+                    if ( UiReady() )
+                        {
+                        if ( !iHideFirstBeep && !iHideNextBeep ) // starting up
+                            {
+                            Beep();
+                            // Switch lights on
+                            iSysApLightsController->MemoryCardInsertedL();
+                            }
+                        iHideNextBeep = EFalse;
+                        }
+
+                    iMMCPowerMenuEjectUsed = EFalse;
+                    iMMCEjectUsed = EFalse;
+                    iMMCInserted = ETrue;
+
+                    // No need to show ESysApRemoveMmcNote after MMC already mounted
+                    if ( iSysApConfirmationQuery )
+                        {
+                        if ( iSysApConfirmationQuery->CurrentQuery() == ESysApRemoveMmcNote )
+                            {
+                            iSysApConfirmationQuery->Cancel();
+                            }
+                        }
+
+                    // Check if the MMC is locked and unlock it if necessary
+                    RunUnlockNotifierL( memoryCardStatus );
+                    }
+                break;
+            default:
+                TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL: MMC drive not mounted" ) ) );
+                delete iMemoryCardDialog; // sets itself to null
+                RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                if ( iMMCInserted )
+                    {
+                    // No need to show ESysApEjectMmcQuery after MMC already removed
+                    if ( iSysApConfirmationQuery )
+                        {
+                        if ( iSysApConfirmationQuery->CurrentQuery() == ESysApEjectMmcQuery )
+                            {
+                            iSysApConfirmationQuery->Cancel();
+                            }
+                        }
+
+                    iMMCInserted = EFalse;
+
+                    TInt propertyValue( StateOfProperty( KPSUidUsbWatcher, KUsbWatcherSelectedPersonality ) );
+                    if ( !iMMCEjectUsed && propertyValue != KUsbPersonalityIdMS )
+                        {
+                        // if USB file transfer active, do not close applications
+                        // if eject selected in MMC App, MMC App takes care of the following and
+                        // if eject selected from powerkeymenu, applications have already been shutdown
+                        iTimeToKill = EFalse;
+                        iApplicationScanningRoundNumber = 0;
+                        CloseUIAppsInHotSwapL();
+                        }
+                    }
+                else
+                    {
+                    // If MMC was not previously inserted and eject was chosed from power key menu, attempt to remount.
+                    if ( iMMCPowerMenuEjectUsed )
+                        {
+                        TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL: Attempt to remount" ) ) );
+                        MountMMC();
+                        // If mount was successful, unnecessary note will be canceled in insert notification handling.
+                        }
+                    }
+                break;
+            }
+
+        // Update memory card indicator status
+        SetMemoryCardIndicatorL();
+        }
+    TRACES( RDebug::Print( _L( "CSysApAppUi::MMCStatusChangedL   END: iMMCInserted: %d, iMMCEjectUsed: %d, iHideFirstBeep: %d, iHideNextBeep: %d" ), iMMCInserted, iMMCEjectUsed, iHideFirstBeep, iHideNextBeep ) );
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::ShowMMCDismountedDialogL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::ShowMMCDismountedDialogL()
+    {
+    TInt propertyValue( StateOfProperty( KPSUidUsbWatcher, KUsbWatcherSelectedPersonality ) );
+
+    // Do not show any note if USB file transfer is active.
+    if ( propertyValue != KUsbPersonalityIdMS )
+        {
+        if ( iSysApFeatureManager->MemoryCardHatchSupported() )
+            { // MMC hatch has been opened and MMC has been dismounted
+            TRACES( RDebug::Print( _L( "CSysApAppUi::ShowMMCDismountedDialogL: Show note: Remove MMC and press OK." ) ) );
+            ShowQueryL( ESysApRemoveMmcNote );
+            }
+        else
+            {
+            // MMC has been removed and dismounted
+            TRACES( RDebug::Print( _L( "CSysApAppUi::ShowMMCDismountedDialogL: Show note: You might have lost some data." ) ) );
+            // No confirmation but let's set this true to enable MMC passwd query
+            ShowUiNoteL( EMemoryCardRemovedWithoutEjectNote );
+            }
+        }
+    else
+        {
+        TRACES( RDebug::Print( _L( "CSysApAppUi::ShowMMCDismountedDialogL: No note shown, USB file transfer caused dismount." ) ) );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::MMCDismountedDialogConfirmed
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::MMCDismountedDialogConfirmed()
+    {
+    TRACES( RDebug::Print( _L( "CSysApAppUi::MMCDismountedDialogConfirmed") ) );
+
+    // Try to remount just in case when eject was chosen from power key menu
+    if ( iMMCPowerMenuEjectUsed )
+        {
+        iMMCPowerMenuEjectUsed = EFalse;
+
+        if ( MountMMC() == KErrLocked ) // In case a locked card was not removed after all
+            {
+            TRAPD( err, MMCStatusChangedL() ); // This will update power menu and memory card icon. Also memory card password is requeried.
+            if ( err != KErrNone )
+                {
+                TRACES( RDebug::Print( _L( "CSysApAppUi::MMCDismountedDialogConfirmed: MMCStatusChangedL failed, err=%d"), err ) );
+                }
+            }
+        }
+
+    }
+
+#else // RD_MULTIPLE_DRIVE
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::MMCInsertedL
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::MMCInsertedL()
+    {
+    TRACES( RDebug::Print( _L( "CSysApAppUi::MMCInsertedL") ) );
+
+    if ( iSysApFeatureManager->MmcSupported() && !iShutdownStarted )
+        {
+        TBool normalState( UiReady() );
+
+        if ( normalState )
+            {
+            TInt defaultMemoryCard( iSysApDriveList->DefaultMemoryCard() );
+            TSysApMemoryCardStatus memoryCardStatus( iSysApDriveList->MemoryCardStatus( defaultMemoryCard ) );
+
+            TRACES( RDebug::Print(
+                _L( "CSysApAppUi::MMCInsertedL: drive: %d, memoryCardStatus: %d" ), defaultMemoryCard, memoryCardStatus ) );
+
+            switch ( memoryCardStatus )
+                {
+                case ESysApMemoryCardInserted: // Fall through
+                case ESysApMemoryCardLocked:
+                    {
+                    // Reset eject and unlock of inserted memory card
+                    iSysApDriveList->ResetDriveToEject( defaultMemoryCard );
+                    iSysApDriveList->ResetDriveUnlockQueryShown( defaultMemoryCard );
+
+//                    CancelWaitNote();
+
+                    if ( memoryCardStatus == ESysApMemoryCardInserted )
+                        {
+                        TRACES( RDebug::Print(
+                            _L( "CSysApAppUi::MMCInsertedL: memoryCardStatus ESysApMemoryCardInserted: %d" ), memoryCardStatus ) );
+                        RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
+                        }
+                    else
+                        {
+                        TRACES( RDebug::Print(
+                            _L( "CSysApAppUi::MMCInsertedL: memoryCardStatus ESysApMemoryCardLocked: %d" ), memoryCardStatus ) );
+                        RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                        }
+                    break;
+                    }
+                case ESysApMemoryCardNotInserted:
+                    {
+                    // Always reset eject and unlock of removed memory card
+                    TBool isEject( iSysApDriveList->IsDriveToEject( defaultMemoryCard ) );
+
+                    TRACES( RDebug::Print(
+                        _L( "CSysApAppUi::MMCInsertedL: isEject: %d, drive: %d" ),
+                        isEject, defaultMemoryCard ) );
+
+                    iSysApDriveList->ResetDriveToEject( defaultMemoryCard );
+                    iSysApDriveList->ResetDriveUnlockQueryShown( defaultMemoryCard );
+
+                    TRACES( RDebug::Print(
+                        _L( "SysApAppUi::MMCInsertedL: memoryCardStatus ESysApMemoryCardNotInserted: %d" ), memoryCardStatus ) );
+
+                    RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                    break;
+                    }
+                case ESysApMemoryCardStatusNotKnown: // Fall through
+                default:
+                    {
+                    break;
+                    }
+                }
+                RunUnlockNotifierL();
+            }
+        }
+    }
+
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::RunUnlockNotifierL()
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::RunUnlockNotifierL()
+    {
+    TRACES( RDebug::Print(
+        _L("CSysApAppUi::RunUnlockNotifierL: START iDeviceLockEnabled: %d, iKeyLockEnabled: %d" ),
+         iDeviceLockEnabled, iKeyLockEnabled ) );
+
+    if ( !iSysApFeatureManager->MmcSupported() ||
+         iDeviceLockEnabled ||
+         iKeyLockEnabled ||
+         !UiReady() )
+        {
+        TRACES( RDebug::Print( _L("CSysApAppUi::RunUnlockNotifierL: END") ) );
+        return;
+        }
+
+    // We don't want to see the MMC passwd query
+    // when the user is e.g. making an emergency call
+    TInt callState( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) );
+    if ( callState != EPSCTsyCallStateRinging &&
+        callState != EPSCTsyCallStateAlerting )
+        {
+        TInt defaultMemoryCard( iSysApDriveList->DefaultMemoryCard() );
+        TSysApMemoryCardStatus memoryCardStatus( iSysApDriveList->MemoryCardStatus( defaultMemoryCard ) );
+        if ( memoryCardStatus == ESysApMemoryCardLocked)
+            {
+            iSysApDriveUnlockHandler->StartUnlock();
+            }
+        }
+
+    TRACES( RDebug::Print(
+        _L("CSysApAppUi::RunUnlockNotifierL: END callState: %d"), callState ) );
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::MMCStatusChangedL() from MSysApMemoryCardObserver
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::MMCStatusChangedL( TInt aDrive )
+    {
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::MMCStatusChangedL START: MMCCount: %d, iMMCEjectUsed: %d" ),
+        iInsertedMemoryCards.Count(), iMMCEjectUsed ) );
+
+    if ( iShutdownStarted || !iSysApFeatureManager->MmcSupported() )
+        {
+        TRACES( RDebug::Print(
+            _L( "CSysApAppUi::MMCStatusChangedL iShutdownStarted: %d END" ),
+            iShutdownStarted ) );
+        return;
+        }
+
+    TBool normalState( UiReady() );
+
+    TInt defaultMemoryCard( iSysApDriveList->DefaultMemoryCard() );
+    TSysApMemoryCardStatus memoryCardStatus( iSysApDriveList->MemoryCardStatus( aDrive ) );
+    TInt insertedIndex( CSysApDriveList::Find( iInsertedMemoryCards, aDrive ) );
+
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::MMCStatusChangedL: normalState: %d, index: %d, drive: %d, memoryCardStatus: %d" ),
+        normalState, insertedIndex, aDrive, memoryCardStatus ) );
+
+    switch ( memoryCardStatus )
+        {
+        case ESysApMemoryCardInserted: // Fall through
+        case ESysApMemoryCardLocked:
+            {
+            if ( insertedIndex == KErrNotFound ) // Not inserted before
+                {
+                // Reset eject and unlock of inserted memory card
+                iSysApDriveList->ResetDriveToEject( aDrive );
+                iSysApDriveList->ResetDriveUnlockQueryShown( aDrive );
+
+//                CancelWaitNote();
+
+                if ( aDrive == defaultMemoryCard )
+                    {
+                    if ( memoryCardStatus == ESysApMemoryCardInserted )
+                        {
+                         RProperty::Set( KPSUidUikon, KUikMMCInserted, 1 );
+                        }
+                    else
+                        {
+                        RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                        }
+                    }
+
+                if ( normalState )
+                    {
+                    // Ignore extra beep from USB file transfer
+                    TBool ignoreBeep(
+                        iSysApDriveList->IsDriveInsertBeepIgnored( aDrive ) );
+
+                    TRACES( RDebug::Print(
+                        _L( "CSysApAppUi::MMCStatusChangedL: ignoreBeep: %d, drive: %d" ),
+                        ignoreBeep, aDrive ) );
+
+                    if ( !ignoreBeep )
+                        {
+//                        Beep();
+                        iSysApLightsController->MemoryCardInsertedL();
+                        }
+
+                    iSysApDriveList->ResetDriveInsertBeepIgnored( aDrive );
+
+                    // Keep ignoring extra beep if USB file transfer is active
+                    TInt propertyValue( StateOfProperty( KPSUidUsbWatcher, KUsbWatcherSelectedPersonality ) );
+
+                    TRACES( RDebug::Print(
+                        _L( "CSysApAppUi::MMCStatusChangedL: usbState: %d" ), propertyValue ) );
+
+                    if ( propertyValue == KUsbPersonalityIdMS )
+                        {
+                        iSysApDriveList->MarkDriveInsertBeepIgnored( aDrive );
+                        }
+                    }
+
+//                if ( iDriveToDismount == aDrive && iSysApConfirmationQuery )
+                    {
+//                    if ( iSysApConfirmationQuery->CurrentQuery() == ESysApRemoveMmcNote )
+                        {
+                        // User put back ejected memory card or did not remove it
+//                        iSysApConfirmationQuery->Cancel();
+                        }
+                    }
+                RunUnlockNotifierL();
+                }
+            break;
+            }
+        case ESysApMemoryCardNotInserted:
+            {
+            // Always reset eject and unlock of removed memory card
+            TBool isEject( iSysApDriveList->IsDriveToEject( aDrive ) );
+
+            TRACES( RDebug::Print(
+                _L( "CSysApAppUi::MMCStatusChangedL: isEject: %d, drive: %d" ),
+                isEject, aDrive ) );
+
+            iSysApDriveList->ResetDriveToEject( aDrive );
+            iSysApDriveList->ResetDriveUnlockQueryShown( aDrive );
+
+            if ( insertedIndex != KErrNotFound ) // Inserted before
+                {
+                if ( memoryCardStatus == ESysApMemoryCardNotInserted )
+                    {
+                    // Reset extra beep ignore if memory card was removed without eject
+                    iSysApDriveList->ResetDriveInsertBeepIgnored( aDrive );
+                    }
+
+//                CancelGlobalListQuery(); // Cancel power menu
+
+                if ( aDrive == defaultMemoryCard )
+                    {
+                    RProperty::Set( KPSUidUikon, KUikMMCInserted, 0 );
+                    }
+
+//                if ( iSysApConfirmationQuery )
+                    {
+//                    if ( iSysApConfirmationQuery->CurrentQuery() == ESysApEjectMmcQuery )
+                        {
+                        // User removed memory card too early
+//                        iSysApConfirmationQuery->Cancel();
+                        // Allow application closing to execute.
+                        // Also FileManager is closed in this case, regardless where the eject was initiated from.
+                        iMMCEjectUsed = EFalse;
+                        }
+                    }
+
+                // Stop unlock of removed memory card
+                iSysApDriveUnlockHandler->StopUnlock( aDrive );
+
+                if ( !iMMCEjectUsed && !isEject )
+                    {
+                    TInt propertyValue( StateOfProperty( KPSUidUsbWatcher, KUsbWatcherSelectedPersonality ) );
+
+                    TRACES( RDebug::Print(
+                        _L( "CSysApAppUi::MMCStatusChangedL: usbState: %d" ), propertyValue ) );
+
+                    if ( propertyValue != KUsbPersonalityIdMS )
+                        {
+                        if ( iSysApFeatureManager->MemoryCardHatchSupported() )
+                            {
+                            // Store drive removed without eject and start eject handling
+                            iSysApDriveList->MarkDriveToEject(
+                                aDrive, CSysApDriveList::EEjectRemovedWithoutEject );
+                            iSysApDriveEjectHandler->StartEject();
+                            }
+                        else
+                            {
+                            // Just show the note
+                            ShowUiNoteL( EMemoryCardRemovedWithoutEjectNote );
+                            }
+                        }
+                    }
+                iMMCEjectUsed = EFalse;
+                }
+            break;
+            }
+        case ESysApMemoryCardStatusNotKnown: // Fall through
+        default:
+            {
+            break;
+            }
+        }
+
+    // Update inserted memory cards
+    iSysApDriveList->GetMemoryCardsL(
+        iInsertedMemoryCards, CSysApDriveList::EIncludeInserted );
+
+    // Update memory card indicator status
+//    SetMemoryCardIndicatorL();
+
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::MMCStatusChangedL END: MMCCount: %d, iMMCEjectUsed: %d" ),
+        iInsertedMemoryCards.Count(), iMMCEjectUsed ) );
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::ShowMMCDismountedDialogL()
+// ----------------------------------------------------------------------------
+
+TBool CSysApAppUi::ShowMMCDismountedDialogL(
+        TInt aDrive, CSysApDriveList::TDriveEjectType aEjectType )
+    {
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::ShowMMCDismountedDialogL: aDrive: %d, aEjectType: %d" ),
+        aDrive, aEjectType ) );
+
+    TBool ret( EFalse );
+    iDriveToDismount = aDrive;
+    HBufC* driveName = iSysApDriveList->GetFormattedDriveNameLC(
+        aDrive,
+        R_QTN_EJECT_REMOVE_MEMORY_INFO );
+
+    if ( aEjectType == CSysApDriveList::EEjectFromMenu )
+        {
+        TRACES( RDebug::Print(
+            _L( "CSysApAppUi::ShowMMCDismountedDialogL: Show note: Remove MMC and press OK...." ) ) );
+        ShowQueryL( ESysApRemoveMmcNote, *driveName );
+        ret = ETrue;
+        }
+    else
+        {
+        // Memory card was removed without eject
+        TInt propertyValue( StateOfProperty( KPSUidUsbWatcher, KUsbWatcherSelectedPersonality ) );
+
+        // Do not show any note if USB file transfer is active.
+        if ( propertyValue != KUsbPersonalityIdMS )
+            {
+            if ( iSysApFeatureManager->MemoryCardHatchSupported() )
+                {
+                // MMC hatch has been opened and MMC has been dismounted
+                TRACES( RDebug::Print(
+                    _L( "CSysApAppUi::ShowMMCDismountedDialogL: Show note: Remove MMC and press OK." ) ) );
+                ShowQueryL( ESysApRemoveMmcNote, *driveName );
+                ret = ETrue;
+                }
+            else
+                {
+                iSysApDriveList->ResetDrivesToEject();
+
+                // MMC has been removed and dismounted
+                TRACES( RDebug::Print( _L(
+                    "CSysApAppUi::ShowMMCDismountedDialogL: Show note: You might have lost some data." ) ) );
+
+                // No confirmation but let's set this true to enable MMC passwd query
+                ShowUiNoteL( EMemoryCardRemovedWithoutEjectNote );
+                }
+            }
+        else
+            {
+            iSysApDriveList->ResetDrivesToEject();
+            TRACES( RDebug::Print(
+                _L( "CSysApAppUi::ShowMMCDismountedDialogL: No note shown, USB file transfer caused dismount." ) ) );
+            }
+        }
+
+    CleanupStack::PopAndDestroy( driveName );
+
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::ShowMMCDismountedDialogL: ret: %d" ), ret ) );
+
+    return ret;
+    }
+
+// ----------------------------------------------------------------------------
+// CSysApAppUi::MMCDismountedDialogConfirmed
+// ----------------------------------------------------------------------------
+
+void CSysApAppUi::MMCDismountedDialogConfirmed()
+    {
+    TRACES( RDebug::Print(
+        _L( "CSysApAppUi::MMCDismountedDialogConfirmed: iDriveToDismount: %d" ),
+        iDriveToDismount ) );
+
+    // Try remount to check if drive was put back
+    iSysApDriveList->MountDrive( iDriveToDismount );
+    if ( !iSysApDriveEjectHandler->CompleteDismount( iDriveToDismount ) )
+        {
+        // When ready, check for locked memory cards and update indicators
+ //       TRAP_IGNORE( SetMemoryCardIndicatorL() );
+        TRAP_IGNORE( RunUnlockNotifierL() );
+        }
+    }
+
+#endif // RD_MULTIPLE_DRIVE
 
 
 // ----------------------------------------------------------------------------
@@ -3047,7 +3959,7 @@ void CSysApAppUi::HandleApplicationSpecificEventL(TInt aType,const TWsEvent& aEv
                     {
                     if ( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) !=  EPSCTsyCallStateRinging && StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) !=  EPSCTsyCallStateAlerting )
                         {
-                        //RunUnlockNotifierL();
+                        RunUnlockNotifierL();
                         }
                     }
                 }
