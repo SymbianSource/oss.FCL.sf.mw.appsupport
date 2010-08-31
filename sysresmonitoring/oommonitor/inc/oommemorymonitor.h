@@ -19,9 +19,8 @@
 #ifndef OOMMEMORYMONITOR_H
 #define OOMMEMORYMONITOR_H
 
-#include <u32hal.h>
 #include <e32property.h>
-#include <f32file.h>
+#include <e32svr.h>
 #include <w32std.h>
 #include "oomglobalconfig.h"
 #include "oomwindowgrouplist.h"

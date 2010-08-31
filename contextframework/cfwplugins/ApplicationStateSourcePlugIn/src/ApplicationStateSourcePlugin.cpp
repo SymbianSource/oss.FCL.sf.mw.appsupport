@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -26,6 +26,7 @@
 #include <apgwgnam.h>
 #include <applicationorientation.h>
 #include <aknappui.h>
+#include <coedef.h>
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <vwsdefpartner.h>
 #endif
@@ -81,7 +82,8 @@ void CApplicationStateSourcePlugIn::ConstructL()
     iDefaultAppName = KApplicationStateDefaultValue().AllocL();
     iDefaultViewName = KApplicationStateDefaultValue().AllocL();
     iContext = CCFContextObject::NewL();
-    
+    iWsEventHandler = CWsEventHandler::NewL( *this );
+    iWsEventHandler->IssueRequest();
     }
 
 // -----------------------------------------------------------------------------
@@ -131,7 +133,7 @@ CApplicationStateSourcePlugIn::~CApplicationStateSourcePlugIn()
     delete iCRAppOrientation;
     iApplicationSettings.ResetAndDestroy();
     delete iSettings;
-    delete iVws;
+    
     delete iDefaultViewName;
     delete iDefaultAppName;
     delete iApplDefaultState;
@@ -223,8 +225,7 @@ void CApplicationStateSourcePlugIn::InitializeL()
         iSettings = NULL;
         }
 
-    iVws = CVwsSessionWrapper::NewL( *this );
-    iVws->NotifyNextActivation();
+    
     }
 
 // -----------------------------------------------------------------------------
@@ -351,33 +352,7 @@ void CApplicationStateSourcePlugIn::InitializeApplicationsFromXMLL()
         }
     }
 
-// -----------------------------------------------------------------------------
-// CApplicationStateSourcePlugIn::HandleViewEventL
-// Maps view activations to contexts.
-// -----------------------------------------------------------------------------
-//
-void CApplicationStateSourcePlugIn::HandleViewEventL(
-    const TVwsViewEvent& aEvent )
-    {
-    FUNC_LOG;
 
-    // Renew listening
-    iVws->NotifyNextActivation();
-
-    // Handle the view server event
-    DoHandleViewEventL( aEvent );
-
-    // Log event members!
-    INFO_1( "HandleViewEventL: eventType: [%d]", aEvent.iEventType );
-    
-    INFO_2( "HandleViewEventL: viewOne [appUid:%S] [viewUid%S]",
-        &(const TDesC&)aEvent.iViewOneId.iAppUid.Name(),
-        &(const TDesC&)aEvent.iViewOneId.iViewUid.Name() );
-    
-    INFO_2( "HandleViewEventL: viewTwo [appUid:%S] [viewUid%S]",
-        &(const TDesC&)aEvent.iViewTwoId.iAppUid.Name(),
-        &(const TDesC&)aEvent.iViewTwoId.iViewUid.Name() );
-    }
 
 //------------------------------------------------------------------------------
 // CApplicationStateSourcePlugIn::HandleNotifyGeneric
@@ -452,8 +427,8 @@ void CApplicationStateSourcePlugIn::DoHandleViewEventL(
         if ( !fgFound && aEvent.iViewOneId.iAppUid == appSettings->Uid() )
             {
             fgApp.Set( appSettings->Name() );
-            //Check for flag returned by GetViewName, don't directly set the Flag to ETrue
-            fgFound = appSettings->GetViewName( aEvent.iViewOneId.iViewUid, fgView );
+            appSettings->GetViewName( aEvent.iViewOneId.iViewUid, fgView );
+            fgFound = ETrue;
             }
         if ( !bgFound && aEvent.iViewTwoId.iAppUid == appSettings->Uid() )
             {
@@ -745,6 +720,223 @@ TInt CApplicationStateSourcePlugIn::FindByUid( const TUid& aUid ) const
         }
     return index;
     }
+void CApplicationStateSourcePlugIn::HandleWsEventL( RWsSession& aWsSession )
+	{
+	TUid appUid( TUid::Null() );
+    TPtrC bgApp( *iDefaultAppName );
+    TPtrC fgApp( *iDefaultAppName );
+    TPtrC fgView( *iDefaultViewName );
 
+	TInt focWndGrp( aWsSession.GetFocusWindowGroup() );
+    CApaWindowGroupName* wndGrpName = CApaWindowGroupName::NewL( aWsSession );
+    CleanupStack::PushL( wndGrpName );
+    wndGrpName->ConstructFromWgIdL( focWndGrp );
+    appUid = wndGrpName->AppUid();
+
+    for ( TInt i = 0; i < iApplicationSettings.Count(); ++i )
+        {
+        CCFApplicationStateSettings* appSettings = iApplicationSettings[ i ];
+        if ( appUid == appSettings->Uid() )
+            {
+            fgApp.Set( appSettings->Name() );
+            appSettings->GetViewName( appUid, fgView );
+            bgApp.Set( iPreviousForegroundApplication );
+            break;
+            }
+        }
+    TBool publishFgApp( EFalse );
+    TBool publishFgView( EFalse );
+    TBool publishBgApp( EFalse );
+
+    if ( iPreviousForegroundApplication.Compare( fgApp ) != 0 )
+        {
+        publishFgApp = ETrue;
+        }
+    else if ( iPreviousForegroundView.Compare( fgView ) != 0 )
+        {
+        publishFgView = ETrue;
+        }
+
+    if ( bgApp != fgApp )
+        {
+        publishBgApp = ETrue;
+        }
+
+    iPreviousForegroundApplication.Set( fgApp ); // Store for next round
+    iPreviousForegroundView.Set( fgView );
+
+   RThread thread;
+
+    if ( publishFgApp )
+        {
+        iContext->SetTypeL( KApplicationStateForegroundApplicationType );
+        iContext->SetValueL( fgApp );
+        iCF.PublishContext( *iContext, thread );
+        }
+
+    if ( publishFgApp || publishFgView )
+        {
+        iContext->SetTypeL( KApplicationStateForegroundApplicationViewType );
+        iContext->SetValueL( fgView );
+        iCF.PublishContext( *iContext, thread );
+        }
+
+    if ( publishBgApp )
+        {
+        iContext->SetTypeL( KApplicationStateBackgroundApplicationType );
+        iContext->SetValueL( bgApp );
+        iCF.PublishContext( *iContext, thread );
+        }
+	
+	thread.Close();
+    CleanupStack::PopAndDestroy( wndGrpName );
+
+	}
+
+// ======================== CWsEventHandler ========================
+
+// ---------------------------------------------------------------------------
+// C++ constructor.
+// ---------------------------------------------------------------------------
+//
+CWsEventHandler::CWsEventHandler( MWsEventObserver& aObserver ):
+    CActive( CActive::EPriorityStandard ),
+    iObserver( aObserver )
+    {
+    CActiveScheduler::Add( this );
+    }
+
+// ---------------------------------------------------------------------------
+// Symbian 2nd phase constructor.
+// ---------------------------------------------------------------------------
+//
+void CWsEventHandler::ConstructL()
+    {
+    // Connect to window server server
+    User::LeaveIfError( iWsSession.Connect() );
+    
+    // Construct window group
+    iWindowGroup = new( ELeave ) RWindowGroup( iWsSession );
+    User::LeaveIfError( iWindowGroup->Construct( (TUint32)this, EFalse ) );
+    User::LeaveIfError( iWindowGroup->EnableGroupChangeEvents() );
+    iWindowGroup->SetOrdinalPosition( 0, ECoeWinPriorityNeverAtFront );
+    iWindowGroup->EnableReceiptOfFocus( EFalse );
+    
+    // Hide the invisible window from the task manager
+    iWindowGroupName = CApaWindowGroupName::NewL( iWsSession );
+    iWindowGroupName->SetHidden( ETrue );
+    iWindowGroupName->SetWindowGroupName( *iWindowGroup );
+
+    }
+// ---------------------------------------------------------------------------
+// Symbian two phased constructor.
+// ---------------------------------------------------------------------------
+//
+CWsEventHandler* CWsEventHandler::NewL( MWsEventObserver& aObserver )
+    {
+    CWsEventHandler* self = CWsEventHandler::NewLC( aObserver );
+    CleanupStack::Pop( self );
+    
+    return self;
+    }
+
+// ---------------------------------------------------------------------------
+// Symbian two phased constructor.
+// Leaves pointer in the cleanup stack.
+// ---------------------------------------------------------------------------
+//
+CWsEventHandler* CWsEventHandler::NewLC( MWsEventObserver& aObserver )
+    {
+    CWsEventHandler* self = new ( ELeave ) CWsEventHandler( aObserver );
+    CleanupStack::PushL( self );
+    self->ConstructL();
+    
+    return self;
+    }
+
+// ---------------------------------------------------------------------------
+// C++ destructor.
+// ---------------------------------------------------------------------------
+//
+CWsEventHandler::~CWsEventHandler()
+    {
+    Cancel();
+        
+    // Cleanup window group name
+    delete iWindowGroupName;
+       
+    // Cleanup window group
+    if( iWindowGroup )
+        {
+        iWindowGroup->DisableGroupChangeEvents();
+        iWindowGroup->Close();
+        delete iWindowGroup;
+        }
+    
+    // Cleanup window server session
+    iWsSession.Close();
+    }
+
+//------------------------------------------------------------------------------
+// CWsEventHandler::IssueRequest
+//------------------------------------------------------------------------------
+//
+void CWsEventHandler::IssueRequest()
+    {
+    // Request events from window server
+    iWsSession.EventReady( &iStatus );
+    SetActive();
+    }
+
+
+//------------------------------------------------------------------------------
+// CWsEventHandler::RunL
+//------------------------------------------------------------------------------
+//
+void CWsEventHandler::RunL()
+    {
+    TInt err = iStatus.Int();
+    if( err == KErrNone )
+        {
+        // No errors occured, fetch event
+        TWsEvent wsEvent;
+        iWsSession.GetEvent( wsEvent );
+        
+        // Continue listening
+        IssueRequest();
+		switch (wsEvent.Type()) 
+			{
+		case EEventWindowGroupsChanged :
+	       // Forward event to observer
+	       iObserver.HandleWsEventL( iWsSession );
+			break;
+		default:
+			break;
+			}
+        }
+    }
+
+//------------------------------------------------------------------------------
+// CWsEventHandler::DoCancel
+//------------------------------------------------------------------------------
+//
+void CWsEventHandler::DoCancel()
+    {
+    // Cancel event ready from window server
+    iWsSession.EventReadyCancel();
+    }
+
+//------------------------------------------------------------------------------
+// CWsEventHandler::RunError
+//------------------------------------------------------------------------------
+//
+TInt CWsEventHandler::RunError( TInt /*aError*/ )
+    {
+    // Issue a new request, other error handling is not performed since the
+    // problem has occured in the observer code
+    IssueRequest();
+    
+    return KErrNone;
+    }
 
 	

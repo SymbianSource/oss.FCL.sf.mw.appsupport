@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -142,7 +142,7 @@ TBool CASSrvSystemState::GetState(MASSrvSystemStateObserver::TState& aState)
 		aState = MASSrvSystemStateObserver::EShutdown;
 		interestedInChange = ETrue;
 		}
-	else if (ssmState.MainState() == ESsmNormal)
+	else if (ssmState.MainState() == ESsmNormal && ssmState.SubState() == ESsmNormalSubState)
 		{
 		aState = MASSrvSystemStateObserver::ENormal;
 		interestedInChange = ETrue;

@@ -13,7 +13,6 @@
 *
 * Description:  CSensorChannelBase class implementation.
 *
-*  
 */
 
 
@@ -236,8 +235,9 @@ void CSensorChannelBase::DataReceived( CSensrvChannel& aChannel,
     TInt aDataLost )
     {
     FUNC_LOG;
-    
-    
+
+    TRAP_IGNORE( HandleDataReceivedL( aChannel, aCount, aDataLost ) );
+
     // If we are fetching initial value, make sure that the channel is closed
     // properly if there are no active connections
     if( !SensorActive() && iState == EChannelStateInitializing )
@@ -247,7 +247,6 @@ void CSensorChannelBase::DataReceived( CSensrvChannel& aChannel,
         }
     else
         {
-        TRAP_IGNORE( HandleDataReceivedL( aChannel, aCount, aDataLost ) );
         // Active connections received, change state
         ChangeState( EChannelStateActive );
         }
@@ -632,4 +631,3 @@ void CSensorChannelBase::RemoveClient( TInt aIndex )
     }
 
 // End of file
-

@@ -19,7 +19,7 @@
 // To get the MW_LAYER_SYSTEMINCLUDE-definition
 #include <platform_paths.hrh>
 
-TARGET                  GSServerEngine.dll
+TARGET                  gsserverengine.dll
 TARGETTYPE              dll
 UID                     0x10281F16
 

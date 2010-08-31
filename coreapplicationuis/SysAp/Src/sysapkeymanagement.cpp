@@ -134,6 +134,10 @@ void CSysApKeyManagement::CancelCaptureKeys()
             {
             iRootWindowGroup.CancelCaptureKeyUpAndDowns( info->iUpAndDownKeyHandles[upAndDownKeyHandleCounter] );
             }
+        for ( TInt keyHandleCounter = info->iLongKeyPressHandle.Count()-1; keyHandleCounter >= 0; keyHandleCounter-- )
+             {
+             iRootWindowGroup.CancelCaptureLongKey( info->iLongKeyPressHandle[keyHandleCounter] );
+             }
         }
     }
 
@@ -166,8 +170,10 @@ void CSysApKeyManagement::CaptureKeys()
                                        captureKey, info->iPluginUid ) );
 			if (info->iIsKeyProvider)
 			    {
+			    TUint repeatValue = 0;
 			    TInt captureUpDownKey = info->iKeys[keyCounter].iScanCode;
 			    TUint modifiers = info->iKeys[keyCounter].iModifiers;
+			    repeatValue = info->iKeys[keyCounter].iRepeats; 
 			    
                 TInt32 keyHandle = iRootWindowGroup.CaptureKey( captureKey, modifiers, modifiers );
                 
@@ -195,6 +201,19 @@ void CSysApKeyManagement::CaptureKeys()
                     {
                     //error of Append ignored, key will not be cancelled. We can live with that.
                     TRACES( RDebug::Print( _L("CSysApKeyManagement::CaptureKeys UpAndDowns: Append failed, error %d"), upAndDownKeyHandle ) );
+                    }
+                if( repeatValue == 1 )
+                    {
+                    TInt32 longKeyPressHandle = iRootWindowGroup.CaptureLongKey( captureKey, captureKey,0, modifiers,0, ELongCaptureWaitShort);
+                    if ( longKeyPressHandle < KErrNone )
+                        {
+                       TRACES( RDebug::Print( _L("CSysApKeyManagement::CaptureLongKey : error %d"), longKeyPressHandle ) );
+                       continue; // other keys may be possible to capture, so continue
+                        }
+                    if ( ( longKeyPressHandle = info->iLongKeyPressHandle.Append( longKeyPressHandle ) ) != KErrNone ) //store handle for CancelCaptureKeyUpAndDowns
+                         {
+                          TRACES( RDebug::Print( _L("CSysApKeyManagement::CaptureLongKey : Append failed, error %d"), longKeyPressHandle ) );
+                         }                               
                     }
 			    }
 			else

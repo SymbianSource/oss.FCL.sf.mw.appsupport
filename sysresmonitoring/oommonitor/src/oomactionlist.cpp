@@ -18,6 +18,7 @@
 
 
 #include <hal.h>
+#include <u32hal.h>
 #include <apgwgnam.h>
 
 #include "oommonitorplugin.h"
@@ -696,7 +697,7 @@ void COomActionList::ConstructL(COomConfig& aConfig)
         COomRunPluginConfig& pluginConfig = aConfig.GetPluginConfig(iPluginListV2->Uid(pluginIndex));
         
         // Create an action acording to the config
-        COomRunPlugin* action = COomRunPlugin::NewL(iPluginListV2->Uid(pluginIndex), pluginConfig, *this, iPluginListV2->Implementation(pluginIndex), &(iPluginListV2->Implementation(pluginIndex)));
+        COomRunPlugin* action = COomRunPlugin::NewL(iPluginList->Uid(pluginIndex), pluginConfig, *this, iPluginListV2->Implementation(pluginIndex), &(iPluginListV2->Implementation(pluginIndex)));
         
         iRunPluginActions.AppendL(action);
         }

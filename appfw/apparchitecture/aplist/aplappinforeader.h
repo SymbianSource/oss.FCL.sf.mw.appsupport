@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,6 +26,11 @@
 #include <barsread.h>
 #include <apgicnfl.h>
 
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+#include <usif/scr/scr.h>
+#include <usif/scr/appregentries.h>
+#endif
+
 class TEntry;
 class RFs;
 class CResourceFile;
@@ -34,6 +39,7 @@ class CApaAppList;
 class CApaAppIconArray;
 class CApaAppViewData;
 
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 /**
 @internalComponent
 */
@@ -42,7 +48,7 @@ NONSHARABLE_CLASS(ApaUtils)
 public:
 	static TBool TypeUidIsForRegistrationFile(const TUidType& aUidType);
 	};
-
+#endif
 
 /**
 @internalComponent
@@ -126,8 +132,16 @@ optional localisable resource file and optional icon file.
 class CApaAppInfoReader : public CBase
 	{
 public:
-	static CApaAppInfoReader* NewL(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid);
-	TBool ReadL();
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+    static CApaAppInfoReader* NewL(RFs& aFs, const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScr); 
+#else
+    static CApaAppInfoReader* NewL(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid);
+    HBufC* LocalisableResourceFileName();
+    TTime LocalisableResourceFileTimeStamp() const; 
+    TTime TimeStamp() const;
+    TTime IconFileTimeStamp() const;   
+#endif
+    TBool ReadL();    
     static TBool FileIsMbmWithGenericExtensionL(const TDesC& aFileName);
 	~CApaAppInfoReader();
 public:
@@ -145,35 +159,41 @@ public:
 	HBufC* IconFileName();
 	TBool NonMbmIconFile() const;
 	CApaIconLoader* IconLoader();
-	
-	TTime TimeStamp() const;
-	TTime IconFileTimeStamp() const;
-	
-	HBufC* LocalisableResourceFileName();
-	TTime LocalisableResourceFileTimeStamp() const;
 	TLanguage AppLanguage() const;
 	CArrayFixFlat<TApaAppServiceInfo>* ServiceArray(TInt& aIndexOfFirstOpenService);
 	HBufC8* OpaqueData();
+	
 private:
-	CApaAppInfoReader(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid);
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	CApaAppInfoReader(RFs& aFs, const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScr);
+    void ReadAppRegistrationInfoL();
+    void ReadServiceInfoL(const RPointerArray<Usif::CServiceInfo>& aServiceInfo);    
+    void ReadOwnedFilesInfoL(const RPointerArray<HBufC>& aOwnedFiles);
+    void ReadMimeTypesSupportedL(const RPointerArray<Usif::CDataType>& dataTypes, CArrayFixFlat<TDataTypeWithPriority>& aMimeTypesSupported);    
+    void ReadLocalisationInfoL();
+    void ReadViewInfoL(const RPointerArray<Usif::CAppViewData>& aViewData);    
+#ifdef APPARC_SHOW_TRACE   
+    void DisplayAppInfo();
+#endif
+    
+#else
+    CApaAppInfoReader(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid);
+    void ReadMandatoryInfoL(RResourceReader& aResourceReader);
+    void ReadNonLocalisableInfoL(RResourceReader& aResourceReader, CResourceFile*& aLocalisableResourceFile, TUint& aLocalisableResourceId);
+    void ReadNonLocalisableOptionalInfoL(RResourceReader& aResourceReader, const CResourceFile* aRegistrationFile, CResourceFile* aLocalisableResourceFile);
+    void ReadMimeTypesSupportedL(RResourceReader& aResourceReader, CArrayFixFlat<TDataTypeWithPriority>& aMimeTypesSupported);       
+    void ReadLocalisableInfoL(const CResourceFile& aResourceFile, TUint aResourceId, TBool& aUseDefaultIcons);
+    HBufC* CreateFullIconFileNameL(const TDesC& aIconFileName) const;    
+#endif
 	void ConstructL();
-	void ReadMandatoryInfoL(RResourceReader& aResourceReader);
-	void ReadNonLocalisableInfoL(RResourceReader& aResourceReader, CResourceFile*& aLocalisableResourceFile, TUint& aLocalisableResourceId);
-	void ReadNonLocalisableOptionalInfoL(RResourceReader& aResourceReader, const CResourceFile* aRegistrationFile, CResourceFile* aLocalisableResourceFile);
-	void ReadMimeTypesSupportedL(RResourceReader& aResourceReader, CArrayFixFlat<TDataTypeWithPriority>& aMimeTypesSupported);
-	void ReadLocalisableInfoL(const CResourceFile& aResourceFile, TUint aResourceId, TBool& aUseDefaultIcons);
-	HBufC* CreateFullIconFileNameL(const TDesC& aIconFileName) const;
 	TBool HasWriteDeviceDataCap();
     void ReadAppSecurityInfo();
-	
 	static HBufC8* ReadOpaqueDataL(TUint aResourceId, const CResourceFile* aRegistrationFile, CResourceFile* aLocalisableResourceFile);
 private:
 	RFs& iFs;
 	TUid iAppUid;
 	HBufC* iAppBinaryFullName;
 	TUidType iAppBinaryUidType;
-	TTime iTimeStamp;
-	TTime iIconFileTimeStamp;
 	TApaAppCapability iCapability;
 	TUint iDefaultScreenNumber;
 	HBufC* iCaption;
@@ -184,20 +204,28 @@ private:
 	CDesCArray* iOwnedFileArray;
 	HBufC* iIconFileName;
 	TBool iNonMbmIconFile; // ETrue if icon filename is not an MBM file, however, EFalse does not necessarily mean it is an MBM file
-	HBufC* iLocalisableResourceFileName;
-	TTime iLocalisableResourceFileTimeStamp;
 	TLanguage iApplicationLanguage;
 	CArrayFixFlat<TApaAppServiceInfo>* iServiceArray;
-	TInt iIndexOfFirstOpenService;
-	TBool iOpenServiceIsLegacy;
+    TInt iIndexOfFirstOpenService; 	
 	HBufC8* iOpaqueData;
 private:
-	const TDesC& iRegistrationFileName;
 	TBool iHasWriteDeviceDataCap;
     TBool iIsSidTrusted;
     // This flag is used to determine if app security info was allready read
     TBool iSecurityInfoHasBeenRead;
-	CApaIconLoader* iIconLoader;	
+	CApaIconLoader* iIconLoader;
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	const Usif::CApplicationRegistrationData& iAppInfo; //The ownership is not taken	
+	const Usif::RSoftwareComponentRegistry& iScr; //The ownership is not taken	
+#else
+    const TDesC& iRegistrationFileName;
+    TTime iTimeStamp;
+    TTime iIconFileTimeStamp;   
+    HBufC* iLocalisableResourceFileName;
+    TTime iLocalisableResourceFileTimeStamp; 
+    TBool iOpenServiceIsLegacy;   
+#endif
+	
 	};
 
 

@@ -23,7 +23,7 @@
 #include <e32base.h>
 #include <centralrepository.h>
 #include <cenrepnotifyhandler.h>
-#include <LogsDomainCRKeys.h>
+//#include <LogsDomainCRKeys.h>
 
 // FORWARD DECLARATIONS
 class CSysApAppUi;

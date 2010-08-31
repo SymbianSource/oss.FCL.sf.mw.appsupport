@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include "../inc/psstatesourcepluginconst.hrh"
 
-TARGET          PSStateSourcePlugIn.dll
+TARGET          psstatesourceplugin.dll
 TARGETTYPE      PLUGIN
 UID             0x10009D8D KPSStateSourcePluginDllUid
 CAPABILITY      ALL -TCB

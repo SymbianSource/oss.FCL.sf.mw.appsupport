@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -39,10 +39,7 @@
 
 #include <secui.h>                  // security UI
 #include <secuisecurityhandler.h>
-
-#include <aknnotewrappers.h>
-#include <AknQueryDialog.h>
-
+#include <StringLoader.h>
 #include <hal.h>
 #include <centralrepository.h>
 #include <CommonEngineDomainCRKeys.h>
@@ -50,16 +47,18 @@
 #include <data_caging_path_literals.hrh>
 
 #include "CleanupResetPointer.h"
-#include <AknWaitDialog.h>
 #include <pdpcontextmanagerpskeys.h>
 #include <pdpcontextmanagerinternalcrkeys.h>
 #include "rfsConnectionObserver.h"
 #include "rfsHandler.h"
 #include "rfsClient.h"
 #include "RfsTraces.h"
+#include <hbdevicemessageboxsymbian.h>
 
 
 _LIT( KRfsResourceFileName, "Z:rfs.rsc");
+_LIT(KYes,"yes");
+_LIT(KNo,"No");
 
 // CONSTANTS
 const TInt KPhoneIndex = 0;
@@ -187,11 +186,19 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
         if( startersession.Connect() == KErrNone )
             {
 			// Displays information note to the user telling that the device will restart
-            HBufC* prompt = iEnv->AllocReadResourceLC( R_DEVICE_RESTART );
-            CAknInformationNote* note = new ( ELeave ) CAknInformationNote( ETrue );
-            note->ExecuteLD( *prompt );
-            CleanupStack::PopAndDestroy( prompt );
-			
+            HBufC* prompt = StringLoader::LoadLC( R_DEVICE_RESTART );
+                 
+          CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
+                CleanupStack::PushL(note);
+                note->SetTextL(*prompt);
+                //could have used show() but it is aynchronous and execution proceeds before note is seen so have used synchronous API exec()
+                note->ExecL();
+                CleanupStack::PopAndDestroy(note);
+                CleanupStack::PopAndDestroy( prompt );
+                	
+                	              
+               
+                
             if (aType == ERfsNormal ) startersession.Reset( RStarterSession::ENormalRFSReset );
             else if (aType == ERfsDeep ) startersession.Reset( RStarterSession::EDeepRFSReset );
             else startersession.Reset( RStarterSession::EUnknownReset );
@@ -238,12 +245,9 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
 EXPORT_C void CRfsHandler::Cancel()
     {
     TRACES("CRfsHandler::Cancel()");
-
-    // delete confirmation query
-    delete iQuery;
-    iQuery = NULL;
-
-    // delete security handler
+    
+     
+     // delete security handler
     if ( iSecurityHandler )
         {
         iSecurityHandler->CancelSecCodeQuery();
@@ -326,32 +330,26 @@ void CRfsHandler::SetDefaultLanguage() const
 TBool CRfsHandler::AskConfirmationL( const TBool& aThisDestroyed, TRfsType aType )
     {
     TRACES("CRfsHandler::AskConfirmationL()");
-    CleanupResetPointerPushL( iQuery );
-
-    // Show the confirmation query.
-
-    iQuery = CAknQueryDialog::NewL(); // no tone as default
-
+     
+   
     TInt resourceId = ( aType == ERfsNormal ) ? R_CONFIRM_RFS : R_CONFIRM_DEEP_RFS;
-    //iQuery->SetSize();
-    //iQuery->pref
-    
-    TBool ret = iQuery->ExecuteLD( resourceId );
-
-    if ( aThisDestroyed )
+    HBufC* query = iEnv->AllocReadResourceLC( resourceId );
+         
+   // Show the confirmation query.
+          
+   CHbDeviceMessageBoxSymbian::TButtonId selection = CHbDeviceMessageBoxSymbian::QuestionL(*query, KYes, KNo);
+    TBool ret;    
+    if (selection == CHbDeviceMessageBoxSymbian::EAcceptButton) // user pressed yes
         {
-        // this object was destroyed
-        ret = EFalse;
-        // remove cleanup item
-        CleanupStack::Pop();
+        ret=ETrue;
         }
     else
         {
-        // NULLs iQuery
-        CleanupStack::PopAndDestroy();
-        }
-
-    return ret;
+        ret=EFalse;
+        }  
+    CleanupStack::PopAndDestroy(query);
+    return ret;  
+    
     }
 
 // -----------------------------------------------------------------------------
@@ -441,11 +439,13 @@ TBool CRfsHandler::CheckConnectionsL()
         {
         HBufC* prompt = iEnv->AllocReadResourceLC( R_ACTIVE_CALLS );
 
-        CAknInformationNote* note = new ( ELeave ) CAknInformationNote( ETrue );
-
-        note->ExecuteLD( *prompt );
-
-        CleanupStack::PopAndDestroy( prompt );
+           CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
+                CleanupStack::PushL(note);
+                        note->SetTextL(*prompt);
+                        note->ShowL();
+                         CleanupStack::PopAndDestroy( note );
+                        CleanupStack::PopAndDestroy( prompt );
+               
         return ETrue;
         }
 

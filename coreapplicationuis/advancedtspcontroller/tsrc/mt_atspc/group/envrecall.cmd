@@ -25,7 +25,16 @@ popd
 @echo Cleaning advanced tsp test stub... Finished
 
 @echo Restoring remcon...
-move remconservercaps_orig.mmh \epoc32\include\remcon\remconservercaps.mmh
+pushd \sf\os\devicesrv\accessoryservices\remotecontrolfw\server\group
+call bldmake bldfiles
+call abld cleanexport
+call abld export
+popd
+pushd \sf\os\devicesrv\accessoryservices\remotecontrolfw\targetselectorplugin\group
+call bldmake bldfiles
+call abld reallyclean
+call abld build
+popd
 @echo Restoring remcon... Finished
 
 @echo Restoring advanced tsp

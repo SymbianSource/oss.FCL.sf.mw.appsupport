@@ -1,4 +1,4 @@
-// Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -25,7 +25,11 @@ client.mmp				support
 
 PRJ_TESTEXPORTS
 CoreAppsTestTest.iby	/epoc32/rom/include/coreappstesttest.iby
-../Inc/testserver.h	SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(coreappstest/testserver.h)
-../Inc/utilities.h	SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(coreappstest/utilities.h)
+#ifdef SYMBIAN_OLD_EXPORT_LOCATION
+../Inc/TestServer.h	/epoc32/include/coreappstest/testserver.h
+#endif
+#ifdef SYMBIAN_OLD_EXPORT_LOCATION
+../Inc/utilities.h	/epoc32/include/coreappstest/utilities.h
+#endif
 CoreAppsTest.iby	/epoc32/rom/include/coreappstest.iby
 runeshell.iby	/epoc32/rom/include/runeshell.iby

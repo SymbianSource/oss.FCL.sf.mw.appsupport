@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+ // Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -28,6 +28,8 @@
 #include "../apgrfx/APGSTD.H"			// EPanicNullPointer
 #include "../apgrfx/apsecutils.h"		// CApaSecurityUtils
 
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 const TUint KResourceOffsetMask = 0xFFFFF000;
 
 _LIT(KAppBinaryPathAndExtension, "\\sys\\bin\\.exe");
@@ -35,6 +37,9 @@ const TInt KAppRegistrationInfoResourceId = 1;
 
 // The 2nd UID that defines a resource file as being an application registration resource file.
 const TUid KUidAppRegistrationFile = {0x101F8021};
+#endif
+
+
 
 //
 // Local functions
@@ -42,14 +47,16 @@ const TUid KUidAppRegistrationFile = {0x101F8021};
 
 extern void CleanupServiceArray(TAny* aServiceArray);	// Implemented in AplAppList.cpp
 
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 // ApaUtils
 
 TBool ApaUtils::TypeUidIsForRegistrationFile(const TUidType& aUidType)
-	{ // static
-	return (aUidType[1].iUid==KUidAppRegistrationFile.iUid ||
-		   aUidType[0].iUid==KUidPrefixedNonNativeRegistrationResourceFile);
-	}
-
+    { // static
+    return (aUidType[1].iUid==KUidAppRegistrationFile.iUid ||
+           aUidType[0].iUid==KUidPrefixedNonNativeRegistrationResourceFile);
+    }
+#endif
 
 //
 // CApaAppInfoReader
@@ -62,29 +69,6 @@ TBool ApaUtils::TypeUidIsForRegistrationFile(const TUidType& aUidType)
 // to delete it's stored pointer, and replace it with one returned by this function,
 // instead of having to copy the object (copying could be expensive for the methods
 // of this class that need to return arrays).
-
-
-CApaAppInfoReader* CApaAppInfoReader::NewL(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid)
-	{
-	CApaAppInfoReader* self = new(ELeave) CApaAppInfoReader(aFs, aRegistrationFileName, aAppUid);
-	CleanupStack::PushL(self);
-	self->ConstructL();
-	CleanupStack::Pop(self);
-	return self;
-	}
-
-CApaAppInfoReader::CApaAppInfoReader(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid) :
-	iFs(aFs),
-	iAppUid(aAppUid),
-	iTimeStamp(0),
-	iDefaultScreenNumber(0),
-	iNonMbmIconFile(EFalse),
-	iLocalisableResourceFileTimeStamp(0),
-	iApplicationLanguage(ELangNone),
-	iIndexOfFirstOpenService(KErrNotFound),
-	iRegistrationFileName(aRegistrationFileName)
-	{
-	}
 
 void CApaAppInfoReader::ConstructL()
 	{
@@ -103,7 +87,9 @@ CApaAppInfoReader::~CApaAppInfoReader()
 	delete iViewDataArray;
 	delete iOwnedFileArray;
 	delete iIconFileName;
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	delete iLocalisableResourceFileName;
+#endif
 	
 	if (iServiceArray)
  		{
@@ -126,16 +112,6 @@ TUidType CApaAppInfoReader::AppBinaryUidType() const
 	{
 	return iAppBinaryUidType;
 	}
-
-TTime CApaAppInfoReader::TimeStamp() const
-	{
-	return iTimeStamp;
-	}
-
-TTime CApaAppInfoReader::IconFileTimeStamp() const
-     {
-     return iIconFileTimeStamp;
-     }
 
 void CApaAppInfoReader::Capability(TDes8& aCapabilityBuf) const
 	{
@@ -200,18 +176,7 @@ TBool CApaAppInfoReader::NonMbmIconFile() const
 	return iNonMbmIconFile;
 	}
 
-HBufC* CApaAppInfoReader::LocalisableResourceFileName()
-	{
-	HBufC* localisableResourceFileName = iLocalisableResourceFileName;
-	iLocalisableResourceFileName = NULL; // ownership transferred to caller
-	return localisableResourceFileName;
-	}
 
-TTime CApaAppInfoReader::LocalisableResourceFileTimeStamp() const
-	{
-	return iLocalisableResourceFileTimeStamp;
-	}
-	
 TLanguage CApaAppInfoReader::AppLanguage() const
 	{
 	return iApplicationLanguage;
@@ -238,6 +203,518 @@ CApaIconLoader* CApaAppInfoReader::IconLoader()
 	iIconLoader = NULL; // ownership transferred to caller
 	return iconLoader;
 	}
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+
+CApaAppInfoReader::CApaAppInfoReader(RFs& aFs, const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScr) :
+    iFs(aFs),
+    iDefaultScreenNumber(0),
+    iNonMbmIconFile(EFalse),
+    iApplicationLanguage(ELangNone),
+    iIndexOfFirstOpenService(KErrNotFound),
+    iAppInfo(aAppInfo),
+    iScr(aScr)
+    {
+    }
+
+CApaAppInfoReader* CApaAppInfoReader::NewL(RFs& aFs, const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScr)
+    {
+    CApaAppInfoReader* self = new(ELeave) CApaAppInfoReader(aFs, aAppInfo, aScr);
+    CleanupStack::PushL(self);
+    self->ConstructL();
+    CleanupStack::Pop(self);
+    return self;
+    }
+
+/*
+ * Reads the application information from SCR. 
+ */
+TBool CApaAppInfoReader::ReadL()
+    {
+    ReadAppRegistrationInfoL();
+    ReadLocalisationInfoL();  
+#ifdef APPARC_SHOW_TRACE    
+    DisplayAppInfo();
+#endif
+    return ETrue;
+    }
+
+#ifdef APPARC_SHOW_TRACE
+void CApaAppInfoReader::DisplayAppInfo()
+    { 
+    RDebug::Print(_L("[Apparc] Application UID: %X"), iAppUid.iUid);
+    if(iAppBinaryFullName)
+        RDebug::Print(_L("[Apparc] AppBinary Name: %S"), iAppBinaryFullName);
+    
+    RDebug::Print(_L("[Apparc] Embeddability: %d"), iCapability.iEmbeddability);
+    RDebug::Print(_L("[Apparc] Hidden: %d"), iCapability.iAppIsHidden);
+    RDebug::Print(_L("[Apparc] NewFile: %d"), iCapability.iSupportsNewFile);
+    RDebug::Print(_L("[Apparc] Launch in Foreground: %d"), iCapability.iLaunchInBackground);
+    RDebug::Print(_L("[Apparc] Attributes: %X"), iCapability.iAttributes);
+    RDebug::Print(_L("[Apparc] Group Name: %S"), &iCapability.iGroupName);
+    
+    RDebug::Print(_L("[Apparc] Default Screen Number: %d"), iDefaultScreenNumber);
+    RDebug::Print(_L("[Apparc] Application Language: %d"), iApplicationLanguage);
+    
+    if(iCaption)
+        RDebug::Print(_L("[Apparc] Short Cpation: %S"), iCaption); 
+		
+    if(iShortCaption)
+        RDebug::Print(_L("[Apparc] Caption: %S"), iShortCaption);
+    
+    if(iServiceArray)
+        {
+        for(TInt index=0;index<iServiceArray->Count();index++)
+            {
+            TApaAppServiceInfo serviceInfo=(*iServiceArray)[index];
+            RDebug::Print(_L("[Apparc] Service Uid: %X"), serviceInfo.Uid().iUid);
+            
+            for(TInt j=0;j<serviceInfo.DataTypes().Count();j++)
+            {
+            TDataTypeWithPriority dataType=(serviceInfo.DataTypes())[j];
+            RDebug::Print(_L("[Apparc] Data Type: %s   Priority:%d"), &dataType.iDataType, dataType.iPriority);
+            }
+            
+            }
+        }
+    
+    if(iIconFileName)
+        {
+        RDebug::Print(_L("[Apparc] Icon File: %S"), iIconFileName);   
+        
+        if(iNonMbmIconFile)
+            RDebug::Print(_L("[Apparc] Its Non MBM icon file"));
+        RDebug::Print(_L("[Apparc] Num Icons: %d"), iNumOfAppIcons);
+        }
+
+    if(iViewDataArray)
+        {
+        for(TInt index=0; index<iViewDataArray->Count();index++)
+            {
+            CApaAppViewData* view= (*iViewDataArray)[index];
+            RDebug::Print(_L("[Apparc] ViewID: %X"), view->Uid().iUid);
+            //RDebug::Print(_L("[Apparc] View Caption: %s"), view->Caption());
+            //RDebug::Print(_L("[Apparc] View Icon File: %s"), view->IconFileName());   
+            if(view->NonMbmIconFile())
+                RDebug::Print(_L("[Apparc] Its Non MBM icon file"));
+            RDebug::Print(_L("[Apparc] Screen Mode: %d"), view->ScreenMode());
+            }
+        }
+    }
+
+#endif
+
+
+void CApaAppInfoReader::ReadAppRegistrationInfoL()
+    {
+    //Get 3rd UID of the application
+    iAppUid=iAppInfo.AppUid();
+    
+    iCapability.iAttributes=iAppInfo.Attributes();
+    TUid firstUid(KExecutableImageUid);
+    TUid middleUid(KUidApp);
+
+    //If the application is non-native, first UID should be Null UID and second uid is the non-native application type(i.e type ID of java, widget etc.). 
+    if (iCapability.iAttributes & TApaAppCapability::ENonNative)
+        {
+            firstUid=KNullUid;
+            middleUid.iUid=iAppInfo.TypeId();
+        }
+    else if (iCapability.iAttributes & TApaAppCapability::EBuiltAsDll)
+        {
+        User::Leave(KErrNotSupported); // legacy dll-style app
+        }
+    
+    iAppBinaryUidType=TUidType(firstUid, middleUid, iAppUid);
+   
+    //If executable file name is not given then just leave. 
+    if(iAppInfo.AppFile().Length() ==0 )
+        User::Leave(KErrGeneral);
+
+    //Absolute path of the executable file is stored in iAppBinaryFullName
+    iAppBinaryFullName=iAppInfo.AppFile().AllocL();
+    
+//    //Check whether the binary exists.
+    /*RLibrary::TInfoBuf infoBuf;
+    TInt ret = RLibrary::GetInfo(*iAppBinaryFullName, infoBuf);
+    User::LeaveIfError(ret);
+    
+    if(infoBuf().iUids[2]!=iAppUid && iAppBinaryUidType[1]==KUidApp)
+        User::Leave(KErrNotFound);*/
+    
+    iCapability.iAppIsHidden=iAppInfo.Hidden();
+    iCapability.iEmbeddability = static_cast<TApaAppCapability::TEmbeddability>(iAppInfo.Embeddability());
+    iCapability.iLaunchInBackground=iAppInfo.Launch();
+    iCapability.iSupportsNewFile=iAppInfo.NewFile();
+    
+    iDefaultScreenNumber=iAppInfo.DefaultScreenNumber();
+    
+    iCapability.iGroupName=iAppInfo.GroupName();
+    
+    RPointerArray<Usif::COpaqueData> appOpaqueData=iAppInfo.AppOpaqueData();
+    ASSERT(!(appOpaqueData.Count()>1));
+    
+    if(appOpaqueData.Count()>0)
+        {
+        iOpaqueData=appOpaqueData[0]->OpaqueData().AllocL();
+        }
+    else
+        {
+        //If opaque data is not available, create an empty object and assign to iOpaqueData
+        iOpaqueData=HBufC8::NewL(0);
+        }  
+    
+    ReadServiceInfoL(iAppInfo.ServiceArray()); 
+    ReadOwnedFilesInfoL(iAppInfo.OwnedFileArray());
+    }
+
+
+/*
+ * Reads service information of the application.
+ */
+void CApaAppInfoReader::ReadServiceInfoL(const RPointerArray<Usif::CServiceInfo>& aServiceInfo)
+    {
+    TInt serviceCount=aServiceInfo.Count();
+    
+    if (serviceCount > 0)
+        {
+        iServiceArray = new(ELeave) CArrayFixFlat<TApaAppServiceInfo>(4);   
+        }
+    else
+        {
+        //if service information is not avaliable, just return.
+        return;        
+        }
+
+    //Read application service info one at a time and store in iServiceArray.
+    for (TInt index=0;index<serviceCount;index++)
+        {
+        TUid serviceUid=aServiceInfo[index]->Uid();
+        
+        CArrayFixFlat<TDataTypeWithPriority>* mimeTypesSupported = new(ELeave) CArrayFixFlat<TDataTypeWithPriority>(5);
+        CleanupStack::PushL(mimeTypesSupported);
+        
+        //Read supported mime types of a service
+        ReadMimeTypesSupportedL(aServiceInfo[index]->DataTypes(), *mimeTypesSupported); 
+        
+        RPointerArray<Usif::COpaqueData> serviceOpaqueData=aServiceInfo[index]->OpaqueData();
+        //SCR schould give atmost only one opaque data for a service.
+        ASSERT(!(serviceOpaqueData.Count()>1));
+        
+        HBufC8* opaqueData=NULL;
+        if(serviceOpaqueData.Count()>0)
+            {
+            opaqueData= serviceOpaqueData[0]->OpaqueData().AllocL();
+            }
+        else
+            {
+            //If opaque data is not available, create an empty object and assign to opaqueData        
+            opaqueData=HBufC8::NewL(0);
+            }
+        
+        TApaAppServiceInfo serviceInfo(serviceUid, mimeTypesSupported,opaqueData); // takes ownership of mimeTypesSupported and opaqueData 
+        CleanupStack::PushL(opaqueData);
+        iServiceArray->AppendL(serviceInfo);
+        CleanupStack::Pop(2, mimeTypesSupported);        
+    
+        //If service UID is KOpenServiceUid and it is first open service then initialize iIndexOfFirstOpenService
+        if ((serviceUid == KOpenServiceUid) && (iIndexOfFirstOpenService < 0))
+            iIndexOfFirstOpenService = iServiceArray->Count() - 1;        
+        }
+    } 
+
+
+/*
+ * Reads supported mime types and its handling priorities of a service
+ */
+void CApaAppInfoReader::ReadMimeTypesSupportedL(const RPointerArray<Usif::CDataType>& dataTypes, CArrayFixFlat<TDataTypeWithPriority>& aMimeTypesSupported) 
+    {
+    
+    const TInt dataTypeArraySize = dataTypes.Count();
+    //if there are no data types available, just return.
+    if (dataTypeArraySize <= 0)
+        return;
+   
+    for (TInt i=0; i < dataTypeArraySize; i++)
+        {
+        TDataTypePriority priority = static_cast<TDataTypePriority>(dataTypes[i]->Priority());
+        
+        //Check for data priority of UnTrusted apps however the trusted apps will not have any restrictions 
+        //over the data priority.   
+        //If an untrusted app has write device data capability (i.e. still has priority = KDataTypePrioritySystem),
+        //do not restrict to KDataTypeUnTrustedPriorityThreshold
+        if (priority > KDataTypeUnTrustedPriorityThreshold || priority == KDataTypePrioritySystem )
+            {
+            ReadAppSecurityInfo();
+
+            if (priority == KDataTypePrioritySystem)
+                {
+                // Check that the app has capability WriteDeviceData
+                if (!iHasWriteDeviceDataCap)
+                    priority = KDataTypePriorityNormal;
+                }
+            else
+                {
+                //data priority for UnTrusted apps would be capped if it is greater than the threshold priority i.e, KMaxTInt16.
+                //Component ID is zero if the application is shipped with phone.
+                TBool isInstalledApp=(iScr.GetComponentIdForAppL(iAppBinaryUidType[2])!=0);
+                if (!iIsSidTrusted && isInstalledApp) 
+                    {
+                    //if application sid is in unprotected range and the applciation is instaleld with  
+                    //one of the installers after phone marketed, then priority needs to be downgraded.
+                    priority = KDataTypeUnTrustedPriorityThreshold; 
+                    }
+                }
+            }
+
+        TBuf8<KMaxDataTypeLength> buf;
+        //Convert 16-bit descriptor to 8-bit descriptor.
+        buf.Copy(dataTypes[i]->Type());
+
+        TDataType dataType(buf);
+        TDataTypeWithPriority dataTypeWithPriority(dataType, priority); 
+        aMimeTypesSupported.AppendL(dataTypeWithPriority);
+        }
+    }
+
+
+/*
+ * Reads owned files information.
+ */
+void CApaAppInfoReader::ReadOwnedFilesInfoL(const RPointerArray<HBufC>& aOwnedFiles)
+    {
+    const TInt fileOwnershipArraySize = aOwnedFiles.Count();
+    
+    //if owned files information is not avaliable, just return.
+    if (fileOwnershipArraySize <= 0)
+        return;
+    
+    iOwnedFileArray = new(ELeave) CDesCArraySeg(fileOwnershipArraySize);
+
+    for (TInt index=0; index < fileOwnershipArraySize; index++)
+        {
+        HBufC *fileowned=aOwnedFiles[index]->Des().AllocL();
+        CleanupStack::PushL(fileowned);
+        iOwnedFileArray->AppendL(*fileowned); //takes the ownership of fileowned
+        CleanupStack::Pop(fileowned);
+        }
+    }
+
+void CApaAppInfoReader::ReadLocalisationInfoL()
+    {
+    RPointerArray<Usif::CLocalizableAppInfo> localisationInfo;
+    localisationInfo=iAppInfo.LocalizableAppInfoList();
+    ASSERT(localisationInfo.Count() <= 1);
+    
+    if(localisationInfo.Count()<=0)
+        {
+        //If localisable information is not avaialable then assign default icons.
+        TRAP_IGNORE(iIcons = CApaAppIconArray::NewDefaultIconsL());     
+        return;
+        }
+
+    //Group name provided in localisation file takes precedence over group name provided in registration file name.
+    const TDesC& groupName=localisationInfo[0]->GroupName();
+
+    if(groupName.Length()>0)
+        {
+        iCapability.iGroupName=groupName;
+        }
+    
+    //Get application language for current phone language.
+    iApplicationLanguage=localisationInfo[0]->ApplicationLanguage();
+    
+    const Usif::CCaptionAndIconInfo* captionIconInfo=localisationInfo[0]->CaptionAndIconInfo();
+    
+    TBool useDefaultIcons=ETrue;
+    
+    if(captionIconInfo!=NULL)
+        {
+        iShortCaption=localisationInfo[0]->ShortCaption().AllocL();
+        if(iShortCaption && iShortCaption->Length() == 0)
+            {
+                delete iShortCaption;
+                iShortCaption=NULL;
+            }
+    
+        iCaption=captionIconInfo->Caption().AllocL();
+        if(iCaption && iCaption->Length() == 0)
+            {
+                delete iCaption;
+                iCaption=NULL;
+            }        
+    
+        iNumOfAppIcons=captionIconInfo->NumOfAppIcons();
+
+        if(captionIconInfo->IconFileName().Length()>0)
+            iIconFileName=captionIconInfo->IconFileName().AllocL();    
+
+        
+        if (iIconFileName && iIconFileName->Length())
+            {
+            if (iFs.IsValidName(*iIconFileName))
+                {
+                RFile file;
+                TInt fileSize( 0 );
+                TInt err= file.Open(iFs, *iIconFileName, EFileShareReadersOnly );
+                
+                //If the icon file does not exist, use default icons.
+                if(err==KErrNone)
+                    {
+                    User::LeaveIfError(err);
+                    CleanupClosePushL( file );
+                    User::LeaveIfError( file.Size( fileSize ) );
+                    CleanupStack::PopAndDestroy(&file);//file
+                    
+                    if ( fileSize > 0 )
+                        {
+                        if(FileIsMbmWithGenericExtensionL(*iIconFileName))
+                            {
+                            if (iNumOfAppIcons > 0)
+                                {
+                                //Icon file is valid and contains mbm icons.
+                                iIcons = CApaAppIconArray::NewAppIconsL(iNumOfAppIcons, *iIconFileName, *iIconLoader);
+                                useDefaultIcons=EFalse;
+                                }
+                            }
+                        else
+                            {
+                            //If the icon file is not a mbm icon file then the file is treated as a non-mbm file.                
+                            iNonMbmIconFile = ETrue;
+                            useDefaultIcons=EFalse;
+                            }
+                        
+                        }
+                    }
+                }
+            else
+                {
+                //If the filename is not a valid name then the file is treated as a non-mbm file.        
+                iNonMbmIconFile = ETrue;
+                useDefaultIcons=EFalse;                
+                }
+            }
+        }
+    
+    if(useDefaultIcons)
+        TRAP_IGNORE(iIcons = CApaAppIconArray::NewDefaultIconsL());        
+
+    ReadViewInfoL(localisationInfo[0]->ViewDataList());
+    }
+
+/*
+ * Read application view information.
+ */
+
+void CApaAppInfoReader::ReadViewInfoL(const RPointerArray<Usif::CAppViewData>& aViewData)
+    {
+     const TInt numOfViews = aViewData.Count();
+
+     //if view information not avaliable, just return.     
+     if(numOfViews <=0 )
+         return;
+     
+     iViewDataArray = new(ELeave) CArrayPtrFlat<CApaAppViewData>(numOfViews);
+
+     //Read one view information at time and add it iViewDataArray
+     for(TInt view = 0; view < numOfViews; ++view)
+         {
+         CApaAppViewData* viewData = CApaAppViewData::NewLC();
+         
+         const TUid viewUid = aViewData[view]->Uid();
+         viewData->SetUid(viewUid);
+         
+         const TInt screenMode = {aViewData[view]->ScreenMode()};
+         viewData->SetScreenMode(screenMode);
+
+         const Usif::CCaptionAndIconInfo* viewCaptionIconInfo=aViewData[view]->CaptionAndIconInfo();
+         
+         if(viewCaptionIconInfo!=NULL)
+             {
+             viewData->SetCaptionL(viewCaptionIconInfo->Caption());
+    
+             const TInt numOfViewIcons = viewCaptionIconInfo->NumOfAppIcons();
+             viewData->SetNumOfViewIcons(numOfViewIcons);
+    
+             TPtrC viewIconFile = viewCaptionIconInfo->IconFileName();
+             
+             if (viewIconFile.Length())
+                 {
+                 viewData->SetIconFileNameL(viewIconFile);
+                 
+                 if (iFs.IsValidName(viewIconFile))
+                     {
+                     if(!FileIsMbmWithGenericExtensionL(viewIconFile))
+                         viewData->SetNonMbmIconFile(ETrue);
+                     }
+                 else    //If the filename is not a valid name then the file is treated as a non-mbm file.
+                     viewData->SetNonMbmIconFile(ETrue);
+                 }
+             else
+                 {
+                 viewIconFile.Set(KNullDesC);
+                 if (numOfViewIcons > 0 && iIconFileName)
+                     viewIconFile.Set(*iIconFileName); // default to app icon filename
+                 }
+             
+             if (numOfViewIcons > 0 && iFs.IsValidName(viewIconFile) && FileIsMbmWithGenericExtensionL(viewIconFile))
+                 {
+                 CApaAppIconArray* iconArray = CApaAppIconArray::NewViewIconsL(numOfViewIcons, viewIconFile, *iIconLoader);
+                 viewData->SetIconArray(iconArray);
+                 iconArray = NULL;
+                 }
+             }
+
+         iViewDataArray->AppendL(viewData);
+         CleanupStack::Pop(viewData);
+         }    
+    }
+
+#else
+
+CApaAppInfoReader* CApaAppInfoReader::NewL(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid)
+    {
+    CApaAppInfoReader* self = new(ELeave) CApaAppInfoReader(aFs, aRegistrationFileName, aAppUid);
+    CleanupStack::PushL(self);
+    self->ConstructL();
+    CleanupStack::Pop(self);
+    return self;
+    }
+
+CApaAppInfoReader::CApaAppInfoReader(RFs& aFs, const TDesC& aRegistrationFileName, TUid aAppUid) :
+    iFs(aFs),
+    iAppUid(aAppUid),
+    iTimeStamp(0),
+    iDefaultScreenNumber(0),
+    iNonMbmIconFile(EFalse),
+    iLocalisableResourceFileTimeStamp(0),
+    iApplicationLanguage(ELangNone),
+    iIndexOfFirstOpenService(KErrNotFound),
+    iRegistrationFileName(aRegistrationFileName)
+    {
+    }
+
+TTime CApaAppInfoReader::TimeStamp() const
+    {
+    return iTimeStamp;
+    }
+
+TTime CApaAppInfoReader::IconFileTimeStamp() const
+     {
+     return iIconFileTimeStamp;
+     }
+
+HBufC* CApaAppInfoReader::LocalisableResourceFileName()
+    {
+    HBufC* localisableResourceFileName = iLocalisableResourceFileName;
+    iLocalisableResourceFileName = NULL; // ownership transferred to caller
+    return localisableResourceFileName;
+    }
+
+TTime CApaAppInfoReader::LocalisableResourceFileTimeStamp() const
+    {
+    return iLocalisableResourceFileTimeStamp;
+    }
 
 // reads as much info as it can
 // at least captions and icons must be setup on return from this method (using defaults if necessary)
@@ -359,54 +836,6 @@ void CApaAppInfoReader::ReadMandatoryInfoL(RResourceReader& aResourceReader)
 		}
 
 	iAppBinaryFullName = parse.FullName().AllocL();
-	}
-
-
-HBufC* CApaAppInfoReader::CreateFullIconFileNameL(const TDesC& aIconFileName) const
-	{
-	HBufC* filename = NULL;
-	if (aIconFileName.Length() == 0)
-		return NULL;
-	/*
-	 * aIconFileName may contain a valid string in some format (for eg. URI format) other than path to a regular file on disk
-	 * and that can be a mbm or non-mbm file. Such a filename will be reported as invalid filename by iFs.IsValidName() method. 
-	 * aIconFileName will be returned since it is a valid string. 
-	 */	
-	if(!iFs.IsValidName(aIconFileName))
-		{
-		filename = aIconFileName.AllocL();
-		return filename;
-		}
-	
-	TParsePtrC parsePtr(aIconFileName);
-	if (parsePtr.IsWild() || !parsePtr.PathPresent() || !parsePtr.NamePresent())
-		return NULL;
-
-	// check for fully qualified icon filename
-	if (parsePtr.DrivePresent() && BaflUtils::FileExists(iFs, aIconFileName))
-		filename = aIconFileName.AllocL();
-	else
-		{
-		// check for icon file on same drive as localisable resource file
-		TParse parse;
-		TPtrC localisableResourceFileDrive = TParsePtrC(*iLocalisableResourceFileName).Drive();
-		TInt ret = parse.SetNoWild(localisableResourceFileDrive, &aIconFileName, NULL);
-		if (ret == KErrNone && BaflUtils::FileExists(iFs, parse.FullName()))
-			filename = parse.FullName().AllocL();
-		else
-			{
-			TPtrC registrationFileDrive = TParsePtrC(iRegistrationFileName).Drive();
-			if (TInt(TDriveUnit(registrationFileDrive)) != TInt(TDriveUnit(localisableResourceFileDrive)))
-				{
-				// check for icon file on same drive as registration file
-				ret = parse.SetNoWild(registrationFileDrive, &aIconFileName, NULL);
-				if (ret == KErrNone && BaflUtils::FileExists(iFs, parse.FullName()))
-					filename = parse.FullName().AllocL();
-				}
-			}
-		}
-
-	return filename;
 	}
 
 void CApaAppInfoReader::ReadLocalisableInfoL(const CResourceFile& aResourceFile, TUint aResourceId, TBool& aUseDefaultIcons)
@@ -570,68 +999,6 @@ void CApaAppInfoReader::ReadLocalisableInfoL(const CResourceFile& aResourceFile,
 	CleanupStack::PopAndDestroy(&resourceReader);
 	}
 
-/*An MBM file may have a generic icon extension. In this case, as a way to check whether the file is an MBM one, 
-it is necessary to read the content of the fist four 32bit words of it and find out whether these words correspond to 
-KWriteonceFileStoreUid, KMultiBitmapFileImageUid, zero and KMultiBitmapFileImageChecksum respectively (defined in graphics/gditools/bmconv/bmconv.h).
-So the file is opened and the first 4 32 bit words are extracted and compared with the header information of standard MBM file.
-If they match, the function returns ETrue, else it returns EFalse */
-TBool CApaAppInfoReader::FileIsMbmWithGenericExtensionL(const TDesC& aFileName)
-      { 
-      if (aFileName.Length() > 0) 
-            { 
-            //open a file in Share mode - this will allow other methods to access it too
-            RFile file;
-            RFs fs;
-            User::LeaveIfError(fs.Connect());
-            CleanupClosePushL(fs);
-            User::LeaveIfError(file.Open(fs,aFileName,EFileShareReadersOnly));
-            //this is done beacuse the file can also be accessed by applist at the same time
-            //buffer stores the 16 bytes of the file
-            CleanupClosePushL(file);
-            TBuf8<16> buffer;
-            User::LeaveIfError(file.Read(buffer,16));
-            CleanupStack::PopAndDestroy();//file
-            CleanupStack::PopAndDestroy(&fs);//fs
-            //we use a constant pointer to the buffer to read header info
-        	TPtrC8 filePointer(buffer);
-        	
-            /*The first 16 bytes of an MBM file are the same for any generic MBM file.
-            These are :
-            KWriteOnceFileStoreUid = 0x10000037(Emulator MBM file) 0x10000041(ROM image)	
-            KMultiBitMapFileImageUid = 0x10000042(Emulator MBM file) 	0x00000001(ROM image)
-            Zero = 0x00000000(Emulator MBM file) 0x0000000C(ROM image)
-            checksum = 0x47396439(Emulator MBM file) 0x10000040(ROM image)
-            The first 16 bytes of the given file is compared with these standard values to ascertain it is MBM file*/
-        	if((filePointer[3]==0x10)&&(filePointer[2]==0x00)&&(filePointer[1]==0x00)&&(filePointer[0]==0x37))
-        		{//KWriteOnceFileStoreUid = 0x10000037
-        		if((filePointer[7]==0x10)&&(filePointer[6]==0x00)&&(filePointer[5]==0x00)&&(filePointer[4]==0x42))
-        			{//KMultiBitMapFileImageUid = 0x10000042
-        			if((filePointer[11]==0x00)&&(filePointer[10]==0x00)&&(filePointer[9]==0x00)&&(filePointer[8]==0x00))
-        				{//Zero = 0x00000000)
-        				if((filePointer[15]==0x47)&&(filePointer[14]==0x39)&&(filePointer[13]==0x64)&&(filePointer[12]==0x39))
-        					{//checksum = 0x47396439
-        					return ETrue;
-        					}
-        				}
-        			}
-        		}
-        	//Else Check for ROM Image MBM file's header
-        	else if((filePointer[3]==0x10)&&(filePointer[2]==0x00)&&(filePointer[1]==0x00)&&(filePointer[0]==0x41))
-        		{//KWriteOnceFileStoreUid = 0x10000041
-        		if((filePointer[7]==0x00)&&(filePointer[6]==0x00)&&(filePointer[5]==0x00)&&(filePointer[4]==0x01))
-        			{//KMultiBitMapFileImageUid = 0x00000001
-        			if((filePointer[11]==0x00)&&(filePointer[10]==0x00)&&(filePointer[9]==0x00)&&(filePointer[8]==0x0C))
-        				{//Zero = 0x0000000C)
-        				if((filePointer[15]==0x10)&&(filePointer[14]==0x00)&&(filePointer[13]==0x00)&&(filePointer[12]==0x40))
-        					{//checksum = 0x10000040
-        					return ETrue;
-        					}
-        				}
-        			}
-        		}
-        	}
-      return EFalse;
-      }
 
 HBufC8* CApaAppInfoReader::ReadOpaqueDataL(TUint aResourceId, const CResourceFile* aRegistrationFile, CResourceFile* aLocalisableResourceFile)
 	{ // static
@@ -844,6 +1211,119 @@ void CApaAppInfoReader::ReadMimeTypesSupportedL(RResourceReader& aResourceReader
 		}
 	}
 
+
+HBufC* CApaAppInfoReader::CreateFullIconFileNameL(const TDesC& aIconFileName) const
+    {
+    HBufC* filename = NULL;
+    if (aIconFileName.Length() == 0)
+        return NULL;
+    /*
+     * aIconFileName may contain a valid string in some format (for eg. URI format) other than path to a regular file on disk
+     * and that can be a mbm or non-mbm file. Such a filename will be reported as invalid filename by iFs.IsValidName() method. 
+     * aIconFileName will be returned since it is a valid string. 
+     */ 
+    if(!iFs.IsValidName(aIconFileName))
+        {
+        filename = aIconFileName.AllocL();
+        return filename;
+        }
+    
+    TParsePtrC parsePtr(aIconFileName);
+    if (parsePtr.IsWild() || !parsePtr.PathPresent() || !parsePtr.NamePresent())
+        return NULL;
+
+    // check for fully qualified icon filename
+    if (parsePtr.DrivePresent() && BaflUtils::FileExists(iFs, aIconFileName))
+        filename = aIconFileName.AllocL();
+    else
+        {
+        // check for icon file on same drive as localisable resource file
+        TParse parse;
+        TPtrC localisableResourceFileDrive = TParsePtrC(*iLocalisableResourceFileName).Drive();
+        TInt ret = parse.SetNoWild(localisableResourceFileDrive, &aIconFileName, NULL);
+        if (ret == KErrNone && BaflUtils::FileExists(iFs, parse.FullName()))
+            filename = parse.FullName().AllocL();
+        else
+            {
+            TPtrC registrationFileDrive = TParsePtrC(iRegistrationFileName).Drive();
+            if (TInt(TDriveUnit(registrationFileDrive)) != TInt(TDriveUnit(localisableResourceFileDrive)))
+                {
+                // check for icon file on same drive as registration file
+                ret = parse.SetNoWild(registrationFileDrive, &aIconFileName, NULL);
+                if (ret == KErrNone && BaflUtils::FileExists(iFs, parse.FullName()))
+                    filename = parse.FullName().AllocL();
+                }
+            }
+        }
+
+    return filename;
+    }
+
+#endif
+
+/*An MBM file may have a generic icon extension. In this case, as a way to check whether the file is an MBM one, 
+it is necessary to read the content of the fist four 32bit words of it and find out whether these words correspond to 
+KWriteonceFileStoreUid, KMultiBitmapFileImageUid, zero and KMultiBitmapFileImageChecksum respectively (defined in graphics/gditools/bmconv/bmconv.h).
+So the file is opened and the first 4 32 bit words are extracted and compared with the header information of standard MBM file.
+If they match, the function returns ETrue, else it returns EFalse */
+TBool CApaAppInfoReader::FileIsMbmWithGenericExtensionL(const TDesC& aFileName)
+      { 
+      if (aFileName.Length() > 0) 
+            { 
+            //open a file in Share mode - this will allow other methods to access it too
+            RFile file;
+            RFs fs;
+            User::LeaveIfError(fs.Connect());
+            CleanupClosePushL(fs);
+            User::LeaveIfError(file.Open(fs,aFileName,EFileShareReadersOnly));
+            //this is done beacuse the file can also be accessed by applist at the same time
+            //buffer stores the 16 bytes of the file
+            CleanupClosePushL(file);
+            TBuf8<16> buffer;
+            User::LeaveIfError(file.Read(buffer,16));
+            CleanupStack::PopAndDestroy();//file
+            CleanupStack::PopAndDestroy(&fs);//file, fs
+            //we use a constant pointer to the buffer to read header info
+            TPtrC8 filePointer(buffer);
+            
+            /*The first 16 bytes of an MBM file are the same for any generic MBM file.
+            These are :
+            KWriteOnceFileStoreUid = 0x10000037(Emulator MBM file) 0x10000041(ROM image)    
+            KMultiBitMapFileImageUid = 0x10000042(Emulator MBM file)    0x00000001(ROM image)
+            Zero = 0x00000000(Emulator MBM file) 0x0000000C(ROM image)
+            checksum = 0x47396439(Emulator MBM file) 0x10000040(ROM image)
+            The first 16 bytes of the given file is compared with these standard values to ascertain it is MBM file*/
+            if((filePointer[3]==0x10)&&(filePointer[2]==0x00)&&(filePointer[1]==0x00)&&(filePointer[0]==0x37))
+                {//KWriteOnceFileStoreUid = 0x10000037
+                if((filePointer[7]==0x10)&&(filePointer[6]==0x00)&&(filePointer[5]==0x00)&&(filePointer[4]==0x42))
+                    {//KMultiBitMapFileImageUid = 0x10000042
+                    if((filePointer[11]==0x00)&&(filePointer[10]==0x00)&&(filePointer[9]==0x00)&&(filePointer[8]==0x00))
+                        {//Zero = 0x00000000)
+                        if((filePointer[15]==0x47)&&(filePointer[14]==0x39)&&(filePointer[13]==0x64)&&(filePointer[12]==0x39))
+                            {//checksum = 0x47396439
+                            return ETrue;
+                            }
+                        }
+                    }
+                }
+            //Else Check for ROM Image MBM file's header
+            else if((filePointer[3]==0x10)&&(filePointer[2]==0x00)&&(filePointer[1]==0x00)&&(filePointer[0]==0x41))
+                {//KWriteOnceFileStoreUid = 0x10000041
+                if((filePointer[7]==0x00)&&(filePointer[6]==0x00)&&(filePointer[5]==0x00)&&(filePointer[4]==0x01))
+                    {//KMultiBitMapFileImageUid = 0x00000001
+                    if((filePointer[11]==0x00)&&(filePointer[10]==0x00)&&(filePointer[9]==0x00)&&(filePointer[8]==0x0C))
+                        {//Zero = 0x0000000C)
+                        if((filePointer[15]==0x10)&&(filePointer[14]==0x00)&&(filePointer[13]==0x00)&&(filePointer[12]==0x40))
+                            {//checksum = 0x10000040
+                            return ETrue;
+                            }
+                        }
+                    }
+                }
+            }
+      return EFalse;
+      }
+
 // This method can be used to check whether app has a WriteDeviceCap 
 // and its sid is trusted
 void CApaAppInfoReader::ReadAppSecurityInfo()
@@ -925,7 +1405,7 @@ TInt CApaIconLoader::IconIndexL(const TDesC& aFileName, TBool& aUseCache)
 		return ret;
 		}
 	else
-		aUseCache = ETrue;
+	    aUseCache = ETrue;	    
 
 	// if filename in array, get the next index
 	TInt ret = 0;
@@ -963,6 +1443,7 @@ TInt CApaIconLoader::IconIndexL(const TDesC& aFileName, TBool& aUseCache)
 // Leaves if an error occurs while trying to populate aIcons or sort icons
 TBool CApaIconLoader::LoadIconsL(TInt aNumOfIcons, const TDesC& aMbmFileName, CArrayPtr<CApaMaskedBitmap>& aIcons)
 	{
+  
 	TEntry entry;
 	TInt error=iFs.Entry(aMbmFileName,entry);
 	if (error!=KErrNone)
@@ -985,7 +1466,8 @@ TBool CApaIconLoader::LoadIconsL(TInt aNumOfIcons, const TDesC& aMbmFileName, CA
 		CApaMaskedBitmap* bitmap = CApaMaskedBitmap::NewLC();
 		fileIndex = IconIndexL(aMbmFileName, useCache);
 		User::LeaveIfError(bitmap->Load(mbmFile, 2*fileIndex));
-		User::LeaveIfError((bitmap->Mask())->Load(mbmFile,2*fileIndex+1));		
+		User::LeaveIfError((bitmap->Mask())->Load(mbmFile,2*fileIndex+1));   
+		
 		aIcons.AppendL(bitmap);
 		CleanupStack::Pop(bitmap);		
 		}

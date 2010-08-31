@@ -27,7 +27,7 @@
 #include <avkon.hrh>
 #include <avkon.rsg>
 #include <SysAp.rsg>
-#include <secondarydisplay/SecondaryDisplaySysApAPI.h>
+#include <SecondaryDisplay/SecondaryDisplaySysApAPI.h>
 #include <aknSDData.h>
 
 // Constants
@@ -181,14 +181,14 @@ void CSysApConfirmationQuery::ShowQueryL( const TSysApConfirmationQueryIds aQuer
                 anim = R_QGN_NOTE_INFO_ANIM;
                 secondaryDisplayCmdId = SecondaryDisplay::ECmdShowMemoryCardLockedQuery;
                 break;
-            case ESysApUseFmTxInOfflineQuery:
+/*            case ESysApUseFmTxInOfflineQuery:
                  queryStringBuf 
                      = StringLoader::LoadLC( R_QTN_FMTX_SYSAP_NOTE_ACTIVATE_IN_OFFLINE,
                                              aLoaderEnv );
                  keys = R_AVKON_SOFTKEYS_YES_NO;
                  secondaryDisplayCmdId = SecondaryDisplay::ECmdShowFmTxKeepOnInOfflineQuery;
                  break;
-            case ESysApBattChargingPowerSavingQuery:
+*/            case ESysApBattChargingPowerSavingQuery:
                 queryStringBuf = StringLoader::LoadLC( R_QTN_BATTERY_CHARGING_POWER_SAVING_QUERY, aLoaderEnv );
                 keys = R_AVKON_SOFTKEYS_YES_NO;
                 secondaryDisplayCmdId = SecondaryDisplay::ECmdShowChargingDeactivatePowerSavingQuery;
@@ -325,14 +325,14 @@ void CSysApConfirmationQuery::RunL()
                 ShowQueryL( iPendingQuery, CCoeEnv::Static() );
                 }
             break;
-         case ESysApUseFmTxInOfflineQuery:
+/*         case ESysApUseFmTxInOfflineQuery:
              if ( iStatus.Int() == EAknSoftkeyNo )
                  {
                  TRACES( RDebug::Print( _L( "CSysApConfirmationQuery::RunL: calling CSysApAppUi::ChangeFmTxStateL( EFalse )" ) ) );
                  iSysApAppUi.ChangeFmTxStateL( EFalse ); // disable FM TX
                  }
              break;
-         case ESysApBattChargingPowerSavingQuery:
+*/         case ESysApBattChargingPowerSavingQuery:
             iSysApAppUi.HandleDeactivatePsmQueryResponse( iStatus.Int() == EAknSoftkeyYes );
             break;
             

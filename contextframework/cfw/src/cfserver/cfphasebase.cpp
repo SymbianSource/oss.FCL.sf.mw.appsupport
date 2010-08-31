@@ -95,10 +95,8 @@ void CCFPhaseBase::Cancel()
     FUNC_LOG;
 
     __ASSERT_DEBUG( iStarterRequest, Panic( ENoRequestToComplete ) );
-    if ( iStarterRequest )
-		{
-		User::RequestComplete( iStarterRequest, KErrCancel );
-		}
+    
+    User::RequestComplete( iStarterRequest, KErrCancel );
     }
 
 //-----------------------------------------------------------------------------

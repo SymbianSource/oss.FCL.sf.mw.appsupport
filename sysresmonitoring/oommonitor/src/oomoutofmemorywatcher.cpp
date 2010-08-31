@@ -20,6 +20,7 @@
 #include "oomoutofmemorywatcher.h"
 #include "oommemorymonitor.h"
 #include "OomTraces.h"
+#include <u32hal.h>
 
 // ======================================================================
 // class COutOfMemoryWatcher

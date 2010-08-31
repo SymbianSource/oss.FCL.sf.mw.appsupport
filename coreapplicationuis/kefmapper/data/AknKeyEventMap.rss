@@ -44,22 +44,7 @@ RESOURCE KEF_KEY_EVENT_MAP r_avkon_key_event_map
 	            devicemode = { KKefModeDefault };
 	            eventtype  = { KKefTypeShort | KKefTypeKey };
 	            feedbacktype = 1; // 1 = Basic feedback
-	            },
-	        KEF_KEY_EVENT
-           		{
-            	scancode = { EStdKeyRightFunc, EStdKeyUpArrow } ;            
-				keycode = { EStdKeyApplicationC, EStdKeyApplicationC, EStdKeyApplicationC } ;
-            	devicemode = { 0, 1, 2 };
-            	eventtype = { KKefTypeShort | KKefTypeLong, KKefTypeShort | KKefTypeLong, KKefTypeShort | KKefTypeLong };
-            	},
-
-        	KEF_KEY_EVENT
-            	{
-           	 	scancode = { EStdKeyRightFunc, EStdKeyDownArrow } ;
-           	 	keycode = { EStdKeyApplicationD, EStdKeyApplicationD, EStdKeyApplicationD } ;
-            	devicemode = { 0, 1, 2 };
-            	eventtype = { KKefTypeShort | KKefTypeLong, KKefTypeShort | KKefTypeLong, KKefTypeShort | KKefTypeLong };
-            	}
+	            }
 	        };	
 	    }
 

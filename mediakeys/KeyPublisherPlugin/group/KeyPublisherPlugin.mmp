@@ -18,7 +18,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET          KeyPublisherPlugin.DLL
+TARGET          keypublisherplugin.dll
 TARGETTYPE      ani
 UID             0x10003B22 0x1020724B
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,7 +19,7 @@
 // INCLUDE FILES
 #include <remconcoreapitarget.h>
 #include <remconinterfaceselector.h>
-#include <aknconsts.h>
+//#include <aknconsts.h>
 #include "sysapremconobserver.h"
 #include "SysApAppUi.h"
 
@@ -47,6 +47,12 @@ CSysApRemConObserver::CSysApRemConObserver( CSysApAppUi& aSysApAppUi )
 void CSysApRemConObserver::ConstructL()
     {
     TRACES( RDebug::Print( _L("CSysApRemConObserver::ConstructL") ) );  
+    
+    iInterfaceSelector = CRemConInterfaceSelector::NewL();
+    
+    iCoreTarget = CRemConCoreApiTarget::NewL( *iInterfaceSelector, *this );
+    
+    iInterfaceSelector->OpenTargetL();
     }
 
 // -----------------------------------------------------------------------------
@@ -75,6 +81,7 @@ CSysApRemConObserver* CSysApRemConObserver::NewL( CSysApAppUi& aSysApAppUi )
 CSysApRemConObserver::~CSysApRemConObserver()
     {
     TRACES( RDebug::Print( _L("CSysApRemConObserver::~CSysApRemConObserver") ) );
+    delete iInterfaceSelector; // Internally deletes iCoreTarget 
     }
     
 // -----------------------------------------------------------------------------
@@ -104,32 +111,5 @@ void CSysApRemConObserver::MrccatoCommand( TRemConCoreApiOperationId aOperationI
 	        }
 	    }
 	}
-
-/**
- * Reserve the volume keys
- */
-void CSysApRemConObserver::StartRemconInterfaceL()
-    {
-    TRACES( RDebug::Print( _L("CSysApRemConObserver::BlockKeys")));
-    if(!iInterfaceSelector)
-        {
-        iInterfaceSelector = CRemConInterfaceSelector::NewL();
-        iCoreTarget = CRemConCoreApiTarget::NewL( *iInterfaceSelector, *this );
-        iInterfaceSelector->OpenTargetL();
-        }
-    }
-
-/**
- * Release the volume keys for other application like phone app during call
- */
-void CSysApRemConObserver::StopRemconInterface()
-    {
-    TRACES( RDebug::Print( _L("CSysApRemConObserver::UnBlockKeys")));
-    if(iInterfaceSelector)
-        {
-        delete iInterfaceSelector;
-        iInterfaceSelector = NULL;
-        }
-    }
 
 //  End of File 

@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -55,21 +55,22 @@ public:
 
 	inline RWsSession& WsSession();
 	
-	inline const CApaFsMonitor& AppFsMonitor() const {return *iAppFsMonitor;}
-	
 	inline CApaScanningRuleBasedPlugIns* RuleBasedPlugIns();
 		
 	// Application list stuff
 	inline CApaAppList& AppList();
-	void UpdateApps();
-	IMPORT_C TCallBack RescanCallBack();
-	
-	void RegisterNonNativeApplicationTypeL(TUid aApplicationType, const TDesC& aNativeExecutable);
-	void DeregisterNonNativeApplicationTypeL(TUid aApplicationType);
-	TPtrC NativeExecutableL(TUid aNonNativeApplicationType) const;
-	
+	TPtrC NativeExecutableL(TUid aNonNativeApplicationType);
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+    void UpdateApps();
+    IMPORT_C TCallBack RescanCallBack();
+    void UpdateAppsByForceRegistration();   
+    void RegisterNonNativeApplicationTypeL(TUid aApplicationType, const TDesC& aNativeExecutable);
+    void DeregisterNonNativeApplicationTypeL(TUid aApplicationType);
+    inline const CApaFsMonitor& AppFsMonitor() const {return *iAppFsMonitor;}
 	IMPORT_C void HandleInstallationStartEvent();
 	IMPORT_C void HandleInstallationEndEventL();
+#endif
 	
 	// MIME-type recognition
 	inline CApaDataRecognizer* MimeTypeRecognizer();
@@ -101,23 +102,34 @@ public: // from MBackupOperationObserver
 	void HandleBackupOperationEventL(const TBackupOperationAttributes& aBackupOperationAttributes);
 public:	//
 	IMPORT_C ~CApaAppArcServer();
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 	TBool NonNativeRecovery() const;
 	void SetNonNativeRecovery(TBool aValue);
+#else
+    void UpdateAppListL(RArray<TApaAppUpdateInfo>* aAppUpdateInfo, TUid aSecureID);
+#endif
 	TBool LoadMbmIconsOnDemand() const;
-	void UpdateAppsByForceRegistration();
+
 private:
 	CApaAppArcServer(TInt aPriority);
 	void ConstructL();
 	virtual CSession2* NewSessionL(const TVersion& aVersion,const RMessage2& aMessage) const;
-	static TInt AppFsNotifyWithForcedRegistrationsResetCallBack(TAny* aPtr);
-	static TInt AppFsNotifyCallBack(TAny* aPtr);
 	static TInt PlugInNotifyCallBack(TAny* aPtr);
 	static TInt TypeStoreNotifyCallback(TAny* aPtr);
 	void UpdatePlugIns();
 	void UpdateTypeStore();
 	void DoUpdateTypeStoreL();
+	
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+    void InitNonNativeApplicationTypeArrayL();
+    TPtrC FindAndAddNonNativeRuntimeMappingL(TUid aNonNativeApplicationType);
+#else
+    static TInt AppFsNotifyWithForcedRegistrationsResetCallBack(TAny* aPtr);
+    static TInt AppFsNotifyCallBack(TAny* aPtr);
 	void InternalizeNonNativeApplicationTypeArrayL();
-	void ExternalizeNonNativeApplicationTypeArrayL(TInt aIndexToIgnore=-1) const;
+    void ExternalizeNonNativeApplicationTypeArrayL(TInt aIndexToIgnore=-1) const;
+    void ConstructPathsToMonitorL();    
+#endif
 	static void DeleteLastNonNativeApplicationType(TAny* aThis);
 	void NotifyScanComplete();
 	void DeleteCustomAppInfoList();
@@ -131,7 +143,6 @@ private:
 	CRecognitionResult* CachedRecognitionResult(const RFile& aFile, const TParseBase& aParser) const;
 	void CacheRecognitionResultL(const TParseBase& aParser, const TDataRecognitionResult& aResult);
 	void CacheRecognitionResultL(const RFile& aFile, const TParseBase& aParser, const TDataRecognitionResult& aResult);
-	void ConstructPathsToMonitorL();
 private:
 	enum
 		{
@@ -157,7 +168,9 @@ private:
 	CApaAppList* iAppList;
 	CPeriodic* iRecognizerUnloadTimer;
 	CApaScanningDataRecognizer* iMimeTypeRecognizer;
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	CApaFsMonitor* iAppFsMonitor;
+#endif
 	CApaFsMonitor* iTypeStoreMonitor;
 	CTypeStoreManager* iMimeTypeToAppMappingsManager;
 	TTime iTypeStoreModified;
@@ -174,10 +187,17 @@ private:
 	TBool iNonNativeRecovery;
 
 	TBool iLoadRecognizersOnDemand;
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	CApaAppInstallationMonitor* iAppInstallationMonitor; //CApaAppInstallationMonitor monitors installation and uninstallation of applications.
+    RBuf iNonNativeApplicationTypeRegistry;	
+    TInt iForceRegistrationStatus;
+#endif
 	TBool iLoadMbmIconsOnDemand;
-	RBuf iNonNativeApplicationTypeRegistry;
-	TInt iForceRegistrationStatus;
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+    RArray<TApaAppUpdateInfo> iAppUpdateInfo;
+#endif
+	
 	};
 
 

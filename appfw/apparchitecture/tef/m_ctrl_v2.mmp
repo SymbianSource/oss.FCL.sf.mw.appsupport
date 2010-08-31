@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -43,19 +43,19 @@ userinclude     .
 // Application exe specific resource which is localised to the application
 resource  	M_CTRL.rss
 start resource  M_CTRL.rss
-targetpath	/resource/apps
+targetpath	/apparctestregfiles
 lang 		sc
 end
 
 // Application exe registration resource file
 start resource 	M_CTRL_reg.rss
-targetpath 	/private/10003a3f/import/apps
+targetpath 	/apparctestregfiles
 lang		sc
 end
 
 // Application localisable resource file
 start resource 	M_CTRL_loc.RSS
-targetpath 	/resource/apps
+targetpath 	/apparctestregfiles
 lang		sc
 end
 

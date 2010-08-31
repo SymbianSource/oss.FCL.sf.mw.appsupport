@@ -104,3 +104,5 @@ LIBRARY   gsserverengine.lib
 #endif //__WINS
 LIBRARY   hlplch.lib            // "Help" options menu
 LIBRARY   profileeng.lib        // Profile Engine
+
+SMPSAFE

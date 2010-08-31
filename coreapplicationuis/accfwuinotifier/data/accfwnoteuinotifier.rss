@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2004 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -25,140 +25,11 @@ NAME    Accn
 #include <avkon.loc>
 #include <avkon.rsg>
 
-#include <accfwnotifier.loc>
-
-
 //  RESOURCE DEFINITIONS 
 
 RESOURCE RSS_SIGNATURE { }
 
 RESOURCE TBUF r_text_unsupp_accessory_connected { buf = text_unsupp_accessory_connected; }
-RESOURCE TBUF r_text_default_enhanc { buf = qtn_acc_default_enhanc; }
-RESOURCE TBUF r_text_headphones_mic { buf = qtn_acc_headphones_mic; }
 
-
-
-//------------------------------------------------------------------------------
-//   SELECTION_DATA structure.
-//------------------------------------------------------------------------------
-
-STRUCT SELECTION_DATA
-    {
-    LONG index;			//selection index
-    LTEXT nameliteral; 		//name literal
-    }
-    
-//------------------------------------------------------------------------------
-//   SELECTION_LITERALS_ARRAY structure.
-//------------------------------------------------------------------------------
-
-STRUCT SELECTION_LITERALS_ARRAY
-    {
-    STRUCT literals[];
-    }    
-
-//------------------------------------------------------------------------------
-//   r_selection_dialog_list_query.
-//------------------------------------------------------------------------------
-
-RESOURCE DIALOG r_selection_dialog_list_query
-{
-  flags = EGeneralQueryFlags;
-  buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
-  items =
-    {
-    DLG_LINE
-      {
-      type = EAknCtListQueryControl;
-      id = EListQueryControl;
-      
-        control = AVKON_LIST_QUERY_CONTROL
-        {
-        listtype = EAknCtSinglePopupMenuListBox;
-        listbox = LISTBOX
-          {
-              flags = EAknListBoxMenuList;
-
-          };
-        heading = qtn_acc_select_acc;
-        };
-
-      }
-    };
-}
-
-//------------------------------------------------------------------------------
-//   r_accfwuinotifier_information_note
-//------------------------------------------------------------------------------
-
-RESOURCE DIALOG r_accfwuinotifier_information_note
-    {
-    flags = EEikDialogFlagNoDrag |
-            EEikDialogFlagNoTitleBar |
-            EEikDialogFlagCbaButtons;
-
-    buttons = R_AVKON_SOFTKEYS_EMPTY;
-    items =
-        {
-        DLG_LINE
-            {
-            type = EAknCtNote;
-            id = EGeneralNote;
-            control = AVKON_NOTE 
-                { 
-                layout = EGeneralLayout;
-                singular_label = " ";
-                animation = R_QGN_NOTE_INFO_ANIM;
-                };
-            }
-        };
-
-    }
-  
-//------------------------------------------------------------------------------
-//   r_selection_dialog_literals.
-//------------------------------------------------------------------------------
-
-RESOURCE SELECTION_LITERALS_ARRAY r_selection_dialog_literals
-{
-  literals =
-    {
-       SELECTION_DATA
- 	     {
-    	  	index = 0x1;
-      		nameliteral = qtn_tty_acc_selection_dialog;
-      	 },
-    	SELECTION_DATA
-      	 {
-		    index = 0x2;
-		    nameliteral = qtn_loopset_acc_selection_dialog;
-	     },
-	    SELECTION_DATA
-    	 {
-      		index = 0x4;
-      		nameliteral = qtn_headset_acc_selection_dialog;
-      	 },
-    	SELECTION_DATA
-      	 {
-      		index = 0x8;
-      		nameliteral = qtn_headphones_acc_selection_dialog;
-      	 },
-	    SELECTION_DATA
-     	 {
-      		index = 0x10;
-      		nameliteral = qtn_lineout_acc_selection_dialog;
-      	},
-	    SELECTION_DATA
-     	 {
-      		index = 0x20;
-      		nameliteral = qtn_tvout_acc_selection_dialog;
-      	},
-      SELECTION_DATA
-     	 {
-      		index = 0x40;
-      		nameliteral = qtn_musicstand_acc_selection_dialog;
-      	}  
-  	};
-}
 
 // End of File

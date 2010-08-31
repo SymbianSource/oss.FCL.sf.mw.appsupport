@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,6 +27,10 @@
 #include "appfwk_test.h"
 #include "T_EndTaskStep.h"
 #include "TEndTaskTestApp/EndTaskTestAppExternalInterface.h"
+#include "T_SisFileInstaller.h"
+
+_LIT(KEndTaskAppSisFile, "z:\\apparctest\\apparctestsisfiles\\EndTaskTestApp.sis");
+_LIT(KEndTaskAppComponent, "EndTaskTestApp");
 
 CTEndTaskStep::CTEndTaskStep()
 	{
@@ -270,6 +274,32 @@ TInt CTEndTaskStep::LaunchAppL(RApaLsSession& aLs, const TUid& aAppUid)
 	CleanupStack::PopAndDestroy(cmdLn);
 	return result;
 	}
+
+/**
+ * @return - TVerdict code
+ * Override of base class virtual
+ */ 
+TVerdict CTEndTaskStep::doTestStepPreambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KEndTaskAppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KEndTaskAppSisFile);
+    
+    SetTestStepResult(EPass);
+    return TestStepResult();
+    }
+
+/**
+ * @return - TVerdict code
+ * Override of base class virtual
+ */
+TVerdict CTEndTaskStep::doTestStepPostambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    sisFileInstaller.UninstallSisL(KEndTaskAppComponent);
+    
+    return TestStepResult();
+    }
 
 TVerdict CTEndTaskStep::doTestStepL()
 	{

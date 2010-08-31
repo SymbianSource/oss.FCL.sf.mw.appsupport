@@ -23,7 +23,7 @@
 #include <MediatorCommandResponder.h>
 #include <MediatorPluginBase.h>
 #include <MediatorEventProvider.h>
-#include <secondarydisplay/SecondaryDisplaySystemStateAPI.h>
+#include <SecondaryDisplay/SecondaryDisplaySystemStateAPI.h>
 
 // FORWARD DECLARATIONS
 

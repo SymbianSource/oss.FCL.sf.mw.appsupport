@@ -56,7 +56,7 @@ LIBRARY         bafl.lib
 LIBRARY	        efsrv.lib
 LIBRARY         ws32.lib
 LIBRARY         hwrmlightclient.lib
-LIBRARY         HAL.lib
+LIBRARY         hal.lib
 
 DEBUGLIBRARY    flogger.lib
 

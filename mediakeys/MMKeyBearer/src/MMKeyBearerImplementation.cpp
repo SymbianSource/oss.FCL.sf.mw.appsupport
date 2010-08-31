@@ -26,6 +26,7 @@
 #include <UsbWatcherInternalPSKeys.h>
 #include <usbpersonalityids.h>
 #include <PSVariables.h>   // Property values
+#include <keyguardaccessapi.h>
 
 // Include this once it is exported
 // #include <RemConExtensionApi.h>
@@ -74,7 +75,7 @@ CMMKeyBearer::~CMMKeyBearer()
     delete iMediaKeyObserver;
     delete iAccessoryVolKeyObserver;
     delete iUSBFileTransferObserver;
-    iAknServer.Close();
+    delete iKeyguardAccess;
     }
 
 // ---------------------------------------------------------
@@ -84,11 +85,10 @@ CMMKeyBearer::~CMMKeyBearer()
 //
 CMMKeyBearer::CMMKeyBearer(TBearerParams& aParams)
 :   CRemConBearerPlugin(aParams),
-    iUSBFileTransfer(KUsbWatcherSelectedPersonalityNone),
-    iAknServerConnected(EFalse)
+    iUSBFileTransfer(KUsbWatcherSelectedPersonalityNone)
     {
     FUNC_LOG;
-
+    
     //Pass
     }
 
@@ -105,6 +105,7 @@ void CMMKeyBearer::ConstructL()
     TRemConAddress addr;
     addr.BearerUid() = Uid();
     TInt err = Observer().ConnectIndicate(addr);
+    iKeyguardAccess = CKeyguardAccessApi::NewL();
 
     // Start Active object for listening key events from P&S
     TRAP_AND_LEAVE(
@@ -342,12 +343,6 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
     INFO_3( "Received key: enumValue = %d, keyType = %d, usbFileTransfer = %d",
         aEnumValue, aKeyType, iUSBFileTransfer );
 
-	//Start the listener once again
-    if (aKeyType == ESideVolumeKeys)
-        {
-        iMMKeyBearerObserver->Start();
-        }
-
     // Mediakeys must be disabled when MTP (Music Transfer) is happening.
     if (aKeyType == EFileTransferStatus)
         {
@@ -367,25 +362,20 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
     // If events are from accessory device,then do not check for keypadlock
     if (aKeyType != EAccessoryVolumeKeys && aKeyType != ESideVolumeKeys )
         {
-        TBool keysLocked = EFalse;
-        if (!(iAknServerConnected))  // Connect to server for first time
-            {
-            if(iAknServer.Connect() == KErrNone)
-                {
-                iAknServerConnected = ETrue;
-                }
-            else if (aKeyType == EMediaKeys)                 // If connection fails, then return
-                {
-                iMediaKeyObserver->Start();
-	    	return ;
-                }
-            }
-        iAknServer.ShowKeysLockedNote(keysLocked);
+               
+        TInt err=iKeyguardAccess->ShowKeysLockedNote();
 
-        if (keysLocked && aKeyType == EMediaKeys)
+        if (err==KErrNone)
             {
             // Device is locked , Discard the key event
-            iMediaKeyObserver->Start();
+
+            //Start the listener once again
+            
+            if (aKeyType == EMediaKeys)
+                {
+                iMediaKeyObserver->Start();
+                }
+
             return;
             }
         }
@@ -418,7 +408,11 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
     TInt aError = Observer().NewCommand(addr);
 
     //Start the listener once again
-    if (aKeyType == EMediaKeys)
+    if (aKeyType == ESideVolumeKeys)
+        {
+        iMMKeyBearerObserver->Start();
+        }
+    else if (aKeyType == EMediaKeys)
         {
         iMediaKeyObserver->Start();
         }

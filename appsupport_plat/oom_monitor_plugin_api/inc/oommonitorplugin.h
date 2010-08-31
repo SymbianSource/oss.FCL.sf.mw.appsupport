@@ -78,16 +78,6 @@ public:
 	* between low and good memory states.
 	*/
 	virtual void MemoryGood() = 0;
-	
-    /**
-    * Function: AppId
-    * The function return the UID3 of the process which implements the plugin
-    * By default, the Null UID [KNullUid] is returned. 
-    * The plugin can override this API with their own implementation.
-    * COomMonitorPlugin monitor plugins
-    * @return the UID3 the application which implements the plugin
-    */
-	virtual const TUid AppId() const;
 
 public:
     /**
@@ -183,16 +173,6 @@ NONSHARABLE_CLASS(CAppOomMonitorPlugin) : public COomMonitorPlugin
     {
 public:
     IMPORT_C static CAppOomMonitorPlugin* NewL(TUid aAppUid);
-    
-    /**
-    * Function: AppId
-    * The function return the UID3 of the process which implements the plugin
-    * By default, the Null UID [KNullUid] is returned. 
-    * The plugin can override this API with their own implementation.
-    * COomMonitorPlugin monitor plugins
-    * @return the UID3 the application which implements the plugin
-    */
-    const TUid AppId() const;
     
 private:
 	CAppOomMonitorPlugin(TUid aAppUid);

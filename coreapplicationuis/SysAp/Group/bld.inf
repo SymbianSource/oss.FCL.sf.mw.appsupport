@@ -22,11 +22,6 @@ PRJ_PLATFORMS
 DEFAULT
 
 PRJ_EXTENSIONS
-START EXTENSION s60/mifconv
-  OPTION TARGETFILE sysap.mif
-  OPTION HEADERFILE sysap.mbg
-  OPTION SOURCES -c8 qgn_startup_screen
-END
 
 
 PRJ_EXPORTS
@@ -41,12 +36,15 @@ PRJ_EXPORTS
 ../rom/SysAp_variant.iby CUSTOMER_MW_LAYER_IBY_EXPORT_PATH(SysAp_variant.iby)
 ../loc/SysAp.loc MW_LAYER_LOC_EXPORT_PATH(SysAp.loc)
 
-../PubSub/CoreApplicationUIsInternalPSKeys.h |../../../inc/CoreApplicationUIsInternalPSKeys.h
-../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../inc/CoreApplicationUIsPrivatePSKeys.h
-../CenRep/CoreApplicationUIsPrivateCRKeys.h |../../inc/CoreApplicationUIsPrivateCRKeys.h
+../PubSub/CoreApplicationUIsInternalPSKeys.h |../../../inc/coreapplicationuisinternalpskeys.h
+../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../inc/coreapplicationuisprivatepskeys.h
+../CenRep/CoreApplicationUIsPrivateCRKeys.h |../../inc/coreapplicationuisprivatecrkeys.h
 
-../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../../inc/CoreApplicationUIsPrivatePSKeys.h // Illegal export for avoiding breaks
+../PubSub/CoreApplicationUIsPrivatePSKeys.h |../../../inc/coreapplicationuisprivatepskeys.h // Illegal export for avoiding breaks
 
+/epoc32/s60/icons/qgn_startup_screen.svg          /epoc32/data/z/resource/apps/qgn_sysap_screen.svg
+/epoc32/s60/icons/qgn_startup_screen.svg          /epoc32/release/winscw/udeb/z/resource/apps/qgn_sysap_screen.svg
+/epoc32/s60/icons/qgn_startup_screen.svg          /epoc32/release/winscw/urel/z/resource/apps/qgn_sysap_screen.svg
 PRJ_MMPFILES
 //gnumakefile sysap_icons.mk 
 

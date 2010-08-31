@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -27,53 +27,27 @@
 #ifndef STARTUPAPPUI_H
 #define STARTUPAPPUI_H
 
-// FLAGS
-//#define USE_STARTUPTEST_APP
-
-
-// SYSTEM INCLUDES
-#include <aknappui.h>           //appui
-
-#include <data_caging_path_literals.hrh>
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
- #include <secondarydisplay/SecondaryDisplaySystemStateAPI.h>
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
+#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
 
 
 // USER INCLUDES
 #include "startup.hrh"          //internal state types
 #include "StartupDefines.h"     //some common defines
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
- #include "StartupTone.h"
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-
-
-// CONSTANTS
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
- const TInt KConnectionRetryTime = 50000;        // 50 ms
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+ #include <eikappui.h>
 
 // FORWARD DECLARATIONS
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
- class CStartupWelcomeAnimation;
- class CStartupOperatorAnimation;
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
 class CStartupUserWelcomeNote;
 class CStartupPubSubObserver;
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+
  class CStartupAnimationWrapper;
  class CStartupView;
-#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
- class CStartupTone;
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-class CStartupMediatorObserver;
 
 /**
 *  'AppUi' class.
 *
 */
-class CStartupAppUi : public CAknAppUi
+class CStartupAppUi : public CEikAppUi //: public CAknAppUi
 {
     public: // Constructors and destructor
 
@@ -125,65 +99,13 @@ class CStartupAppUi : public CAknAppUi
         */
         TBool HiddenReset();
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        /**
-        * Continue startup when startup tone completes.
-        * @param        None
-        * @return       void
-        */
-        void ContinueStartupAfterToneL(TToneType aToneType);
 
-        /**
-        * Stop startuptone
-        * @param        None
-        * @return       void
-        */
-        void StopStartupTone();
-
-        /**
-        * Stop startuptone
-        * @param        None
-        * @return       void
-        */
-        void StopOperatorTone();
-
-        /**
-        * Checks if StartupTone is playing
-        * @param        None
-        * @return       TBool
-        */
-        TBool StartupTonePlaying();
-
-        /**
-        * Checks if OperatorTone is playing
-        * @param        None
-        * @return       TBool
-        */
-        TBool OperatorTonePlaying();
-
-#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
         /**
         * Called when welcome or operator animation has finished.
         *
         * @since S60 3.2
         */
         void AnimationFinished();
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        /**
-        * Brings Startup application to foregound after Touch Screen Calibration and emergency call from PIN query.
-        * @param        None
-        * @return       void
-        */
-        void BringToForeground();
-
-        /**
-        * Send Startup application to background before Touch Screen Calibration.
-        * @param        None
-        * @return       void
-        */
-        void SendToBackground();
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
         /**
         * Sets iCleanBoot to EStartupCleanBoot.
@@ -192,77 +114,6 @@ class CStartupAppUi : public CAknAppUi
         */
         void SetCleanBoot();
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-        void WaitingTouchScreenCalibL();
-
-#ifdef RD_SCALABLE_UI_V2
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-        void TouchScreenCalibrationDoneL();
-#endif // RD_SCALABLE_UI_V2
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-
-
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-		void CoverUIWelcomeAnimationSyncOKL();
-
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-		void WaitingCoverUIWelcomeAnimationSyncL();
-
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-		void CoverUIOperatorAnimationSyncOKL();
-
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
- 		void WaitingCoverUIOperatorAnimationSyncL();
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-        void WaitingCoverUIStartupReadySyncL();
-
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-		void CoverUIStartupReadySyncOKL();
-
-        /**
-        *
-        * @param        None
-        * @return       void
-        */
-        void RaiseCoverUIEvent( TUid aCategory,
-                                TInt aEventId,
-                                const TDesC8& aData );
 
 
         void SetCriticalBlockEndedL();
@@ -285,12 +136,12 @@ class CStartupAppUi : public CAknAppUi
         /** System state has changed to EmergencyCallsOnly. Skip the animations. */
         void SetEmergencyCallsOnlyL();
 
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+
         /**
         * Check if animation should be loaded in advance and do it.
         */
         void TryPreLoadAnimation();
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
 
         /**
         * Propagates fatal startup error state.
@@ -300,22 +151,6 @@ class CStartupAppUi : public CAknAppUi
         */
         void SwStateFatalStartupErrorL( TBool aPropertyChanged );
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        /**
-        * Returns value of iOfflineModeQueryShown.
-        * @param        None
-        * @return       TBool
-        */
-        TBool GetOfflineModeQueryShown();
-
-        /**
-        * Sets value of iOfflineModeQueryShown.
-        * @param        TBool
-        * @return       void
-        */
-        void SetOfflineModeQueryShown(TBool aValue);
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-
         /**
         * Return value of the__SIMCARD feature
         * @param None
@@ -323,12 +158,7 @@ class CStartupAppUi : public CAknAppUi
         */
         TBool SimSupported();
 
-        /**
-        * Return value of KFeatureIdCoverDisplay feature
-        * @param None
-        * @return TBool
-        */
-        TBool CoverUISupported();
+       
 
         /**
         *  Checks if DOS is in Offline Mode
@@ -349,31 +179,7 @@ class CStartupAppUi : public CAknAppUi
         */
         TBool SimStatusChangedReset();
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-    private:
-        /**
-        *   For starting startup tone initialization timer when needed
-        *   @param      None
-        *   @return     void
-        */
-        void WaitingStartupToneL();
-
-        /**
-        *   Callback function of startup tone initialization timer
-        *   @param      TAny*
-        *   @return     TInt
-        */
-        static TInt ToneInitTimerTimeoutL(TAny* aObject);
-
-        /**
-        *   For checking startup tone initialization status
-        *   @param      None
-        *   @return     void
-        */
-        void StartupToneWaitStatusL();
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-
-    private: // from MEikMenuObserver
+    public: // from MEikMenuObserver
 
         /**
         * EPOC default constructor.
@@ -382,8 +188,9 @@ class CStartupAppUi : public CAknAppUi
 
     private: // from CEikAppUi
 
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+
         /**
+         * Functionality Commented as no support from Qt
         * From CAknAppUi.
         * Handles a change to the application's resources which are shared across
         * the environment.
@@ -391,11 +198,10 @@ class CStartupAppUi : public CAknAppUi
         * @since S60 3.2
         *
         * @param aType The type of resources that have changed.
-        */
-        void HandleResourceChangeL( TInt aType );
         
-        void IsFTUAvailableL(TBool& aFTUAvailable);
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+        void HandleResourceChangeL( TInt aType );
+        */
+
 
         /**
         *  Takes care of command handling.
@@ -441,19 +247,6 @@ class CStartupAppUi : public CAknAppUi
         void DoStartupShowOperatorAnimationL();
 
         /**
-        *  This part of the startup phases
-        *  shows the user welcome note.
-        */
-        void DoStartupShowUserWelcomeNoteL();
-
-        /**
-        *  Returns EFalse if date, time and city
-		*  queries are disabled for testing purposes
-		*  @return TBool
-        */
-		TBool StartupQueriesEnabled();
-
-        /**
         *  Predictive Time and Country selection support
         *  Returns ETrue when enabled.
         *  @return TBool
@@ -467,13 +260,6 @@ class CStartupAppUi : public CAknAppUi
         *  @return    void
         */
         void DoStartupFirstBootAndRTCCheckL();
-
-        /**
-        *  Shows the needed startup queries in first boot
-        *  or when real time clock value is invalid
-        *  @return    void
-        */
-        void ShowStartupQueriesL();
 
         /**
         *  Last part of the startup phases.
@@ -526,48 +312,7 @@ class CStartupAppUi : public CAknAppUi
         */
         TBool UiInOfflineMode();
 
-        /**
-        *  Shows country and city selection lists to the user.
-        *  This is shown in first boot.
-        */
-        void ShowCountryAndCityListsL();
-
-        /**
-        *  Shows country selection list to the user.
-        *  This is shown in first boot.
-        *  @return    TInt
-        */
-        TInt ShowCountryListL();
-
-        /**
-        *  Shows city selection list to the user.
-        *  This is shown in first boot.
-        *  @return    TBool
-        */
-        TBool ShowCityListL(TUint8 cityGroupId);
-
-        /**
-        *  Shows time query to the user.
-        *  This is shown in first boot or when
-        *  real time clock isn't valid.
-        *  @return    TBool
-        */
-        TBool ShowTimeQueryL();
-
-        /**
-        *  Shows date query to the user.
-        *  This is shown in first boot or when
-        *  real time clock isn't valid.
-        *  @return    TBool
-        */
-        TBool ShowDateQueryL();
-
-        /**
-        *  Gets default time and date from cenrep
-        *  @param     aTime
-        *  @return    void
-        */
-        void GetDefaultTimeAndDate( TTime& aTime );
+      
 
         /**
         *  Returns information about is this the first boot happening.
@@ -588,74 +333,40 @@ class CStartupAppUi : public CAknAppUi
         */
         void SystemFatalErrorL();
 
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION        
+        
         /**
         * Updates startup UI phase to Publish&Subscribe key KPSStartupUiPhase.
         *
         * @param aValue the new value to be written to the key KPSStartupUiPhase.
         */
         void UpdateStartupUiPhase( TInt aValue );
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
 
     private: // ***** Member Data ********************************************
 
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+
         // The only window-owning control of the Startup application.
         CStartupView* iMainView;
 
         // Used for showing Welcome Animation. Owned. May not be NULL.
         CStartupAnimationWrapper* iAnimation;
 
-#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
-        //used for showing Welcome Animation
-        CStartupWelcomeAnimation* iWelcomeAnimation;  //owns
 
-        //used for showing Operator Animation
-        CStartupOperatorAnimation* iOperatorAnimation;  //owns
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+        
 
-        //used for showing User Welcome Note
-        CStartupUserWelcomeNote* iUserWelcomeNote;  //owns
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        //used for showing welcome animation
-        CPeriodic* iAnimTimer; //owns
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
         //used for showing user welcome note
         CPeriodic* iNoteTimer; //owns
 
         //used for exiting application, smoothly without tricky errors
         CPeriodic* iExitTimer; //owns
-
-
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        // Used for playing startup tone
-        CStartupTone* iStartupTone; //owns
-
-        // Used for waiting startup tone initialization
-        CPeriodic* iToneInitTimer; //owns
-
-        // Used for playing operator startup tone
-        CStartupTone* iOpStartupTone; //owns
-
-        // Used for following tone initialization time
-        TInt iToneInitWaitTime;
-
-        //used for telling if the user welcome note is animation
-        TBool iAnimation;
-#endif RD_STARTUP_ANIMATION_CUSTOMIZATION
-
+        
+       
         //internal execution state
         TStartupInternalState iInternalState;
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        //is used for telling the application that
-        //splashscreen should be removed for showing the code queries
-        //or welcome note
-        TBool iSplashScreenShouldBeRemoved;
-#endif RD_STARTUP_ANIMATION_CUSTOMIZATION
 
         //is used for quarantee only one time continuing
         TBool iStartupFirstBootAndRTCCheckAlreadyCalled;
@@ -692,18 +403,14 @@ class CStartupAppUi : public CAknAppUi
         //is used for telling if SIM card is supported
         TBool iSimSupported;
 
-        CStartupMediatorObserver* iStartupMediatorObserver; //owns
+     
+     
 
-        TBool iCoverUISupported;
-
-        TInt iCounryListIndex;
+  
 
         TTime iTime;
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-        TBool iTouchScreenCalibSupport;
-        TBool iTouchScreenCalibrationDone;
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
 };
 
 #endif // STARTUPAPPUI_H

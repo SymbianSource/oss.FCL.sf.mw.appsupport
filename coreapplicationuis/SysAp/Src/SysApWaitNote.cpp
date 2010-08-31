@@ -22,7 +22,7 @@
 #include <avkon.rsg>
 #include "SysAp.hrh"
 #include "SysApWaitNote.h"
-#include <secondarydisplay/SecondaryDisplaySysApAPI.h>
+#include <SecondaryDisplay/SecondaryDisplaySysApAPI.h>
 #include <aknSDData.h>
 
 

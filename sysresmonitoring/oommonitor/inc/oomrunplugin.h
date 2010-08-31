@@ -63,20 +63,8 @@ protected:
     
 private:
     
-    COomRunPlugin(TUint aPluginId, COomRunPluginConfig& aConfig, 
-            MOomActionObserver& aStateChangeObserver, 
-            COomMonitorPlugin& aPlugin, COomMonitorPluginV2* aV2Plugin);
+    COomRunPlugin(TUint aPluginId, COomRunPluginConfig& aConfig, MOomActionObserver& aStateChangeObserver, COomMonitorPlugin& aPlugin, COomMonitorPluginV2* aV2Plugin);
     
-    /**
-     * Function: IsAppDataPaged
-     * Checks whether the application which implements the given 
-     * COomMonitorPlugin is data paged
-     * @param instance of the monitor plugin.
-     * @return ETrue if the application is data paged, else EFalse;
-     */
-    TBool IsAppDataPaged( COomMonitorPlugin& aPlugin ) const;
-    
-private:   
     TUint iPluginId;
     
     COomMonitorPlugin& iPlugin;

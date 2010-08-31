@@ -56,6 +56,8 @@ class CSysApShutdownImage : public CCoeControl , public MCoeControlObserver
         void ShowShutdownImageL(TInt aBitmapId);
 
         RWindow& ShutdownCoeControlWindow();
+        
+        void SetRectForAnimation();
 
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
         /**
@@ -131,6 +133,7 @@ class CSysApShutdownImage : public CCoeControl , public MCoeControlObserver
         */
         TKeyResponse OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aType);
 
+        CFbsBitmap* ReadSVGL (TFileName aFileName);
     private:    // Data
 
         //Used for showing user selected image

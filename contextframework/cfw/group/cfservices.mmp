@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include "../inc/common/cftraceconfiguration.hrh"
 
-TARGET          		CFServices.dll
+TARGET          		cfservices.dll
 TARGETTYPE      		dll
 UID             		0x1000008d 0x10282BC5
 

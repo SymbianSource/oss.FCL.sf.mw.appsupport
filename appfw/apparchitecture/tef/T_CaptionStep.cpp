@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -57,6 +57,7 @@
 #include "appfwk_test.h"
 #include "ticoncaptionoverride.h" //KUidTestIconCapOverride defined here
 #include "TIconLoaderAndIconArrayForLeaks.h"
+#include "T_SisFileInstaller.h"
 
 
 //
@@ -89,11 +90,21 @@ _LIT(KTestTApaAppInfoShortCaptionDefault,"TC UK");
 // Cenrep configuration details for English language
 _LIT(KCenRepCaption, "CRTstCap UK");
 _LIT(KCenRepShortCaption, "CRTC UK");
-_LIT(KCenRepIconFilename, "Z:\\resource\\apps\\ticoncapoverride.mbm");
+_LIT(KCenRepIconFilename, "C:\\resource\\apps\\ticoncapoverride.mbm");
+
+_LIT(KTstAppStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TSTAPP_standalone.sis");
+_LIT(KTstAppStandAloneComponent, "TSTAPP_standalone");
+
+_LIT(KTstAppTiconcaptionoverrideSisFile, "z:\\apparctest\\apparctestsisfiles\\ticoncaptionoverride.sis");
+_LIT(KTstAppTiconcaptionoverrideComponent, "ticoncaptionoverride");
+
+_LIT(KForceRegAppSisFile, "z:\\apparctest\\apparctestsisfiles\\ForceRegApp1.sis");
+_LIT(KForceRegAppComponent, "ForceRegApp1");    
 
 const TUid KUidIconCaptionRepository = {0x1028583d}; // Central Repository UID.
 const TInt KTextSize = 100;
 
+const TInt KDelay = 4000000;
 //
 //
 //		CT_CaptionStep
@@ -104,41 +115,61 @@ const TInt KTextSize = 100;
 void CT_CaptionStep::ChangeLocaleL(TLanguage aLanguage)
 	{
 #ifdef SYMBIAN_DISTINCT_LOCALE_MODEL 
-    _LIT(KLitLocaleDllNameBase, "elocl_lan");
-    _LIT(KLitLocaleDllNameExtension, ".loc");
+    _LIT(KLitLanguageLocaleDllNameBase, "elocl_lan");
+    //Region and collation code values are hard coded, as the check, after changing the locale is made for the language only.
+    _LIT(KLitRegionLocaleDllNameBase, "elocl_reg.826");        
+    _LIT(KLitCollationLocaleDllNameBase, "elocl_col.001");
+    _LIT(ThreeDigExt,".%03d");
+    TExtendedLocale localeDll;    
+    const TUidType uidType(TUid::Uid(0x10000079),TUid::Uid(0x100039e6));
+    TBuf<16> languageLocaleDllName(KLitLanguageLocaleDllNameBase);  
+    languageLocaleDllName.AppendFormat(ThreeDigExt, aLanguage);
+    TBuf<16> regionLocaleDllName(KLitRegionLocaleDllNameBase);  
+    TBuf<16> collationLocaleDllName(KLitCollationLocaleDllNameBase);  
+    // Try to load the locale dll
+    TInt error=localeDll.LoadLocale(languageLocaleDllName, regionLocaleDllName, collationLocaleDllName);
+        
+    if (error==KErrNotFound)
+        {
+        // Locale dll is not found for the asked language. 
+        ERR_PRINTF2(_L("Failed to find the locale dll for %d"), aLanguage);
+        }
+           
+    User::LeaveIfError(error);
+    localeDll.SaveSystemSettings();
 #else
     _LIT(KLitLocaleDllNameBase, "ELOCL");
-    _LIT(KLitLocaleDllNameExtension, ".LOC");
-#endif          
-    RLibrary localeDll;
-    TBuf<16> localeDllName(KLitLocaleDllNameBase);
-    CleanupClosePushL(localeDll);
-    const TUidType uidType(TUid::Uid(0x10000079),TUid::Uid(0x100039e6));
-#ifdef SYMBIAN_DISTINCT_LOCALE_MODEL         
-    _LIT(ThreeDigExt,".%03d");
-    localeDllName.AppendFormat(ThreeDigExt, aLanguage);
-#else
     _LIT(TwoDigExt,".%02d");
-    localeDllName.AppendFormat(TwoDigExt, aLanguage);
-#endif          
-            
+    
+    RLibrary localeDll; 
+    CleanupClosePushL(localeDll);
+    
+    const TUidType uidType(TUid::Uid(0x10000079),TUid::Uid(0x100039e6));
+    TBuf<16> localeDllName(KLitLocaleDllNameBase);  
+    localeDllName.AppendFormat(TwoDigExt, language);
+    
+    // Try to load the locale dll
     TInt error=localeDll.Load(localeDllName, uidType);
     if (error==KErrNotFound)
         {
-        localeDllName=KLitLocaleDllNameBase;
-        localeDllName.Append(KLitLocaleDllNameExtension);
-        error=localeDll.Load(localeDllName, uidType);
+        // Locale dll is not found for the asked language. 
+        ERR_PRINTF2(_L("Failed to find the locale dll for %d"), language);
         }
+    
     User::LeaveIfError(error);
-            
-#ifdef  SYMBIAN_DISTINCT_LOCALE_MODEL
-    TExtendedLocale myExtendedLocale;
-    User::LeaveIfError(myExtendedLocale.LoadLocaleAspect(localeDllName));
-    User::LeaveIfError(myExtendedLocale.SaveSystemSettings());
-#else   
     User::LeaveIfError(UserSvr::ChangeLocale(localeDllName));
+    CleanupStack: opAndDestroy(); // localeDll
 #endif
-    CleanupStack::PopAndDestroy(&localeDll);
+    
+    // Check if the device locale has changed
+    if (aLanguage == User::Language())
+        {
+        SetTestStepResult(EPass);
+        }
+    else
+        {
+        ERR_PRINTF3(_L("Failed to change the locale to %d whereas the current locale is"), aLanguage, User::Language());
+        }	
 	}
 
 
@@ -182,12 +213,11 @@ void CT_CaptionStep::DoLanguageTestL()
 			};
 
 		// Change the locale
-		ChangeLocaleL(languageToTest);
-		TEST(User::Language() == languageToTest);
-		
-		// Force the applist to be updated (so test app gets new language settings)
-		RPointerArray<TDesC> dummy;
-		User::LeaveIfError(iLs.ForceRegistration(dummy));
+		if(languageToTest != User::Language())
+		    {
+            ChangeLocaleWaitForApplistUpdate(languageToTest);		
+            TEST(User::Language() == languageToTest);
+		    }
 		
 		// Do the same set of tests for each language
 		TestCApaSystemControlListL();
@@ -199,7 +229,9 @@ void CT_CaptionStep::DoLanguageTestL()
 		}
 
 	// restore original locale, just in case...
-	ChangeLocaleL(language);
+	if(User::Language() != language)
+	    ChangeLocaleWaitForApplistUpdate(language);
+	
 	TEST(User::Language() == language);
 	}	
 
@@ -408,7 +440,7 @@ void CT_CaptionStep::TestTApaAppInfoStreamsL()
 	{
 	INFO_PRINTF1(_L("Testing TApaAppInfo streams... "));
 
-	TApaAppInfo appInfoShort(KUidTestApp, _L("z:\\sys\\bin\\tstapp.exe"), _L("TstCap UK"),_L("TC UK"));
+	TApaAppInfo appInfoShort(KUidTestApp, _L("c:\\sys\\bin\\tstapp.exe"), _L("TstCap UK"),_L("TC UK"));
 	TEST(appInfoShort.iShortCaption.Compare(_L("TC UK"))==0);
 
 	TFileName tempFile=_L("c:\\system\\test\\TC_temp.txt");
@@ -470,8 +502,7 @@ void CT_CaptionStep::DoShortCaptionTestL()
 	TEST(User::Language() == ELangEnglish);
 	
 	// Force the applist to be updated (so test app gets new language settings)
-	RPointerArray<TDesC> dummy;
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
+	ForceApplistUpdate();
 
 	// SetAppShortCaption should return KErrNotFound if it could not find the app
 	INFO_PRINTF1(_L(".....setting short caption for an unknown app"));
@@ -509,18 +540,16 @@ void CT_CaptionStep::DoShortCaptionTestL()
 
 	// Check short caption remains updated after a refresh of the applist
 	INFO_PRINTF1(_L(".....checking short caption remains updated after a refresh of the applist"));
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
+	ForceApplistUpdate();
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);
 
 	// Check short caption remains updated after a locale change
 	INFO_PRINTF1(_L(".....checking short caption remains updated after a locale change"));
-	ChangeLocaleL(ELangJapanese);
+	ChangeLocaleWaitForApplistUpdate(ELangJapanese);
 	TEST(User::Language() == ELangJapanese);	// Japanese locale exists in epoc32 tree but not defined in test app
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
-	ChangeLocaleL(ELangEnglish);				// back to English to see what happened in between
+    ChangeLocaleWaitForApplistUpdate(ELangEnglish);				// back to English to see what happened in between
 	TEST(User::Language() == ELangEnglish);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);
 
@@ -530,17 +559,15 @@ void CT_CaptionStep::DoShortCaptionTestL()
 	TEST(err == KErrNone);
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);	// English, the current app language, doesn't change...
-	ChangeLocaleL(ELangFrench);
+	ChangeLocaleWaitForApplistUpdate(ELangFrench);
 	TEST(User::Language() == ELangFrench);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption2);	
 	
 	// Set short caption of an app for a language which the app does not include (ELangAmerican)
 	INFO_PRINTF1(_L(".....setting short caption of an app for a language which the app does not include"));
-	ChangeLocaleL(ELangAmerican);
+	ChangeLocaleWaitForApplistUpdate(ELangAmerican);
 	TEST(User::Language() == ELangAmerican);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	err = iLs.SetAppShortCaption(KShortCaption2, ELangAmerican, KUidTestApp);
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);	// American takes the default...so English...which has just been updated.
@@ -551,37 +578,31 @@ void CT_CaptionStep::DoShortCaptionTestL()
 	TEST(err == KErrNone);
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);	// American takes the default...so English...which has just been updated.
-	ChangeLocaleL(ELangEnglish);
+	ChangeLocaleWaitForApplistUpdate(ELangEnglish);
 	TEST(User::Language() == ELangEnglish);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);	// English set individually ===> not updated by ELangNone
-	ChangeLocaleL(ELangFrench);
+	ChangeLocaleWaitForApplistUpdate(ELangFrench);
 	TEST(User::Language() == ELangFrench);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption2);	// French set individually ===> not updated by ELangNone
-	ChangeLocaleL(ELangGerman);
+	ChangeLocaleWaitForApplistUpdate(ELangGerman);
 	TEST(User::Language() == ELangGerman);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption3);	// German takes the one set by  ELangNone
-	ChangeLocaleL(ELangItalian);
+	ChangeLocaleWaitForApplistUpdate(ELangItalian);
 	TEST(User::Language() == ELangItalian);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption3);	// Italian takes the one set by ELangNone
-	ChangeLocaleL(ELangSpanish);
+	ChangeLocaleWaitForApplistUpdate(ELangSpanish);
 	TEST(User::Language() == ELangSpanish);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption3);	// Spanish takes the one set by ELangNone
 
 	// Set short caption of an app for a language which was set by the previous ELangNone
 	INFO_PRINTF1(_L(".....setting short caption of an app which was set by the previous ELangNone"));
-	ChangeLocaleL(ELangItalian);
+	ChangeLocaleWaitForApplistUpdate(ELangItalian);
 	TEST(User::Language() == ELangItalian);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	err = iLs.SetAppShortCaption(KShortCaption4, ELangItalian, KUidTestApp);
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption4);
@@ -592,35 +613,30 @@ void CT_CaptionStep::DoShortCaptionTestL()
 	TEST(err == KErrNone);
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption4);	// Italian set individually ===> not updated by ELangNone
-	ChangeLocaleL(ELangEnglish);
+	ChangeLocaleWaitForApplistUpdate(ELangEnglish);
 	TEST(User::Language() == ELangEnglish);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);	// English set individually ===> not updated by ELangNone
-	ChangeLocaleL(ELangFrench);
+	ChangeLocaleWaitForApplistUpdate(ELangFrench);
 	TEST(User::Language() == ELangFrench);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption2);	// French set individually ===> not updated by ELangNone
-	ChangeLocaleL(ELangGerman);
+	ChangeLocaleWaitForApplistUpdate(ELangGerman);
 	TEST(User::Language() == ELangGerman);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption5);	// German takes the one set by  ELangNone
-	ChangeLocaleL(ELangSpanish);
+	ChangeLocaleWaitForApplistUpdate(ELangSpanish);
 	TEST(User::Language() == ELangSpanish);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption5);	// Spanish takes the one set by ELangNone
-	ChangeLocaleL(ELangAmerican);
+	ChangeLocaleWaitForApplistUpdate(ELangAmerican);
 	TEST(User::Language() == ELangAmerican);
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
 	iLs.GetAppInfo(appInfo, KUidTestApp);
 	TEST(appInfo.iShortCaption == KShortCaption1);	// American takes the default...so English...which has just been updated.
 
 	// restore original settings....
 	INFO_PRINTF1(_L(".....restoring original settings"));
-	ChangeLocaleL(language);
+	ChangeLocaleWaitForApplistUpdate(language);
 	TEST(User::Language() == language);
 	// restore original short captions for all langs....(h4 doesn't perform reboots between tests)
 	TEST(iLs.SetAppShortCaption(KTestTApaAppInfoShortCaptionEnglish, ELangEnglish, KUidTestApp) == KErrNone);
@@ -662,9 +678,11 @@ void CT_CaptionStep::TestIconCaptionOverridesL()
 	{
 	INFO_PRINTF1(_L("APPFWK-APPARC-0087:TestIconCaptionOverridesL started..."));
 	
-	//Change the system language to English before starting the tests
-	TRAPD(ret,ChangeLocaleL(ELangEnglish));
-	TEST(ret == KErrNone);
+    //Change the system language to English before starting the tests
+    TRAPD(ret,ChangeLocaleL(ELangEnglish));
+    TEST(ret == KErrNone);
+    TEST(User::Language() == ELangEnglish);
+    ForceApplistUpdate();
 				
 	TApaAppInfo appInfo;
 	//Get test app's information
@@ -778,10 +796,8 @@ void CT_CaptionStep::TestCenRepChangeNotificationL()
 	//tests whether the process with WriteDeviceData capability can update the configuration settings.
 	TEST(error == KErrNone);
 	
-	// Force the applist to be updated (so test app gets new language settings)
-	RPointerArray<TDesC> dummy;
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
-	
+	ForceApplistUpdate();
+    
 	TApaAppInfo appInfo;
 	//Get test app's information
 	iLs.GetAppInfo(appInfo, KUidTestIconCapOverride);
@@ -797,8 +813,8 @@ void CT_CaptionStep::TestCenRepChangeNotificationL()
 	//sets the short caption back to the actual for other tests to work
 	error = cenRep->Set(shortCapKey,KCenRepShortCaption);
 	
-	// Force the applist to be updated (so test app gets new language settings)
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
+    // Force the applist to be updated (so test app gets new language settings)
+    ForceApplistUpdate();
 	
 	CleanupStack::PopAndDestroy(cenRep); //cenRep object
 	INFO_PRINTF1(_L("APPFWK-APPARC-0089:TestCenRepChangeNotificationL finished..."));
@@ -836,12 +852,12 @@ void CT_CaptionStep::TestIconCaptionOverridesWithChangeLangL()
 	//French
 	_LIT(KCaptionFrench, "CRTstCap FR");
 	_LIT(KShortCaptionFrench, "CRTC FR");
-	_LIT(KIconFilenameFrench, "Z:\\resource\\apps\\svg_icon.svg");
+	_LIT(KIconFilenameFrench, "C:\\resource\\apps\\svg_icon.svg");
 
 	//German
 	_LIT(KCaptionGerman, "TstCap GE");
 	_LIT(KShortCaptionGerman, "TC GE");
-	_LIT(KIconFilenameGerman, "Z:\\resource\\apps\\ticoncapoverride.mbm");
+	_LIT(KIconFilenameGerman, "C:\\resource\\apps\\ticoncapoverride.mbm");
 
 	TApaAppInfo appInfo;
 	RFile file;
@@ -855,9 +871,7 @@ void CT_CaptionStep::TestIconCaptionOverridesWithChangeLangL()
 	
 	TEST(User::Language() == ELangFrench);//check language is set to French.
 	
-	// Force the applist to be updated (so test app gets new language settings)
-	RPointerArray<TDesC> dummy;
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
+    ForceApplistUpdate();
 	
 	//Get test app's information
 	iLs.GetAppInfo(appInfo, KUidTestIconCapOverride);
@@ -896,7 +910,7 @@ void CT_CaptionStep::TestIconCaptionOverridesWithChangeLangL()
 	TEST(User::Language() == ELangGerman);//check language is set to German.
 	
 	// Force the applist to be updated (so test app gets new language settings)
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
+	ForceApplistUpdate();
 	
 	//Get test app's information
 	iLs.GetAppInfo(appInfo, KUidTestIconCapOverride);
@@ -940,7 +954,7 @@ void CT_CaptionStep::TestIconCaptionOverridesWithChangeLangL()
 	TEST(User::Language() == ELangEnglish);//check language is set to English.
 	
 	// Force the applist to be updated (so test app gets new language settings)
-	User::LeaveIfError(iLs.ForceRegistration(dummy));
+	ForceApplistUpdate();
 	
 	//Get test app's information
 	iLs.GetAppInfo(appInfo, KUidTestIconCapOverride);
@@ -973,7 +987,7 @@ void CT_CaptionStep::TestIconCaptionOverridesWithChangeLangL()
 	INFO_PRINTF2(_L("----Expected icon filename==>%S"), &printString);
 	INFO_PRINTF2(_L("----Retrieved icon filename==>%S"), &fileName);
 	TEST(fileName.Compare(KCenRepIconFilename)==0);
-	
+	file.Close();
 	INFO_PRINTF1(_L("APPFWK-APPARC-0090:TestIconCaptionOverridesWithChangeLangL finished..."));
 	}
 		
@@ -1011,6 +1025,42 @@ void CT_CaptionStep::DoIconCaptionOverridesTestL()
 	TestApiPrecedenceOverCenRepConfigInfoL();
 	}
 	
+void CT_CaptionStep::ForceApplistUpdate()
+{
+    // Force the applist to be updated (so test app gets new language settings)
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KForceRegAppSisFile);
+    sisFileInstaller.InstallSisL(KForceRegAppSisFile);
+    sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KForceRegAppComponent); 
+}
+
+void CT_CaptionStep::ChangeLocaleWaitForApplistUpdate(TLanguage aLanguage)
+    {
+    TRequestStatus status;
+    iLs.SetNotify(EFalse, status);
+    ChangeLocaleL(aLanguage);
+    User::WaitForRequest(status);
+    }
+
+TVerdict CT_CaptionStep::doTestStepPreambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppStandAloneSisFile);
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppTiconcaptionoverrideSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppTiconcaptionoverrideSisFile);
+    SetTestStepResult(EPass);
+    return TestStepResult();
+    }
+
+TVerdict CT_CaptionStep::doTestStepPostambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    sisFileInstaller.UninstallSisL(KTstAppStandAloneComponent);
+    sisFileInstaller.UninstallSisL(KTstAppTiconcaptionoverrideComponent);
+    return TestStepResult();    
+    }
+
 TVerdict CT_CaptionStep::doTestStepL()
 	{
 	INFO_PRINTF1(_L("Test T_Caption step started....\n"));
@@ -1019,6 +1069,11 @@ TVerdict CT_CaptionStep::doTestStepL()
 	TEST(iFs.Connect() == KErrNone);
 	TEST(iLs.Connect() == KErrNone);
 
+    // Change the locale
+    ChangeLocaleL(ELangEnglish);
+    TEST(User::Language() == ELangEnglish);
+    ForceApplistUpdate();
+    
 	// run language tests for the test caption
 	TRAPD(r, DoLanguageTestL());
 	TEST(r==KErrNone);

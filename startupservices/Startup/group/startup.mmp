@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -33,20 +33,10 @@ SOURCEPATH      ../src
 
 SOURCE          StartupApplication.cpp
 SOURCE          StartupAppUi.cpp
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
 SOURCE          startupanimationwrapper.cpp
 SOURCE          startupview.cpp
-#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
-SOURCE          StartupWelcomeAnimation.cpp
-SOURCE          StartupOperatorAnimation.cpp
-SOURCE          StartupTone.cpp
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 SOURCE          StartupDocument.cpp
-SOURCE          StartupUserWelcomeNote.cpp
-SOURCE          StartupQueryDialog.cpp
 SOURCE          StartupSubscriber.cpp
-SOURCE          StartupMediatorObserver.cpp
-SOURCE          StartupPopupList.cpp
 SOURCE          StartupPubSubObserver.cpp
 
 
@@ -56,12 +46,7 @@ HEADER
 LANGUAGE_IDS
 END  // RESOURCE
 
-#ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
-  START RESOURCE  ../data/operatoranimation.rss
-  HEADER
-  TARGETPATH      APP_RESOURCE_DIR
-  END  // RESOURCE
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
 
 START RESOURCE 	../data/Startup_reg.rss
 HEADER
@@ -74,14 +59,15 @@ USERINCLUDE     ../data
 USERINCLUDE     ../../inc
 USERINCLUDE     ../../../inc
 
+SYSTEMINCLUDE   /epoc32/include/mw/hb/hbwidgets
+
 APP_LAYER_SYSTEMINCLUDE     // dependency to app layer (Profiles)
 
 LIBRARY         eikcoctl.lib
 LIBRARY         euser.lib
 LIBRARY         apparc.lib
 LIBRARY         cone.lib
-LIBRARY         avkon.lib
-LIBRARY         eikdlg.lib
+
 LIBRARY         eikcore.lib
 LIBRARY         efsrv.lib
 LIBRARY         fbscli.lib
@@ -89,23 +75,18 @@ LIBRARY         centralrepository.lib
 LIBRARY         commonengine.lib        //use of SharedData
 LIBRARY         starterclient.lib       //use of Starter to remove splash screen
 LIBRARY         ws32.lib
-LIBRARY         aknnotify.lib           //AknGlobalNote
+
 LIBRARY         apgrfx.lib              //
-LIBRARY         Egul.lib                //DrawUtils
+LIBRARY         egul.lib                //DrawUtils
 LIBRARY         featmgr.lib
 LIBRARY         bafl.lib
-LIBRARY         timezonelocalization.lib
-LIBRARY	        tzclient.lib
-LIBRARY         AknIcon.lib
 LIBRARY         mediatorclient.lib
-#ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
+
 LIBRARY         sanimctrl.lib
-#else // RD_STARTUP_ANIMATION_CUSTOMIZATION
-LIBRARY         CdlEngine.lib
-LIBRARY         MediaClientAudio.lib    //for playing startup tone
-#endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
+
+LIBRARY       hbwidgets.lib
+LIBRARY       hbCore.lib
 LIBRARY         bmpanim.lib
-#ifdef RD_UI_TRANSITION_EFFECTS_PHASE2
-LIBRARY	        gfxtrans.lib
-#endif
-LIBRARY         aknskins.lib
+
+
+SMPSAFE

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2008-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -291,7 +291,7 @@ void CCFContextService::RequestContextL( CCFContextQuery& aContextQuery,
     TInt err = KErrNone;
 
     // Stream context query set into buffer
-    HBufC8* buffer = WriteStreamContextQueryLC( aContextQuery );
+    HBufC8* buffer = buffer = WriteStreamContextQueryLC( aContextQuery );
     HBufC8* resultBuffer = HBufC8::NewLC( iRequestBufferSize );
     TPtr8 resultBufferPtr = resultBuffer->Des();
     TPckg<TInt> bufferSizePtr( iRequestBufferSize );

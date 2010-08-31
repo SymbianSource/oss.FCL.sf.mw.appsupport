@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,10 +20,9 @@
 #include <featmgr.h>
 #include <accfwnoteuinotifier.rsg>
 #include <data_caging_path_literals.hrh> 
-#include <aknnotewrappers.h>
-#include <secondarydisplay/SecondaryDisplayAccFwAPI.h>
+#include <SecondaryDisplay/SecondaryDisplayAccFwAPI.h>
 #include <bautils.h>
-
+#include <hbdevicemessageboxsymbian.h>
 #include "AccFwUiNoteNotifier.h"
 #include "acc_debug.h"
 
@@ -68,7 +67,6 @@ CAccFwUiNoteNotifier::~CAccFwUiNoteNotifier()
     {
     API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::~CAccFwUiNoteNotifier()" );
 
-    delete iNote;
     delete iNoteText;
     CActive::Cancel();
     
@@ -211,144 +209,7 @@ void CAccFwUiNoteNotifier::StartL(
 
     if ( aBuffer.Length() )
         {
-		API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default accessory selection or headphones information" );
-
-    	TInt value( 0 );
-    	TPckg<TInt> pckg( value );
-    	pckg.Copy( aBuffer );
-
-   		//get "default enhancement" string resource
-		API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Read default enhancement string" );
-        defaultText = iCoeEnv->AllocReadResourceLC( R_TEXT_DEFAULT_ENHANC );
-
-  		TPtrC enhancement;
-  		TBool enhancementOk( ETrue );
-
-  		if ( value != 0 )
-  		    {
-			API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default selection" );
-
-  			enhancementOk = EFalse;
-            HBufC8* literals = iCoeEnv->AllocReadResourceAsDes8L( R_SELECTION_DIALOG_LITERALS );
-            TResourceReader reader;
-        	reader.SetBuffer( literals );
-
-			TInt count( reader.ReadInt16() );
-			API_TRACE_1( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Read literals, count %d", count );
-
-			// Find correct accessory literal
-			for ( TInt i = 0; i < count; i++ )
-			    {
-				//read from resource
-				TUint32 index( reader.ReadUint32() );
-				API_TRACE_1( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Read literal, index %d", index );
-
-				if ( index == value )
-				    {
-					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Literal found!" );
-					// Literal found
-					enhancement.Set( reader.ReadTPtrC() );
-					enhancementOk = ETrue;
-					break;
-				    }
-				else
-				    {
-					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Not found!" );
-					reader.ReadTPtrC();
-				    }
-			    }
-			    
-			delete literals;
-  		    }
-
-		if ( enhancementOk )
-		    {
-			API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Enhancement OK!" );
-			HBufC* noteStr = NULL;
-
-			// Headphones...
-			if ( value == 0x08 || value == 0x40 || value == 0 )
-			    {
-				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Show headphones information!" );
-
-				// Default enhancement string if needed
-				if ( value != 0 )
-				    {
-					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Show also default information!" );
-				 	noteStr = HBufC::NewL( defaultText->Length() + enhancement.Length() + 3 );
-
-				 	TPtr ptr( noteStr->Des() );	
-					ptr.Append( defaultText->Des() );
-					ptr.Append( ' ' );
-					ptr.Append( enhancement );
-					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default string ready!" );
-				    }
-
-				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Read use phone mic string!" );
-                // Read resource use phone mic and default enhancement text...
-		   	    HBufC* usePhoneMicTextHolder = iCoeEnv->AllocReadResourceLC( R_TEXT_HEADPHONES_MIC );
-				
-				TBool chekcNoteStr( EFalse );
-				if ( noteStr )
-				    {
-					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Add phone mic string to default accessory string!" );
-					CleanupStack::PushL( noteStr );
-					HBufC* temp = noteStr->ReAllocL( noteStr->Length() + 2 + usePhoneMicTextHolder->Length() + 1 );
-					CleanupStack::Pop( noteStr );
-					noteStr = temp;
-					chekcNoteStr = ETrue;
-					}
-				else
-				    {
-					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Only use phone mic string!" );
-					noteStr = HBufC::NewL( usePhoneMicTextHolder->Length() + 1 );
-				    }
-
-			 	TPtr ptr( noteStr->Des() );	
-				
-				
-				if( chekcNoteStr )
-					{
-					ptr.Append( _L( ". " ) );
-					ptr.Append( usePhoneMicTextHolder->Des() );
-					}
-                else
-                	{
-                	ptr.Append( usePhoneMicTextHolder->Des() );
-                	}
-                // Cleanup
-                CleanupStack::PopAndDestroy( usePhoneMicTextHolder );
-
-				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - String ready!" );
-			    }
-			else
-			    {
-				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Create default accessory text!" );
-				//only default accessory text
-				noteStr = HBufC::NewL( defaultText->Length() + enhancement.Length() + 1 );
-            	TPtr ptr( noteStr->Des() );
-			
-				ptr.Append( defaultText->Des() );
-				ptr.Append( ' ' );
-				ptr.Append( enhancement );
-				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default accessory text ready!" );
-			    }
-
-            // Pass string to member string and free local copies
-            CleanupStack::PopAndDestroy( defaultText );
-            CleanupStack::PushL( noteStr );
-            iNoteText = HBufC::NewL( noteStr->Length() );
-            TPtr ptr( iNoteText->Des() );
-            ptr.Append( noteStr->Des() );
-            CleanupStack::PopAndDestroy( noteStr );
-            showNote = ETrue;
-		    }
-		else
-		    {
-			API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - No note" );
-            // No need to check this one, always set into cleanup stack
-            CleanupStack::PopAndDestroy( defaultText );
-            }
+		//Do nothing as accessory is rightly detected by accessory server and adaptation.
         }
     else
         {
@@ -365,13 +226,7 @@ void CAccFwUiNoteNotifier::StartL(
     iMessage = aMessage;
     if( showNote )
         {
-        if ( FeatureManager::FeatureSupported( KFeatureIdCoverDisplay ) )
-            {
-    		API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Cover UI supported" );
-            iPublishNote = ETrue;
-            }
-
-    	iIsCancelled = EFalse;
+        iIsCancelled = EFalse;
         SetActive();
         TRequestStatus* status = &iStatus;
         User::RequestComplete( status, KErrNone ); // RunL() function will get called
@@ -398,25 +253,13 @@ void CAccFwUiNoteNotifier::RunL()
 		return;	
 	    }
     
-    // Create note
-    iNote = new ( ELeave ) CAknNoteDialog(
-        CAknNoteDialog::ENoTone,
-        CAknNoteDialog::ELongTimeout );
-
-    iNote->PrepareLC( R_ACCFWUINOTIFIER_INFORMATION_NOTE ); // Adds to CleanupStack
-
-    if ( iPublishNote )
-        {
-        iNote->PublishDialogL( ECmdShowAccessoryNotSupportedNote, KCatAccFw );
-        iPublishNote = EFalse;
-        }
-
-    iNote->SetTextL( *iNoteText );
-    API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - iNote->RunLD()!" );
-    iNote->RunLD();
-    iNote = NULL;
-    delete iNoteText;
-    iNoteText = NULL;
+   	CHbDeviceMessageBoxSymbian *messageBox = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
+	           CleanupStack::PushL(messageBox);
+	           messageBox->SetTextL(*iNoteText);
+	           messageBox->ShowL();
+	           CleanupStack::PopAndDestroy(messageBox); // messageBox
+	           delete iNoteText;
+	           iNoteText = NULL;
 
     API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::RunL() - Complete message" );
 	iMessage.Complete( KErrNone );
@@ -465,21 +308,17 @@ void CAccFwUiNoteNotifier::Cancel()
 
     iIsCancelled = ETrue;
     
-    if ( iNote )
-        {
-	   // Cancel active object, delete dialog and free resources
+    	   // Cancel active object and free resources
         if ( IsActive() )
             {
             CActive::Cancel();    
             }
-	    delete iNote;
-	    iNote = NULL;
-        delete iNoteText;
+	      delete iNoteText;
         iNoteText = NULL;
 
         API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::Cancel() - Complete message with Cancel" );
         iMessage.Complete( KErrCancel );
-        }
+       
 
     API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::Cancel() - return" );
     }

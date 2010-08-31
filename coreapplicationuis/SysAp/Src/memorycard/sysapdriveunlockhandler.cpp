@@ -53,7 +53,8 @@ CSysApDriveUnlockHandler::CSysApDriveUnlockHandler(
         const TBool aMemoryCardLockSupported ) :
     iSysApDriveList( aSysApDriveList ),
     iSysApAppUi( aSysApAppUi ),
-    iMemoryCardLockSupported( aMemoryCardLockSupported )
+    iMemoryCardLockSupported( aMemoryCardLockSupported ),
+    iMemCardPwdDialog(NULL)
     {
     }
 
@@ -67,8 +68,12 @@ CSysApDriveUnlockHandler::~CSysApDriveUnlockHandler()
         _L( "CSysApDriveUnlockHandler::~CSysApDriveUnlockHandler" ) ) );
 
     iIgnoreQueryResult = ETrue;
-    delete iQueryShowCB;
-    delete iMemoryCardDialog;
+    if (iMemCardPwdDialog!=NULL)
+        {
+        //MemoryCardDialog already exist
+        delete iMemCardPwdDialog;
+        iMemCardPwdDialog = NULL;
+        }
     }
 
 // ---------------------------------------------------------------------------
@@ -77,16 +82,6 @@ CSysApDriveUnlockHandler::~CSysApDriveUnlockHandler()
 //
 void CSysApDriveUnlockHandler::StartUnlock()
     {
-    TBool isOngoing( IsQueryOngoing() );
-
-    TRACES( RDebug::Print(
-        _L( "CSysApMCSysApMMCUnlockObserver::StartUnlock: ongoing: %d" ),
-        isOngoing ) );
-
-    if ( isOngoing )
-        {
-        return;
-        }
     TRAPD( err, DoStartQueryIfNeededL() );
     if ( err != KErrNone )
         {
@@ -150,7 +145,6 @@ void CSysApDriveUnlockHandler::UnlockComplete( TInt aResult )
 
     // Mark handled and start next query
     iSysApDriveList.MarkDriveUnlockQueryShown( iDriveToUnlock );
-    DoStartQueryAsyncIfNeeded();
     }
 
 // ---------------------------------------------------------------------------
@@ -175,19 +169,23 @@ TInt CSysApDriveUnlockHandler::QueryShowCB( TAny* aPtr )
 //
 void CSysApDriveUnlockHandler::ShowUnlockQueryL()
     {
+    iDriveToUnlock = iSysApDriveList.DriveToUnlock();
     TRACES( RDebug::Print(
         _L( "CSysApMCSysApMMCUnlockObserver::ShowUnlockQueryL: drive: %d" ),
         iDriveToUnlock ) );
 
-    if ( !iMemoryCardDialog )
+    if (iMemCardPwdDialog!=NULL)
         {
-        CAknMemoryCardDialog* mmcDialog = CAknMemoryCardDialog::NewLC( this );
-        iMemoryCardDialog = mmcDialog; // temporary variable used for hiding codescanner error 
-        iMemoryCardDialog->SetSelfPointer( &iMemoryCardDialog );
-        TDriveNumber drive( static_cast< TDriveNumber >( iDriveToUnlock ) );
-        iMemoryCardDialog->UnlockCardLD( drive, ETrue );
-        }
-    }
+        //PowerMenu already exist
+        delete iMemCardPwdDialog;
+        iMemCardPwdDialog = NULL;
+        } 
+    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, JEELani 01") ) );
+    iMemCardPwdDialog = CHbDeviceInputDialogSymbian::NewL();
+    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, JEELani 02") ) );
+    iMemCardPwdDialog->ShowL();
+    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, JEELani 03") ) );    
+}
 
 // ---------------------------------------------------------------------------
 // CSysApDriveUnlockHandler::IsQueryOngoing
@@ -195,7 +193,7 @@ void CSysApDriveUnlockHandler::ShowUnlockQueryL()
 //
 TBool CSysApDriveUnlockHandler::IsQueryOngoing() const
     {
-    return ( iMemoryCardDialog || iQueryShowCB );
+    return 0; 
     }
 
 // ---------------------------------------------------------------------------
@@ -205,10 +203,19 @@ TBool CSysApDriveUnlockHandler::IsQueryOngoing() const
 void CSysApDriveUnlockHandler::DoStartQueryIfNeededL()
     {
     iDriveToUnlock = iSysApDriveList.DriveToUnlock();
+
     if ( iDriveToUnlock == KErrNotFound )
         {
+        _LIT(KChargingNote,"Phone does not found drive to unlock");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KChargingNote);
+        TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString         
         return;
         }
+
     if ( iMemoryCardLockSupported )
         {
         ShowUnlockQueryL();
@@ -216,6 +223,13 @@ void CSysApDriveUnlockHandler::DoStartQueryIfNeededL()
     else
         {
         iSysApAppUi.ShowQueryL( ESysApMemoryCardLockedNote );
+        _LIT(KChargingNote,"Phone does not support locked memory cards");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KChargingNote);
+        TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString    
         iSysApDriveList.MarkDriveUnlockQueryShown( iDriveToUnlock );
         }
     }
@@ -232,18 +246,6 @@ void CSysApDriveUnlockHandler::DoStartQueryAsyncIfNeeded()
         DoStopUnlock( KErrNone );
         return;
         }
-    delete iQueryShowCB;
-    iQueryShowCB = NULL;
-    iQueryShowCB = new CAsyncCallBack(
-        TCallBack( QueryShowCB, this ), CActive::EPriorityStandard );
-    if ( iQueryShowCB )
-        {
-        iQueryShowCB->CallBack();
-        }
-    else
-        {
-        DoStopUnlock( KErrNoMemory );
-        }
     }
 
 // ---------------------------------------------------------------------------
@@ -258,12 +260,117 @@ void CSysApDriveUnlockHandler::DoStopUnlock( TInt aError )
             _L( "CSysApMCSysApMMCUnlockObserver::DoStopUnlock: error: %d" ),
             aError ) );
         }
+    ReleaseMemoryForInputCardDialog();
     iIgnoreQueryResult = ETrue;
-    delete iMemoryCardDialog;
-    iMemoryCardDialog = NULL;
-    delete iQueryShowCB;
-    iQueryShowCB = NULL;
     iIgnoreQueryResult = EFalse;
     }
+
+void CSysApDriveUnlockHandler::ReleaseMemoryForInputCardDialog()
+    {
+    if (iMemCardPwdDialog!=NULL)
+        {
+        //MemoryCardDialog already exist
+        delete iMemCardPwdDialog;
+        iMemCardPwdDialog = NULL;
+        }
+    }
+
+TInt CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()
+  {
+    TRACES( RDebug::Print(_L( "CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded(): Begin" )));
+    TDriveNumber drive( static_cast< TDriveNumber >( iDriveToUnlock ) );
+    TRACES( RDebug::Print(_L( "CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()" )));
+    TPtrC aStringPointer11 = iMemCardPwdDialog->getTextL();           
+    ConvertCharactersToPwd(aStringPointer11,iPassword);
+    
+    if(!aStringPointer11.Length())
+        {
+        return EFalse;  // It meant user has pressed OK without password
+        }
+
+    TRACES( RDebug::Print(_L( "CSysApMCSysApMMCUnlockObserver::RunL; iPassword %S" ),&iPassword));              
+    CEikonEnv* eikEnv = CEikonEnv:: Static();
+    TInt err = eikEnv->FsSession().UnlockDrive(drive,iPassword,ETrue);
+    ReleaseMemoryForInputCardDialog();
+    
+    if ( err == KErrNone)
+        {
+        TRACES( RDebug::Print(_L( "CSysApAppUi::ReleaseMemoryCardCustomDialogMemory(), Drive Unlocked Succesfully" )));
+        _LIT(KUnlockNote,"The memory is unlocked!");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KUnlockNote);   
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString
+        return ETrue;
+        }
+    else if( err == KErrAccessDenied ) 
+        {
+        TRACES( RDebug::Print(_L( "CSysApAppUi::ReleaseMemoryCardCustomDialogMemory(), Password InCorrect" )));
+        _LIT(KUnlockDeniedNote,"The password is incorrect, try again!");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KUnlockDeniedNote);   
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString
+        return EFalse;
+        }
+    else if( err == KErrAlreadyExists ) 
+        {
+        TRACES( RDebug::Print(_L( "CSysApAppUi::ReleaseMemoryCardCustomDialogMemory(), Already been Drive Unlocked" )));
+        _LIT(KUnlockAlreadyExistNote,"The disk has already been unlocked!");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KUnlockAlreadyExistNote);
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString
+        return ETrue;
+        }
+    else if( err == KErrNotSupported ) 
+        {
+        TRACES( RDebug::Print(_L( "CSysApAppUi::ReleaseMemoryCardCustomDialogMemory(), Media does not support password locking." )));
+        _LIT(KUnlockNotSupporrtedNote,"The media does not support password locking!");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KUnlockNotSupporrtedNote);
+        TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString
+        return ETrue;
+        }
+    else
+        {
+        // check for error -18 what it is . 
+        _LIT(KUnlockOperationCancelNote,"Error occurred, operation cancelled!");
+        HBufC* aString = HBufC16::NewLC(150);
+        TPtrC aStringPointer = aString->Des();
+        aStringPointer.Set(KUnlockOperationCancelNote);
+        TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
+        CleanupStack::PopAndDestroy(); // aString
+        return ETrue;
+        }
+}
+        
+HBufC8* CSysApDriveUnlockHandler::Convert16to8L(TDesC16& aStr)//const
+    {
+    
+    HBufC8* newFrom1 = HBufC8::NewL(aStr.Length());
+    
+    newFrom1->Des().Copy(aStr);
+    
+    return newFrom1;
+    }
+
+void CSysApDriveUnlockHandler::ConvertCharactersToPwd(TDesC& aWord, TDes8& aConverted)
+{
+    aConverted.FillZ(aConverted.MaxLength());
+    aConverted.Zero();
+     
+    if (aWord.Length())
+    {
+    aConverted.Copy( (TUint8*)(&aWord[0]), aWord.Size() );
+    }
+}
 
 // End of File

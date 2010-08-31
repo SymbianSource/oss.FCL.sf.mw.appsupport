@@ -32,7 +32,7 @@ SOURCE                  mt_atspc.cpp
 
 USERINCLUDE ../inc
 
-SYSTEMINCLUDE           /epoc32/include/platform/Digia/EUnit
+SYSTEMINCLUDE           /epoc32/include/Digia/EUnit
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY                 EUnit.lib

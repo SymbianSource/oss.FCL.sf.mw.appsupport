@@ -130,7 +130,7 @@ void CSelectiveFormatter::ConstructL( const TDesC& aExcludeListFile )
     HandleAppExcludeListsL();
     
     // Handle NR-Applications
-    HandleNrExcludeListsL();
+    //HandleNrExcludeListsL();
     
     if( !iValidExcludeListFound )
         {

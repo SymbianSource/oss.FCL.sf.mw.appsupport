@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -28,7 +28,6 @@
 #include "CFContextIndication.h"
 #include "CFContextSubscription.h"
 #include "cfcontextobjectimpl.h"
-#include "cfenvutils.h"
 
 
 // CONSTRUCTION
@@ -53,8 +52,6 @@ UT_CCFContextManager* UT_CCFContextManager::NewLC()
 // Destructor (virtual by CBase)
 UT_CCFContextManager::~UT_CCFContextManager()
     {
-    // ETrue screen saver
-    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -68,9 +65,6 @@ void UT_CCFContextManager::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
-
-    // Disable screen saver
-    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 

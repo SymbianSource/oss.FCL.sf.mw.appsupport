@@ -55,9 +55,9 @@ EXPORTS
 	?reserved3@CAppSidChecker@@EAEXXZ @ 54 NONAME ABSENT ; void CAppSidChecker::reserved3(void)
 	?DriveList@CApaAppRegFinder@@QBEABV?$RArray@VTDriveUnitInfo@@@@XZ @ 55 NONAME ABSENT ; class RArray<class TDriveUnitInfo> const & CApaAppRegFinder::DriveList(void) const
 	?FindAllRemovableMediaAppsL@CApaAppRegFinder@@QAEXXZ @ 56 NONAME ABSENT ; void CApaAppRegFinder::FindAllRemovableMediaAppsL(void)
-	??1CApaAppInstallationMonitor@@UAE@XZ @ 57 NONAME ; CApaAppInstallationMonitor::~CApaAppInstallationMonitor(void)
-	?NewL@CApaAppInstallationMonitor@@SAPAV1@PAVCApaAppArcServer@@@Z @ 58  NONAME ; class CApaAppInstallationMonitor * CApaAppInstallationMonitor::NewL(class CApaAppArcServer *)
-	?Start@CApaAppInstallationMonitor@@QAEXXZ @ 59 NONAME ; void CApaAppInstallationMonitor::Start(void)
+	??1CApaAppInstallationMonitor@@UAE@XZ @ 57 NONAME ABSENT; CApaAppInstallationMonitor::~CApaAppInstallationMonitor(void)
+	?NewL@CApaAppInstallationMonitor@@SAPAV1@PAVCApaAppArcServer@@@Z @ 58  NONAME ABSENT; class CApaAppInstallationMonitor * CApaAppInstallationMonitor::NewL(class CApaAppArcServer *)
+	?Start@CApaAppInstallationMonitor@@QAEXXZ @ 59 NONAME ABSENT; void CApaAppInstallationMonitor::Start(void)
 	??1CApfMimeContentPolicy@@UAE@XZ @ 60 NONAME ; CApfMimeContentPolicy::~CApfMimeContentPolicy(void)
 	?IsClosedExtension@CApfMimeContentPolicy@@QAEHABVTDesC16@@@Z @ 61 NONAME ; int CApfMimeContentPolicy::IsClosedExtension(class TDesC16 const &)
 	?IsClosedFileL@CApfMimeContentPolicy@@QAEHAAVRFile@@@Z @ 62 NONAME ; int CApfMimeContentPolicy::IsClosedFileL(class RFile &)
@@ -69,5 +69,4 @@ EXPORTS
 	?NewL@CApfMimeContentPolicy@@SAPAV1@XZ @ 68 NONAME ; class CApfMimeContentPolicy * CApfMimeContentPolicy::NewL(void)
 	?NewLC@CApfMimeContentPolicy@@SAPAV1@AAVRFs@@@Z @ 69 NONAME ; class CApfMimeContentPolicy * CApfMimeContentPolicy::NewLC(class RFs &)
 	?NewLC@CApfMimeContentPolicy@@SAPAV1@XZ @ 70 NONAME ; class CApfMimeContentPolicy * CApfMimeContentPolicy::NewLC(void)
-	_E32Dll=__E32Dll	; Entry point for emulation
 

@@ -24,7 +24,6 @@ PRJ_EXPORTS
 PRJ_MMPFILES
 
 #include "../gssensorplugin/group/bld.inf"
-#include "../GSAccessoryPlugin/group/bld.inf"
 
 PRJ_TESTMMPFILES
 

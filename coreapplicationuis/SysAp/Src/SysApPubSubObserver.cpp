@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,7 +20,7 @@
 #include <e32property.h>
 #include <sacls.h>
 #include <startupdomainpskeys.h>
-#include "CoreApplicationUIsPrivatePSKeys.h"
+#include "coreapplicationuisprivatepskeys.h"
 #include <ctsydomainpskeys.h>
 #include <wlaninternalpskeys.h>
 #include <connect/sbdefs.h>
@@ -30,14 +30,15 @@
 #include "SysApAppUi.h"
 #include "SysApFeatureManager.h"
 #include <ir_sock.h>
-#include <NetworkHandlingDomainPSKeys.h>
+#include <networkhandlingdomainpskeys.h>
 #include <hwrmdomainpskeys.h>
 #include <DataSyncInternalPSKeys.h>
-#include <hwrmfmtxdomainpskeys.h>
-#include <hwrmfmtx.h>
+//#include <hwrmfmtxdomainpskeys.h>
+//#include <hwrmfmtx.h>
 #include "sysapremconobserver.h"
 #include <lbs/locationfwdomainpskeys.h>
 #include <smsuaddr.h>
+#include <avkondomainpskeys.h>
 
 #ifndef SYMBIAN_ENABLE_SPLIT_HEADERS
   #include <ASShdAlarm.h>
@@ -47,10 +48,13 @@
   #include <asshdalarm.h>
 #endif //SYMBIAN_ENABLE_SPLIT_HEADERS
 
-
 // CONSTANTS
 const TUint KCoreAppUIsMmcRemovedWithoutEjectCmdMask = 0xFFFF;
 const TUint KCoreAppUIsMmcRemovedWithoutEjectValShift = 16;
+
+_LIT(KGpsIndicatorPlugin, "com.nokia.positioning.indicatorplugin/1.0");
+const TUid KPSUidSecurityUIs = { 0x100059b5 };
+const TUint32 KSecurityUIsLights  = 0x00000308;
 
 // ============================ MEMBER FUNCTIONS ==============================
 
@@ -93,10 +97,10 @@ void CSysApPubSubObserver::ConstructL()
     iOutboxStatusSubscriber->Subscribe();
     iIrdaStatusSubscriber = CSysApSubscriber::NewL( *this, KIrdaPropertyCategory, KIrdaStatus );
     iIrdaStatusSubscriber->Subscribe();
-    iGprsStatusSubscriber = CSysApSubscriber::NewL( *this, KUidSystemCategory, KPSUidGprsStatusValue );
-    iGprsStatusSubscriber->Subscribe();
-    iWcdmaStatusSubscriber = CSysApSubscriber::NewL( *this, KUidSystemCategory, KPSUidWcdmaStatusValue ); 
-    iWcdmaStatusSubscriber->Subscribe();
+//    iGprsStatusSubscriber = CSysApSubscriber::NewL( *this, KUidSystemCategory, KPSUidGprsStatusValue );
+//    iGprsStatusSubscriber->Subscribe();
+//    iWcdmaStatusSubscriber = CSysApSubscriber::NewL( *this, KUidSystemCategory, KPSUidWcdmaStatusValue ); 
+//    iWcdmaStatusSubscriber->Subscribe();
     iLocationGlobalPrivacySubscriber = CSysApSubscriber::NewL( *this, KUidSystemCategory, KPSUidLocationGlobalPrivacyValue );
     iLocationGlobalPrivacySubscriber->Subscribe();
     iRestoreBackupSubscriber = CSysApSubscriber::NewL( *this, KUidSystemCategory, conn::KUidBackupRestoreKey );
@@ -166,14 +170,14 @@ void CSysApPubSubObserver::ConstructL()
     iFlipStatusSubscriber = CSysApSubscriber::NewL( *this, KPSUidHWRM, KHWRMFlipStatus );
     iFlipStatusSubscriber->Subscribe();
     
-    if ( iSysApAppUi.SysApFeatureManager().FmTxSupported() )
+/*    if ( iSysApAppUi.SysApFeatureManager().FmTxSupported() )
         {
         // Category KHWRMFmTxStatus
         iFmTxStatusSubscriber = CSysApSubscriber::NewL( *this, KPSUidHWRMFmTx, KHWRMFmTxStatus );
         iFmTxStatusSubscriber->Subscribe();
         iPreviousFmTxPSValue = EFmTxStateUnknown;    
         }
-
+*/
     iSyncStatusSubscriber = CSysApSubscriber::NewL( *this, KPSUidDataSynchronizationInternalKeys, KDataSyncStatus );
     iSyncStatusSubscriber->Subscribe();
     
@@ -185,6 +189,15 @@ void CSysApPubSubObserver::ConstructL()
 
     iSmsPhoneStoreSubscriber = CSysApSubscriber::NewL( *this, KUidPSSMSStackCategory, KUidPSSMSStackDiskSpaceMonitorKey );
     iSmsPhoneStoreSubscriber->Subscribe();
+    
+    iKeylockEventSubscriber = CSysApSubscriber::NewL( *this, KPSUidAvkonDomain, KAknKeyguardStatus );
+    iKeylockEventSubscriber->Subscribe();
+    
+    iLightsOnRequestSubscriber = CSysApSubscriber::NewL( *this, KPSUidSecurityUIs, KSecurityUIsLights );
+    iLightsOnRequestSubscriber->Subscribe();
+    
+    iPowerMenuCustomDialogSubscriber = CSysApSubscriber::NewL( *this, KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus );
+    iPowerMenuCustomDialogSubscriber->Subscribe();
     }
 
 // ----------------------------------------------------------------------------
@@ -202,8 +215,8 @@ CSysApPubSubObserver::~CSysApPubSubObserver()
     delete iInboxStatusSubscriber;
     delete iOutboxStatusSubscriber; 
     delete iIrdaStatusSubscriber;
-    delete iGprsStatusSubscriber; 
-    delete iWcdmaStatusSubscriber;
+//    delete iGprsStatusSubscriber; 
+//    delete iWcdmaStatusSubscriber;
     delete iHomeZoneStatusSubscriber;
     delete iNewEmailStatusSubscriber; 
     delete iLocationGlobalPrivacySubscriber;
@@ -230,12 +243,15 @@ CSysApPubSubObserver::~CSysApPubSubObserver()
     delete iNetworkModeSubscriber;
     delete iWlanIndicatorSubscriber;
     delete iFlipStatusSubscriber;
-    delete iFmTxStatusSubscriber;
-    delete iFmTxRemConObserver;
+//    delete iFmTxStatusSubscriber;
+//    delete iFmTxRemConObserver;
     delete iSyncStatusSubscriber;
     delete iVideoSharingIndicatorSubscriber;
     delete iGpsIndicatorSubscriber;
     delete iSmsPhoneStoreSubscriber;
+    delete iKeylockEventSubscriber;
+    delete iLightsOnRequestSubscriber;
+    delete iPowerMenuCustomDialogSubscriber;
     }
 
 
@@ -302,10 +318,11 @@ void CSysApPubSubObserver::HandlePropertyChangedL( const TUid& aCategory, const 
         {
         HandleHwrmCategoryL( aKey, value );
         }
-    else if ( aCategory == KPSUidHWRMFmTx )
+/*    else if ( aCategory == KPSUidHWRMFmTx )
         {
         HandleHwrmFmTxCategoryL( aKey, value );
         }
+*/
     else if ( aCategory == KPSUidDataSynchronizationInternalKeys )
         {
         HandleDataSyncCategoryL( aKey, value );
@@ -317,6 +334,14 @@ void CSysApPubSubObserver::HandlePropertyChangedL( const TUid& aCategory, const 
     else if ( aCategory == KUidPSSMSStackCategory )
         {
         HandleSmsStackCategoryL( aKey, value );
+        }
+    else if ( aCategory == KPSUidAvkonDomain)
+        {
+        HandleLKeylockEventL( aKey, value );
+        }
+    else if ( aCategory == KPSUidSecurityUIs)
+        {
+        HandleLightsOnRequestL( aKey, value );
         }
     }
 // ----------------------------------------------------------------------------
@@ -361,15 +386,15 @@ void CSysApPubSubObserver::HandleCoreAppUIsCategoryL( const TUint aKey, const TI
         case KCoreAppUIsUipInd:
             if ( aValue == ECoreAppUIsDoNotShow )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorInstantMessage, EAknIndicatorStateOff ); 
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorInstantMessage, EAknIndicatorStateOff ); 
                 }
             else if ( aValue == ECoreAppUIsShow )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorInstantMessage, EAknIndicatorStateOn ); 
+//                iSysApAppUi.SetIndicatorStateL( EAknIndicatorInstantMessage, EAknIndicatorStateOn ); 
                 }
             break;
         case KCoreAppUIsMessageToneQuit:
-            iSysApAppUi.HandleMessageTonePlayingQuitability( aValue );
+ //           iSysApAppUi.HandleMessageTonePlayingQuitability( aValue );
             break;
         case KCoreAppUIsNspsRawKeyEvent:
             iSysApAppUi.HandleNspsRawKeyEventL();
@@ -401,11 +426,11 @@ void CSysApPubSubObserver::HandleCoreAppUIsCategoryL( const TUint aKey, const TI
         case KCoreAppUIsNewEmailStatus:
             if ( aValue == ECoreAppUIsNewEmail )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorEmailMessage, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorEmailMessage, EAknIndicatorStateOn );
                 }
             else if ( aValue == ECoreAppUIsNoNewEmail )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorEmailMessage, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorEmailMessage, EAknIndicatorStateOff );
                 }
             break;
 
@@ -423,68 +448,104 @@ void CSysApPubSubObserver::HandleCoreAppUIsCategoryL( const TUint aKey, const TI
         case KCoreAppUIsPoCIndicator:
             if ( aValue == ECoreAppUIsPocIndicatorOff || aValue == ECoreAppUIsPocIndicatorUninitialized )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoC, EAknIndicatorStateOff );
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCDnD, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoC, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCDnD, EAknIndicatorStateOff );
                 }
             else if ( aValue == ECoreAppUIsPocIndicatorDoNotDisturb )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoC, EAknIndicatorStateOff );
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCDnD, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoC, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCDnD, EAknIndicatorStateOn );
                 }
             else if ( aValue == ECoreAppUIsPocIndicatorConnectionOn )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoC, EAknIndicatorStateOn );
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCDnD, EAknIndicatorStateOff );
+//                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoC, EAknIndicatorStateOn );
+//                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCDnD, EAknIndicatorStateOff );
                 }
             break;
         case KCoreAppUIsPoCMissedIndicator:
             if ( aValue == ECoreAppUIsPocMissedIndicatorOff || aValue == ECoreAppUIsPocMissedIndicatorUninitialized )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCMissed, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCMissed, EAknIndicatorStateOff );
                 }
             else if ( aValue == ECoreAppUIsPocMissedIndicatorOn )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCMissed, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorPoCMissed, EAknIndicatorStateOn );
                 }
             break;
             
         case KCoreAppUIsTarmIndicator:
-            iSysApAppUi.HandleTarmIndicatorL( aValue );
+ //           iSysApAppUi.HandleTarmIndicatorL( aValue );
             break;
 
         case KCoreAppUIsMtvRecStatus:
             if ( aValue == ECoreAppUIsMtvRecStatusOn  )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTVRec, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTVRec, EAknIndicatorStateOn );
                 }
             else if ( aValue == ECoreAppUIsMtvRecStatusOff || aValue == ECoreAppUIsMtvRecStatusUninitialized )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTVRec, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTVRec, EAknIndicatorStateOff );
                 }
             break;
 
         case KCoreAppUIsMtvDvbhStatus:
             if ( aValue == ECoreAppUIsMtvDvbhStatusOn )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTV, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTV, EAknIndicatorStateOn );
                 }
             else if ( aValue == ECoreAppUIsMtvDvbhStatusOff || aValue == ECoreAppUIsMtvDvbhStatusUninitialized )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTV, EAknIndicatorStateOff );
+//                iSysApAppUi.SetIndicatorStateL( EAknIndicatorMobileTV, EAknIndicatorStateOff );
                 }
             break;
         
         case KCoreAppUIsVideoSharingIndicator:
             if ( aValue == ECoreAppUIsVideoSharingIndicatorOn )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorVideoSharing, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorVideoSharing, EAknIndicatorStateOn );
                 }
             else if ( aValue == ECoreAppUIsVideoSharingIndicatorOff || aValue == ECoreAppUIsVideoSharingIndicatorUninitialized )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorVideoSharing, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorVideoSharing, EAknIndicatorStateOff );
                 }
             break;
-
+            
+        case KCoreAppUIsPowerMenuCustomDialogStatus:
+            if ( aValue == ECoreAppUIsPowerMenuCustomDialogOn )
+                { 
+                TBool powerMenuMemoryStatus = EFalse;
+                powerMenuMemoryStatus = iSysApAppUi.ReleasePowerMenuCustomDialogMemory();
+                if(powerMenuMemoryStatus)
+                    {
+                    RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogOff );
+                    }
+                }
+            else if(aValue == ECoreAppUIsMemoryCardCustomDialogOk)
+                {
+                TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOk") ) );
+                TBool memoryCardStatus = EFalse;
+                memoryCardStatus = iSysApAppUi.NotifiedDialogIfRequiredAndReleaseMemory();
+                if(memoryCardStatus)
+                    {
+                    TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOn: memoryCardStatus Begin") ) );                                       
+                    RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogOff );
+                    TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOn: memoryCardStatus end") ) );
+                    }
+                TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogOn: memoryCardStatus final end") ) );
+                                    
+                }
+            else if(aValue == ECoreAppUIsMemoryCardCustomDialogCancel)
+                {
+                TRACES( RDebug::Print(_L("CSysApAppUi::ECoreAppUIsMemoryCardCustomDialogCancel") ) );
+                iSysApAppUi.ReleaseMemoryForMemoryCardDialog();
+                RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogOff );
+                }
+            else if ( aValue == ECoreAppUIsPowerMenuCustomDialogOff || aValue == ECoreAppUIsPowerMenuCustomDialogUninitialized )
+                {
+                   // do nothing
+                }
+            break;   
+        
         default:
             break;
         }
@@ -525,43 +586,43 @@ void CSysApPubSubObserver::HandleSystemCategoryL( const TUint aKey, const TInt a
     switch ( aKey )
         {
         case KUidInboxStatusValue:
-            iSysApAppUi.SetEnvelopeIndicatorL();
+//            iSysApAppUi.SetEnvelopeIndicatorL();
             break;
 
         case KUidOutboxStatusValue:
             if ( aValue == ESADocumentsInOutbox )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorOutbox, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorOutbox, EAknIndicatorStateOn );
                 }
             //Hide the Outbox indicator
             else if ( aValue == ESAOutboxEmpty )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorOutbox, EAknIndicatorStateOff );
+//                iSysApAppUi.SetIndicatorStateL( EAknIndicatorOutbox, EAknIndicatorStateOff );
                 }
             break;
 
         case KIrdaStatus:
             if ( aValue == TIrdaStatusCodes::EIrLoaded || aValue == TIrdaStatusCodes::EIrBlocked || aValue == TIrdaStatusCodes::EIrDisconnected )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorIrActive, EAknIndicatorStateAnimate );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorIrActive, EAknIndicatorStateAnimate );
                 }
             else if ( aValue == TIrdaStatusCodes::EIrConnected )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorIrActive, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorIrActive, EAknIndicatorStateOn );
                 }
             else if ( aValue == TIrdaStatusCodes::EIrUnloaded )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorIrActive, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorIrActive, EAknIndicatorStateOff );
                 }
             break;
 
-        case KPSUidGprsStatusValue:
-        case KPSUidWcdmaStatusValue:        
-            iSysApAppUi.SetSignalIndicatorL();
-            break;
+//        case KPSUidGprsStatusValue:
+ //       case KPSUidWcdmaStatusValue:        
+ //           iSysApAppUi.SetSignalIndicatorL();
+//            break;
 
         case KPSUidLocationGlobalPrivacyValue:
-            iSysApAppUi.HandleLocationPrivacyIndicatorL( aValue );
+//            iSysApAppUi.HandleLocationPrivacyIndicatorL( aValue );
             break;
 
         case conn::KUidBackupRestoreKey:
@@ -594,7 +655,7 @@ void CSysApPubSubObserver::HandleHwrmPowerStateCategoryL( const TUint aKey, cons
     switch ( aKey )
         {
         case KHWRMBatteryLevel:
-            iSysApAppUi.UpdateBatteryBarsL( aValue );
+ //           iSysApAppUi.UpdateBatteryBarsL( aValue );
             break;
         
         case KHWRMBatteryStatus:
@@ -609,7 +670,7 @@ void CSysApPubSubObserver::HandleHwrmPowerStateCategoryL( const TUint aKey, cons
             break;
         } 
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApPubSubObserver::HandleHwrmFmTxCategoryL()
 // ----------------------------------------------------------------------------
@@ -642,17 +703,17 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
                     TRACES(RDebug::Print(_L("CSysApPubSubObserver::HandleHwrmFmTxCategoryL Active/Inactive -> Off transition")));
                     
     	            // turn any FM TX indicators off
-	                iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOff );
-	                iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOff );
+//	                iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOff );
+//	                iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOff );
                     
                     // give notification
                     if ( aValue == EFmTxStatePowerSaveAccessory )
                     	{
-                    	iSysApAppUi.ShowUiNoteL( EFmTxAccessoryStandbyNote );
+//                    	iSysApAppUi.ShowUiNoteL( EFmTxAccessoryStandbyNote );
                     	}
                     else
                     	{
-                    	iSysApAppUi.ShowUiNoteL( EFmTxOffNote );
+ //                   	iSysApAppUi.ShowUiNoteL( EFmTxOffNote );
                     	}
                     isFmTxTurnedOff = ETrue;                                                                           	
                     }
@@ -662,8 +723,8 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
                     TRACES(RDebug::Print(_L("CSysApPubSubObserver::HandleHwrmFmTxCategoryL Active -> Inactive transition")));
                    
                     // enable not sending indicator
-	                iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOff );                      
-                    iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOn );                  
+//	                iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOff );                      
+//                    iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOn );                  
                     }
                 else if ( aValue == EFmTxStateActive )
                     {
@@ -671,8 +732,8 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
                     TRACES(RDebug::Print(_L("CSysApPubSubObserver::HandleHwrmFmTxCategoryL Inactive -> Active transition")));
                     
                     // enable active indicator
-                    iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOff );    
-                    iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOn );					                
+//                    iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOff );    
+//                    iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOn );					                
                     }    
         
                 break;    
@@ -689,11 +750,11 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
                     TRACES(RDebug::Print(_L("CSysApPubSubObserver::HandleHwrmFmTxCategoryL Off -> Active transition")));
                                         
                     // enable active indicator
-                    iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOff );   
-                    iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOn );					                  
+ //                   iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOff );   
+ //                   iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOn );					                  
                     
                     // give notification
-                    iSysApAppUi.ShowUiNoteL( EFmTxOnNote );
+ //                   iSysApAppUi.ShowUiNoteL( EFmTxOnNote );
                     isFmTxTurnedOn = ETrue;
                     }
                 else if ( aValue == EFmTxStateInactive || aValue == EFmTxStateScanning )
@@ -702,34 +763,17 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
                 	TRACES(RDebug::Print(_L("CSysApPubSubObserver::HandleHwrmFmTxCategoryL Off -> Inactive transition")));
                 	
                     // enable not sending indicator
-	                iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOff );                      
-                    iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOn );                      	
+//	                iSysApAppUi.SetIndicatorStateL( KFmTxActiveIndicator, EAknIndicatorStateOff );                      
+ //                   iSysApAppUi.SetIndicatorStateL( KFmTxNotSendingIndicator, EAknIndicatorStateOn );                      	
                     
                     // give notification
-                    iSysApAppUi.ShowUiNoteL( EFmTxOnNote );
+ //                   iSysApAppUi.ShowUiNoteL( EFmTxOnNote );
                     isFmTxTurnedOn = ETrue;
                 	}                
                 break;                
                             
             }
-        
-        if ( aValue == EFmTxStateActive )
-            {
-            if(iFmTxRemConObserver)
-                {
-                //Open Remcon and reserve the volume keys
-                iFmTxRemConObserver->StartRemconInterfaceL();
-                }
-            }
-        else 
-            {
-            if(iFmTxRemConObserver)
-                {
-                //Disconnect from Remcon and release keys for other apps like phone app during call
-                iFmTxRemConObserver->StopRemconInterface();
-                }
-            }
-        
+            
         if ( isFmTxTurnedOn )
             {
             if ( !iFmTxRemConObserver )
@@ -767,6 +811,7 @@ void CSysApPubSubObserver::HandleHwrmFmTxCategoryL( const TUint aKey,
         iPreviousFmTxPSValue = aValue;
         }
     }
+*/
 
 // ----------------------------------------------------------------------------
 // CSysApPubSubObserver::HandleWlanCategoryL()
@@ -810,16 +855,16 @@ void CSysApPubSubObserver::HandleNetworkInfoCategoryL( const TUint aKey, const T
         case KNWHomeZoneStatus:
             if ( aValue == ENWHomeZone )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorHomeZone, EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorHomeZone, EAknIndicatorStateOn );
                 }
             else if ( aValue == ENWNone || aValue == ENWCityZone )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorHomeZone, EAknIndicatorStateOff );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorHomeZone, EAknIndicatorStateOff );
                 }
             break; 
 
         case KNWTelephonyNetworkMode:
-            iSysApAppUi.SetSignalIndicatorL();
+ //           iSysApAppUi.SetSignalIndicatorL();
             break;
 
         default:
@@ -837,11 +882,11 @@ void CSysApPubSubObserver::HandleHwrmCategoryL( const TUint aKey, const TInt aVa
         case KHWRMFlipStatus:
             if ( aValue == EPSHWRMFlipClosed )
                 {
-                iSysApAppUi.SimulateFlipKeyEventL( EFalse );
+ //               iSysApAppUi.SimulateFlipKeyEventL( EFalse );
                 }
             else if ( aValue == EPSHWRMFlipOpen )
                 {
-                iSysApAppUi.SimulateFlipKeyEventL( ETrue );
+ //               iSysApAppUi.SimulateFlipKeyEventL( ETrue );
                 }
             break; 
 
@@ -860,11 +905,11 @@ void CSysApPubSubObserver::HandleDataSyncCategoryL( const TUint aKey, const TInt
         case KDataSyncStatus:
             if ( aValue > EDataSyncNotRunning )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorSynchronization , EAknIndicatorStateOn );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorSynchronization , EAknIndicatorStateOn );
                 }
             else
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorSynchronization, EAknIndicatorStateOff );
+  //              iSysApAppUi.SetIndicatorStateL( EAknIndicatorSynchronization, EAknIndicatorStateOff );
                 }
             break;
         
@@ -884,15 +929,17 @@ void CSysApPubSubObserver::HandlePosIndicatorCategoryL( const TUint aKey, const 
         case KPosIntGpsHwStatus:
             if ( aValue == EPosIntGpsHwOff )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOff );
+                iSysApAppUi.iHbIndicatorSymbian->Deactivate(KGpsIndicatorPlugin);
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOff );
                 }
             else if ( aValue == EPosIntGpsHwOn )    
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOn );
+                iSysApAppUi.iHbIndicatorSymbian->Activate(KGpsIndicatorPlugin);
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOn );
                 }
             else if ( aValue == EPosIntGpsHwIntermediate )
                 {
-                iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateAnimate );
+ //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateAnimate );
                 }
             break;
         
@@ -909,8 +956,8 @@ void CSysApPubSubObserver::HandleSmsStackCategoryL( const TUint aKey, const TInt
     {
     switch ( aKey )
         {
-        case KUidPSSMSStackDiskSpaceMonitorKey:
-            iSysApAppUi.SetEnvelopeIndicatorL();
+        case KAknKeyguardStatus:
+ //           iSysApAppUi.SetEnvelopeIndicatorL();
             break;
 
         default:
@@ -918,7 +965,39 @@ void CSysApPubSubObserver::HandleSmsStackCategoryL( const TUint aKey, const TInt
         }
     }
 
+void CSysApPubSubObserver::HandleLKeylockEventL( const TUint /* aKey */, const TInt aValue )
+    {
+    switch( aValue )
+        {
+        case EEikKeyLockEnabled:
+            iSysApAppUi.SetKeyLockEnabledL();
+            break;
+        case EEikKeyLockDisabled:
+            iSysApAppUi.SetKeyLockDisabledL();    
+            break;
+        default:
+            break;
+       }
+    }
+
+void CSysApPubSubObserver::HandleLightsOnRequestL( const TUint /* aKey */, const TInt aValue )
+    {
+    switch ( aValue )
+        {
+        case EEikKeyLockLightsOnRequest:
+             iSysApAppUi.SetLightsOnUnlockNoteL();
+             break;
+        case EEikEcsQueryLights: // emergency note is shown
+             iSysApAppUi.SetLightsOnEcsQueryL();
+             break;
+
+        case EEikSecurityQueryLights: // for device lock security query
+             iSysApAppUi.SetLightsOnSecurityQueryL();
+             break;
+
+        default:
+            break;
+        }
+    }
+
 // End of File
-
-
-

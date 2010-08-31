@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -24,9 +24,17 @@
 #include "tstapp.h"
 #include "TRApaLsSessionStartAppTest.h"
 #include <apacmdln.h>
+#include "T_SisFileInstaller.h"    
 
 _LIT(KCompleted, "Completed.");
 _LIT8(KLitPlainText,"text/plain");
+
+_LIT(KUnprotectedAppSisFile, "z:\\apparctest\\apparctestsisfiles\\UnProctectedUidApp.sis");
+_LIT(KUnprotectedAppComponent, "UnProctectedUidApp");
+
+_LIT(KRApaLsSessionStartAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TRApaLsSessionStartAppTestApp_v2.sis");
+_LIT(KRApaLsSessionStartAppComponent, "TRApaLsSessionStartAppTestApp_v2");
+
 
 const TInt KTUnProtectedAppTestPassed = 1234;
 
@@ -108,6 +116,13 @@ CT_StartAppTestStep::~CT_StartAppTestStep()
  */	
 TVerdict CT_StartAppTestStep::doTestStepPreambleL()
 	{
+    CSisFileInstaller sisFileInstaller;
+    
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KUnprotectedAppSisFile);
+    sisFileInstaller.InstallSisL(KUnprotectedAppSisFile);
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KRApaLsSessionStartAppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KRApaLsSessionStartAppSisFile); 
+    
 	SetTestStepResult(EPass);
 	TInt error = iApaLsSession.Connect();
 	TEST(error==KErrNone);
@@ -120,6 +135,11 @@ TVerdict CT_StartAppTestStep::doTestStepPreambleL()
  */
 TVerdict CT_StartAppTestStep::doTestStepPostambleL()
 	{
+    CSisFileInstaller sisFileInstaller;
+    
+    sisFileInstaller.UninstallSisL(KUnprotectedAppComponent);
+    sisFileInstaller.UninstallSisL(KRApaLsSessionStartAppComponent); 
+     
 	return TestStepResult();
 	}
 

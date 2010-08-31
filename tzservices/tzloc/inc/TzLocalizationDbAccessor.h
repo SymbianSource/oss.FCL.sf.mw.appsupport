@@ -88,8 +88,10 @@ class CTzLocalizationDbAccessor : public CBase
 	private:
 		TInt CreateFrequentlyUsedZoneTableL();
 		TInt CreateUserCityTableL();
+		TBool IsTableCreatedL(const TDesC& aTableName) const;
         void CloseDb();
         void OpenDbL();
+		
 
 	protected:
 		//Member data

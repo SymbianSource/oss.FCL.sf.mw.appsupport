@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -42,8 +42,6 @@ public:
 	void ConstructL(CMainWindow* aWindow);
 	void RunL();
 	void SetMainWindow(CMainWindow* aWindow);
-//protected:
-//	TCallBack iCallBack;
 private:
 	CMainWindow* iWindow;
 	};
@@ -69,7 +67,7 @@ class CWsClient : public CActive
 		// destruct
 		~CWsClient();
 		// main window
-		virtual void ConstructMainWindowL();
+		virtual void ConstructMainWindowL()=0;
 		// terminate cleanly
 		void Exit();
 		// active object protocol
@@ -157,6 +155,7 @@ class CMainWindow : public CWindow
 		CMainWindow (CWsClient* aClient);
 		~CMainWindow ();
 		void Draw (const TRect& aRect);
+		CFbsBitmap* ReadSVGL (TFileName aFileName);
 		void HandlePointerEvent (TPointerEvent& aPointerEvent);
 		void ConstructL (const TRect& aRect, CWindow* aParent=0);
 	private:

@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -30,6 +30,10 @@
 #include "T_groupNametest_ver2.h"
 #include "apparctestserver.h"
 #include <test/testexecutestepbase.h>
+#include "T_SisFileInstaller.h"
+
+_LIT(KGroupNameVer2AppSisFile, "z:\\apparctest\\apparctestsisfiles\\T_groupname_ver2.sis");
+_LIT(KGroupNameVer2AppComponent, "T_groupname_ver2");
 
 // CT_GroupNameStep_ver2
 
@@ -86,6 +90,25 @@ void CT_GroupNameStep_ver2::DoTestCaptionNameL(RApaLsSession& aLs)
 	TEST(info.iCaption == KCaption);
 	TEST(info.iShortCaption == KShortCaption);
 	}
+
+TVerdict CT_GroupNameStep_ver2::doTestStepPreambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KGroupNameVer2AppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KGroupNameVer2AppSisFile);
+
+    SetTestStepResult(EPass);
+    return TestStepResult();
+    }
+	
+TVerdict CT_GroupNameStep_ver2::doTestStepPostambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    sisFileInstaller.UninstallSisL(KGroupNameVer2AppComponent);
+    
+    return TestStepResult();
+    }
+
 
 /**
    @return - TVerdict code

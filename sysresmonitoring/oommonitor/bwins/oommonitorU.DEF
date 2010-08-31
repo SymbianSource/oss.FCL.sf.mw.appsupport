@@ -17,5 +17,4 @@ EXPORTS
 	?RequestOptionalRam@ROomMonitorSession@@QAEHHHHAAH@Z @ 16 NONAME ; int ROomMonitorSession::RequestOptionalRam(int, int, int, int &)
 	?RequestOptionalRam@ROomMonitorSession@@QAEXHHHAAVTRequestStatus@@@Z @ 17 NONAME ; void ROomMonitorSession::RequestOptionalRam(int, int, int, class TRequestStatus &)
 	?SetOomPriority@ROomMonitorSession@@QAEXW4TOomPriority@1@@Z @ 18 NONAME ; void ROomMonitorSession::SetOomPriority(enum ROomMonitorSession::TOomPriority)
-	?AppId@COomMonitorPlugin@@UBE?BVTUid@@XZ @ 19 NONAME ; class TUid const COomMonitorPlugin::AppId(void) const
 

@@ -23,13 +23,13 @@ DEFAULT
 
 PRJ_EXPORTS
 
-../data/sensordatacompensationui.rul               /epoc32/data/Z/private/10282bc4/rules/sensordatacompensationui.rul
-../data/sensordatacompensationui.rul               /epoc32/RELEASE/winscw/UDEB/Z/private/10282bc4/rules/sensordatacompensationui.rul
-../data/sensordatacompensationui.rul               /epoc32/RELEASE/winscw/UREL/Z/private/10282bc4/rules/sensordatacompensationui.rul
+../data/sensordatacompensationui.rul               /epoc32/data/z/private/10282bc4/rules/sensordatacompensationui.rul
+../data/sensordatacompensationui.rul               /epoc32/release/winscw/udeb/z/private/10282bc4/rules/sensordatacompensationui.rul
+../data/sensordatacompensationui.rul               /epoc32/release/winscw/urel/z/private/10282bc4/rules/sensordatacompensationui.rul
 
-../data/sensordatacompensationdevice.rul           /epoc32/data/Z/private/10282bc4/rules/sensordatacompensationdevice.rul
-../data/sensordatacompensationdevice.rul           /epoc32/RELEASE/winscw/UDEB/Z/private/10282bc4/rules/sensordatacompensationdevice.rul
-../data/sensordatacompensationdevice.rul           /epoc32/RELEASE/winscw/UREL/Z/private/10282bc4/rules/sensordatacompensationdevice.rul
+../data/sensordatacompensationdevice.rul           /epoc32/data/z/private/10282bc4/rules/sensordatacompensationdevice.rul
+../data/sensordatacompensationdevice.rul           /epoc32/release/winscw/udeb/z/private/10282bc4/rules/sensordatacompensationdevice.rul
+../data/sensordatacompensationdevice.rul           /epoc32/release/winscw/urel/z/private/10282bc4/rules/sensordatacompensationdevice.rul
 
 ../rom/sensordatacompensatorplugin.iby           CORE_MW_LAYER_IBY_EXPORT_PATH( sensordatacompensatorplugin.iby )
 

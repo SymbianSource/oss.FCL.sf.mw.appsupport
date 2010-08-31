@@ -44,7 +44,12 @@ public:
 	void NotifyScanComplete();
 	void SetNotify(const RMessage2& aMessage);
 	void CancelNotify();
-	void NotifyClients(TInt aReason);
+	
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
+	void NotifyClients(TInt aReason, CArrayFixFlat<TApaAppUpdateInfo>* aUpdatedAppsInfo);
+#else
+    void NotifyClients(TInt aReason);
+#endif	
 	
 	void NotifyClientForCompletionOfListPopulation();
 	void CancelListPopulationCompleteObserver();
@@ -99,6 +104,11 @@ private:
 	
 	void ApplicationLanguageL(const RMessage2& aMessage);
 	void SetAppShortCaptionL(const RMessage2& aMessage);
+	
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
+	void UpdateAppListL(const RMessage2& aMessage);
+	void UpdatedAppsInfoL(const RMessage2& aMessage);	
+#endif
 private:		
 	static TInt NextDriveToScan(TInt aCurrentDrive);	
 	static TBool AppIsControlPanelItem(const CApaAppData& aAppData);
@@ -120,7 +130,9 @@ private:
 	CApaAppList& iAppList;
 	RMessage2 iNotifyMessage;
 	RMessage2 iNotifyOnScanCompleteMsg;
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
 	CApsNonNativeApplicationsManager* iNonNativeApplicationsManager;
+#endif
 	RMessage2 iCompletionOfListPopulationObserverMsg;
 		
 	TAppListType iAppListType;
@@ -130,6 +142,11 @@ private:
 	TUint iCapabilityAttrFilterValue; // contains bit flags from TCapabilityAttribute
 	TUid iServiceUid;
 	RPointerArray<CApaAppInfo> iApaAppInfoArray;	//contains the most recent "snapshot" of the applist taken by GetNextAppL.
+	
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	RArray<TApaAppUpdateInfo> iAppsUpdated;
+	TBool iNotificationRequested; //If its true updated application information is maintained in session object.
+#endif
 	};
 	
 	
@@ -143,7 +160,11 @@ public:
 	virtual void ServiceL(const RMessage2 &aMessage);
 
 	void NotifyClientOfDataMappingChange();
-	void NotifyClients(TInt aReason);
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  
+    void NotifyClients(TInt aReason, CArrayFixFlat<TApaAppUpdateInfo>* aUpdatedAppsInfo);
+#else
+    void NotifyClients(TInt aReason);
+#endif  
 	void NotifyScanComplete();
 	void NotifyClientForCompletionOfListPopulation();
 private:
@@ -157,7 +178,7 @@ private:
 	void RecognizeDataPassedByFileHandleL(const RMessage2& aMessage);
 	void RecognizeSpecificDataL(const RMessage2& aMessage);
 	void RecognizeSpecificDataPassedByFileHandleL(const RMessage2& aMessage);
-	static TPtrC8 DoRecognizeUnpackLC(HBufC*& aName, RChunk& aLocalChunk, const RMessage2& aMessage);
+    static TPtrC8 DoRecognizeUnpackLC(HBufC*& aName, RChunk& aLocalChunk, const RMessage2& aMessage);
 
 	void AppForDataTypeL(const RMessage2& aMessage);
 	TUid AppForDataTypeL(const TDataType& aDataType, const TUid* aServiceUid);
@@ -178,8 +199,10 @@ private:
 	void AppForDataTypeAndServiceL(const RMessage2& aMessage);
 	void AppForDocumentPassedByFileHandleL(const RMessage2& aMessage, const TUid* aServiceUid);
 
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	void RegisterNonNativeApplicationTypeL(const RMessage2& aMessage);
 	void DeregisterNonNativeApplicationTypeL(const RMessage2& aMessage);
+#endif
 
 	void GetExecutableNameGivenDocumentL(const RMessage2& aMessage);
 	void GetExecutableNameGivenDocumentPassedByFileHandleL(const RMessage2& aMessage);

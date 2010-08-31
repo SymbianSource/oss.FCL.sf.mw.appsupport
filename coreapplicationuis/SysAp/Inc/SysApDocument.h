@@ -20,7 +20,8 @@
 #define SYSAPDOCUMENT_H
 
 // INCLUDES
-#include <AknDoc.h>
+//#include <AknDoc.h>
+#include <eikdoc.h>
 
 // FORWARD DECLARATIONS
 class  CEikAppUi;
@@ -32,7 +33,7 @@ class  CEikAppUi;
 *  @since 1.0
 */
 
-class CSysApDocument : public CAknDocument
+class CSysApDocument : public CEikDocument
     {
     public:
         /**
@@ -40,7 +41,12 @@ class CSysApDocument : public CAknDocument
         * @param CEikApplication& aApp
         * @return void
         */
-        CSysApDocument(CEikApplication& aApp): CAknDocument(aApp) { }
+        CSysApDocument(CEikApplication& aApp): CEikDocument(aApp) { }
+        
+        /**
+        *   Two-phased constructor.
+        */
+//        static CSysApDocument* NewL(CEikApplication& aApp);
 
         /**
         * Destructor.
@@ -50,6 +56,12 @@ class CSysApDocument : public CAknDocument
         virtual ~CSysApDocument();
 
     private:
+        
+        /**
+        *   EPOC default constructor.
+        */
+//        void ConstructL();
+        
         /**
         * C++ default constructor.
         * @param None

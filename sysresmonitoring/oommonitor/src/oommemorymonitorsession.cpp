@@ -73,9 +73,12 @@ TBool CMemoryMonitorSession::IsDataPaged(const RMessage2& aMessage)
         if(err == KErrNone)
             {
             dataPaged = processName.DefaultDataPaged();
+            processName.Close();
+            clientThread.Close();
             }
         else
             {
+            clientThread.Close();                        
             PanicClient(aMessage, EPanicIllegalFunction);
             }
         }
@@ -100,7 +103,8 @@ void CMemoryMonitorSession::ServiceL(const RMessage2& aMessage)
         case EOomMonitorRequestFreeMemory:
             if (!iRequestFreeRam.IsNull())
                 PanicClient(aMessage, EPanicRequestActive);
-            // message will be completed when CloseAppsFinished() is called.
+            // message will be completed when CloseAppsFinished() is called.  
+            
 #ifdef CLIENT_REQUEST_QUEUE
             ClientRequestQueue().RequestFreeMemoryL(aMessage);
 #else
@@ -124,6 +128,7 @@ void CMemoryMonitorSession::ServiceL(const RMessage2& aMessage)
             if (!iRequestFreeRam.IsNull())
                 PanicClient(aMessage, EPanicRequestActive);
             // message will be completed when CloseAppsFinished() is called.
+            
 #ifdef CLIENT_REQUEST_QUEUE
             ClientRequestQueue().RequestOptionalRamL(aMessage);
 #else

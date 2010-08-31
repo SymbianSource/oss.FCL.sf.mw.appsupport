@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2004 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,9 +19,7 @@
 // INCLUDE FILES
 #include <e32std.h>
 #include <ecom/implementationproxy.h>
-
 #include "AccFwUiNoteNotifier.h"
-#include "AccFwUiDialogNotifier.h"
 #include "acc_debug.h"
 
 // EXTERNAL DATA STRUCTURES
@@ -30,7 +28,7 @@
 
 // CONSTANTS
 
-const TInt KNumberOfImplementations(2);
+const TInt KNumberOfImplementations(1);
 
 // MACROS
 
@@ -51,15 +49,10 @@ void CreateNotifiersL( CArrayPtrFlat<MEikSrvNotifierBase2>* aSubjects )
     API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CreateNotifiersL() - enter" );
     MEikSrvNotifierBase2* note = CAccFwUiNoteNotifier::NewL();
     CleanupStack::PushL( note );
-    
-    MEikSrvNotifierBase2* dialog = CAccFwUiDialogNotifier::NewL();
-    CleanupStack::PushL( dialog );        
-    
+          
     aSubjects->AppendL( note );
-    aSubjects->AppendL( dialog );
-    
-    CleanupStack::Pop( dialog );
-    CleanupStack::Pop( note );
+     
+      CleanupStack::Pop( note );
     API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CreateNotifiersL() - return void" );
     
     }

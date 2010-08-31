@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -21,13 +21,19 @@
 #include "APFDEF.H"
 #include "../apparc/TRACE.H"
 #include "apgnotif.h"			// MApaAppListServObserver
-#include "aplappregfinder.h"	// CApaAppRegFinder
 #include <bautils.h>			// BaflUtils::NearestLanguageFile()
 #include <s32mem.h>				// RBufWriteStream
 #include "aplappinforeader.h"
 #include "apsiconcaptionoverride.h"
 #ifdef SYMBIAN_BAFL_SYSUTIL
 #include <bafl/sysutil.h>
+#endif
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+#include<usif/scr/scr.h>
+#include<usif/scr/appregentries.h>
+#else
+#include "aplappregfinder.h"    // CApaAppRegFinder
 #endif
 
 
@@ -47,6 +53,13 @@ _LIT(KROMVersionStringCacheFileName, "ROMVersionCache.bin");
 const TInt8 KROMVersionCacheFileMajorVersion=1;
 const TInt8 KROMVersionCacheFileMinorVersion=0;
 const TInt16 KROMVersionCacheFileBuildVersion=0;
+#endif
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+const TInt KNumAppEntriesFromSCR=10;
+
+const TInt KSCRConnectionWaitTime=20000; //Time to wait if SCR is busy
+const TUid KUidSisLaunchServer={0x1020473f};
 #endif
 
 
@@ -84,7 +97,373 @@ private:
 	TLanguage iPrevLanguage;
 	};
 
-		
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+
+enum TApaSCRFetchAction
+    {
+    EGetAllAppsInfo, //Fetch all application the information from SCR
+    EGetSpecificAppsInfo //Fetch only provided application uids information
+    };
+
+/*
+ * Contain information about appliations to be fetched from SCR.
+ */
+
+NONSHARABLE_CLASS(CApaAppSCRFetchInfo : public CBase)
+    { 
+public:
+    static CApaAppSCRFetchInfo* NewL(TApaSCRFetchAction aSCRFetchAction, RArray<TApaAppUpdateInfo>* aAppUpdateInfo);
+    ~CApaAppSCRFetchInfo();
+    RArray<TApaAppUpdateInfo>* AppUpdateInfo();
+    TApaSCRFetchAction SCRFetchAction();
+    
+private:
+    CApaAppSCRFetchInfo(TApaSCRFetchAction aSCRFetchAction, RArray<TApaAppUpdateInfo>* aAppUpdateInfo);
+    
+private:
+    TApaSCRFetchAction iSCRFetchAction;
+    RArray<TApaAppUpdateInfo>* iAppUpdateInfo;
+    };
+
+
+/*
+ * Reads multiple application information from SCR and caches it. When requested provides one application
+ * information at a time.
+ */
+NONSHARABLE_CLASS(CApaAppList::CApaScrAppInfo)
+    {
+public:
+    static CApaScrAppInfo* NewL(const Usif::RSoftwareComponentRegistry& aScrCon, TInt aNumEntries);    
+    void GetAllAppsInfoL();
+    void GetSpecificAppsInfoL(RArray<TApaAppUpdateInfo>* aAppUpdateInfo);    
+    TUid GetNextApplicationInfo(TApaAppUpdateInfo::TApaAppAction& aAppAction, Usif::CApplicationRegistrationData*& aAppData);
+    TApaSCRFetchAction GetSCRFetchAction();    
+    ~CApaScrAppInfo();
+    
+private:
+    void ConstructL();
+    CApaScrAppInfo(const Usif::RSoftwareComponentRegistry& aScr, TInt aNumEntries);
+    void GetAppUidListL(RArray<TApaAppUpdateInfo>& aAppUpdateInfoArr, RArray<TUid>& aAppUids);
+    TUid GetAllAppsNextApplicationInfoL(TApaAppUpdateInfo::TApaAppAction& aAppAction, Usif::CApplicationRegistrationData*& aAppData); 
+    TUid GetSpecificAppsNextApplicationInfoL(TApaAppUpdateInfo::TApaAppAction& aAppAction, Usif::CApplicationRegistrationData*& aAppData);  
+private:
+    Usif::RApplicationRegistryView iScrAppView;
+    RPointerArray<Usif::CApplicationRegistrationData> iAppInfo;
+    RPointerArray<CApaAppSCRFetchInfo> iSCRFetchInfoQueue;
+    const Usif::RSoftwareComponentRegistry& iSCR;   
+    TBool iIsSCRRegViewOpen;
+    TInt iSpecificAppsIndex;
+    CApaAppSCRFetchInfo* iAppSCRFetchInfo;
+    TBool iMoreAppInfo;
+    TInt iNumEntriesToFetch;
+    };
+
+
+
+CApaAppSCRFetchInfo* CApaAppSCRFetchInfo::NewL(TApaSCRFetchAction aSCRFetchAction, RArray<TApaAppUpdateInfo>* aAppUpdateInfo)
+            {
+            //Ownership of aAppUpdateInfo is transfered to this object.
+            CApaAppSCRFetchInfo* self=new (ELeave) CApaAppSCRFetchInfo(aSCRFetchAction, aAppUpdateInfo);
+            return(self);
+            }
+
+
+CApaAppSCRFetchInfo::CApaAppSCRFetchInfo(TApaSCRFetchAction aSCRFetchAction, RArray<TApaAppUpdateInfo>* aAppUpdateInfo):
+        iSCRFetchAction(aSCRFetchAction),        
+        iAppUpdateInfo(aAppUpdateInfo)
+        {
+        }
+
+CApaAppSCRFetchInfo::~CApaAppSCRFetchInfo()
+    {
+    delete iAppUpdateInfo;
+    }
+
+RArray<TApaAppUpdateInfo>* CApaAppSCRFetchInfo::AppUpdateInfo()
+            {
+            return iAppUpdateInfo;
+            }
+
+
+TApaSCRFetchAction CApaAppSCRFetchInfo::SCRFetchAction()
+    {
+    return iSCRFetchAction;
+    }
+
+
+//CApaAppList::CApaScrAppInfo
+
+CApaAppList::CApaScrAppInfo* CApaAppList::CApaScrAppInfo::NewL(const Usif::RSoftwareComponentRegistry& aScrCon, TInt aNumEntries)
+    { 
+    CApaScrAppInfo* self=new(ELeave) CApaScrAppInfo(aScrCon, aNumEntries);
+    CleanupStack::PushL(self);    
+    self->ConstructL();
+    CleanupStack::Pop();
+    return self;
+    }
+
+
+CApaAppList::CApaScrAppInfo::CApaScrAppInfo(const Usif::RSoftwareComponentRegistry& aScr, TInt aNumEntries):
+        iSCR(aScr),
+        iIsSCRRegViewOpen(EFalse),
+        iSpecificAppsIndex(-1),
+        iAppSCRFetchInfo(NULL),
+        iMoreAppInfo(EFalse),
+        iNumEntriesToFetch(aNumEntries)
+       
+    {
+    }
+
+void CApaAppList::CApaScrAppInfo::ConstructL()
+    {
+    }
+
+
+CApaAppList::CApaScrAppInfo::~CApaScrAppInfo()
+    {
+    if(iAppSCRFetchInfo)
+        {
+        delete iAppSCRFetchInfo; 
+        iAppSCRFetchInfo=NULL;
+        }
+    
+    iAppInfo.ResetAndDestroy();
+    iSCRFetchInfoQueue.ResetAndDestroy();
+    iScrAppView.Close();
+    }
+
+/*
+ * Gets all the application information available in the SCR. It adds SCR fetch info with action EGetAllAppsInfo to a queue 
+ * to get all the application information. The information can be obtained one at a time by calling GetNextApplicationInfoL 
+ * function.
+ */
+void CApaAppList::CApaScrAppInfo::GetAllAppsInfoL()
+    {
+    CApaAppSCRFetchInfo* appSCRFetchInfo = CApaAppSCRFetchInfo::NewL(EGetAllAppsInfo, NULL);
+    CleanupStack::PushL(appSCRFetchInfo);      
+    iSCRFetchInfoQueue.AppendL(appSCRFetchInfo);
+    CleanupStack::Pop();
+    }
+
+
+/*
+ * Gets specific application information from the SCR. It adds SCR fetch info request with action EGetSpecificAppsInfo 
+ * along with the required uid list to the queue. The information can be obtained one at a time by calling GetNextApplicationInfoL 
+ * function.
+ */
+void CApaAppList::CApaScrAppInfo::GetSpecificAppsInfoL(RArray<TApaAppUpdateInfo>* aAppUpdateInfo)
+    {
+    CApaAppSCRFetchInfo* appSCRFetchInfo=CApaAppSCRFetchInfo::NewL(EGetSpecificAppsInfo, aAppUpdateInfo);
+    CleanupStack::PushL(appSCRFetchInfo);
+    iSCRFetchInfoQueue.AppendL(appSCRFetchInfo);
+    CleanupStack::Pop();   
+    }
+
+/*
+ * Create array of uids from TApaAppUpdateInfo array.
+ */
+void CApaAppList::CApaScrAppInfo::GetAppUidListL(RArray<TApaAppUpdateInfo>& aAppUpdateInfoArr, RArray<TUid>& aAppUids)
+    {
+    TInt count=aAppUpdateInfoArr.Count();
+    
+    for(TInt index=0;index<count;index++)
+        {
+        TApaAppUpdateInfo appUpdateInfo=aAppUpdateInfoArr[index];
+        aAppUids.AppendL(appUpdateInfo.iAppUid);
+        }
+    }
+
+
+TApaSCRFetchAction CApaAppList::CApaScrAppInfo::GetSCRFetchAction()
+{
+    return iAppSCRFetchInfo->SCRFetchAction();
+}
+
+
+/*
+ * Provides one application information at a time. Returns Null UID if no more application information available.
+ * Ownership of aAppData is transfered to calling function.
+ */
+TUid CApaAppList::CApaScrAppInfo::GetNextApplicationInfo(TApaAppUpdateInfo::TApaAppAction& aAppAction, Usif::CApplicationRegistrationData*& aAppData)
+    {
+    aAppData=NULL;
+    TUid appUid=KNullUid;
+
+    while(appUid==KNullUid)
+        {
+        //If there is no valid current SCR fetch information, get it from SCR fetch info queue
+        if(!iAppSCRFetchInfo)
+            {
+            if(iSCRFetchInfoQueue.Count()>0)
+                {
+                //Get next SCR fetch info
+                iAppSCRFetchInfo=iSCRFetchInfoQueue[0]; 
+                iSCRFetchInfoQueue.Remove(0); 
+                iMoreAppInfo=ETrue;               
+                }
+            else
+                {
+                //No more SCR fetch information avaialable.
+                break;
+                }
+            }
+        
+        //Get next application information        
+        if(iAppSCRFetchInfo->SCRFetchAction()==EGetAllAppsInfo)
+            {
+            //If there is a leave with current SCR fetch info, ignore and proceed with next SCR fetch info
+            TRAP_IGNORE(appUid=GetAllAppsNextApplicationInfoL(aAppAction, aAppData));
+            }
+        else
+            {
+            //If there is a leave with current SCR fetch info, ignore and proceed with next SCR fetch info        
+            TRAP_IGNORE(appUid=GetSpecificAppsNextApplicationInfoL(aAppAction, aAppData));       
+            }
+            
+        if(appUid==KNullUid)
+            {
+            //If no application information avaialble with current fetch action reset the values for next SCR fetch action.
+            delete iAppSCRFetchInfo;
+            iAppSCRFetchInfo=NULL;
+            iScrAppView.Close();
+            iIsSCRRegViewOpen=EFalse;            
+            }
+        }
+    
+    return(appUid);
+    }
+
+TUid CApaAppList::CApaScrAppInfo::GetAllAppsNextApplicationInfoL(TApaAppUpdateInfo::TApaAppAction& aAppAction, Usif::CApplicationRegistrationData*& aAppData)
+    {
+    TUid appUid=KNullUid;
+
+    if(iAppInfo.Count()==0 && iMoreAppInfo)
+        {
+        //Open registry view if its not open.
+        if(!iIsSCRRegViewOpen)
+            {
+            TInt err=KErrNone;
+            TInt timeOut=KSCRConnectionWaitTime;
+
+            //Retry if an error occurs while opening a SCR view. 
+            while(timeOut < KSCRConnectionWaitTime*8)
+            {
+            TRAP(err, iScrAppView.OpenViewL(iSCR));
+            if(err != KErrNone)
+                {
+                User::After(timeOut);
+                timeOut= (2*timeOut); 
+                }
+            else
+                {
+                break;
+                }
+            }
+            User::LeaveIfError(err);
+            iIsSCRRegViewOpen=ETrue;
+            }
+        
+        //Get next available applications information.
+        iScrAppView.GetNextApplicationRegistrationInfoL(iNumEntriesToFetch, iAppInfo);
+        if(iAppInfo.Count()<KNumAppEntriesFromSCR)
+            iMoreAppInfo=EFalse;
+        }
+
+    //If no application information avaialble, return Null UID.
+    if(iAppInfo.Count()==0)
+        return KNullUid;
+
+    aAppData=iAppInfo[0];
+    aAppAction=TApaAppUpdateInfo::EAppPresent;
+    iAppInfo.Remove(0);
+    appUid=aAppData->AppUid();
+    return appUid;
+    }
+
+
+/*
+ * Gets next application information when specific applications information requested.
+ */
+TUid CApaAppList::CApaScrAppInfo::GetSpecificAppsNextApplicationInfoL(TApaAppUpdateInfo::TApaAppAction& aAppAction, Usif::CApplicationRegistrationData*& aAppData)
+    {
+    TUid appUid=KNullUid;
+    TApaAppUpdateInfo::TApaAppAction action = TApaAppUpdateInfo::EAppNotPresent; //To make compiler happy
+    Usif::CApplicationRegistrationData* appData=NULL;
+    
+    while(appUid==KNullUid)
+        {
+        if(iAppInfo.Count()==0 && iMoreAppInfo)
+            {
+            //Open registry view if its not open and also provides application uid list for which applist needs to be updated.
+            if(!iIsSCRRegViewOpen)
+                {
+                RArray<TUid> appUids;
+                CleanupClosePushL(appUids);
+                //Get application uids list.
+                GetAppUidListL(*iAppSCRFetchInfo->AppUpdateInfo(), appUids);
+                
+                TInt err=KErrNone;
+                do
+                    {
+                    TRAP(err, iScrAppView.OpenViewL(iSCR, appUids));
+                    if(err)
+                        User::After(KSCRConnectionWaitTime);
+                    }
+                while(err!=KErrNone);
+
+                CleanupStack::PopAndDestroy();
+                iIsSCRRegViewOpen=ETrue;
+                iSpecificAppsIndex=0;
+                }
+            
+            //Get next available applications information.
+            iScrAppView.GetNextApplicationRegistrationInfoL(iNumEntriesToFetch,iAppInfo);
+            if(iAppInfo.Count()<KNumAppEntriesFromSCR)
+                iMoreAppInfo=EFalse;
+            }
+    
+        RArray<TApaAppUpdateInfo>& appUpdateInfo=*iAppSCRFetchInfo->AppUpdateInfo();
+        
+        
+        if(iSpecificAppsIndex<appUpdateInfo.Count())
+            {
+            appUid=appUpdateInfo[iSpecificAppsIndex].iAppUid;
+            action=appUpdateInfo[iSpecificAppsIndex].iAction;
+    
+            //If application information avaialable, and if application action is not uninstalled or
+            //If application action is uninstalled and the uninstalled application exists in SCR,
+            //then get the info and assign to aAppData.
+            if(iAppInfo.Count()>0)
+                {
+                if(iAppInfo[0]->AppUid()==appUid)
+                    {
+                    appData=iAppInfo[0];
+                    iAppInfo.Remove(0);
+                    }
+                }
+            
+            iSpecificAppsIndex++;
+            
+            //If action is not uninstalled, there should be application data in SCR. Otherwise skip the application action.
+            if((action!=TApaAppUpdateInfo::EAppNotPresent) && appData==NULL)
+                {
+                appUid=KNullUid;
+                }
+            
+            }
+            //If there are no more applications in the current update applist, break the loop;     
+            if(appUpdateInfo.Count()==iSpecificAppsIndex)
+                break;        
+        }
+    
+    aAppData=appData;
+    aAppAction=action;
+    return appUid;
+    }
+
+#endif
+
 //
 // Local functions
 //
@@ -108,26 +487,29 @@ void CleanupServiceArray(TAny* aServiceArray)
 //
 
 EXPORT_C CApaAppList* CApaAppList::NewL(RFs& aFs, TBool aLoadMbmIconsOnDemand, TInt aIdlePeriodicDelay)
-	{
-	CApaAppList* self=new (ELeave) CApaAppList(aFs, aLoadMbmIconsOnDemand, aIdlePeriodicDelay);
-	CleanupStack::PushL(self);
-	self->ConstructL();
-	CleanupStack::Pop(self);
-	return self;
-	}
+    {
+    CApaAppList* self=new (ELeave) CApaAppList(aFs, aLoadMbmIconsOnDemand, aIdlePeriodicDelay);
+    CleanupStack::PushL(self);
+    self->ConstructL();
+    CleanupStack::Pop(self);
+    return self;
+    }
 
 CApaAppList::CApaAppList(RFs& aFs, TBool aLoadMbmIconsOnDemand, TInt aIdlePeriodicDelay)
-	:iFs(aFs),
-	iFlags(0),
-	iIdlePeriodicDelay(aIdlePeriodicDelay),
-	iLoadMbmIconsOnDemand(aLoadMbmIconsOnDemand),
-    iUninstalledApps(NULL)	
-	{
-	}
+    :iFs(aFs),
+    iFlags(0),
+    iIdlePeriodicDelay(aIdlePeriodicDelay),
+    iLoadMbmIconsOnDemand(aLoadMbmIconsOnDemand),
+    iUninstalledApps(NULL)  
+    {
+    }
+
 
 void CApaAppList::ConstructL()
 	{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	iAppRegFinder = CApaAppRegFinder::NewL(iFs);
+#endif
 	
 	User::LeaveIfError(iFsShareProtected.Connect());
 	User::LeaveIfError(iFsShareProtected.ShareProtected());
@@ -135,8 +517,11 @@ void CApaAppList::ConstructL()
 	
 	//Start language change monitor.
 	iAppLangMonitor = CApaLangChangeMonitor::NewL(*this);
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  	
 	const TInt KArrayGranularity = 128;
 	iForcedRegistrations = new (ELeave) CDesCArraySeg(KArrayGranularity);
+#endif	
 	
 	// Init the AppsList cache paths
 	_LIT(KAppsListCacheFileName, ":\\private\\10003a3f\\AppsListCache\\AppsList.bin");
@@ -176,12 +561,14 @@ EXPORT_C CApaAppList::~CApaAppList()
 
 	delete iDefaultIconArray;
 	delete iDefaultAppIconMbmFileName;
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	delete iAppRegFinder;
+    delete iForcedRegistrations;
+#endif
 	delete iAppIdler;
 	delete iAppListStorer;
 	delete iAppIconLoader;
 	delete iAppLangMonitor;
-	delete iForcedRegistrations;
 	delete iIconCaptionObserver;
 	delete iIconCaptionOverrides;
 	iAppsListCacheFileName.Close();
@@ -190,8 +577,16 @@ EXPORT_C CApaAppList::~CApaAppList()
 	
 	iCustomAppList.ResetAndDestroy();
 	iCustomAppList.Close();
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	iForceRegAppUids.Close();	
+	delete iScrAppInfo;
+	iScr.Close();
+#endif	
 	}
 
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK   
 // Stop scanning applications if installation or uninstallation has started	
 EXPORT_C void CApaAppList::StopScan(TBool aNNAInstall)
 	{
@@ -206,7 +601,7 @@ EXPORT_C void CApaAppList::StopScan(TBool aNNAInstall)
 		}
 	UndoSetPending(iAppData);
 	}
-	
+
 // Allow scanning when installation or uninstallation is complete
 EXPORT_C void CApaAppList::RestartScanL()
 	{
@@ -218,18 +613,7 @@ EXPORT_C TBool CApaAppList::AppListUpdatePending()
 	{
 	return iNNAInstallation;
 	}
-
-void CApaAppList::UndoSetPending(CApaAppData* aAppData)
-	// Reset all apps to pevious pending state so they don't get purged
-	{
-  	for (; aAppData; aAppData = aAppData->iNext)
-		{
-		if (aAppData->iIsPresent == CApaAppData::EPresentPendingUpdate)
-			{
-			aAppData->iIsPresent = CApaAppData::EIsPresent;
-			}
-		}
-	}
+#endif
 
 EXPORT_C void CApaAppList::StartIdleUpdateL()
 /** Updates the list asynchronously, using an idle time active object, 
@@ -267,7 +651,8 @@ list is stored. */
 		delete iAppIdler;
 		iAppIdler=NULL;
 		}
-		
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	// DEF072701
 	// When performing the update scan let the idle object have lower priority.
 	if (IsFirstScanComplete())
@@ -280,16 +665,133 @@ list is stored. */
 		}
 	SetPending(iAppData);
 	iAppRegFinder->FindAllAppsL(CApaAppRegFinder::EScanAllDrives);
- 
- 	// DEF072701
- 	// If this is the first scan i.e the boot scan then it may take some time. Thus
- 	// the periodic delay value should be used so that this process will stop periodically 
- 	// to allow time for other processes.
- 	// If this is just a re-scan it should take much less time. Therefore it should just
- 	// be completed in one go rather than periodically delayed. Thus the delay value
- 	// should be set to 0.
-	iAppIdler->Start(KIdleStartDelay, IsFirstScanComplete()? 0 : iIdlePeriodicDelay, TCallBack(IdleUpdateCallbackL, this));
-	}
+    // DEF072701
+    // If this is the first scan i.e the boot scan then it may take some time. Thus
+    // the periodic delay value should be used so that this process will stop periodically 
+    // to allow time for other processes.
+    // If this is just a re-scan it should take much less time. Therefore it should just
+    // be completed in one go rather than periodically delayed. Thus the delay value
+    // should be set to 0.
+    iAppIdler->Start(KIdleStartDelay, IsFirstScanComplete()? 0 : iIdlePeriodicDelay, TCallBack(IdleUpdateCallbackL, this));
+#else	
+	
+    iAppIdler=CPeriodic::NewL(CActive::EPriorityStandard);
+    iAppIdler->Start(KIdleStartDelay, IsFirstScanComplete()? 0 : iIdlePeriodicDelay, TCallBack(IdleUpdateCallbackL, this));
+
+#endif    
+ 	}
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
+EXPORT_C void CApaAppList::InitializeApplistL(MApaAppListObserver* aObserver)
+    {
+    if(!iScr.Handle())
+        User::LeaveIfError(iScr.Connect());
+    
+    if(iScrAppInfo==NULL)
+        iScrAppInfo=CApaScrAppInfo::NewL(iScr, KNumAppEntriesFromSCR);
+    
+    iScrAppInfo->GetAllAppsInfoL();
+    
+    StartIdleUpdateL(aObserver);   
+    }
+
+
+void CApaAppList::InitializeLangAppListL()
+    {
+    if(!iScr.Handle())
+        User::LeaveIfError(iScr.Connect());
+    
+    if(iScrAppInfo==NULL) 
+        iScrAppInfo=CApaScrAppInfo::NewL(iScr, KNumAppEntriesFromSCR);
+    
+    iScrAppInfo->GetAllAppsInfoL();
+    
+    // set iIsLangChangePending=ETrue, to all the application present in the applist    
+    CApaAppData* appData=iAppData;    
+    while(appData)
+        {
+        appData->iIsLangChangePending=ETrue;
+        appData=appData->iNext;
+        }
+    }
+	
+	
+EXPORT_C void CApaAppList::UpdateApplistL(MApaAppListObserver* aObserver, RArray<TApaAppUpdateInfo>* aAppUpdateInfo, TUid aSecureID)
+    {
+    //If update applist is called by SWI, clear force registrations from applist.
+    if(aSecureID == KUidSisLaunchServer)
+        {
+        TInt count=iForceRegAppUids.Count();
+        for(TInt index=0; index<count; index++)
+            FindAndDeleteApp(iForceRegAppUids[index]);
+        iForceRegAppUids.Reset();
+        }
+    
+    if(aAppUpdateInfo->Count() == 0)
+        return;
+    
+    //If SCR connection is not valid then connect.
+    if(!iScr.Handle())
+        User::LeaveIfError(iScr.Connect());
+    
+    if(iScrAppInfo==NULL)
+        iScrAppInfo=CApaScrAppInfo::NewL(iScr, KNumAppEntriesFromSCR);
+    
+    iScrAppInfo->GetSpecificAppsInfoL(aAppUpdateInfo);
+    
+    if(IsIdleUpdateComplete())
+        StartIdleUpdateL(aObserver);   
+    }
+
+void CleanupAndDestroyAppInfoArray(TAny* aRPArray)
+    {
+    RPointerArray<Usif::CApplicationRegistrationData>* rpArray = (static_cast<RPointerArray<Usif::CApplicationRegistrationData>*>(aRPArray));
+    rpArray->ResetAndDestroy();
+    rpArray->Close();
+    }
+
+
+EXPORT_C void CApaAppList::UpdateApplistByForceRegAppsL(RPointerArray<Usif::CApplicationRegistrationData>& aForceRegAppsInfo)
+    {
+    //Get number of force registered application information.
+    TInt count=aForceRegAppsInfo.Count();
+    Usif::RSoftwareComponentRegistry scr;
+    User::LeaveIfError(scr.Connect());
+    CleanupClosePushL(scr);
+    
+    //As this function takes the ownership of aForceRegAppsInfo, this needs to be destroyed if any leave occurs.
+    TCleanupItem cleanup(CleanupAndDestroyAppInfoArray, &aForceRegAppsInfo); 
+    CleanupStack::PushL(cleanup);
+    
+    //Get each force registered application information and add it to applist.
+    for(TInt index=0; index<count; index++)
+        {
+        Usif::CApplicationRegistrationData* appInfo=aForceRegAppsInfo[index];
+        CApaAppData* appData = CApaAppData::NewL(*appInfo, iFs, scr);
+        TUid appUid=appInfo->AppUid();
+        
+        //Delete if the application already exist in the applist.
+        FindAndDeleteApp(appUid);
+        AddToList(appData);
+        //Maintain added force registered application uids so that it can be cleared from applist
+        //once installation complete.
+        iForceRegAppUids.AppendL(appUid);
+        }
+    
+    CleanupStack::PopAndDestroy(2); //cleanup, scr
+    }
+
+
+// The function transfers ownership of the pointer owned by a CApaAppList to the caller
+// to avoid copying the array.
+EXPORT_C  CArrayFixFlat<TApaAppUpdateInfo>* CApaAppList::UpdatedAppsInfo()
+{
+    CArrayFixFlat<TApaAppUpdateInfo>* updatedAppsInfo=iAppsUpdated;
+    iAppsUpdated=NULL;
+    return updatedAppsInfo;
+}
+
+#endif
 
 EXPORT_C void CApaAppList::StartIdleUpdateL(MApaAppListObserver* aObserver)
 /** Updates the list asynchronously, using an idle time active object 
@@ -327,7 +829,13 @@ EXPORT_C void CApaAppList::InitListL(MApaAppListObserver* aObserver)
 
 @param aObserver Observer to be notified when the update has finished. */
 	{
+    
+#ifdef APPARC_SHOW_TRACE    
+    RDebug::Printf("[Apparc] *****************START CREATING APPLIST ****************************");
+#endif    
+    
 	DeleteAppsListBackUpAndTempFiles();
+	
 	TInt ret = KErrGeneral;
 #ifndef __WINS__ // on the emulator, don't read app list from file, as doing so means apps
                  // built while the emulator isn't running won't appear in the list
@@ -338,7 +846,12 @@ EXPORT_C void CApaAppList::InitListL(MApaAppListObserver* aObserver)
 		// There was an error during restore, so update the list asynchronously.
 		DeleteAppData();
 		iFs.Delete(iAppsListCacheFileName);
-		StartIdleUpdateL(aObserver);
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
+		InitializeApplistL(aObserver);		
+#else
+        StartIdleUpdateL(aObserver);		
+#endif
+		
 		}
 	else
 		{
@@ -360,36 +873,6 @@ void CApaAppList::StartIconLoadingL()
 	iAppIconLoader->Start();
 	}
 
-void CApaAppList::ScanRemovableDrivesAndUpdateL()
-/** Rename Appslist.bin file to AppsList_Backup.bin, so that it can be renamed back, 
-     if the update scan on removable media drives does not change applist. */
-	{
-	const TArray<const TDriveUnitInfo> listOfRemovableMediaDrives = iAppRegFinder->DriveList();
-	const TInt count = listOfRemovableMediaDrives.Count();
-
-	// Removable media scan would take place only if removable drives are present.
-	if (count)
-		{
-		CApaAppData* appData = iAppData;
-		while (appData)
-			{
-			for (TInt driveIndex = 0; driveIndex < count; ++driveIndex)
-				{
-				if (TParsePtrC(*appData->iRegistrationFile).Drive() == listOfRemovableMediaDrives[driveIndex].iUnit.Name())
-					{
-					appData->SetAppPending();
-					break;
-					}
-				}
-			appData = appData->iNext;
-			}
-
-		while (IdleUpdateL())
-			{ // It updates the removable media apps present in AppList if it has changed.
-
-			};
-		}
-	}
 
 void CApaAppList::DeleteAppsListBackUpAndTempFiles()
 /** Deletes all files inside AppsListCache folder except AppsList.bin */
@@ -484,7 +967,7 @@ void CApaAppList::RestoreL()
 			{
 			//Leave if the current version is different from the previous stored version and recreate applist.
 #ifdef _DEBUG
-			RDebug::Print(_L("!!Firmware update detected!! Rebuilding AppList"));
+			RDebug::Print(_L("[Apparc] !!Firmware update detected!! Rebuilding AppList"));
 #endif
 			User::Leave(KErrGeneral);
 			}
@@ -495,7 +978,7 @@ void CApaAppList::RestoreL()
 		if (err != KErrPathNotFound && err != KErrNotFound)
 			{
 #ifdef _DEBUG
-			RDebug::Print(_L("!!Error %d reading Firmware version.  Rebuilding AppList"),err);
+			RDebug::Print(_L("[Apparc] !!Error %d reading Firmware version.  Rebuilding AppList"),err);
 #endif
 			User::Leave(err);
 			}
@@ -533,6 +1016,9 @@ void CApaAppList::RestoreL()
 	// Close the stream;
 	CleanupStack::PopAndDestroy(&theReadStream);
 
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	iFlags |= ENotifyUpdateOnFirstScanComplete;
+#else
 	iFs.Rename(iAppsListCacheFileName, iAppsListCacheBackUpFileName);
 	iAppRegFinder->FindAllAppsL(CApaAppRegFinder::EScanRemovableDrives);	// Builds the Removable Media Drive List
 
@@ -540,6 +1026,7 @@ void CApaAppList::RestoreL()
 
 	// It runs an update scan on removable media apps.
 	ScanRemovableDrivesAndUpdateL();
+#endif
 	}
 
 EXPORT_C TBool CApaAppList::IsLanguageChangePending() const
@@ -587,7 +1074,7 @@ void CApaAppList::NotifyObserver()
 		else
 			iObserver->NotifyScanComplete();	// NotifyScanComplete will notify clients for scan complete.
 
-		iObserver=NULL;
+		//iObserver=NULL;
 		}
 	}
 
@@ -597,9 +1084,219 @@ void CApaAppList::StopIdler()
 	iAppIdler=NULL;
 	}
 
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+
+// returns ETrue if there more application information avaialable.
+TInt CApaAppList::IdleUpdateL()
+    {
+
+    Usif::CApplicationRegistrationData* appInfo=NULL;
+    TApaAppUpdateInfo::TApaAppAction action=TApaAppUpdateInfo::EAppPresent; //to make compiler happy. Actual value is assigned by GetNextApplicationInfo
+    TUid appUid;
+    
+    //Ownership of appInfo is transfered to this function.
+    appUid=iScrAppInfo->GetNextApplicationInfo(action,appInfo);
+    
+    if(appUid==KNullUid) 
+        return EFalse;
+    
+    CleanupStack::PushL(appInfo);
+    CApaAppData *appData=NULL;    
+    CApaAppData* app = NULL;
+    
+    switch(action)
+        {
+        case TApaAppUpdateInfo::EAppNotPresent:
+            if(appInfo==NULL)
+                {
+                TInt ret=FindAndDeleteApp(appUid);
+                if(ret==KErrNone)
+                    iFlags |= EAppListHasChanged;
+
+                //Add uninstalled application UID to a list
+                if(iUninstalledApps==NULL)
+                    iUninstalledApps=new(ELeave) CArrayFixFlat<TUid>(1);
+                
+                iUninstalledApps->AppendL(appUid);
+                }
+            break;
+            
+        case TApaAppUpdateInfo::EAppPresent:
+            // holds the application information from Applist
+            app = AppDataByUid(appInfo->AppUid());
+            
+            if( app && IsLanguageChangePending() && (iScrAppInfo->GetSCRFetchAction() == EGetAllAppsInfo))
+                {
+                //Application needs to be updated because of language change
+                RPointerArray<Usif::CLocalizableAppInfo> localisationInfo;
+                localisationInfo=appInfo->LocalizableAppInfoList();
+                ASSERT(!(localisationInfo.Count()>1));
+                
+                if((localisationInfo.Count()>0) && (app->ApplicationLanguage() != localisationInfo[0]->ApplicationLanguage()))
+                    {
+                    // holds the application information read from SCR db
+                    appData=CApaAppData::NewL(*appInfo, iFs, iScr);    
+                    FindAndDeleteApp(appUid);
+                    AddToList(appData);  
+                    iFlags |= EAppListHasChanged;
+                    }
+                else
+                    {
+                    app->iIsLangChangePending=EFalse;                
+                    }
+                }
+            else
+                {
+                // holds the application information read from SCR db
+                appData=CApaAppData::NewL(*appInfo, iFs, iScr);
+                if(app)
+                    {
+                    //Application found in applist. Delete existing application information from applist and create new
+                    //application information object and add to the applist.
+                    FindAndDeleteApp(appUid);
+                    AddToList( appData );
+                    }
+                else
+                    {
+                    AddToList( appData );                   
+                    }
+                iFlags |= EAppListHasChanged;
+                }
+            
+            break;
+            
+        case TApaAppUpdateInfo::EAppInfoChanged:
+            appData=CApaAppData::NewL(*appInfo, iFs, iScr);
+            //Delete existing application information from applist and create new application information object and 
+            //add to the applist.
+            FindAndDeleteApp(appUid);
+            AddToList( appData );
+            iFlags |= EAppListHasChanged;
+            break;
+        }
+
+    //If first scan not complete or if phone language is changed then clear the updated application list
+    //Otherwise add application updated apps list
+    if(!(iFlags&EFirstScanComplete) || (iFlags&ELangChangePending))
+        {
+        if(!iAppsUpdated)
+            delete iAppsUpdated;
+        iAppsUpdated=NULL;
+        }
+    else
+        {
+        if(!iAppsUpdated)
+            iAppsUpdated= new(ELeave) CArrayFixFlat<TApaAppUpdateInfo>(1);
+    
+        TApaAppUpdateInfo appUpdateInfo(appUid, action);
+        iAppsUpdated->AppendL(appUpdateInfo);
+        }
+    
+    CleanupStack::PopAndDestroy(appInfo); 
+    return ETrue;
+    }
+
+
+
+/*
+ * Finds and delete an application from applist.
+ */
+TInt CApaAppList::FindAndDeleteApp(TUid aAppUid)
+    {
+    CApaAppData* appData=iAppData;
+    CApaAppData* prevAppData=NULL;
+    
+    while(appData && appData->iUidType[2] != aAppUid)
+        {
+        prevAppData=appData;
+        appData=appData->iNext;
+        }
+
+    if(appData)
+        {
+        if(prevAppData)
+            {
+            //If the application position is not the first application in the list
+            prevAppData->iNext=appData->iNext;
+            }
+        else
+            {
+            //If the application position is first in the list
+            iAppData=appData->iNext;
+            }
+
+#ifdef APPARC_SHOW_TRACE  
+        if(appData)
+            {
+            RDebug::Print(_L("[Apparc] Application with UID: %X is deleted from applist"), appData->iUidType[2]);
+            }
+#endif
+
+        delete appData;
+        return(KErrNone);
+        }
+
+    //if application not found, return KErrNotFound
+    return(KErrNotFound);
+    }
+
+/**
+@internalComponent
+*/
+EXPORT_C CApaAppData* CApaAppList::FindAndAddSpecificAppL(TUid aAppUid)
+    {
+    Usif::RSoftwareComponentRegistry scrCon;
+	//If SCR connection not avaialable then connect to SCR. Otherwise use the 
+	//existing connection.
+    if(!iScr.Handle())
+        {
+        User::LeaveIfError(scrCon.Connect());
+        CleanupClosePushL(scrCon);
+        }
+    else
+        scrCon=iScr;
+  
+    
+    //Pass 1 as number of entries to fetch from SCR as only specific application information is required.
+    CApaScrAppInfo *scrAppInfo=CApaScrAppInfo::NewL(scrCon, 1); 
+    CleanupStack::PushL(scrAppInfo);
+
+    RArray<TApaAppUpdateInfo>* appUpdateInfoList=new (ELeave) RArray<TApaAppUpdateInfo>(1);
+    CleanupStack::PushL(appUpdateInfoList);
+    TApaAppUpdateInfo appUpdateInfo(aAppUid, TApaAppUpdateInfo::EAppPresent) ;
+    appUpdateInfoList->AppendL(appUpdateInfo);
+
+    scrAppInfo->GetSpecificAppsInfoL(appUpdateInfoList);
+    CleanupStack::Pop(appUpdateInfoList);
+    
+    Usif::CApplicationRegistrationData* appInfo=NULL;
+    TApaAppUpdateInfo::TApaAppAction action;
+    TUid uid;
+    uid=scrAppInfo->GetNextApplicationInfo(action, appInfo);
+    CleanupStack::PushL(appInfo);
+
+    CApaAppData *appData=NULL;
+    if(appInfo)
+        {
+        appData=CApaAppData::NewL(*appInfo, iFs, scrCon);
+        FindAndDeleteApp(uid);
+        AddToList(appData);
+        iFlags |= EAppListHasChanged;
+        }
+    CleanupStack::PopAndDestroy(2, scrAppInfo);
+    
+	//If SCR session established in this function, then close it.
+    if(!iScr.Handle())
+        CleanupStack::PopAndDestroy();
+        
+    return appData;
+    }
+
+#else
 TInt CApaAppList::IdleUpdateL()
 // returns ETrue if there is more scanning to be done.
 	{
+    
 	TBool more=EFalse;
 	TApaAppEntry currentApp = TApaAppEntry();
 	TRAPD(err, more = iAppRegFinder->NextL(currentApp, *iForcedRegistrations));
@@ -635,6 +1332,205 @@ TInt CApaAppList::IdleUpdateL()
 	return more;
 	}
 
+void CApaAppList::UpdateNextAppL(const TApaAppEntry& aAppEntry,TBool& aHasChanged)
+    {
+    CApaAppData* appData=AppDataByUid(aAppEntry.iUidType[2]);
+    if (appData==NULL)
+        {// not in list, so add it at the start
+        TRAPD(err,appData=CApaAppData::NewL(aAppEntry, iFs));
+        if (err==KErrNone)
+            {
+            AddToList( appData );
+            aHasChanged=ETrue;
+            }
+        }
+    else if (appData->IsPending())
+        { // not found yet during current scan - we may need to override this one
+        
+        // On a system which scans for registration .RSC files (V2 apps) first, followed by
+        // .APP files (V1 apps), it's valid for a V1 app to override a V2 app (if the V2 app
+        // has just been removed). If this is the case, assume it's ok to compare the V1 .APP filename,
+        // with the V2 .RSC filename as their filenames will never match (which is what we want in this case).
+        TPtrC currentFileName;
+        if (appData->RegistrationFileUsed())
+            currentFileName.Set(*appData->iRegistrationFile);
+        else
+            currentFileName.Set(*appData->iFullName);
+    
+        if (aAppEntry.iFullName.CompareF(currentFileName)!=0)
+            {
+            delete appData->iSuccessor;
+            appData->iSuccessor = NULL;
+            appData->iSuccessor = CApaAppEntry::NewL(aAppEntry);
+
+            appData->iIsPresent = CApaAppData::ESuperseded;
+            aHasChanged=ETrue;
+            }
+        else
+            {
+            if (appData->Update() || appData->iIsPresent==CApaAppData::ENotPresentPendingUpdate) 
+                aHasChanged=ETrue; 
+
+            appData->iIsPresent = CApaAppData::EIsPresent;
+            }
+        }
+    }
+
+void CApaAppList::SetPending(CApaAppData* aAppData)
+    // set all apps to pending update - we'll find them again as we scan
+    {
+    for (; aAppData; aAppData = aAppData->iNext)
+        aAppData->SetAppPending();
+    }
+
+void CApaAppList::SetNotFound(CApaAppData* aAppData, TBool& aHasChanged)
+    // mark any unfound apps not present
+    {
+    while (aAppData)
+        {
+        if (aAppData->IsPending())
+            {
+            aAppData->iIsPresent = CApaAppData::ENotPresent;
+            aHasChanged = ETrue;
+            }
+        aAppData = aAppData->iNext;
+        }
+    }
+
+EXPORT_C void CApaAppList::PurgeL()
+/** Removes any applications from the list if they are no longer present 
+on the phone. It updates applications that have been 
+superceded. */
+    {
+    CApaAppData* appData=iAppData;
+    CApaAppData* prev=NULL;
+    while (appData)
+        {
+        CApaAppData* next=appData->iNext;
+        if (appData->iIsPresent==CApaAppData::ENotPresent)
+            {
+            if (prev)
+                prev->iNext=next;
+            else
+                iAppData=next;
+            
+            //Add uninstalled application UID to a list
+            if(iUninstalledApps==NULL)
+                iUninstalledApps=new(ELeave) CArrayFixFlat<TUid>(1);
+            
+            iUninstalledApps->AppendL(appData->AppEntry().iUidType[2]);
+            
+            delete appData;
+            }
+        else if (appData->iIsPresent==CApaAppData::ESuperseded)
+            {
+            CApaAppData* newApp=NULL;
+            TApaAppEntry appEntry;
+            appData->iSuccessor->Get(appEntry);
+            TRAPD(err,newApp=CApaAppData::NewL(appEntry, iFs));
+            if (err==KErrNone)
+                {
+                // remove the old one and add the new one in its place
+                if (prev)
+                    prev->iNext=newApp;
+                else
+                    iAppData=newApp;
+        
+                newApp->iNext = appData->iNext;
+                delete appData;
+                // increment the iterator
+                prev = newApp;
+                }
+            }
+        else
+            prev=appData;
+        
+        appData=next;
+        }
+    }
+
+void CApaAppList::ScanRemovableDrivesAndUpdateL()
+/** Rename Appslist.bin file to AppsList_Backup.bin, so that it can be renamed back, 
+     if the update scan on removable media drives does not change applist. */
+    {
+    const TArray<const TDriveUnitInfo> listOfRemovableMediaDrives = iAppRegFinder->DriveList();
+    const TInt count = listOfRemovableMediaDrives.Count();
+
+    // Removable media scan would take place only if removable drives are present.
+    if (count)
+        {
+        CApaAppData* appData = iAppData;
+        while (appData)
+            {
+            for (TInt driveIndex = 0; driveIndex < count; ++driveIndex)
+                {
+                if (TParsePtrC(*appData->iRegistrationFile).Drive() == listOfRemovableMediaDrives[driveIndex].iUnit.Name())
+                    {
+                    appData->SetAppPending();
+                    break;
+                    }
+                }
+            appData = appData->iNext;
+            }
+
+        while (IdleUpdateL())
+            { // It updates the removable media apps present in AppList if it has changed.
+
+            };
+        }
+    }
+
+void CApaAppList::UndoSetPending(CApaAppData* aAppData)
+    // Reset all apps to pevious pending state so they don't get purged
+    {
+    for (; aAppData; aAppData = aAppData->iNext)
+        {
+        if (aAppData->iIsPresent == CApaAppData::EPresentPendingUpdate)
+            {
+            aAppData->iIsPresent = CApaAppData::EIsPresent;
+            }
+        }
+    }
+
+/**
+@internalComponent
+*/
+EXPORT_C CApaAppData* CApaAppList::FindAndAddSpecificAppL(CApaAppRegFinder* aFinder, TUid aAppUid)
+    {
+//Scans and adds the specified application to the app list if found
+  __ASSERT_DEBUG(aFinder, Panic(EPanicNullPointer));
+  TBool found = EFalse;
+  TApaAppEntry appEntry;
+  aFinder->FindAllAppsL(CApaAppRegFinder::EScanAllDrives);
+  while (aFinder->NextL(appEntry, *iForcedRegistrations))
+      {
+      if (appEntry.iUidType[2] == aAppUid)
+          {
+          found = ETrue;
+          break;
+          }
+      }
+  
+  CApaAppData* app = NULL;
+  if (found)
+      {
+      // add the app to the list
+      TBool hasChanged = EFalse;
+      CApaAppData* prevFirstAppInList = iAppData;
+      UpdateNextAppL(appEntry, hasChanged);
+      if (iAppData != prevFirstAppInList)
+          app = iAppData;     // assume the new app was added to the list
+
+      if (hasChanged)
+          iFlags |= EAppListHasChanged;
+      }
+
+  return app;
+    return NULL;
+    }
+
+#endif
+
 EXPORT_C TBool CApaAppList::IsIdleUpdateComplete() const
 /** Tests whether an asynchronous update of the list is currently in progress.
 
@@ -644,165 +1540,19 @@ otherwise false. */
 	return iAppIdler == NULL;
 	}
 
-void CApaAppList::SetPending(CApaAppData* aAppData)
-	// set all apps to pending update - we'll find them again as we scan
-	{
-  	for (; aAppData; aAppData = aAppData->iNext)
-		aAppData->SetAppPending();
-	}
-
-void CApaAppList::SetNotFound(CApaAppData* aAppData, TBool& aHasChanged)
-	// mark any unfound apps not present
-	{
-	while (aAppData)
-		{
-		if (aAppData->IsPending())
-			{
-			aAppData->iIsPresent = CApaAppData::ENotPresent;
-			aHasChanged = ETrue;
-			}
-		aAppData = aAppData->iNext;
-		}
-	}
 
 void CApaAppList::AddToList( CApaAppData* aAppData )
 	{
 	__ASSERT_DEBUG(aAppData, Panic(EPanicNullPointer));
 	aAppData->iNext=iAppData;
 	iAppData=aAppData;
-	}
-
-void CApaAppList::UpdateNextAppL(const TApaAppEntry& aAppEntry,TBool& aHasChanged)
-	{
-	CApaAppData* appData=AppDataByUid(aAppEntry.iUidType[2]);
-	if (appData==NULL)
-		{// not in list, so add it at the start
-		TRAPD(err,appData=CApaAppData::NewL(aAppEntry, iFs));
-		if (err==KErrNone)
-			{
-			AddToList( appData );
-			aHasChanged=ETrue;
-			}
-		}
-	else if (appData->IsPending())
-		{ // not found yet during current scan - we may need to override this one
-		
-		// On a system which scans for registration .RSC files (V2 apps) first, followed by
-		// .APP files (V1 apps), it's valid for a V1 app to override a V2 app (if the V2 app
-		// has just been removed). If this is the case, assume it's ok to compare the V1 .APP filename,
-		// with the V2 .RSC filename as their filenames will never match (which is what we want in this case).
-		TPtrC currentFileName;
-		if (appData->RegistrationFileUsed())
-			currentFileName.Set(*appData->iRegistrationFile);
-		else
-			currentFileName.Set(*appData->iFullName);
 	
-		if (aAppEntry.iFullName.CompareF(currentFileName)!=0)
-			{
-			delete appData->iSuccessor;
-			appData->iSuccessor = NULL;
-			appData->iSuccessor = CApaAppEntry::NewL(aAppEntry);
-
-			appData->iIsPresent = CApaAppData::ESuperseded;
-			aHasChanged=ETrue;
-			}
-		else
-			{
-			if (appData->Update() || appData->iIsPresent==CApaAppData::ENotPresentPendingUpdate) 
-				aHasChanged=ETrue; 
-
-			appData->iIsPresent = CApaAppData::EIsPresent;
-			}
-		}
+#ifdef APPARC_SHOW_TRACE	
+    RDebug::Print(_L("[Apparc] Application with UID: %X is added to applist"), aAppData->iUidType[2]);
+#endif
+    
 	}
 
-/**
-@internalComponent
-*/
-EXPORT_C CApaAppData* CApaAppList::FindAndAddSpecificAppL(CApaAppRegFinder* aFinder, TUid aAppUid)
-	{
-//Scans and adds the specified application to the app list if found
-	__ASSERT_DEBUG(aFinder, Panic(EPanicNullPointer));
-	TBool found = EFalse;
-	TApaAppEntry appEntry;
-	aFinder->FindAllAppsL(CApaAppRegFinder::EScanAllDrives);
-	while (aFinder->NextL(appEntry, *iForcedRegistrations))
-		{
-		if (appEntry.iUidType[2] == aAppUid)
-			{
-			found = ETrue;
-			break;
-			}
-		}
-	
-	CApaAppData* app = NULL;
-	if (found)
-		{
-		// add the app to the list
-		TBool hasChanged = EFalse;
-		CApaAppData* prevFirstAppInList = iAppData;
-		UpdateNextAppL(appEntry, hasChanged);
-		if (iAppData != prevFirstAppInList)
-			app = iAppData;		// assume the new app was added to the list
-
-		if (hasChanged)
-			iFlags |= EAppListHasChanged;
-		}
-
-	return app;
-	}
-
-EXPORT_C void CApaAppList::PurgeL()
-/** Removes any applications from the list if they are no longer present 
-on the phone. It updates applications that have been 
-superceded. */
-	{
-	CApaAppData* appData=iAppData;
-	CApaAppData* prev=NULL;
-	while (appData)
-		{
-		CApaAppData* next=appData->iNext;
-		if (appData->iIsPresent==CApaAppData::ENotPresent)
-			{
-			if (prev)
-				prev->iNext=next;
-			else
-				iAppData=next;
-			
-            //Add uninstalled application UID to a list
-            if(iUninstalledApps==NULL)
-                iUninstalledApps=new(ELeave) CArrayFixFlat<TUid>(1);
-            
-            iUninstalledApps->AppendL(appData->AppEntry().iUidType[2]);
-			
-			delete appData;
-			}
-		else if (appData->iIsPresent==CApaAppData::ESuperseded)
-			{
-			CApaAppData* newApp=NULL;
-			TApaAppEntry appEntry;
-			appData->iSuccessor->Get(appEntry);
-			TRAPD(err,newApp=CApaAppData::NewL(appEntry, iFs));
-			if (err==KErrNone)
-				{
-				// remove the old one and add the new one in its place
-				if (prev)
-					prev->iNext=newApp;
-				else
-					iAppData=newApp;
-		
-				newApp->iNext = appData->iNext;
-				delete appData;
-				// increment the iterator
-				prev = newApp;
-				}
-			}
-		else
-			prev=appData;
-		
-		appData=next;
-		}
-	}
 
 EXPORT_C TInt CApaAppList::Count() const
 /** Gets the count of applications present in the app list.
@@ -841,7 +1591,7 @@ regardless of screen mode.
 specified screen mode. */
 	{
 
-	CApaAppData* appData=iValidFirstAppData;
+	CApaAppData* appData=iAppData;
 
 	if(aScreenMode!=KIgnoreScreenMode)
 		{
@@ -935,6 +1685,7 @@ if no match is found or if KNullDesC was specified.
 	return NULL;
 	}
 	
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 /**
 Adds a registration file to the iForcedRegistrations array.
 
@@ -954,6 +1705,7 @@ EXPORT_C void CApaAppList::ResetForcedRegistrations()
 	if(iForcedRegistrations)
 		iForcedRegistrations->Reset();
 	}
+#endif
 
 /** Finds the preferred application to handle the specified data type.
 
@@ -1047,7 +1799,19 @@ void CApaAppList::ScanComplete()
 		iObserver->InitialListPopulationComplete();
 	iValidFirstAppData = iAppData;
 	iFlags|=EFirstScanComplete;
+
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  	
 	iNNAInstallation = EFalse;
+#endif
+	
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
+	delete iScrAppInfo;
+	iScrAppInfo=NULL;
+    iScr.Close();
+#endif
+#ifdef APPARC_SHOW_TRACE    
+    RDebug::Printf("[Apparc] *****************END CREATING APPLIST ****************************");
+#endif    
 	}
 
 /**
@@ -1080,8 +1844,10 @@ EXPORT_C CBufFlat* CApaAppList::ServiceArrayBufferL(TUid aAppUid) const
 
 	if (app)
 		{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 		if (!app->RegistrationFileUsed())
 			User::Leave(KErrNotSupported);
+#endif		
 
 		if (app->iServiceArray)
 			{
@@ -1111,9 +1877,12 @@ EXPORT_C CBufFlat* CApaAppList::ServiceUidBufferL(TUid aAppUid) const
 
 	if (app)
 		{
+	
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 		if (!app->RegistrationFileUsed())
 			User::Leave(KErrNotSupported);
-
+#endif
+		
 		if (app->iServiceArray)
 			{
 			CArrayFixFlat<TApaAppServiceInfo>& serviceArray = *(app->iServiceArray);
@@ -1149,8 +1918,10 @@ EXPORT_C CBufFlat* CApaAppList::ServiceOpaqueDataBufferL(TUid aAppUid, TUid aSer
 
 	if (app)
 		{
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 		if (!app->RegistrationFileUsed())
 			User::Leave(KErrNotSupported);
+#endif		
 
 		if (app->iServiceArray)
 			{
@@ -1704,6 +2475,9 @@ void CApaAppList::CApaLangChangeMonitor::RunL()
 		{		
 		iPrevLanguage = User::Language();
 		iAppList.iFlags |= CApaAppList::ELangChangePending;
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK		
+		iAppList.InitializeLangAppListL();
+#endif
 		iAppList.StartIdleUpdateL(iAppList.iObserver);
 		}
 	}

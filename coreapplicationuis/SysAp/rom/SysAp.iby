@@ -20,6 +20,7 @@
 #define __SysAp_IBY__
 
 file=ABI_DIR\BUILD_DIR\NspsWsPlugin.dll         SHARED_LIB_DIR\NspsWsPlugin.dll
+data=DATAZ_\resource\apps\qgn_sysap_screen.svg        resource\apps\qgn_sysap_screen.svg
 
 S60_APP_EXE(SysAp)
 S60_APP_AIF_RSC(SysAp)

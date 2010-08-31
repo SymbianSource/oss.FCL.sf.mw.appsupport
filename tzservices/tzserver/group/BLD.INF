@@ -57,7 +57,6 @@ backup_registration.xml		z:/private/1020383e/backup_registration.xml
 
 // ROM
 TimeZoneServer.iby		/epoc32/rom/include/timezoneserver.iby
-Timezoneserver.iby              /epoc32/rom/include/core/mw/timezoneserver.iby
 
 PRJ_MMPFILES
 TimeZoneClient.mmp

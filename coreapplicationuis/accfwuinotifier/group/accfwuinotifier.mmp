@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -28,11 +28,17 @@ VENDORID        VID_DEFAULT
 
 CAPABILITY      CAP_ECOM_PLUGIN
 
+
+
+
+
+SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
+
 SOURCEPATH      ../src
 
 SOURCE          AccFwUiNotifierProxy.cpp
 SOURCE          AccFwUiNoteNotifier.cpp
-SOURCE          AccFwUiDialogNotifier.cpp
+
 						
 USERINCLUDE     ../inc
 
@@ -52,14 +58,15 @@ LIBRARY         ecom.lib
 LIBRARY         euser.lib
 LIBRARY         eiksrv.lib
 LIBRARY	        efsrv.lib
-LIBRARY         FeatMgr.lib
+LIBRARY         featmgr.lib
 LIBRARY         eikdlg.lib
-LIBRARY         Avkon.lib
-LIBRARY			bafl.lib
-LIBRARY 		cone.lib
-
+LIBRARY		bafl.lib
+LIBRARY 	cone.lib
+//hb
+LIBRARY         HbWidgets.lib
 
 MACRO           API_TRACE_FLAG
 MACRO           COMPONENT_TRACE_FLAG
 
 // End of file
+

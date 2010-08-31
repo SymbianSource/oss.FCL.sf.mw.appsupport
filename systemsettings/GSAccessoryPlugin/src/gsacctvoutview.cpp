@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -262,27 +262,28 @@ void CGSAccTvoutView::ChangeFlickerFilterSettingL( TBool aSettingPage )
 void CGSAccTvoutView::ChangeTvSystemSettingL()
     {
     FUNC_LOG;
+
     TInt currentValue = iServerEngine->TvSystemL();
 
-    // If PALM is not supported only toggle values
-    // pal = 0, palm = 1, ntsc = 2
-    TInt pal = 0;
-    TInt ntsc = 2;
-    if( !iModel.PalmSupport() )
+    // If PALM is not supported, index correction
+    if( !iModel.PalmSupport() && currentValue )
         {
-        iServerEngine->SetTvSystemL( currentValue == pal ? ntsc : pal );
-        UpdateListBoxL( EGSSettIdTvSystem );
-        iSettingChanged = ETrue;
-        return;
+        currentValue--;
         }
 
-    // otherwise when palm is supported and more than two options
-    // available show the dialog
     if ( ShowRadioButtonSettingsPageL(
             R_ACC_TV_SYSTEM_SETTING_PAGE,
-            R_ACC_TV_SYSTEM_SETTING_PAGE_LBX,
+            iModel.PalmSupport() ?
+                R_ACC_TV_SYSTEM_SETTING_PAGE_LBX :
+                R_ACC_TV_SYSTEM_SETTING_PAGE_NO_PALM_LBX,
             currentValue ) )
         {
+        if( !iModel.PalmSupport() && currentValue )
+            {
+            //In case PALM support is missing fix the NTSC value index
+            currentValue++;
+            }
+
         iServerEngine->SetTvSystemL( currentValue );
         UpdateListBoxL( EGSSettIdTvSystem );
         iSettingChanged = ETrue;

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -39,6 +39,8 @@ class CT_DataTypeMappingWithSid1 : public CTestStep
 	{
 public:
 	CT_DataTypeMappingWithSid1();
+    virtual TVerdict doTestStepPreambleL();
+    virtual TVerdict doTestStepPostambleL();	
 	virtual TVerdict doTestStepL();
 	void ExecuteL(RApaLsSession& aLs);
 private:

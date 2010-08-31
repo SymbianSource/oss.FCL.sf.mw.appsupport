@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -23,6 +23,12 @@
 #include <apaid.h>
 #include <badesca.h>
 #include <f32file.h>
+
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+#include "apgupdate.h"
+//#include<usif/scr/scr.h>
+#include<usif/scr/appregentries.h>
+#endif
 
 // classes referenced
 class RFile;
@@ -64,7 +70,6 @@ private:
 	TFileName iPath;
 	RPointerArray<CItem> iItems;
 	};
-
 
 /** A session with the application architecture server.
 
@@ -234,6 +239,7 @@ public: // for internal use only
 	IMPORT_C TInt RollbackNonNativeApplicationsUpdates();
 	IMPORT_C TInt GetAppType(TUid& aTypeUid, TUid aAppUid) const;
 	IMPORT_C TInt ForceRegistration(const RPointerArray<TDesC>& aRegFiles);
+	
 private: // Reserved for future use
 	IMPORT_C virtual void RApaLsSession_Reserved1();
 	IMPORT_C virtual void RApaLsSession_Reserved2();
@@ -245,6 +251,12 @@ public:
 	*/
 	IMPORT_C void ForceCommitNonNativeApplicationsUpdatesL(); 
 
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	IMPORT_C TInt UpdateAppListL(RArray<TApaAppUpdateInfo>& aAppUpdateInfo);
+    IMPORT_C TInt ForceRegistration(const RPointerArray<Usif::CApplicationRegistrationData>& aForceRegAppsInfo);
+    IMPORT_C TInt UpdatedAppsInfoL(RArray<TApaAppUpdateInfo>& aUpdatedApps);
+#endif
+	
 private:
 	void DoGetAppOwnedFilesL(CDesCArray& aArrayToFill, TUid aAppUid) const;
 	void DoGetAppViewsL(CApaAppViewArray& aArrayToFill, TUid aAppUid) const;
@@ -267,9 +279,17 @@ private:
 	void DoStartAppL(const CApaCommandLine& aCommandLine, TThreadId* aThreadId, TRequestStatus* aRequestStatusForRendezvous);
 	static void GetMainThreadIdL(TThreadId& aThreadId, const RProcess& aProcess);
 	static void DeletePointerToPointerToTAny(TAny* aPointerToPointerToTAny);
+	
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	static CBufFlat* CreateRegFilesBufferL(const RPointerArray<TDesC>& aRegFiles);
+#endif
+	
 	static void CleanupOperation(TAny* aAny);
 
+#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	CBufFlat* CreateAppUpdateInfoBufferL(RArray<TApaAppUpdateInfo>& aAppUpdateInfo);
+	CBufFlat* CreateForceRegAppInfoBufferL(const RPointerArray<Usif::CApplicationRegistrationData>& aForceRegAppsInfo);	
+#endif
 private: // data
 	friend class CApaLsSessionExtension;
 	CApaLsSessionExtension* iExtension;

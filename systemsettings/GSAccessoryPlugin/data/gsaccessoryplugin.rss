@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -68,7 +68,7 @@ RESOURCE MENU_BAR r_acc_menubar
             {
             menu_pane = r_gs_menu_item_help;
             },
-        MENU_TITLE 
+        MENU_TITLE
             {
             menu_pane = r_acc_menu_item_set_as_default;
             },
@@ -83,7 +83,7 @@ RESOURCE MENU_BAR r_acc_menubar
 // R_ACC_MENU_ITEM_SET_AS_DEFAULT
 //----------------------------------------------------------------------------
 //
- RESOURCE MENU_PANE r_acc_menu_item_set_as_default  
+RESOURCE MENU_PANE r_acc_menu_item_set_as_default
     {
     items =
         {
@@ -94,7 +94,7 @@ RESOURCE MENU_BAR r_acc_menubar
 	    flags = EEikMenuItemSpecific;
             }
         };
-    } 
+    }
 
 //----------------------------------------------------------------------------
 // R_ACC_MAIN_VIEW_CAPTION
@@ -788,7 +788,7 @@ RESOURCE AVKON_SETTING_PAGE r_acc_default_profile_setting_page
     {
     number = EAknSettingPageNoOrdinalDisplayed;
     label = qtn_acc_sett_def_prof;
-    softkey_resource = R_AVKON_SOFTKEYS_CANCEL;
+    softkey_resource = R_AVKON_SOFTKEYS_SELECT_CANCEL__SELECT;
     type = EAknSetListBox;
     editor_resource_id = r_setting_listbox;
     }

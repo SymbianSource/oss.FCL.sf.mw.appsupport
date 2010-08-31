@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -28,6 +28,14 @@
 #include "tstapp.h"
 #include "testableapalssession.h"
 #include "appfwk_test.h"
+#include "T_SisFileInstaller.h"
+
+_LIT(KTestTrustedPriorityApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\TestTrustedPriorityApp2.sis");
+_LIT(KTestTrustedPriorityApp2Component, "TestTrustedPriorityApp2");
+
+_LIT(KTestUntrustedPriorityApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\TestUnTrustedPriorityApp2.sis");
+_LIT(KTestUntrustedPriorityApp2Component, "TestUnTrustedPriorityApp2");
+
 
 /**
    @SYMTestCaseID		APPFWK-APPARC-0036
@@ -114,6 +122,24 @@ CT_DataTypeMappingWithSid1::CT_DataTypeMappingWithSid1()
 CT_DataTypeMappingWithSid1::~CT_DataTypeMappingWithSid1()
 	{
 	}
+
+TVerdict CT_DataTypeMappingWithSid1::doTestStepPreambleL()
+    {
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTestUntrustedPriorityApp2SisFile);
+    sisFileInstaller.InstallSisL(KTestUntrustedPriorityApp2SisFile);
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTestTrustedPriorityApp2SisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTestTrustedPriorityApp2SisFile);
+
+    SetTestStepResult(EPass);
+    return TestStepResult();
+    }
+
+TVerdict CT_DataTypeMappingWithSid1::doTestStepPostambleL()
+    {
+    return TestStepResult();    
+    }
+
 
 TVerdict CT_DataTypeMappingWithSid1::doTestStepL()
     {

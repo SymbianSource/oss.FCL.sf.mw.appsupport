@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,7 +19,9 @@
 */
 
 #include "T_DataMappingPersistenceA.h"
+#include "T_SisFileInstaller.h"
 
+_LIT(KServerApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp2.sis");
 
 /**
  * Constructor
@@ -44,7 +46,11 @@ CT_DataMappingPersistenceATestStep::~CT_DataMappingPersistenceATestStep()
  */	
 TVerdict CT_DataMappingPersistenceATestStep::doTestStepPreambleL()
 	{
-	SetTestStepResult(EPass);
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp2SisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KServerApp2SisFile); 
+
+    SetTestStepResult(EPass);
 	TInt error = iSession.Connect();
 	TEST(error==KErrNone);
 	return TestStepResult();

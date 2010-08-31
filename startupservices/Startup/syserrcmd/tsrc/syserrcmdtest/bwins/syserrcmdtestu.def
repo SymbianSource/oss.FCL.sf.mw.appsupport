@@ -1,3 +1,0 @@
-EXPORTS
-	?LibEntryL@@YAPAVCSysErrCmdTest@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CSysErrCmdTest * LibEntryL(class CTestModuleIf &)
-

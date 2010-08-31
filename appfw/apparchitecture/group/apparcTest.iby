@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -135,7 +135,6 @@ data=EPOCROOTepoc32\data\Z\resource\apps\default_app_icon.m02								resource\ap
 data=EPOCROOTepoc32\data\Z\private\10003a3f\apps\TCtrlPnlApp_reg.RSC						private\10003a3f\apps\TCtrlPnlApp_reg.RSC
 
 data=EPOCROOTepoc32\data\Z\private\10202be9\1028583d.txt				         private\10202be9\1028583d.txt
-data=EPOCROOTepoc32\data\Z\private\10202be9\10003a3f.txt				         private\10202be9\10003a3f.txt
 
 
 // Change for Control panel Start

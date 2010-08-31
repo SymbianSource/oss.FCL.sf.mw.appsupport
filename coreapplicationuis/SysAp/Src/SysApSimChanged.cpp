@@ -20,11 +20,11 @@
 #include "SysApSimChanged.h"
 #include "SysApAppUi.h"
 #include <settingsinternalcrkeys.h>
-#include <LogsDomainCRKeys.h>
+//#include <LogsDomainCRKeys.h>
 #include <logcli.h>
 #include <centralrepository.h>
 const TInt KPSetDefaultCFTimer = 30;
-#include <RSSSettings.h>
+#include <rsssettings.h>
 #include <startupdomainpskeys.h>
 #include <PSVariables.h>
 #include "SysAp.hrh"
@@ -71,6 +71,12 @@ CSysApSimChanged::~CSysApSimChanged()
 
 void CSysApSimChanged::ClearRepositoriesL()
     {
+    const TUid KCRUidLogs = {0x101F874E};
+    /**
+    * Informs the Logs application about the amount of new missed calls.
+    * Integer type
+    **/
+    const TUint32 KLogsNewMissedCalls = 0x00000006;
     TRACES( RDebug::Print( _L("CSysApSimChanged::ClearRepositoriesL(): opening KCRUidCallForwarding") ) );
     
     CRepository* repository = CRepository::NewL( KCRUidCallForwarding );
@@ -111,13 +117,13 @@ void CSysApSimChanged::ClearLogsL()
     dateTime.Set( 2100, EJanuary, 1, 0, 0, 0, 0 );
     TTime date(dateTime);
     
-    TRACES( RDebug::Print( _L("CSysApSimChanged::ClearLogsL(): trying CLogClient::NewL") ) );
+/*    TRACES( RDebug::Print( _L("CSysApSimChanged::ClearLogsL(): trying CLogClient::NewL") ) );
     CLogClient* logClient = CLogClient::NewL( iFs );    
     logClient->ClearLog( date, active->iStatus );
-    
+*/    
     CActiveScheduler::Start();
 
-    delete logClient;
+//    delete logClient;
     CleanupStack::PopAndDestroy( active );
     }
     
@@ -130,7 +136,7 @@ void CSysApSimChanged::ClearSsSettingsL()
     TRACES( RDebug::Print( _L("CSysApSimChanged::ClearSsSettingsL()") ) );
     
     // Reset SSSettings values
-    RSSSettings ssSettings;
+/*    RSSSettings ssSettings;
     User::LeaveIfError( ssSettings.Open( iSysApAppUi.GetTelServer() ) );
     
     TRACES( RDebug::Print( _L("CSysApSimChanged::ClearSsSettingsL(): trying RSSSettings::HandleSIMChanged") ) );
@@ -138,6 +144,7 @@ void CSysApSimChanged::ClearSsSettingsL()
     ssSettings.Close();    
     
     User::LeaveIfError( err );
+*/
     }
 
 // -----------------------------------------------------------------------------
@@ -164,7 +171,7 @@ void CSysApSimChanged::HandleSimChangedL()
     if ( simNotOwned )
         {
         ClearRepositoriesL();
-        ClearLogsL();
+//        ClearLogsL();
         }
     }
 // =============== CShareActive MEMBER FUNCTIONS ===============================

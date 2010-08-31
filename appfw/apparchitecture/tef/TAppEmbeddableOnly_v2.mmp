@@ -1,4 +1,4 @@
-// Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -36,11 +36,12 @@ APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 //reg added for Datacaging
 START RESOURCE	TAppEmbeddableOnly_reg.rss
-TARGETPATH	/private/10003a3f/apps
+TARGETPATH	/apparctestregfiles
 END
 
 START RESOURCE 	10004c5C.rss
-TARGET 		tappembeddableonly.rsc
+TARGET 			/tappembeddableonly.rsc
+targetpath 		/apparctestregfiles
 END
 
 

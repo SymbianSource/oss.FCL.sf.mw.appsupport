@@ -17,7 +17,7 @@
 
 
 #include <hal.h>
-
+#include <u32hal.h>
 
 #include <UikonInternalPSKeys.h>
 

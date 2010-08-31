@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -23,7 +23,7 @@
 #include "SysApFeatureManager.h"
 #include "SysAp.hrh"
 #include <centralrepository.h>
-#include "CoreApplicationUIsPrivateCRKeys.h"
+#include "coreapplicationuisprivatecrkeys.h"
 #include <hwrmlight.h>
 #include <AknUtils.h>
 
@@ -63,10 +63,6 @@ void CSysApFeatureManager::ConstructL()
     iGripNotSupported = FeatureManager::FeatureSupported( KFeatureIdKeypadNoSlider );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: iGripNotSupported=%d"), iGripNotSupported ) );
     
-//    iSlideSupported = FeatureManager::FeatureSupported( KFeatureIdFfCommonSlide );
-		iSlideSupported = EFalse;
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: iSlideSupported=%d"), iSlideSupported ) );
-    
     iLocationPrivacySupported = FeatureManager::FeatureSupported( KFeatureIdPrivacyFramework );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Location Privacy supported=%d"), iLocationPrivacySupported ) );
 
@@ -97,10 +93,10 @@ void CSysApFeatureManager::ConstructL()
     iNoPowerKeySupported = FeatureManager::FeatureSupported( KFeatureIdNoPowerkey );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: No power key supported=%d"), iNoPowerKeySupported ) );
     
-    iFmTxSupported = FeatureManager::FeatureSupported( KFeatureIdFmtx );
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX supported=%d"), iFmTxSupported ) );
+//    iFmTxSupported = FeatureManager::FeatureSupported( KFeatureIdFmtx );
+//    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX supported=%d"), iFmTxSupported ) );
 
-    iPenEnabled = AknLayoutUtils::PenEnabled();
+//    iPenEnabled = AknLayoutUtils::PenEnabled();
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Pen enabled=%d"), iPenEnabled ) );
     
     iVmbxCallDivertIconSupported = FeatureManager::FeatureSupported( KFeatureIdVmbxCallDivertIcon );
@@ -109,14 +105,8 @@ void CSysApFeatureManager::ConstructL()
     iTouchUnlockStrokeSupported = FeatureManager::FeatureSupported( KFeatureIdFfTouchUnlockStroke );
     TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Touch unlock stroke supported=%d"), iTouchUnlockStrokeSupported ) );
     
-    iFmTxRdsTextSupported = FeatureManager::FeatureSupported( KFeatureIdFfFmtxRdsText );
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX RDS-TEXT supported=%d"), iFmTxRdsTextSupported ) );
-    
-    iPowerKeyIsLockKey = FeatureManager::FeatureSupported( KFeatureIdFfPowerKeyAsKeyguard );
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: Power Key as keyguard supported=%d"), iPowerKeyIsLockKey ) );
-
-    iGanSupported = FeatureManager::FeatureSupported( KFeatureIdFfGenericAccessNetwork );
-    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: GAN supported=%d"), iGanSupported ) );
+//    iFmTxRdsTextSupported = FeatureManager::FeatureSupported( KFeatureIdFfFmtxRdsText );
+//    TRACES( RDebug::Print( _L("CSysApFeatureManager::ConstructL: FM TX RDS-TEXT supported=%d"), iFmTxRdsTextSupported ) );
     
     CRepository* repository = NULL;
     
@@ -190,13 +180,12 @@ CSysApFeatureManager::CSysApFeatureManager() : iFeatMgrActive( EFalse ),
                                                iGripNotSupported( ETrue ),
                                                iPowerSaveSupported( EFalse ),
                                                iNoPowerKeySupported( EFalse ),
-                                               iFmTxSupported( EFalse ),
+                                               //iFmTxSupported( EFalse ),
                                                iPenEnabled( EFalse ),
                                                iVmbxCallDivertIconSupported( EFalse ),
-                                               iTouchUnlockStrokeSupported( EFalse ),
-                                               iFmTxRdsTextSupported( EFalse ),
-                                               iPowerKeyIsLockKey ( EFalse ),
-                                               iGanSupported( EFalse )
+                                               iTouchUnlockStrokeSupported( EFalse )
+                                               //iFmTxRdsTextSupported( EFalse )
+
     {
     }
 
@@ -353,15 +342,6 @@ TBool CSysApFeatureManager::GripNotSupported() const
     {
     return iGripNotSupported;
     }
-
-// ----------------------------------------------------------------------------
-// CSysApFeatureManager::SlideSupported()
-// ----------------------------------------------------------------------------
-//
-TBool CSysApFeatureManager::SlideSupported() const
-    {
-    return iSlideSupported;
-    }
     
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::CoverDisplaySupported()
@@ -389,7 +369,7 @@ TBool CSysApFeatureManager::NoPowerKeySupported() const
     {
     return iNoPowerKeySupported;
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::FmTxSupported()
 // ----------------------------------------------------------------------------
@@ -398,6 +378,7 @@ TBool CSysApFeatureManager::FmTxSupported() const
     {
     return iFmTxSupported;
     }
+*/
 
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::PenEnabled()
@@ -425,7 +406,7 @@ TBool CSysApFeatureManager::TouchUnlockStrokeSupported() const
     {
     return iTouchUnlockStrokeSupported;
     }
-
+/*
 // ----------------------------------------------------------------------------
 // CSysApFeatureManager::FmTxRdsTextSupported()
 // ----------------------------------------------------------------------------
@@ -434,25 +415,7 @@ TBool CSysApFeatureManager::FmTxRdsTextSupported() const
     {
     return iFmTxRdsTextSupported;
     }
-
-//-----------------------------------------------------------------------------
-// CSysApFeatureManager::PowerKeyIsLockKey()
-//-----------------------------------------------------------------------------
-//
-TBool CSysApFeatureManager::PowerKeyIsLockKey() const
-    {
-    return iPowerKeyIsLockKey;
-    }
-
-// ----------------------------------------------------------------------------
-// CSysApFeatureManager::GanSupported()
-// ----------------------------------------------------------------------------
-//  
-TBool CSysApFeatureManager::GanSupported() const
-    {
-    return iGanSupported;
-    }        
-
+*/
 // End of File
 
 

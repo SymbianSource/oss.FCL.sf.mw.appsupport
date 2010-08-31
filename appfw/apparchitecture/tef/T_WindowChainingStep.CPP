@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -23,6 +23,15 @@
 #include "T_WindowChainingStep.h"
 #include "TWindowChaining.h"
 #include <apacmdln.h>
+#include "T_SisFileInstaller.h"
+
+_LIT(KWinChainAppSisFile, "z:\\apparctest\\apparctestsisfiles\\t_winchainLaunch.sis");
+_LIT(KWinChainAppComponent, "t_winchainLaunch");
+
+_LIT(KWinChainChildAppSisFile, "z:\\apparctest\\apparctestsisfiles\\t_winchainChild.sis");
+_LIT(KWinChainChildAppComponent, "t_winchainChild");
+
+
 
 /**
    @SYMTestCaseID TODO
@@ -112,6 +121,30 @@ void CT_WindowChainingStep::TestWindowChainingL()
 		SetTestStepResult(EFail);
 	}
 	
+
+TVerdict CT_WindowChainingStep::doTestStepPreambleL()
+    {
+    CSisFileInstaller sisInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KWinChainChildAppSisFile);
+    sisInstaller.InstallSisL(KWinChainChildAppSisFile);
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KWinChainAppSisFile);
+    sisInstaller.InstallSisAndWaitForAppListUpdateL(KWinChainAppSisFile);  
+    
+    SetTestStepResult(EPass);
+    return TestStepResult();    
+    }
+
+
+TVerdict CT_WindowChainingStep::doTestStepPostambleL()
+    {
+    CSisFileInstaller sisInstaller;
+    sisInstaller.UninstallSisL(KWinChainChildAppComponent);
+    sisInstaller.UninstallSisL(KWinChainAppComponent);
+    
+    return TestStepResult();    
+    }
+
+
 TVerdict CT_WindowChainingStep::doTestStepL()
 {
 	__UHEAP_MARK;

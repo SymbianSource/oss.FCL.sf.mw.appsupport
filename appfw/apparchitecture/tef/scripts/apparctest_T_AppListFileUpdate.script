@@ -37,6 +37,6 @@ START_TESTCASE API-APPFWK-APPARC-0032
 PRINT Run T_AppListFileUpdate Apparc test
 //
 LOAD_SUITE ApparcTestServer
-RUN_TEST_STEP 500 ApparcTestServer T_AppListFileUpdate
+RUN_TEST_STEP 800 ApparcTestServer T_AppListFileUpdate
 
 END_TESTCASE API-APPFWK-APPARC-0032

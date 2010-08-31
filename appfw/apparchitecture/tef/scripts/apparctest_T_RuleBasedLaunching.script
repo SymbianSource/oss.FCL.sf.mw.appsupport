@@ -27,6 +27,6 @@ START_TESTCASE API-APPFWK-APPARC-0023
 PRINT Run T_RuleBasedLaunching Apparc test
 //
 LOAD_SUITE ApparcTestServer
-RUN_TEST_STEP 100 ApparcTestServer T_RuleBasedLaunching
+RUN_TEST_STEP 200 ApparcTestServer T_RuleBasedLaunching
 
 END_TESTCASE API-APPFWK-APPARC-0023

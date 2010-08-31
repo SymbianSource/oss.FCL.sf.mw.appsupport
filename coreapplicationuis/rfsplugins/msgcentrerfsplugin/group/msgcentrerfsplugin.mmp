@@ -44,4 +44,4 @@ LIBRARY         ecom.lib                // ECom library
 LIBRARY         eikcore.lib             // Eikon library
 LIBRARY         euser.lib               // Base library
 LIBRARY         cone.lib                // Control environment library
-LIBRARY         muiu.lib                // For message centre reset
+LIBRARY         muiuutils.lib                // For message centre reset

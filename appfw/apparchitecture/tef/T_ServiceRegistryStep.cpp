@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -25,16 +25,18 @@
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <apaidpartner.h>
 #endif
+#include "T_SisFileInstaller.h" 
+ 
+_LIT(KTstAppStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TSTAPP_standalone.sis");
+_LIT(KTstAppStandAloneComponent, "TSTAPP_standalone");
 
+_LIT(KServerApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp2.sis");
+_LIT(KServerApp2Component, "serverapp2");
 
-
-_LIT(KImportAppsDir,"c:\\private\\10003a3f\\import\\apps\\");
-_LIT(KAppRscSourcePath,"z:\\system\\data\\TestUpdRegAppUninstallation_reg.rsc");
-_LIT(KUpgradeAppRscSourcePath,"z:\\system\\data\\TestUpgradeUpdRegAppUninstallation_reg.rsc");
-_LIT(KAppRscTargetPath,"c:\\private\\10003a3f\\import\\apps\\TestUpdRegAppUninstallation_reg.rsc");
+_LIT(KApparcTestAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TApparcTestApp.sis");
+_LIT(KApparcTestAppComponent, "TApparcTestApp");
 
 _LIT8(KLitMimeType,"mime/updregappuninstall");
-_LIT8(KLitUpgradeAppMimeType,"mime/upgradeupdregappuninstall");
 
 /**
  * Constructor
@@ -58,6 +60,10 @@ CT_ServiceRegistryTestStep::~CT_ServiceRegistryTestStep()
  */	
 TVerdict CT_ServiceRegistryTestStep::doTestStepPreambleL()
 	{
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp2SisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KServerApp2SisFile);
+    
 	SetTestStepResult(EPass);
 	return TestStepResult();
 	}
@@ -68,6 +74,9 @@ TVerdict CT_ServiceRegistryTestStep::doTestStepPreambleL()
  */
 TVerdict CT_ServiceRegistryTestStep::doTestStepPostambleL()
 	{
+    CSisFileInstaller sisFileInstaller;
+    sisFileInstaller.UninstallSisL(KServerApp2Component);
+    
 	return TestStepResult();
 	}
 
@@ -95,6 +104,15 @@ TInt CT_ServiceRegistryTestStep::RunTestCasesL()
 	RTestableApaLsSession ls;
 	TEST(KErrNone == ls.Connect());
 	CleanupClosePushL(ls);
+	
+	TApaAppInfo info;
+	TUid uid = {0x100048F3};
+	TInt err = ls.GetAppInfo(info, uid);
+	if(err == KErrNone)
+        {       
+        CSisFileInstaller sisFileInstaller;
+        sisFileInstaller.UninstallSisL(KApparcTestAppComponent);
+        } 
 
 	// Use DONT_CHECK because it complaints of heap unbalance (a CTypeStoreManager object, althought it is not actually leaked,
 	//   but reallocated in CApaAppListServer::DoUpdateTypeStoreL(void)). 
@@ -102,7 +120,9 @@ TInt CT_ServiceRegistryTestStep::RunTestCasesL()
 	//	 a CApaFsMonitor object, which introduces an extra 0.25 second delay before invoking the callback.
 	//	 *** See DEF101056 ****
 	HEAP_TEST_LS_SESSION(ls, 0, DONT_CHECK, TestAssociation1L(), NO_CLEANUP);
+#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	HEAP_TEST_LS_SESSION(ls, 0, DONT_CHECK, TestAppForDataTypeAndServiceL(ls), NO_CLEANUP);
+#endif	
     HEAP_TEST_LS_SESSION(ls, 0, DONT_CHECK, TestUpdateOfServiceRegistryOnAppUninstallationL(ls), NO_CLEANUP);
     HEAP_TEST_LS_SESSION(ls, 0, DONT_CHECK, TestServiceRegistryOnAppUpgradeL(ls), NO_CLEANUP);    
     
@@ -279,42 +299,27 @@ void CT_ServiceRegistryTestStep::TestUpdateOfServiceRegistryOnAppUninstallationL
     CleanupClosePushL(fs);
     User::LeaveIfError(fs.Connect());
 
-     TInt err = fs.CreateDirectoryL(KImportAppsDir);
-     TESTEL((err == KErrNone || err == KErrAlreadyExists), err);
-     INFO_PRINTF1(_L("c:\\private\\10003a3f\\import\\apps is created successfully or already exists"));
-     
-     //Make sure that the target file does not exist.
-     DeleteFileL(fs, KAppRscTargetPath);
-
-     // Copy TestUpdRegAppUninstallation_reg.rsc from z:\ to c:\private\10003a3f\import\apps\.
-     err = fs.CopyFileL(KAppRscSourcePath, KAppRscTargetPath);
-     TEST(err == KErrNone);
-     INFO_PRINTF1(_L("Successfully copied TestUpdRegAppUninstallation_reg.rsc from Z:\\system\\data to c:\\private\\10003a3f\\import\\apps"));
-
-     //Wait till the applist is updated.
-     WaitForAppListUpdateL();
-
+    CSisFileInstaller sisFileInstaller;
+    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KApparcTestAppSisFile);
+    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KApparcTestAppSisFile);
+    
      CServiceRegistry* registry = CServiceRegistry::NewL();
      CleanupStack::PushL(registry);
      
-     TUid appUid = {0x10207f80};
+     TUid appUid = {0x100048f3};
      TUid resultUid={KNullUidValue};    
      TDataType dataType (KLitMimeType);
      
-     //Test whether 0x10207f80 application is in application list.
+     //Test whether 0x100048f3 application is in application list.
      TApaAppInfo appInfo;
      TEST(aLs.GetAppInfo(appInfo,appUid)==KErrNone);
 
-     //Set 0x10207f80 as default application for "mime/updregappuninstall" MIME type.
+     //Set 0x100048f3 as default application for "mime/updregappuninstall" MIME type.
      registry->SetDefault(KOpenServiceUid,dataType, appUid);
      registry->GetDefault(KOpenServiceUid,dataType, resultUid);
      TEST(appUid==resultUid);
  
-     //Delete file c:\\private\\10003a3f\\import\\apps\\TestUpdRegAppUninstallation_reg.rsc 
-     DeleteFileL(fs, KAppRscTargetPath);
-     
-     //Wait till the application list is updated.
-     WaitForAppListUpdateL();  
+     sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KApparcTestAppComponent);
      
      //Check the application is removed from the application list
      TEST(aLs.GetAppInfo(appInfo,appUid)==KErrNotFound);
@@ -353,62 +358,26 @@ void CT_ServiceRegistryTestStep::TestServiceRegistryOnAppUpgradeL(RApaLsSession&
     {
     INFO_PRINTF1(_L("TestServiceRegistryOnAppUpgrade"));
  
-    RSmlTestUtils fs;
-    CleanupClosePushL(fs);
-    User::LeaveIfError(fs.Connect());
-
-     TInt err = fs.CreateDirectoryL(KImportAppsDir);
-     TESTEL((err == KErrNone || err == KErrAlreadyExists), err);
-     INFO_PRINTF1(_L("c:\\private\\10003a3f\\import\\apps is created successfully or already exists"));
-     
-     //Make sure that the target file does not exist.
-     DeleteFileL(fs, KAppRscTargetPath);
-
-     // Copy TestUpdRegAppUninstallation_reg.rsc from z:\ to c:\private\10003a3f\import\apps\.
-     err = fs.CopyFileL(KAppRscSourcePath, KAppRscTargetPath);
-     TEST(err == KErrNone);
-     INFO_PRINTF1(_L("Successfully copied TestUpdRegAppUninstallation_reg.rsc from Z:\\system\\data to c:\\private\\10003a3f\\import\\apps"));
-
-     //Wait till the applist is updated.
-     WaitForAppListUpdateL();
-
      CServiceRegistry* registry = CServiceRegistry::NewL();
      CleanupStack::PushL(registry);
      
-     TUid appUid = {0x10207f80};
+     TUid appUid = {0xA};
      TUid resultUid={KNullUidValue};    
      TDataType dataType (KLitMimeType);
      
-     //Test whether 0x10207f80 application is in application list.
+     //Test whether 0xA application is in application list.
      TApaAppInfo appInfo;
      TEST(aLs.GetAppInfo(appInfo,appUid)==KErrNone);
 
-     //Set 0x10207f80 as default application for "mime/updregappuninstall" MIME type.
+     //Set 0xA as default application for "mime/updregappuninstall" MIME type.
      registry->SetDefault(KOpenServiceUid,dataType, appUid);
      registry->GetDefault(KOpenServiceUid,dataType, resultUid);
      TEST(appUid==resultUid);
      
-     TDataType upgDataType(KLitUpgradeAppMimeType);
-     err=aLs.AppForDataType(upgDataType,resultUid);
-     TEST(resultUid.iUid==KNullUidValue);
- 
-     DeleteFileL(fs, KAppRscTargetPath);
+     CSisFileInstaller sisFIleInstaller;
+     INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
+     sisFIleInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppStandAloneSisFile);
      
-     err = fs.CopyFileL(KUpgradeAppRscSourcePath, KAppRscTargetPath);
-     TEST(err == KErrNone);
-     INFO_PRINTF1(_L("Successfully copied TestUpgradeUpdRegAppUninstallation_reg.rsc from Z:\\system\\data to c:\\private\\10003a3f\\import\\apps"));
-
-     //Change the modified time of the file to current time
-     RFs aFs;
-     TEST(aFs.Connect()==KErrNone);
-     TTime modifiedTime(0);
-     modifiedTime.HomeTime();
-     TEST(aFs.SetModified(KAppRscTargetPath, modifiedTime)==KErrNone);
-     aFs.Close();
-     
-     //Wait till the applist is updated.
-     WaitForAppListUpdateL();
-    
      //Check the application is not removed from the application list
      TEST(aLs.GetAppInfo(appInfo,appUid)==KErrNone);
      
@@ -416,13 +385,9 @@ void CT_ServiceRegistryTestStep::TestServiceRegistryOnAppUpgradeL(RApaLsSession&
      TEST(registry->GetDefault(KOpenServiceUid,dataType, resultUid)==KErrNone);
      TEST(resultUid==appUid);
      
-     err=aLs.AppForDataType(upgDataType,resultUid);
-     TEST((err==KErrNone) && (resultUid==appUid));
-     
-     DeleteFileL(fs,KAppRscTargetPath);
+     sisFIleInstaller.UninstallSisL(KTstAppStandAloneComponent);
 
      CleanupStack::PopAndDestroy(registry);
-     CleanupStack::PopAndDestroy(&fs);  
     }
 
 
