@@ -16,16 +16,13 @@ REM
 REM
 @echo on
 
+@echo Copying remconservercaps.mmh to safe place for envrecall
+copy \epoc32\include\remcon\remconservercaps.mmh remconservercaps_orig.mmh
 
 @echo Setting up advanced tsp test stub...
 pushd ..\..\stub\group
 call bldmake bldfiles
 call abld test reallyclean
 call abld test build
-popd
-pushd \sf\os\devicesrv\accessoryservices\remotecontrolfw\targetselectorplugin\group
-call bldmake bldfiles
-call abld reallyclean
-call abld build
 popd
 @echo Setting up advanced tsp test stub... Finished

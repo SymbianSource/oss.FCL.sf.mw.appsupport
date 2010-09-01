@@ -20,7 +20,7 @@
 #include <AknGlobalConfirmationQuery.h>
 #include "SysApMsgSimMemLowQuery.h"
 #include "SysAp.hrh"
-#include <SecondaryDisplay/SecondaryDisplaySysApAPI.h>
+#include <secondarydisplay/SecondaryDisplaySysApAPI.h>
 #include <aknSDData.h>
 
 // ============================ MEMBER FUNCTIONS ==============================

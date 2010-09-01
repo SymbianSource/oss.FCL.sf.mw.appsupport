@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -35,6 +35,7 @@
 #include "cfactionindicationimpl.h"
 #include "cfactionsubscriptionimpl.h"
 #include "cfscriptevent.h"
+#include "cfenvutils.h"
 #include "TestActionPluginConst.hrh"
 #include "cfactionpluginthread.h"
 
@@ -96,6 +97,9 @@ UT_CFActivatorEngine* UT_CFActivatorEngine::NewLC()
 UT_CFActivatorEngine::~UT_CFActivatorEngine()
     {
     Teardown();
+
+    // Enable screen saver again
+    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -108,7 +112,10 @@ void UT_CFActivatorEngine::ConstructL()
     {
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
-    CEUnitTestSuiteClass::ConstructL();
+    CEUnitTestSuiteClass::ConstructL();    
+
+    // Disable screen saver since it is causing false memory leaks
+    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 // METHODS

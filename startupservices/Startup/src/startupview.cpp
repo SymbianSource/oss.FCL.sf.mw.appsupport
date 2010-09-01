@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007,2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -16,7 +16,9 @@
 */
 
 
-
+#include <aknappui.h>
+#include <AknsBasicBackgroundControlContext.h> // Skin support
+#include <AknsDrawUtils.h> // Skin support
 
 #include "startupview.h"
 #include "StartupDefines.h"
@@ -50,7 +52,7 @@ CStartupView* CStartupView::NewL( const TRect& aRect )
 CStartupView::~CStartupView()
     {
     TRACES("CStartupView::~CStartupView()");
-    
+    delete iBgContext;
     TRACES("CStartupView::~CStartupView(): End");
     }
 
@@ -92,6 +94,12 @@ void CStartupView::RemoveComponent()
 void CStartupView::SizeChanged()
     {
     TRACES("CStartupView::SizeChanged()");
+
+    if (iBgContext)
+    	{
+    	iBgContext->SetRect( Rect() );
+    	}
+    
     if ( iComponent )
         {
         iComponent->SetRect( Rect() );
@@ -136,14 +144,22 @@ void CStartupView::Draw( const TRect& aRect ) const
     TRACES("CStartupView::Draw()");
 
     CWindowGc& gc = SystemGc();
- 
+    MAknsSkinInstance* skin = AknsUtils::SkinInstance();
     gc.SetPenStyle( CGraphicsContext::ENullPen );
     gc.SetBrushStyle( CGraphicsContext::ESolidBrush );
-    gc.SetClippingRect( aRect );
-    gc.SetBrushColor( KRgbWhite );
-    gc.Clear();
+    
+    // Draw skin background
+    if ( !AknsDrawUtils::Background( skin, iBgContext, gc, aRect ) )
+        {
+        // If Skin is missing, clear with default color
+        gc.SetClippingRect( aRect );
+        gc.SetBrushColor( KRgbWhite );
+        gc.Clear();
+        }
+
     TRACES("CStartupView::Draw(): End");
     }
+
 
 // ---------------------------------------------------------------------------
 // CStartupView::CStartupView
@@ -156,6 +172,7 @@ CStartupView::CStartupView()
     TRACES("CStartupView::CStartupView(): End");
     }
 
+
 // ---------------------------------------------------------------------------
 // CStartupView::ConstructL
 //
@@ -164,11 +181,18 @@ CStartupView::CStartupView()
 void CStartupView::ConstructL( const TRect& aRect )
     {
     TRACES("CStartupView::ConstructL()");
+
+    iAvkonAppUi->StatusPane()->MakeVisible( EFalse );
     CreateWindowL();
     SetRect( aRect );
 
 	// Create background drawing context    
     TRect bgrect(aRect.Size());
+    iBgContext = CAknsBasicBackgroundControlContext::NewL( 
+            KAknsIIDQsnBgScreen,
+    		bgrect, EFalse );
+
     ActivateL();
+
     TRACES("CStartupView::ConstructL(): End");
     }

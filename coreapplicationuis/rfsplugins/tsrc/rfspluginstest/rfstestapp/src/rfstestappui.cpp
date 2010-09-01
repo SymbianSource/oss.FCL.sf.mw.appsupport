@@ -16,9 +16,9 @@
 */
 
 
-#include <akncommondialogsdynmem.h>
+//#include <akncommondialogsdynmem.h>
 #include <aknwaitdialog.h>
-#include <commondialogs.hrh>
+//#include <commondialogs.hrh>
 #include <rfstestapp.rsg>
 #include <aknlists.h>
 #include <aknpopup.h>
@@ -63,13 +63,13 @@ static TBool AskPathL( TDes& aPath, TInt aResId )
     TParsePtr parse( aPath );
     TPtrC rootFolder = parse.DriveAndPath();
     INFO_1( "Root folder for opening test files: %S", &rootFolder );
-    TBool ret = AknCommonDialogsDynMem::RunSelectDlgLD(
-        AknCommonDialogsDynMem::EMemoryTypePhone |
-        AknCommonDialogsDynMem::EMemoryTypeMMC,
-        aPath,
-        rootFolder,
-        R_RFSTESTAPP_MEMORY_SELECTION,
-        aResId );
+   TBool ret =ETrue;// = AknCommonDialogsDynMem::RunSelectDlgLD(
+        //AknCommonDialogsDynMem::EMemoryTypePhone |
+        //AknCommonDialogsDynMem::EMemoryTypeMMC,
+        //aPath,
+        //rootFolder,
+        //R_RFSTESTAPP_MEMORY_SELECTION,
+        //aResId );
 
     return ret;
     }
@@ -234,6 +234,7 @@ void CRfsTestAppUi::SetupTestL( const TDesC& aSpec,
     HBufC* specFile = HBufC::NewLC( KMaxFileName );
     TPtr specFileDes = specFile->Des();
     specFileDes = aSpec;
+    /*
     if ( AskPathL( specFileDes, R_RFSTESTAPP_SPECFILE_SELECTION ) )
         {
         HBufC* excludeFile = HBufC::NewLC( KMaxFileName );
@@ -278,7 +279,7 @@ void CRfsTestAppUi::SetupTestL( const TDesC& aSpec,
             }
 
         CleanupStack::PopAndDestroy( excludeFile );
-        }
+        }*/
     CleanupStack::PopAndDestroy( specFile );
     }
 

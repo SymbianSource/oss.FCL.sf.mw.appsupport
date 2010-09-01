@@ -51,7 +51,8 @@
 /**
 * Prefix macro for strings
 */
-#define _PREFIX_CHAR( aMsg ) (const char*)"[BSUtil]: " ##aMsg
+#define _PREFIX_CHAR( aMsg ) (const char*)"[BSUtil]: " aMsg
+
 
 /**
 * Define needed directories if TRACE_INTO_FILE macro in use

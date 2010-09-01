@@ -163,6 +163,7 @@ void CSysApDriveEjectHandler::StopEject( TInt aError )
             aError ) );
         }
     // Ensure that the wait note without softkeys gets closed
+    iSysApAppUi.CancelWaitNote();
     iSysApDriveList.ResetDrivesToEject();
 	iDriveToEject = KErrNotFound;
     iDiskNotifyHandler->CancelStartedDismount();
@@ -184,6 +185,7 @@ void CSysApDriveEjectHandler::HandleNotifyDismountFinished(
         aError, aEvent.iDrive, aEvent.iForcedDismount ) );
 
     iDriveToEject = KErrNotFound;
+    iSysApAppUi.CancelWaitNote();
 
     // Show dismount ready note
     TBool dialogShown( EFalse );

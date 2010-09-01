@@ -19,7 +19,7 @@
 // INCLUDE FILES
 #include "SysApNspsAnim.h"              // This
 #include <coecntrl.h>                   // CCoeControl
-#include "nspswsplugindllstd.h"         // Command
+#include "NspsWsPluginDllStd.h"         // Command
 
 // ============================ MEMBER FUNCTIONS ==============================
 

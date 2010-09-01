@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -29,20 +29,6 @@
 #endif //SYMBIAN_ENABLE_SPLIT_HEADERS
 #include "testableapalssession.h"
 
-#include "T_SisFileInstaller.h"
-
-_LIT(KRuleBasedApp1SisFile, "z:\\apparctest\\apparctestsisfiles\\tRuleBasedApp1.sis");
-_LIT(KRuleBasedApp1Component, "tRuleBasedApp1");
-
-_LIT(KRuleBasedApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\tRuleBasedApp2.sis");
-_LIT(KRuleBasedApp2Component, "tRuleBasedApp2");
-
-_LIT(KRuleBasedApp3SisFile, "z:\\apparctest\\apparctestsisfiles\\tRuleBasedApp3.sis");
-_LIT(KRuleBasedApp3Component, "tRuleBasedApp3");
-
-_LIT(KRuleBasedApp4SisFile, "z:\\apparctest\\apparctestsisfiles\\tRuleBasedApp4.sis");
-_LIT(KRuleBasedApp4Component, "tRuleBasedApp4");
-
 const TUint KNonNativeApplicationType = 0x10207f90;
 const TUint KNonNativeApplication = 0xA0000B6E;
 
@@ -69,9 +55,7 @@ void CTRuleBasedLaunchingStep::ExecuteL()
 	CleanupClosePushL(theLs);
 	
 	//DONT_CHECK since app list is updated
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	HEAP_TEST_LS_SESSION(theLs, 0, DONT_CHECK, TestLaunchNonNativeApplicationForRuleBasedL(theLs), NO_CLEANUP);	
-#endif	
 	//DONT_CHECK since result is unstable
 	HEAP_TEST_LS_SESSION(theLs, 0, DONT_CHECK, LaunchAppTests1L(theLs), theLs.FlushRecognitionCache() );
 	HEAP_TEST_LS_SESSION(theLs, 0, 0, LaunchAppTests2L(theLs), theLs.FlushRecognitionCache() );
@@ -460,38 +444,6 @@ void CTRuleBasedLaunchingStep::ClosedAllTestApp()
 	AppClosed(KUidApp3);
 	AppClosed(KUidApp4);
 	}
-
-TVerdict CTRuleBasedLaunchingStep::doTestStepPreambleL()
-    {
-    CSisFileInstaller sisFIleInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KRuleBasedApp1SisFile);
-    sisFIleInstaller.InstallSisL(KRuleBasedApp1SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KRuleBasedApp2SisFile);
-    sisFIleInstaller.InstallSisL(KRuleBasedApp2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KRuleBasedApp3SisFile);
-    sisFIleInstaller.InstallSisL(KRuleBasedApp3SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KRuleBasedApp4SisFile);
-    sisFIleInstaller.InstallSisAndWaitForAppListUpdateL(KRuleBasedApp4SisFile);
-    
-    SetTestStepResult(EPass);
-    return TestStepResult();
-    }
-
-
-/**
-   @return - TVerdict code
-   Override of base class virtual
- */
-TVerdict CTRuleBasedLaunchingStep::doTestStepPostambleL()
-    {
-    CSisFileInstaller sisFIleInstaller;
-    sisFIleInstaller.UninstallSisL(KRuleBasedApp1Component);
-    sisFIleInstaller.UninstallSisL(KRuleBasedApp2Component); 
-    sisFIleInstaller.UninstallSisL(KRuleBasedApp3Component);
-    sisFIleInstaller.UninstallSisL(KRuleBasedApp4Component);
-    return TestStepResult();
-    }
-
 
 TVerdict CTRuleBasedLaunchingStep::doTestStepL()
 	{

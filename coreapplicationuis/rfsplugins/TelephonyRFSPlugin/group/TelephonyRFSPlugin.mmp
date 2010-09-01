@@ -19,7 +19,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET      telephonyrfsplugin.dll
+TARGET      TelephonyRFSPlugin.dll
 
 TARGETTYPE	PLUGIN
 
@@ -34,7 +34,7 @@ SOURCE      Proxy.cpp
 
 START RESOURCE 2000F8C1.rss
 #ifdef SYMBIAN_SECURE_ECOM 
-  TARGET telephonyrfsplugin.rsc
+  TARGET TelephonyRFSPlugin.rsc
 #endif 
 END
 
@@ -45,4 +45,4 @@ USERINCLUDE ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY euser.lib       // Base library
-LIBRARY ecom.lib	    // ECom library
+LIBRARY ECom.lib	    // ECom library

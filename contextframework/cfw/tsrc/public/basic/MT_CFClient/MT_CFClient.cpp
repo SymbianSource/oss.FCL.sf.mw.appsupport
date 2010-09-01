@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -37,6 +37,7 @@
 #include "testcontextsourceplugin.h"
 #include "testcontextsourcepluginconst.hrh"
 #include "CFTestDelay.h"
+#include "cfenvutils.h"
 
 // CONSTANTS
 
@@ -305,6 +306,9 @@ MT_CFClient* MT_CFClient::NewLC( )
 MT_CFClient::~MT_CFClient( )
     {
     Teardown();
+
+    // Enable screen saver
+    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -318,6 +322,9 @@ void MT_CFClient::ConstructL( )
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL ( );
+
+    // Disable screen saver
+    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 //  METHODS

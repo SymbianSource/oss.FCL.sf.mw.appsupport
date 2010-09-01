@@ -186,7 +186,7 @@ EXPORT_C TBool CApaAppRegFinder::NextL(TApaAppEntry& aAppRegistrationEntry, cons
 			TParse regFileNameParser;
 			const TDriveName driveName = currentDrive.iUnit.Name();
 			regFileNameParser.Set(entry.iName, &appFolderOnDrive, &driveName);
-
+			
 			// Apparc will call sidchecker to verify if an application is a valid registered application. 
 			// Apparc will call sidchecker in the following conditions
 			// 1. If the current drive is a removable drive

@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -21,8 +21,6 @@
 
 #include <barsread.h>
 #include "T_ServicesStep.h"
-#include "T_SisFileInstaller.h" 
-
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <apaidpartner.h>
 #endif //SYMBIAN_ENABLE_SPLIT_HEADERS
@@ -31,37 +29,6 @@ _LIT(KCompleted, "Completed.");
 _LIT8(KLitPlainText,"text/plain");
 _LIT8(KLitPriorityText,"text/priority");
 _LIT8(KLitCustom1Text, "text/custom1");
-
-
-_LIT(KServerApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp2.sis");
-_LIT(KServerApp2Component, "serverapp2");
-
-_LIT(KServerApp4SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp4.sis");
-_LIT(KServerApp4Component, "serverapp4");
-
-_LIT(KServerApp6SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp6.sis");
-_LIT(KServerApp6Component, "serverapp6");
-
-_LIT(KServerApp7SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp7.sis");
-_LIT(KServerApp7Component, "serverapp7");
-
-_LIT(KOpenServiceApp1SisFile, "z:\\apparctest\\apparctestsisfiles\\openservice1app.sis");
-_LIT(KOpenServiceApp1Component, "openservice1app");
-
-_LIT(KOpenServiceApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\openservice2app.sis");
-_LIT(KOpenServiceApp2Component, "openservice2app");
-
-_LIT(KCtrlPanelAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TCtrlPnlApp.sis");
-_LIT(KCtrlPanelAppComponent, "TCtrlPnlApp");
-
-_LIT(KDataPrioritySystem1SisFile, "z:\\apparctest\\apparctestsisfiles\\T_DataPrioritySystem1.sis");
-_LIT(KDataPrioritySystem1Component, "T_DataPrioritySystem1");
-
-_LIT(KDataPrioritySystem2SisFile, "z:\\apparctest\\apparctestsisfiles\\T_DataPrioritySystem2.sis");
-_LIT(KDataPrioritySystem2Component, "T_DataPrioritySystem2");
-
-_LIT(KDataPrioritySystem3SisFile, "z:\\apparctest\\apparctestsisfiles\\T_DataPrioritySystem3.sis");
-_LIT(KDataPrioritySystem3Component, "T_DataPrioritySystem3");
 
 /**
    Constructor
@@ -86,28 +53,6 @@ CT_ServicesTestStep::~CT_ServicesTestStep()
  */	
 TVerdict CT_ServicesTestStep::doTestStepPreambleL()
 	{
-    CSisFileInstaller sisInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp2SisFile);
-    sisInstaller.InstallSisL(KServerApp2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp4SisFile);
-    sisInstaller.InstallSisL(KServerApp4SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp6SisFile);
-    sisInstaller.InstallSisL(KServerApp6SisFile);   
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KOpenServiceApp1SisFile);
-    sisInstaller.InstallSisL(KOpenServiceApp1SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KOpenServiceApp2SisFile);
-    sisInstaller.InstallSisL(KOpenServiceApp2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KCtrlPanelAppSisFile);
-    sisInstaller.InstallSisL(KCtrlPanelAppSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KDataPrioritySystem1SisFile);
-    sisInstaller.InstallSisL(KDataPrioritySystem1SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KDataPrioritySystem2SisFile);
-    sisInstaller.InstallSisL(KDataPrioritySystem2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KDataPrioritySystem3SisFile);
-    sisInstaller.InstallSisL(KDataPrioritySystem3SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp7SisFile);
-    sisInstaller.InstallSisAndWaitForAppListUpdateL(KServerApp7SisFile);
-    
 	SetTestStepResult(EPass);
 	TInt error = iApaLsSession.Connect();
 	TEST(error==KErrNone);
@@ -120,17 +65,6 @@ TVerdict CT_ServicesTestStep::doTestStepPreambleL()
  */
 TVerdict CT_ServicesTestStep::doTestStepPostambleL()
 	{
-    CSisFileInstaller sisInstaller;
-    sisInstaller.UninstallSisL(KServerApp2Component);
-    sisInstaller.UninstallSisL(KServerApp4Component);
-    sisInstaller.UninstallSisL(KServerApp6Component);
-    sisInstaller.UninstallSisL(KServerApp7Component);
-    sisInstaller.UninstallSisL(KOpenServiceApp1Component);
-    sisInstaller.UninstallSisL(KOpenServiceApp2Component); 
-    sisInstaller.UninstallSisL(KCtrlPanelAppComponent); 
-    sisInstaller.UninstallSisL(KDataPrioritySystem1Component); 
-    sisInstaller.UninstallSisL(KDataPrioritySystem2Component); 
-    sisInstaller.UninstallSisL(KDataPrioritySystem3Component);     
 	return TestStepResult();
 	}
 
@@ -151,7 +85,6 @@ TVerdict CT_ServicesTestStep::doTestStepL()
 TInt CT_ServicesTestStep::RunTestCasesL()
 	{
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery1L(), iApaLsSession.ClearAppInfoArray() );
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery2L(), iApaLsSession.ClearAppInfoArray() );
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery3L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery4L(), NO_CLEANUP);
@@ -159,13 +92,10 @@ TInt CT_ServicesTestStep::RunTestCasesL()
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery6(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery7L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery8L(), NO_CLEANUP);
-#endif	
 	// The following two APIs InsertDataMappingL() & DeleteDataMappingL(), update the type store on the server side.
 	// This update takes place on the server side while the test case is still running, which causes the heap check to fail.
 	// To avoid the heap check on the server side, DONT_CHECK macro is used.
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, DONT_CHECK, TestServiceDiscovery9(), NO_CLEANUP );
-#endif	
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery10L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery11L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery12L(), NO_CLEANUP);
@@ -205,7 +135,7 @@ TInt CT_ServicesTestStep::RunTestCasesL()
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery24(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery25(), iApaLsSession.FlushRecognitionCache() );
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery27(), iApaLsSession.FlushRecognitionCache() );
-	//HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery28L(), NO_CLEANUP);
+	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestServiceDiscovery28L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestOpenService1L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iApaLsSession, 0, 0, TestCtrlPnlAppL(), NO_CLEANUP);
 	// The following two APIs InsertDataMappingL() & DeleteDataMappingL(), update the type store on the server side.

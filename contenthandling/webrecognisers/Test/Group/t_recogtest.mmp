@@ -1,4 +1,4 @@
-// Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -13,8 +13,6 @@
 // Description:
 //
 
-#include <platform_paths.hrh>
-
 TARGET			t_recogtest.exe
 TARGETTYPE		exe
 CAPABILITY 		ProtServ
@@ -25,13 +23,14 @@ SOURCE			crectestengine.cpp crectestlogger.cpp
 
 USERINCLUDE		.
 #ifdef SYMBIAN_OLD_EXPORT_LOCATION
-MW_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE	/epoc32/include
 SYSTEMINCLUDE	/epoc32/include/ecom
 #else
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 SYSTEMINCLUDE	/epoc32/include/ecom
 SYSTEMINCLUDE	/epoc32/include/platform/ecom
-MW_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE	/epoc32/include/mw
+SYSTEMINCLUDE	/epoc32/include/platform/mw
 #endif
 
 LIBRARY			euser.lib ecom.lib

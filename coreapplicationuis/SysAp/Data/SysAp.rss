@@ -21,7 +21,7 @@ NAME    SYSA
 
 //  INCLUDES
 #include <eikon.rh>
-#include <SysAp.loc>
+#include <sysap.loc>
 #include <avkon.loc>
 #include <avkon.rsg>
 #include <AiwCommon.rh>
@@ -31,18 +31,12 @@ NAME    SYSA
 
 RESOURCE RSS_SIGNATURE { }
 
-RESOURCE TBUF { buf="sysap"; }
+RESOURCE TBUF { buf=""; }
 
 RESOURCE EIK_APP_INFO
-    {
-        status_pane = r_status_pane;
-    }
-
-RESOURCE STATUS_PANE_APP_MODEL r_status_pane
-    {
-        layout= R_AVKON_STATUS_PANE_LAYOUT_EMPTY;
-    }
-
+{
+    status_pane=R_AVKON_STATUS_PANE_LAYOUT_EMPTY;
+}
 
 //   LOCALIZED STRINGS 
 

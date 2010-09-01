@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -23,12 +23,6 @@
 
 #include <apgcli.h>
 #include "T_AppList.h"
-#include "T_SisFileInstaller.h"
-
-_LIT(KApparcTestAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TApparcTestApp.sis");
-_LIT(KApparcTestAppComponent, "TApparcTestApp");
-
-
 
 CTestAppListStep::CTestAppListStep()
 	{
@@ -66,23 +60,6 @@ void CTestAppListStep::TestAppList()
 	TEST(ret==KErrNone);
 	}
 
-TVerdict CTestAppListStep::doTestStepPreambleL()
-    {
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KApparcTestAppSisFile);
-    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KApparcTestAppSisFile);
-
-    SetTestStepResult(EPass);
-    return TestStepResult();
-    }
-
-TVerdict CTestAppListStep::doTestStepPostambleL()
-    {
-    CSisFileInstaller sisFileInstaller;
-    sisFileInstaller.UninstallSisL(KApparcTestAppComponent);
-    
-    return TestStepResult();    
-    }
 
 TVerdict CTestAppListStep::doTestStepL()
 	{
@@ -98,5 +75,3 @@ TVerdict CTestAppListStep::doTestStepL()
 	INFO_PRINTF1(_L("Test Finished"));	
 	return TestStepResult();
 	}
-
-

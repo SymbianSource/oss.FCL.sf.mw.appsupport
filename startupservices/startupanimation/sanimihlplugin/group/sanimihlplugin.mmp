@@ -45,5 +45,3 @@ LIBRARY         efsrv.lib
 LIBRARY         euser.lib
 LIBRARY         ihl.lib
 LIBRARY         sanimengine.lib
-
-SMPSAFE

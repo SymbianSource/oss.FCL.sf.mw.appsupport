@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -29,11 +29,8 @@
 #include <e32test.h>
 #include "appfwk_test_utils.h"
 #include "t_drivenotification.h"
-#include "T_SisFileInstaller.h"
 
-_LIT(KNotifyDriveAppSisFile, "z:\\apparctest\\apparctestsisfiles\\tnotifydrivesapp.sis");
-_LIT(KNotifyDriveAppComponent, "tnotifydrivesapp");
-
+_LIT(KResourceFileSourceZ, "z:\\system\\data\\tnotifydrivesapp_reg.rsc");
 
 void CDriveTestObserver::HandleAppListEvent(TInt /*aEvent*/)
 	{
@@ -85,16 +82,16 @@ void CT_DriveNotificationStep::TestDrivesNotificationL()
 	CleanupClosePushL(theLs);
 	
 	// Wait for applist to be updated.... 
-	TRequestStatus status;
-	theLs.SetNotify(ETrue, status);
-	User::WaitForRequest(status);
+	RPointerArray<TDesC> dummy;
+	User::LeaveIfError(theLs.ForceRegistration(dummy));
 	
 	//Check whether app is not present in the applist
 	TInt ret = theLs.GetAppInfo(appInfo,appUid);
 	INFO_PRINTF3(_L(" Expected value is %d, Call to GetAppInfo returned : %d  "), KErrNotFound, ret);
 	TEST(ret==KErrNotFound);
 	
-	//Install the application.
+	//Copy the registration file to C: drive.
+	CopyRegFileL(EDriveC);
 	
 	CDriveTestObserver* obs = new(ELeave) CDriveTestObserver();
 	CleanupStack::PushL(obs);
@@ -102,10 +99,7 @@ void CT_DriveNotificationStep::TestDrivesNotificationL()
 	CleanupStack::PushL(notif);
 	
 	obs->iNotifier = notif;
-
-    CSisFileInstaller sisFileInstaller;
-    sisFileInstaller.InstallSisL(KNotifyDriveAppSisFile);
-	
+		
 	CActiveScheduler::Start();
 	//Since c:\\private\\10003a3f\\Import\\apps\\ path is Monitored, a notification is issued and applist is updated.
 	TEST(obs->iNotified > 0);	
@@ -116,8 +110,11 @@ void CT_DriveNotificationStep::TestDrivesNotificationL()
 	INFO_PRINTF3(_L(" Expected value is %d, Call to GetAppInfo returned : %d  "), KErrNone, ret);
 	TEST(ret==KErrNone);
 	
-	//Uninstall the application
-	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KNotifyDriveAppComponent);
+	//Deleting the rsc file that is present in c:\\private\\10003a3f\\Import\\apps\\ path.
+	DeleteRegFileL(EDriveC);
+	
+	// Wait for applist to be updated.... 
+	User::LeaveIfError(theLs.ForceRegistration(dummy));
 	
 	//Check whether applist is updated and app is absent in the applist.
 	ret = theLs.GetAppInfo(appInfo,appUid);
@@ -131,8 +128,8 @@ void CT_DriveNotificationStep::TestDrivesNotificationL()
 	//Copy the registration file to drive specified.
 	CopyRegFileL(drive);
 	
-//	// Wait for applist to be updated.... 
-//	User::LeaveIfError(theLs.ForceRegistration(dummy));
+	// Wait for applist to be updated.... 
+	User::LeaveIfError(theLs.ForceRegistration(dummy));
 	
 	//Check whether applist is updated and app is present in the applist.
 #ifdef __EABI__
@@ -146,7 +143,7 @@ void CT_DriveNotificationStep::TestDrivesNotificationL()
 	TEST(ret==KErrNone);
 	INFO_PRINTF3(_L(" Expected value is %d, Call to GetAppInfo returned : %d  "),KErrNone, ret);
 	//Deleting the rsc file.
-//	DeleteRegFileL(drive);
+	DeleteRegFileL(drive);
 #endif
 	CleanupStack::PopAndDestroy(3, &theLs);
 	
@@ -187,7 +184,7 @@ void CT_DriveNotificationStep::CopyRegFileL(TDriveNumber aDriveNumber)
 		{
 		User::LeaveIfError(ret);
 		}
-//	ret = smlServer.CopyFileL(KResourceFileSourceZ, tempPathToBeCopied);
+	ret = smlServer.CopyFileL(KResourceFileSourceZ, tempPathToBeCopied);
 	TEST(ret == KErrNone);
 	INFO_PRINTF2(_L("Copied Registration file. Finished with the value : %d "), ret);
 	CleanupStack::PopAndDestroy(4, &fs);

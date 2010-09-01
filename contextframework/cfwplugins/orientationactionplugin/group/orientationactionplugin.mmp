@@ -20,7 +20,7 @@
 #include "../inc/traceconfiguration.hrh"
 #include "../inc/orientationactionpluginconst.hrh"
 
-TARGET          orientationactionplugin.dll
+TARGET          OrientationActionPlugin.dll
 TARGETTYPE      PLUGIN
 UID             0x10009D8D KOrientationActionPlugInDllUid
 CAPABILITY      CAP_ECOM_PLUGIN
@@ -50,7 +50,7 @@ LIBRARY         akncapserverclient.lib
 LIBRARY         cfactivatorengine.lib
 LIBRARY         cfservices.lib
 LIBRARY         centralrepository.lib
-LIBRARY         avkon.lib
+LIBRARY         Avkon.lib
 LIBRARY         apgrfx.lib
 #ifdef TRACE_INTO_FILE
 LIBRARY         flogger.lib

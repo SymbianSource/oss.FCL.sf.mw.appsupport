@@ -96,7 +96,7 @@ void CASSrvAlarmQueue::ConstructL()
 	iASSrvDSTChange = CASSrvDSTChange::NewL(*this);
 
 #ifdef SYMBIAN_SYSTEM_STATE_MANAGEMENT
-	User::LeaveIfError(iSsmRtcAdaptation.Connect());
+	iSsmRtcAdaptation.Connect();
 	// Notify the listeners of 'KWakeupAlarmPubSubKey' key that the alarm queue is yet  to be internalized 
 	// by Alarm Server on its start-up at the device boot time.
 	RProperty::Define(KAlarmServerPubSubCategory, KWakeupAlarmPubSubKey, RProperty::EInt, KReadPolicy, KWritePolicy);

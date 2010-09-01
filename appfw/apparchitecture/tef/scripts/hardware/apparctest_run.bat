@@ -1,5 +1,5 @@
 @rem
-@rem Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+@rem Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 @rem All rights reserved.
 @rem This component and the accompanying materials are made available
 @rem under the terms of "Eclipse Public License v1.0"
@@ -62,11 +62,6 @@ testexecute.exe z:\apparctest\apparctest_t_StartDoc.script
 testexecute.exe z:\apparctest\apparctest_t_Wgnam.script
 testexecute.exe z:\apparctest\apparctest_t_WindowChaining.script
 testexecute.exe z:\apparctest\apparctest_t_RecUpgrade.script
-testexecute.exe z:\apparctest\apparctest_t_UpdateAppList.script
-testexecute.exe z:\apparctest\apparctest_t_forcereg.script
-testexecute.exe z:\apparctest\apparctest_t_clientnotif.script
-testexecute.exe z:\apparctest\apparctest_t_nonnativetest.script
-
 
 :: *******************************************************************
 :: This batch file is used to run tests on 9.3 and higher versions.

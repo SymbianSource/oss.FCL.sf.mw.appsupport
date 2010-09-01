@@ -71,6 +71,11 @@ class CGSSenTurnCtrlView : public CGSSensorBaseView
          * Checks currently activated item in list and updates MSK label if needed
          */
         void CheckMiddleSoftkeyLabelL();
+		
+		/**
+         * Deactivates current view.
+         */
+        void DoDeactivate();
     
     private:
 

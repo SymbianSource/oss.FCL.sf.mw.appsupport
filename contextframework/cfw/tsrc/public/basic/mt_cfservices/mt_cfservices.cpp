@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2004 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -33,6 +33,7 @@
 #include "CFKeyValuePair.h"
 #include "cfserviceutils.h"
 #include "cfcontextdataproxy.h"
+#include "cfenvutils.h"
 
 // CONSTANTS
 _LIT( KKey, "Key_%d" );
@@ -72,6 +73,9 @@ MT_CFServices* MT_CFServices::NewLC()
 MT_CFServices::~MT_CFServices()
     {
     Teardown();
+
+    // Enable screen saver
+    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -85,6 +89,9 @@ void MT_CFServices::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
+
+    // Disable screen saver
+    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 // METHODS

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,9 +26,9 @@ rls_string STRING_r_tstapp_short_caption_string "TC IT"
 rls_string STRING_r_tstapp_view1_caption "V1 IT"
 rls_string STRING_r_tstapp_view2_caption "V2 IT"
 
-rls_string STRING_r_tstapp_icon_file "\\resource\\apps\\tstapp.mbm"
-rls_string STRING_r_tstapp_view1_icon_file "\\resource\\apps\\tstapp.mbm"
-rls_string STRING_r_tstapp_view2_icon_file "\\resource\\apps\\tstapp.mbm"
-rls_string STRING_r_tstapp_view3_icon_file "\\resource\\apps\\tstappviewneg.xyz"
+rls_string STRING_r_tstapp_icon_file "z:\\resource\\apps\\tstapp.mbm"
+rls_string STRING_r_tstapp_view1_icon_file "z:\\resource\\apps\\tstapp.mbm"
+rls_string STRING_r_tstapp_view2_icon_file "z:\\resource\\apps\\tstapp.mbm"
+rls_string STRING_r_tstapp_view3_icon_file "z:\\resource\\apps\\tstappviewneg.xyz"
 
 

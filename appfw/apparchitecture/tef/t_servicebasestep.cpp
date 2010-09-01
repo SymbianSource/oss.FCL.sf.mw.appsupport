@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -25,10 +25,6 @@
 #include "appfwk_test.h"
 #include "testableapalssession.h"
 #include "../tef/TNonNative/TNNApp1.h"
-#include "T_SisFileInstaller.h" 
-
-_LIT(KTNNA1AppSisFile, "z:\\apparctest\\apparctestsisfiles\\TNNApp1.sis");
-_LIT(KTNNA1AppComponent, "TNNApp1");
 
 TInt PanicTest(TAny* aOption);
 
@@ -467,19 +463,12 @@ CT_ServiceBaseStep::CT_ServiceBaseStep()
 
 TVerdict CT_ServiceBaseStep::doTestStepPreambleL()
 	{
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTNNA1AppSisFile);
-    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTNNA1AppSisFile);
-    
 	SetTestStepResult(EPass);
 	return TestStepResult();
 	}
 
 TVerdict CT_ServiceBaseStep::doTestStepPostambleL()
 	{
-    CSisFileInstaller sisFileInstaller;
-    sisFileInstaller.UninstallSisL(KTNNA1AppComponent);
-    
 	return TestStepResult();
 	}
 

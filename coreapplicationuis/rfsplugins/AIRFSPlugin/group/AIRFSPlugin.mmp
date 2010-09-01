@@ -19,7 +19,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET      airfsplugin.dll
+TARGET      AIRFSPlugin.dll
 
 TARGETTYPE	PLUGIN
 
@@ -34,7 +34,7 @@ SOURCE      Proxy.cpp
 
 START RESOURCE 2000F8BD.rss
 #ifdef SYMBIAN_SECURE_ECOM 
-  TARGET airfsplugin.rsc
+  TARGET AIRFSPlugin.rsc
 #endif 
 END
 
@@ -45,4 +45,4 @@ USERINCLUDE ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY euser.lib       // Base library
-LIBRARY ecom.lib	    // ECom library
+LIBRARY ECom.lib	    // ECom library

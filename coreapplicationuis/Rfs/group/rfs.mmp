@@ -29,14 +29,6 @@ CAPABILITY CAP_GENERAL_DLL
 
 USERINCLUDE ../inc
 
-
-SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
-
-
-LIBRARY		HbWidgets.lib
-
-
-
 MW_LAYER_SYSTEMINCLUDE
 
 SOURCEPATH ../src
@@ -60,17 +52,18 @@ END  // RESOURCE
 LIBRARY euser.lib
 LIBRARY efsrv.lib
 LIBRARY bafl.lib
+LIBRARY avkon.lib
 LIBRARY cone.lib
 LIBRARY etel.lib
 LIBRARY etelmm.lib
-LIBRARY commonengine.lib
+LIBRARY CommonEngine.lib
 LIBRARY sysutil.lib
 LIBRARY hal.lib
 LIBRARY secui.lib
 LIBRARY eikcore.lib
-LIBRARY syslangutil.lib
-LIBRARY platformenv.lib  // PathInfo
+LIBRARY SysLangUtil.lib
+LIBRARY PlatformEnv.lib  // PathInfo
 LIBRARY centralrepository.lib // Central Repository
 LIBRARY starterclient.lib
 LIBRARY ecom.lib
-LIBRARY featmgr.lib
+LIBRARY FeatMgr.lib

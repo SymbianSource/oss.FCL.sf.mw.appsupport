@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -26,6 +26,7 @@ ECOM_PLUGIN(ClockRFSPlugin.dll,2000F8BE.rsc)
 ECOM_PLUGIN(DatastoreRFSPlugin.dll,2000F8C2.rsc)
 ECOM_PLUGIN(DefaultFolderRFSPlugin.dll,2000F8BA.rsc)
 ECOM_PLUGIN(RfsDisplayContrastPlugin.dll,102071F7.rsc)
+ECOM_PLUGIN(FavouritesRFSPlugin.dll,102071F6.rsc)
 ECOM_PLUGIN(NitzRFSPlugin.dll,2000F8BF.rsc)
 ECOM_PLUGIN(StarterRFSPlugin.dll,2000F8BB.rsc)
 ECOM_PLUGIN(SyncMLRFSPlugin.dll,2000F8BC.rsc)

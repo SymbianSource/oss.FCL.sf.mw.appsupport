@@ -32,18 +32,18 @@ VENDORID 0x70000001
 
 option MSVC /Od
 
-
 SOURCEPATH	../aplist
 
 userinclude	../inc
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 
-source		aplapplist.cpp	aplapplistitem.cpp aplappinforeader.cpp apsidchecker.cpp
+source		aplapplist.cpp	aplapplistitem.cpp aplappinforeader.cpp aplappregfinder.cpp apsidchecker.cpp
 source		apsiconcaptionoverride.cpp
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-source aplappregfinder.cpp
-#endif
+// source       APGCTL.CPP apgdoor.cpp APGICNFL.CPP APGSTD.CPP APGTASK.CPP
+// source	APGWGNAM.CPP apgcli.cpp apgstart.cpp apgrecog.cpp APGPRIV.CPP
+// source	apgnotif.cpp APGAIR.CPP APGAIRV2.CPP APSCLI.CPP APGCONSTDATA.CPP
+// SOURCE	apsecutils.cpp
+// source       APGAPLSTV2.CPP
 
 library         euser.lib gdi.lib estor.lib efsrv.lib fbscli.lib
 library         bitgdi.lib ws32.lib bafl.lib ecom.lib 
@@ -59,13 +59,10 @@ library 		apserv.lib	// CApaAppListServer referenced from CApaAppRegFinder
 library 		apmime.lib 	// TDataType referenced from CApaAppData
 library			centralrepository.lib
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-library			scrclient.lib
-#endif
-
 //library         	apserv.lib apfile.lib apparc.lib 
 
 #ifdef USE_IH_RAISE_EVENT
+APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 LIBRARY			instrumentationhandler.lib
 #endif // USE_IH_RAISE_EVENT
 
@@ -78,13 +75,5 @@ END
 
 START MARM
 END
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	deffile aplist.def
-#else
-	deffile aplist_legacy.def
-#endif
-
-
 
 SMPSAFE

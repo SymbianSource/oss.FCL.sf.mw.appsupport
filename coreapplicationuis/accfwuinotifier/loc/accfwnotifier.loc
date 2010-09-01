@@ -1,0 +1,92 @@
+/*
+* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Localization strings for AccFWNotifier
+*
+*/
+
+
+//  LOCALISATION STRINGS
+
+//d:Text of a default accessory in use note
+//d:Shown when accessory connected and default accessory is used
+//l:popup_note_window
+//w:
+//r: 3.1
+#define qtn_acc_default_enhanc "Default enhancement:"
+
+//d:Text of a accessory use phone microphone information note
+//d:Shown when headphones are connected 
+//l:popup_note_window
+//w:
+//r: 3.1
+#define qtn_acc_headphones_mic "Use phone microphone."
+
+//d:Text of a accessory selection dialog header
+//d:Accessory selection dialog
+//l:heading_pane_t1
+//w:
+//r: 3.1
+#define qtn_acc_select_acc "Select accessory:"
+
+
+//d:Text for TTY selection
+//d:Accessory selection dialog
+//l:list_single_pane_t1_cp2
+//w:
+//r: 3.1
+#define qtn_tty_acc_selection_dialog "TTY"
+
+//d:Text for loopset selection
+//d:Accessory selection dialog
+//l:list_single_pane_t1_cp2
+//w:
+//r: 3.1
+#define qtn_loopset_acc_selection_dialog "Loopset"
+
+//d:Text for headset selection
+//d:Accessory selection dialog
+//l:list_single_pane_t1_cp2
+//w:
+//r: 3.1
+#define qtn_headset_acc_selection_dialog "Headset"
+
+//d:Text for headphones selection
+//d:Accessory selection dialog
+//l:list_single_pane_t1_cp2
+//w:
+//r: 3.1
+#define qtn_headphones_acc_selection_dialog "Headphones"
+
+//d:Text for lineout selection
+//d:Accessory selection dialog
+//l:list_single_pane_t1_cp2
+//w:
+//r: 3.1
+#define qtn_lineout_acc_selection_dialog "Lineout"
+
+//d:Text for tv-out selection
+//d:Accessory selection dialog
+//l:list_single_pane_t1_cp2
+//w:
+//r: 3.1
+#define qtn_tvout_acc_selection_dialog "TV-out"
+
+//d:Text for Music Stand selection
+//d:Accessory selection dialog
+//l: heading_pane_t1
+//w:
+//r: 3.1
+#define qtn_musicstand_acc_selection_dialog "Music Stand"
+
+// End of File

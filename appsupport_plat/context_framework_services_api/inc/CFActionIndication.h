@@ -20,7 +20,7 @@
 #define C_CFACTIONINDICATION_H
 
 #include <e32base.h>
-#include <cfkeyvaluepair.h>
+#include <CFKeyValuePair.h>
 
 /**
 * Encapsulates inside an action indication. Action indication consists of

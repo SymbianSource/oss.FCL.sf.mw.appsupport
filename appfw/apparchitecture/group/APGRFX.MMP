@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -42,19 +42,12 @@ source			APGWGNAM.CPP APGCLI.CPP apgstart.cpp apgrecog.cpp APGPRIV.CPP
 source			apgnotif.cpp APSCLI.CPP apgconstdata.cpp
 SOURCE			apsecutils.cpp
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-SOURCE			apgupdate.cpp
-#endif
-
 library         euser.lib apparc.lib apmime.lib gdi.lib estor.lib efsrv.lib fbscli.lib
 library         bitgdi.lib ws32.lib bafl.lib
 library         apserv.lib apfile.lib
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-library			scrclient.lib
-#endif
-
 #ifdef USE_IH_RAISE_EVENT
+APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 LIBRARY			instrumentationhandler.lib
 #endif // USE_IH_RAISE_EVENT
 
@@ -64,12 +57,7 @@ library sysutil.lib
 
 macro			SYMBIAN_SUPPORT_UI_FRAMEWORKS_V1
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	deffile APGRFX.DEF
-#else
-	deffile apgrfx_legacy.def
-#endif
-
+deffile			APGRFX.DEF
 
 START WINS
 	baseaddress	0x42F00000

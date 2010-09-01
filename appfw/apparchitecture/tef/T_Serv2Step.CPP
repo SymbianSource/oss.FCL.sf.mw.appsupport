@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -48,36 +48,6 @@
 #include <eikenv.h>
 #include "TAppEmbedUids.h"
 #include "appfwk_test_utils.h"
-#include "T_SisFileInstaller.h"  
-
-_LIT(KTstAppStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TSTAPP_standalone.sis");
-_LIT(KTstAppStandAloneComponent, "TSTAPP_standalone");
-
-_LIT(KAppEmbeddableEmbeddedSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddable_embedded.sis");
-_LIT(KAppEmbeddableEmbeddedComponent, "TAppEmbeddable_embedded");
-
-_LIT(KAppNotEmbeddableV2SisFile, "z:\\apparctest\\apparctestsisfiles\\TAppNotEmbeddable_v2.sis");
-_LIT(KAppNotEmbeddableV2Component, "TAppNotEmbeddable_v2");
-
-_LIT(KAppEmbeddableOnlyV2SisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableOnly_v2.sis");
-_LIT(KAppEmbeddableOnlyV2Component, "TAppEmbeddableOnly_v2");
-
-_LIT(KAppEmbeddableStandaloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddable_standalone.sis");
-_LIT(KAppEmbeddableStandaloneComponent, "TAppEmbeddable_standalone");
-
-_LIT(KAppEmbeddableUiNotStandAloneV2SisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableUiNotStandAlone_v2.sis");
-_LIT(KAppEmbeddableUiNotStandAloneV2Component, "TAppEmbeddableUiNotStandAlone_v2");
-
-_LIT(KAppEmbeddableUiOrStandAloneEmbeddedSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableUiOrStandAlone_embedded.sis");
-_LIT(KAppEmbeddableUiOrStandAloneEmbeddedComponent, "TAppEmbeddableUiOrStandAlone_embedded");
-
-
-_LIT(KAppEmbeddableUiOrStandAloneStandaloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableUiOrStandAlone_standalone.sis");
-_LIT(KAppEmbeddableUiOrStandAloneStandaloneComponent, "TAppEmbeddableUiOrStandalone_standalone");
-                                                       
-_LIT(KSimpleAppSisFile, "z:\\apparctest\\apparctestsisfiles\\SimpleApparcTestApp.sis");
-_LIT(KSimpleAppComponent, "SimpleApparcTestApp");
-
 
 // Constants
 const TInt KOneSecondDelay = 1000000;
@@ -135,11 +105,8 @@ void CT_Serv2Step::AppInfoTest1(RApaLsSession& aLs)
 	{
 	_LIT(KLitAppPath,"z:\\sys\\bin\\tstapp.exe");
 	TFullName appPath(KLitAppPath);
-	
-
 	//Search for TestApp
 	TApaAppInfo info;
-	
 	TInt ret = aLs.GetAllApps();
 	TEST(ret==KErrNone);
 	
@@ -1420,12 +1387,27 @@ void CT_Serv2Step::DoInterrogationTestsL(RApaLsSession& aLs)
  */
 void CT_Serv2Step::DoInstallationTestL (RApaLsSession ls)
  	{
+ 	_LIT(KTestAppDestDir, "C:\\private\\10003a3f\\import\\apps\\" );
+ 	_LIT(KTestAppSource, "Z:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc" );
+ 	_LIT(KTestAppDest, "C:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc" );
 
+ 	_LIT(KTestWaitingForApplistUpdate,"\nWaiting %d microseconds for applist to be updated");
+ 	const TInt KApplistUpdateTime = 8000000;
+
+ 	// Copy App files around and delete them to check whether 
+	// the app list updates and stores the cache correctly.
+ 	RFs	theFs;
+ 	theFs.Connect();
  
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
-    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppStandAloneSisFile);
-    
+ 	// Remove Test app from the file system
+ 	CFileMan* fileManager = CFileMan::NewL (theFs);
+ 
+ 	INFO_PRINTF1(_L("Copying the app to C"));
+ 	TEST(KErrNone == fileManager->Copy (KTestAppSource, KTestAppDest, CFileMan::ERecurse));
+ 	
+ 	INFO_PRINTF2(KTestWaitingForApplistUpdate, KApplistUpdateTime);
+ 	User::After(KApplistUpdateTime);
+ 
  	TApaAppInfo aInfo;
  	TEST(KErrNone == ls.GetAppInfo (aInfo, KUidTestApp));
 
@@ -1435,10 +1417,15 @@ void CT_Serv2Step::DoInstallationTestL (RApaLsSession ls)
 	TEST(parse.Drive ().CompareF (KCdrive) == 0);
  
  	INFO_PRINTF1(_L("Removing the app from C"));
-
- 
+	TTime tempTime(0);
+	fileManager->Attribs(KTestAppDest,0,KEntryAttReadOnly, tempTime, CFileMan::ERecurse);
+ 	TEST(KErrNone == fileManager->Delete (KTestAppDest, CFileMan::ERecurse));
+	INFO_PRINTF1(_L("Removing the app dir from C"));
+	TEST(fileManager->RmDir(KTestAppDestDir)==KErrNone);
  	
- 	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KTstAppStandAloneComponent);
+	INFO_PRINTF2(KTestWaitingForApplistUpdate, KApplistUpdateTime);
+	User::After(KApplistUpdateTime);
+ 
  	// That should put the file in the right place
  	TEST(KErrNone == ls.GetAppInfo( aInfo, KUidTestApp));
 
@@ -1446,7 +1433,9 @@ void CT_Serv2Step::DoInstallationTestL (RApaLsSession ls)
  	_LIT (KZdrive, "Z:");
 	INFO_PRINTF1(_L("Comparing App drive location is Z:... "));
  	TEST((parse1.Drive().CompareF(KZdrive)) == 0);
-
+ 	
+ 	delete fileManager;
+ 	theFs.Close();
  }
 
 //
@@ -1768,24 +1757,6 @@ TVerdict CT_Serv2Step::doTestStepPreambleL()
    Override of base class virtual
  */
 	{
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableEmbeddedSisFile);
-    sisFileInstaller.InstallSisL(KAppEmbeddableEmbeddedSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppNotEmbeddableV2SisFile);
-    sisFileInstaller.InstallSisL(KAppNotEmbeddableV2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableOnlyV2SisFile);
-    sisFileInstaller.InstallSisL(KAppEmbeddableOnlyV2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableStandaloneSisFile);
-    sisFileInstaller.InstallSisL(KAppEmbeddableStandaloneSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableUiNotStandAloneV2SisFile);
-    sisFileInstaller.InstallSisL(KAppEmbeddableUiNotStandAloneV2SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableUiOrStandAloneEmbeddedSisFile);
-    sisFileInstaller.InstallSisL(KAppEmbeddableUiOrStandAloneEmbeddedSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KSimpleAppSisFile);
-    sisFileInstaller.InstallSisL(KSimpleAppSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableUiOrStandAloneStandaloneSisFile);
-    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KAppEmbeddableUiOrStandAloneStandaloneSisFile); 
-    
 	SetTestStepResult(EPass);
 	return TestStepResult();
 	}
@@ -1796,16 +1767,6 @@ TVerdict CT_Serv2Step::doTestStepPostambleL()
    Override of base class virtual
  */
 	{
-    CSisFileInstaller sisFileInstaller;
-    sisFileInstaller.UninstallSisL(KAppEmbeddableEmbeddedComponent);
-    sisFileInstaller.UninstallSisL(KAppNotEmbeddableV2Component);
-    sisFileInstaller.UninstallSisL(KAppEmbeddableOnlyV2Component);
-    sisFileInstaller.UninstallSisL(KAppEmbeddableStandaloneComponent);
-    sisFileInstaller.UninstallSisL(KAppEmbeddableUiNotStandAloneV2Component);
-    sisFileInstaller.UninstallSisL(KAppEmbeddableUiOrStandAloneEmbeddedComponent);
-    sisFileInstaller.UninstallSisL(KAppEmbeddableUiOrStandAloneStandaloneComponent);
-    sisFileInstaller.UninstallSisL(KSimpleAppComponent);
-    
 	return TestStepResult();
 	}
 

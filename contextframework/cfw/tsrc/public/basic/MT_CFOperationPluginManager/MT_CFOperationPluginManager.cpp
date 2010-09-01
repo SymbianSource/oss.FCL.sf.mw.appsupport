@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -27,6 +27,7 @@
 
 //  INTERNAL INCLUDES
 #include "cfscripthandler.h"
+#include "cfenvutils.h"
 
 // CONSTRUCTION
 MT_CFOperationPluginManager* MT_CFOperationPluginManager::NewL()
@@ -50,6 +51,8 @@ MT_CFOperationPluginManager* MT_CFOperationPluginManager::NewLC()
 // Destructor (virtual by CBase)
 MT_CFOperationPluginManager::~MT_CFOperationPluginManager()
     {
+    // Enable screen saver
+    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -63,6 +66,9 @@ void MT_CFOperationPluginManager::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
+
+    // Disable screen saver
+    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 //  METHODS

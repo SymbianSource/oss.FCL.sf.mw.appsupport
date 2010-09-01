@@ -18,7 +18,7 @@
 
 // INCLUDE FILES
 #include <e32property.h>
-#include "coreapplicationuisinternalpskeys.h"
+#include "CoreApplicationUIsInternalPSKeys.h"
 #include "NspsWsPluginDllStd.h"
 #include "NspsWsPlugin.h"         // this
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -29,10 +29,6 @@
 #endif //SYMBIAN_ENABLE_SPLIT_HEADERS
 #include "../apserv/apsclsv.h"
 #include "t_largestackstep.h"
-#include "T_SisFileInstaller.h"
-
-_LIT(KLargeStackAppSisFile, "z:\\apparctest\\apparctestsisfiles\\tlargestackapp.sis");
-_LIT(KLargeStackAppComponent, "tlargestackapp");
 
 const TUid KLargeStackAppUid = {0x10282B27};
 
@@ -97,33 +93,6 @@ void CT_LargeStackStep::TestLargeStackL()
 	// Cleanup
 	CleanupStack::PopAndDestroy(commandline);
 	}
-
-TVerdict CT_LargeStackStep::doTestStepPreambleL()
-/**
-   @return - TVerdict code
-   Override of base class virtual
- */
-    {
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KLargeStackAppSisFile);
-    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KLargeStackAppSisFile); 
-    
-    SetTestStepResult(EPass);
-    return TestStepResult();
-    }
-
-TVerdict CT_LargeStackStep::doTestStepPostambleL()
-/**
-   @return - TVerdict code
-   Override of base class virtual
- */
-    {
-    CSisFileInstaller sisFileInstaller;
-    sisFileInstaller.UninstallSisL(KLargeStackAppComponent); 
-    
-    return TestStepResult();
-    }
-
 
 TVerdict CT_LargeStackStep::doTestStepL()
 	{

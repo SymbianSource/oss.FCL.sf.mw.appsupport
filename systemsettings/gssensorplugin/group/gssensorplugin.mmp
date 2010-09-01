@@ -74,13 +74,11 @@ LIBRARY   eikcore.lib
 LIBRARY   egul.lib              // For GulIcon in checkbox icons
 LIBRARY   eikctl.lib            // For checkbox icons
 
-LIBRARY   commonengine.lib      // For RConeResourceLoader
-LIBRARY   featmgr.lib           // Feature manager 
-LIBRARY   centralrepository.lib // for CenRep
+LIBRARY   CommonEngine.lib      // For RConeResourceLoader
+LIBRARY   FeatMgr.lib           // Feature manager 
+LIBRARY   CentralRepository.lib // for CenRep
 LIBRARY   aknskins.lib          // for enhanced skinning
 LIBRARY   hlplch.lib            // for "Help" options menu
-LIBRARY   gsframework.lib       // For base classes
-LIBRARY   gslistbox.lib         // For CGSListBoxItemTextArray
-LIBRARY   gsecomplugin.lib      // For base classes
-
-SMPSAFE
+LIBRARY   GSFramework.lib       // For base classes
+LIBRARY   GSListBox.lib         // For CGSListBoxItemTextArray
+LIBRARY   GSEcomPlugin.lib      // For base classes

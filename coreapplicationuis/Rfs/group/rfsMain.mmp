@@ -19,7 +19,7 @@
 
 #include <platform_paths.hrh>
 
-TARGET rfsserver.exe
+TARGET RfsServer.exe
 TARGETTYPE exe
 SOURCEPATH ../src
 VENDORID VID_DEFAULT

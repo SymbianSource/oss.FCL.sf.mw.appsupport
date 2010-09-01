@@ -433,13 +433,3 @@ EXPORTS
 	X @ 432 NONAME ABSENT
 	_ZN13RApaLsSession40ForceCommitNonNativeApplicationsUpdatesLEv @ 433 NONAME
 	_ZNK13RApaLsSession13RecognizeDataERK6TDesC8R22TDataRecognitionResult @ 434 NONAME
-	_ZN13RApaLsSession14UpdateAppListLER6RArrayI17TApaAppUpdateInfoE @ 435 NONAME
-	_ZN17TApaAppUpdateInfo12InternalizeLER11RReadStream @ 436 NONAME
-	_ZN17TApaAppUpdateInfoC1Ev @ 437 NONAME
-	_ZN17TApaAppUpdateInfoC2Ev @ 438 NONAME
-	_ZNK17TApaAppUpdateInfo12ExternalizeLER12RWriteStream @ 439 NONAME
-	_ZN17TApaAppUpdateInfoC1E4TUidNS_13TApaAppActionE @ 440 NONAME
-	_ZN17TApaAppUpdateInfoC2E4TUidNS_13TApaAppActionE @ 441 NONAME
-	_ZN13RApaLsSession16UpdatedAppsInfoLER6RArrayI17TApaAppUpdateInfoE @ 442 NONAME
-	_ZN13RApaLsSession17ForceRegistrationERK13RPointerArrayIN4Usif28CApplicationRegistrationDataEE @ 443 NONAME
-

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -69,12 +69,6 @@ CSysApCenRepLogsObserver::~CSysApCenRepLogsObserver()
 
 void CSysApCenRepLogsObserver::ConstructL()
     {
-    const TUid KCRUidLogs = {0x101F874E};
-    /**
-    * Informs the Logs application about the amount of new missed calls.
-    * Integer type
-    **/
-    const TUint32 KLogsNewMissedCalls = 0x00000006;
     TRAPD( err, iSession = CRepository::NewL( KCRUidLogs ) );
     TRACES( RDebug::Print( _L("CSysApCenRepLogsObserver::ConstructL: err=%d (KCRUidLogs)"), err ) );
     User::LeaveIfError( err );
@@ -85,7 +79,7 @@ void CSysApCenRepLogsObserver::ConstructL()
                                     KLogsNewMissedCalls );
                                     iNewMissedCallsHandler->StartListeningL();
     
-    iSession->Get(KLogsNewMissedCalls, iMissedCallsValue);
+    User::LeaveIfError(iSession->Get(KLogsNewMissedCalls, iMissedCallsValue));
     }
 
 // ----------------------------------------------------------------------------
@@ -154,9 +148,9 @@ void CSysApCenRepLogsObserver::UpdateMissedCallsIndicatorL()
     
     if ( iSimChangedCheckDone && iUiReady )
         {
-//        TInt newState( iMissedCallsValue > 0 ? EAknIndicatorStateOn : EAknIndicatorStateOff );
+        TInt newState( iMissedCallsValue > 0 ? EAknIndicatorStateOn : EAknIndicatorStateOff );
         
-//        iSysApAppUi.SetIndicatorStateL( EAknIndicatorMissedCalls, newState );
+        iSysApAppUi.SetIndicatorStateL( EAknIndicatorMissedCalls, newState );
         }
     }
 

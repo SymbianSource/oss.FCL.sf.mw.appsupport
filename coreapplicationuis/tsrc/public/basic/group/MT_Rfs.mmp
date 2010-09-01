@@ -32,8 +32,7 @@ SOURCE                  MT_Rfs_DllMain.cpp
 USERINCLUDE             ../MT_Rfs/Src .
 
 MW_LAYER_SYSTEMINCLUDE
-
-SYSTEMINCLUDE           /epoc32/include/Digia/EUnit
+SYSTEMINCLUDE           /epoc32/include/platform/Digia/EUnit
 
 LIBRARY                 EUnit.lib
 LIBRARY                 EUnitUtil.lib

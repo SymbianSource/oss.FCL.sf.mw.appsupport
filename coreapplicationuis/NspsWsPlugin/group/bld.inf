@@ -20,7 +20,7 @@ PRJ_PLATFORMS
 DEFAULT
 
 PRJ_EXPORTS
-../inc/NspsWsPluginDllStd.h |../../inc/nspswsplugindllstd.h
+../inc/NspsWsPluginDllStd.h |../../inc/NspsWsPluginDllStd.h
 
 PRJ_MMPFILES
 ../group/NspsWsPlugin.mmp

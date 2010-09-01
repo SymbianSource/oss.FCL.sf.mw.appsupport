@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -42,11 +42,6 @@
 
 #include "appfwk_test_utils.h"
 #include "T_NotifStep.h"
-#include "T_SisFileInstaller.h"
-
-_LIT(KApparcTestAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TApparcTestApp.sis");
-_LIT(KApparcTestAppComponent, "TApparcTestApp");
-
 
 _LIT(KImportAppsDir,"c:\\private\\10003a3f\\import\\apps\\");
 _LIT(KResourceAppsDir,"c:\\resource\\apps\\");
@@ -145,10 +140,9 @@ void CT_NotifStep::TestAppNotificationL()
 	{
 	// Force the applist to be updated 
 	//To ensure that server has time to count all applications in the system
-    TRequestStatus status;
-    iSession.SetNotify(ETrue, status);
-    User::WaitForRequest(status);
-    
+	RPointerArray<TDesC> dummy;
+	User::LeaveIfError(iSession.ForceRegistration(dummy));
+
 	TInt theAppCount = 0;
 	TInt theErr1 = iSession.AppCount(theAppCount);
 	TEST(theErr1==KErrNone);
@@ -161,12 +155,10 @@ void CT_NotifStep::TestAppNotificationL()
 	CleanupStack::PushL(notif);
 	obs->iNotifier=notif;	
 	INFO_PRINTF1(_L("Creating and deleting apps for notification"));
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KApparcTestAppSisFile);
-    sisFileInstaller.InstallSisAndWaitForAppListUpdateL(KApparcTestAppSisFile);
+	CreateAppL(_L("AAA"));
 
 	CActiveScheduler::Start();
-
+	
 	TInt theAppCount1 = 0;
 	theErr1 = iSession.AppCount(theAppCount1);
 	TEST((theAppCount1 - 1) == theAppCount);
@@ -177,12 +169,13 @@ void CT_NotifStep::TestAppNotificationL()
 	CleanupStack::PushL(notif);
 	obs->iNotifier = notif;
 	INFO_PRINTF1(_L("Deleting the application"));
-	sisFileInstaller.UninstallSisL(KApparcTestAppComponent);
+	DeleteAppL(_L("AAA")); 
+
 	CActiveScheduler::Start();
 	
 	CleanupStack::PopAndDestroy(notif);	
+	User::LeaveIfError(iSession.ForceRegistration(dummy));	
 	theErr1 = iSession.AppCount(theAppCount1);
-	
 	TEST(theErr1==KErrNone);
 	TEST(theAppCount1 == theAppCount);
 	
@@ -483,33 +476,24 @@ TVerdict CT_NotifStep::doTestStepL()
 	TEST(KErrNone == iSession.Connect());
 	TEST(KErrNone == iUtils.Connect());
 
-    TApaAppInfo info;
-    TUid uid = {0x100048F3};
-    TInt err = iSession.GetAppInfo(info, uid);
-    if(err == KErrNone)
-        {       
-        CSisFileInstaller sisFileInstaller;
-        sisFileInstaller.UninstallSisL(KApparcTestAppComponent);
-        }
-	
 	// run the testcode (inside an alloc heaven harness)	
 	__UHEAP_MARK;
 	iUtils.Connect();
-//#if defined (__WINSCW__)
-//	INFO_PRINTF1(_L("T-NotifStep-TTestIconFileNotificationL Test Started..."));
-//	TRAP(ret,TestIconFileNotificationL());
-//	TEST(ret==KErrNone);
-//	INFO_PRINTF2(_L("TestIconFileNotificationL() finished with return code '%d'\n"), ret);
-//#endif
+#if defined (__WINSCW__)
+	INFO_PRINTF1(_L("T-NotifStep-TTestIconFileNotificationL Test Started..."));
+	TRAP(ret,TestIconFileNotificationL());
+	TEST(ret==KErrNone);
+	INFO_PRINTF2(_L("TestIconFileNotificationL() finished with return code '%d'\n"), ret);
+#endif
 	INFO_PRINTF1(_L("T-NotifStep-TestAppNotificationL Test Started..."));
 	TRAP(ret,TestAppNotificationL());
 	TEST(ret==KErrNone);
 	INFO_PRINTF2(_L("TestAppNotificationL() finished with return code '%d'\n"), ret);
 
-//	INFO_PRINTF1(_L("TestForceRegistrationNotificationL Test Started..."));
-//	TRAP(ret, TestForceRegistrationNotificationL());
-//	TEST(ret==KErrNone);	
-//	INFO_PRINTF2(_L("TestForceRegistrationNotificationL() finished with return code '%d'\n"), ret);
+	INFO_PRINTF1(_L("TestForceRegistrationNotificationL Test Started..."));
+	TRAP(ret, TestForceRegistrationNotificationL());
+	TEST(ret==KErrNone);	
+	INFO_PRINTF2(_L("TestForceRegistrationNotificationL() finished with return code '%d'\n"), ret);
 	iUtils.Close();	
 	__UHEAP_MARKEND;
 	

@@ -44,5 +44,3 @@ MW_LAYER_SYSTEMINCLUDE
 LIBRARY         ecom.lib
 LIBRARY         euser.lib
 LIBRARY         fbscli.lib
-
-SMPSAFE

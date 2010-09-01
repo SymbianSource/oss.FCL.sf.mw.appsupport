@@ -26,33 +26,33 @@ PRJ_EXPORTS
 ../rom/VariatedSettings_variant.iby     CUSTOMER_MW_LAYER_IBY_EXPORT_PATH(VariatedSettings_variant.iby)
 
 // Normal RFS script
-../scripts/script0.txt /epoc32/release/winscw/udeb/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/winscw/urel/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/thumb/udeb/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/thumb/urel/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/arm4/udeb/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/arm4/urel/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/armv5/udeb/z/private/100059c9/script0.txt
-../scripts/script0.txt /epoc32/release/armv5/urel/z/private/100059c9/script0.txt
+../scripts/script0.txt /epoc32/release/winscw/udeb/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/winscw/urel/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/thumb/udeb/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/thumb/urel/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/arm4/udeb/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/arm4/urel/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/armv5/udeb/z/private/100059C9/script0.txt
+../scripts/script0.txt /epoc32/release/armv5/urel/z/private/100059C9/script0.txt
 
 // Deep RFS script
-../scripts/script1.txt /epoc32/release/winscw/udeb/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/winscw/urel/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/thumb/udeb/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/thumb/urel/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/arm4/udeb/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/arm4/urel/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/armv5/udeb/z/private/100059c9/script1.txt
-../scripts/script1.txt /epoc32/release/armv5/urel/z/private/100059c9/script1.txt
+../scripts/script1.txt /epoc32/release/winscw/udeb/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/winscw/urel/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/thumb/udeb/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/thumb/urel/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/arm4/udeb/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/arm4/urel/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/armv5/udeb/z/private/100059C9/script1.txt
+../scripts/script1.txt /epoc32/release/armv5/urel/z/private/100059C9/script1.txt
 
 // Init RFS script
-../scripts/ScriptInit.txt /epoc32/release/winscw/udeb/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/winscw/urel/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/thumb/udeb/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/thumb/urel/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/arm4/udeb/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/arm4/urel/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/armv5/udeb/z/private/100059c9/scriptinit.txt
-../scripts/ScriptInit.txt /epoc32/release/armv5/urel/z/private/100059c9/scriptinit.txt
+../scripts/ScriptInit.txt /epoc32/release/winscw/udeb/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/winscw/urel/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/thumb/udeb/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/thumb/urel/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/arm4/udeb/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/arm4/urel/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/armv5/udeb/z/private/100059C9/ScriptInit.txt
+../scripts/ScriptInit.txt /epoc32/release/armv5/urel/z/private/100059C9/ScriptInit.txt
 
 PRJ_MMPFILES

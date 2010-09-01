@@ -21,8 +21,8 @@ NAME RFST
 #include <appinfo.rh>
 #include <avkon.rh>
 #include <avkon.rsg>
-#include <commondialogs.hrh>
-#include <commondialogs.rh>
+//#include <commondialogs.hrh>
+//#include <commondialogs.rh>
 #include <eikon.rh>
 #include <avkon.loc>
 #include "rfstestappcmds.hrh"
@@ -120,17 +120,19 @@ RESOURCE MENU_PANE r_rfstestapp_main_menu_pane
 // r_rfstestapp_memory_selection
 // ---------------------------------------------------------------------------
 //
+/*
 RESOURCE MEMORYSELECTIONDIALOG r_rfstestapp_memory_selection
     {
     title = "";
     softkey_1 = "Ok";
     }
-
+*/
 
 // ---------------------------------------------------------------------------
 // r_rfstestapp_specfile_selection
 // ---------------------------------------------------------------------------
 //
+/*
 RESOURCE FILESELECTIONDIALOG r_rfstestapp_specfile_selection
     {
     title = "Select Data Specification File";
@@ -147,13 +149,14 @@ RESOURCE FILESELECTIONDIALOG r_rfstestapp_specfile_selection
             filter_data = { "*.spc" };
             }
         };
-    }
+    }*/
 
 
 // ---------------------------------------------------------------------------
 // r_rfstestapp_excludelist_selection
 // ---------------------------------------------------------------------------
 //
+/*
 RESOURCE FILESELECTIONDIALOG r_rfstestapp_excludelist_selection
     {
     title = "Select Exclude List File";
@@ -171,7 +174,7 @@ RESOURCE FILESELECTIONDIALOG r_rfstestapp_excludelist_selection
             }
         };
     }
-
+*/
 
 // ---------------------------------------------------------------------------
 // r_rfstestapp_progress

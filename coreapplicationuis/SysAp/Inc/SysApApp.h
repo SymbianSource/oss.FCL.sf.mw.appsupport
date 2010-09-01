@@ -20,8 +20,7 @@
 #define SYSAPAPP_H
 
 // INCLUDES
-//#include <aknapp.h>
-#include <eikapp.h>
+#include <aknapp.h>
 
 // CONSTANTS
 const TUid KUidSysAp={0x100058F3};
@@ -34,7 +33,7 @@ const TUid KUidSysAp={0x100058F3};
 *  @since 1.0
 */
 
-class CSysApApp : public CEikApplication 
+class CSysApApp : public CAknApplication
     {
     private: // from CApaApplication
         /**

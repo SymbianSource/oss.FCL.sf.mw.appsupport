@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -16,16 +16,15 @@
 */
 
 
-
- #include <eikappui.h>
-
+#include <aknappui.h>
+#include <aknsoundsystem.h>
 #include <centralrepository.h>
 #include <featmgr.h>
 #include <MediatorDomainUIDs.h>
 #include <Profile.hrh>
 #include <ProfileEngineSDKCRKeys.h>
 #include "sanimengine.h"
-#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
+#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
 
 #include "sanimstartupctrl.h"
 #include "trace.h"
@@ -36,7 +35,7 @@ const TInt KMaxVolume( 10000 ); /** Maximum allowed volume level. */
 const TInt KDefaultRepeatCount( 1 ); /** Default repeat count for animation and tone. */
 const TInt KDefaultVolumeRamp( 0 );  /** Default volume ramp value in microseconds. */
 
-//static const TInt KMediatorTimeout( 1000000 ); /** Default timeout for Mediator commands. */
+static const TInt KMediatorTimeout( 1000000 ); /** Default timeout for Mediator commands. */
 
 // ======== LOCAL FUNCTIONS ========
 
@@ -198,7 +197,7 @@ void CSAnimStartupCtrl::Start( TRequestStatus& aStatus )
         else if ( iCommandInitiator )
             {
             INFO_1( "Secondary display data: %d", iSyncCommand );
-		
+
             iClientStatus = &aStatus;
             iWaitingForSyncResponse = ETrue;
             TInt errorCode = iCommandInitiator->IssueCommand(
@@ -315,7 +314,7 @@ void CSAnimStartupCtrl::CommandResponseL(
         {
         iWaitingForSyncResponse = EFalse;
         StartAnimation();
-       }
+        }
     }
 
 
@@ -350,7 +349,21 @@ EXPORT_C void CSAnimStartupCtrl::ConstructL(
         FeatureManager::FeatureSupported( KFeatureIdCoverDisplay );
     FeatureManager::UnInitializeLib();
 
-   
+    if ( secondaryDisplaySupported )
+        {
+        iCommandInitiator = CMediatorCommandInitiator::NewL( this );
+        iCommandResponder = CMediatorCommandResponder::NewL( this );
+
+        TInt errorCode = iCommandResponder->RegisterCommand(
+            KMediatorSecondaryDisplayDomain,
+            SecondaryDisplay::KCatStartup,
+            SecondaryDisplay::ECmdStartupPhaseSkip,
+            TVersion( 0, 0, 0 ),
+            ECapabilitySwEvent,
+            KMediatorTimeout );
+        ERROR( errorCode, "Failed to register command ECmdStartupPhaseSkip with mediator" );
+        User::LeaveIfError( errorCode );
+        }
 
     CSAnimCtrl::BaseConstructL( aRect, aContainer );
     }
@@ -491,7 +504,7 @@ void CSAnimStartupCtrl::StartAnimation()
         if ( iPlayDefaultBeep )
             {
             INFO( "Default startup beep requested" );
-            /*
+
             CAknAppUi* appUi = static_cast<CAknAppUi*>( iEikonEnv->EikAppUi() );
             if ( appUi )
                 {
@@ -499,7 +512,6 @@ void CSAnimStartupCtrl::StartAnimation()
 
                 appUi->KeySounds()->PlaySound( EAvkonSIDPowerOnTone );
                 }
-             */
             }
 
         iEngine->Start( *iClientStatus );

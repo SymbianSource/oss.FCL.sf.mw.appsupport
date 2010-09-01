@@ -38,17 +38,12 @@
 #include <s32file.h>
 #include "../apgrfx/apprivate.h"
 #include "apgnotif.h"
+#include "../aplist/aplappregfinder.h"
 #include "ApLaunchChecker.h"
+#include "apsnnapps.h"
 #include "../aplist/aplapplistitem.h"
 
 #include "apsecutils.h"
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-#include "../aplist/aplappregfinder.h"
-#include "apsnnapps.h"
-#else
-#include "usif/scr/scr.h"
-#endif
 
 const TInt KApaAppListServMaxBuffer=256;
 #include "APSRECCACHE.h"
@@ -152,34 +147,21 @@ CApaAppListServSession* CApaAppListServSession::NewL(RFs& aFs, CApaAppArcServer&
 	return self;
 	}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  
 CApaAppListServSession::CApaAppListServSession(RFs& aFs, CApaAppArcServer& aAppArcSrv, CApaAppList& aAppList)
  : iFs(aFs), iAppArcSrv(aAppArcSrv), iAppList(aAppList), iApaAppInfoArray(KApaAppInfoArrayGranularity)
 	{
 
 	}
-#else
-CApaAppListServSession::CApaAppListServSession(RFs& aFs, CApaAppArcServer& aAppArcSrv, CApaAppList& aAppList)
- : iFs(aFs), iAppArcSrv(aAppArcSrv), iAppList(aAppList), iApaAppInfoArray(KApaAppInfoArrayGranularity), 
-   iNotificationRequested(EFalse)
-	{
-
-	}
-#endif
 
 void CApaAppListServSession::ConstructL()
 	{
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	iNonNativeApplicationsManager = CApsNonNativeApplicationsManager::NewL(iAppArcSrv,iFs);
-#endif
 	}
 	
 
 CApaAppListServSession::~CApaAppListServSession()
 	{
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	delete iNonNativeApplicationsManager;
-#endif
 	iApaAppInfoArray.ResetAndDestroy();
 	iApaAppInfoArray.Close();
 	}
@@ -269,68 +251,36 @@ void CApaAppListServSession::DoServiceL(const RMessage2& aMessage)
 		ApplicationLanguageL(aMessage);
 		break;
 	case EAppListServAppInfoProvidedByRegistrationFile: // private OpCode for CEikApplication's use only
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 		AppInfoProvidedByRegistrationFileL(aMessage);
-#else
-		ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif		
 		break;
 	case EAppListServAppIconFileName:
 		IconFileNameL(aMessage);
 		break;
 	case EAppListServAppViewIconFileName:
 		ViewIconFileNameL(aMessage);
-		break;
+		break;	
 	case EAppListServPrepareNonNativeApplicationsUpdates:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 		iNonNativeApplicationsManager->PrepareNonNativeApplicationsUpdatesL();
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif		
 		break;
 	case EAppListServRegisterNonNativeApplication:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 		iNonNativeApplicationsManager->RegisterNonNativeApplicationL(aMessage);
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif		
 		break;
 	case EAppListServDeregisterNonNativeApplication:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 		iNonNativeApplicationsManager->DeregisterNonNativeApplicationL(aMessage);
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif
 		break;
 	case EAppListServCommitNonNativeApplications:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 		iNonNativeApplicationsManager->CommitNonNativeApplicationsUpdatesL(aMessage);
 		completeMessage=EFalse;
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif		
 		break;
 	case EAppListServRollbackNonNativeApplications:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 		iNonNativeApplicationsManager->RollbackNonNativeApplicationsUpdates();
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif		
 		break;
 	case EAppListServGetAppType:
 		GetAppTypeL(aMessage);
 		break;
 	case EAppListServForceRegistration:
 		ForceRegistrationL(aMessage);
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 		
 		completeMessage=EFalse;
-#endif		
 		break;
 	case EMatchesSecurityPolicy:
 		MatchesSecurityPolicyL(aMessage);
@@ -345,41 +295,25 @@ void CApaAppListServSession::DoServiceL(const RMessage2& aMessage)
 	#endif
 		break;
 	case EDebugAddFailingNonNativeApplicationsUpdate:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	#ifdef _DEBUG
 		iNonNativeApplicationsManager->ForceFailInNonNativeApplicationsUpdatesL();
 	#endif
-#endif
 		break;
 	case EDebugAddPanicingNonNativeApplicationsUpdate:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	#ifdef _DEBUG
 		iNonNativeApplicationsManager->ForcePanicInNonNativeApplicationsUpdatesL();
 	#endif
-#endif	
 		break;
 	case EDebugAddRollbackPanicingNonNativeApplicationsUpdate:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	#ifdef _DEBUG
 		iNonNativeApplicationsManager->ForcePanicInNonNativeApplicationsRollbackL();
 	#endif
-#endif	
 		break;
-		
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 		
-	case EAppListServUpdateAppList:
-	    UpdateAppListL(aMessage);
-	    break;
-    case EAppListUpdatedAppsInfo:
-        UpdatedAppsInfoL(aMessage);
-        break;
-#endif	    
 	default:
 		aMessage.Panic(KApaPanicCli,EClientBadRequest);
 		break;
-	
 		}
-	
+		
 	if (completeMessage && !aMessage.IsNull())
 		aMessage.Complete(KErrNone);
 	}
@@ -421,18 +355,6 @@ CApaAppArcServSession::~CApaAppArcServSession()
 
 void CApaAppArcServSession::ServiceL(const RMessage2& aMessage)
 	{
-#ifdef APPARC_SHOW_TRACE    
-    TFullName* name = new(ELeave) TFullName();
-    RThread client;
-    if ( aMessage.Client( client ) == KErrNone )
-        {
-        client.FullName( *name );
-        client.Close();
-        }
-    RDebug::Print( _L("[Apparc] CApaAppListServSession::ServiceL(0x%08x) - START - op code: %04d, client: %S"), this, aMessage.Function(), name );
-    delete name; 
-#endif
-    
 	TBool completeMessage = ETrue;
 	switch (aMessage.Function())
 		{
@@ -550,20 +472,10 @@ void CApaAppArcServSession::ServiceL(const RMessage2& aMessage)
 		}
 		break;
 	case EAppListServRegisterNonNativeApplicationType:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 		RegisterNonNativeApplicationTypeL(aMessage);
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif
 		break;
 	case EAppListServDeregisterNonNativeApplicationType:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 		DeregisterNonNativeApplicationTypeL(aMessage);
-#else
-        ASSERT(0);  // panic debug only
-        User::Leave(KErrNotSupported);
-#endif		
 		break;
 	case EAppListServPreferredBufSize:
 		aMessage.Complete(PreferredBufSize());
@@ -624,15 +536,9 @@ void CApaAppArcServSession::ServiceL(const RMessage2& aMessage)
 		break;
 	default:
 		iAppListSession->DoServiceL(aMessage);
-#ifdef APPARC_SHOW_TRACE   
-		RDebug::Print( _L("[Apparc] CApaAppListServSession::ServiceL(0x%08x) - END - op code: %04d, completeMessage: %d"), this, aMessage.Function(), completeMessage );
-#endif		
 		return;
 		}
-	
-#ifdef APPARC_SHOW_TRACE 	
-    RDebug::Print( _L("[Apparc] CApaAppListServSession::ServiceL(0x%08x) - END - op code: %04d, completeMessage: %d"), this, aMessage.Function(), completeMessage );
-#endif	
+		
 	if (completeMessage && !aMessage.IsNull())
 		aMessage.Complete(KErrNone);
 	}
@@ -660,7 +566,6 @@ TInt CApaAppArcServSession::PreferredBufSize() const
 	return (err==KErrNone) ? Min(iMaxBufSize, preferredBufferSize) : iMaxBufSize;
 	}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 void CApaAppArcServSession::RegisterNonNativeApplicationTypeL(const RMessage2& aMessage)
 	{
 	const TUid applicationType(TUid::Uid(aMessage.Int0()));
@@ -676,55 +581,23 @@ void CApaAppArcServSession::DeregisterNonNativeApplicationTypeL(const RMessage2&
 	const TUid applicationType(TUid::Uid(aMessage.Int0()));
 	iServ.DeregisterNonNativeApplicationTypeL(applicationType);
 	}
-#endif
 
 void CApaAppListServSession::GetAppTypeL(const RMessage2& aMessage)
 	{
-    const TUid KTypeIDToNonNativeUidMapping[2][2]={ {TUid::Uid(0xB031C52A), TUid::Uid(0x10210E26)},  //Java
-                                                    {TUid::Uid(0x7BDB6DA1), TUid::Uid(0x10282821)}}; //Widget 
-   
 	TInt uid = aMessage.Int0();
 	CApaAppData* appData = iAppList.AppDataByUid(TUid::Uid(uid));
 	if (!appData)
-	    {
 		aMessage.Complete(KErrNotFound);
-	    }
 	else
 		{
-		TUid typeId(appData->NonNativeApplicationType());
-		
-		//Check if non-native type to non-native UID mapping available. Otherwise
-		//return whatever returned by NonNativeApplicationType.
-		TUid nonNativeUid=typeId;
-		TInt numMappings= (sizeof(KTypeIDToNonNativeUidMapping)/ (2*sizeof(TUid)));
-		
-		for(TInt index=0; index<numMappings; index++)
-		    {
-            if(typeId == KTypeIDToNonNativeUidMapping[index][0])
-                {
-                nonNativeUid = KTypeIDToNonNativeUidMapping[index][1];
-                break;
-                }
-		    }
-		
-		TPckgBuf<TUid> nonNativeUidBuf(nonNativeUid);
-		aMessage.WriteL(1,nonNativeUidBuf);
+		TPckgBuf<TUid> typeUid(appData->NonNativeApplicationType());
+		aMessage.WriteL(1,typeUid);
 		aMessage.Complete(KErrNone);
 		}
 	}
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  
-void CleanupAndDestroyAppInfoArray(TAny* aRPArray)
-    {
-    RPointerArray<Usif::CApplicationRegistrationData>* rpArray = (static_cast<RPointerArray<Usif::CApplicationRegistrationData>*>(aRPArray));
-    rpArray->ResetAndDestroy();
-    rpArray->Close();
-    }
-#endif
-
+	
 void CApaAppListServSession::ForceRegistrationL(const RMessage2& aMessage)
 	{
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	TInt bufferSize = aMessage.GetDesLength(0);
 	User::LeaveIfError(bufferSize);
 	HBufC8* const buffer=HBufC8::NewLC(bufferSize);
@@ -750,46 +623,8 @@ void CApaAppListServSession::ForceRegistrationL(const RMessage2& aMessage)
 	// Trigger a rescan, when rescan completes it will complete iNotifyOnScanCompleteMsg
 	iNotifyOnScanCompleteMsg=aMessage;
 	iAppArcSrv.UpdateAppsByForceRegistration();
-#else
-	const TUid KUidSisLaunchServer={0x1020473f};
-	
-	if(aMessage.SecureId().iId != KUidSisLaunchServer.iUid)
-	    User::Leave(KErrNotSupported);
-	
-	//Get the size of the updated apps info buffer
-    TInt bufferSize = aMessage.GetDesLength(0);
-
-    //Allocate the buffer of bufferSize and read.
-    HBufC8* const buffer=HBufC8::NewLC(bufferSize);
-    TPtr8 buffer_asWritable(buffer->Des());
-    aMessage.ReadL(0,buffer_asWritable);
-        
-    RDesReadStream readStream(*buffer);
-    CleanupClosePushL(readStream);
-    
-    //Read the number of application information available in the buffer.
-    const TUint count=readStream.ReadUint32L();
-
-    RPointerArray<Usif::CApplicationRegistrationData> appsInfo;
-    TCleanupItem cleanup(CleanupAndDestroyAppInfoArray, &appsInfo); 
-    CleanupStack::PushL(cleanup); 
-    
-    //Read one applciation information at a time and create list of application information.
-    for(TUint index=0; index<count; index++)
-        {
-        Usif::CApplicationRegistrationData* appData= Usif::CApplicationRegistrationData::NewL();
-        CleanupStack::PushL(appData);
-        readStream>>*appData;
-        appsInfo.AppendL(appData);
-        CleanupStack::Pop(appData);
-        }
-    CleanupStack::Pop(); //Remove cleanup
-    CleanupStack::PopAndDestroy(2, buffer); //delete readStream, buffer	
-
-    iAppList.UpdateApplistByForceRegAppsL(appsInfo);
-#endif	
 	}
-
+	
 void CApaAppArcServSession::AppForDocumentPassedByFileHandleL(const RMessage2& aMessage, const TUid* aServiceUid)
 	{
 #if defined(__PROFILE)
@@ -922,75 +757,8 @@ CApaAppData& CApaAppListServSession::FindAppInListL(TUid aUid)
 	if (!FindAppInList(app, dummy, aUid))
 		User::Leave(KErrNotFound);
 
-    return *app;
-    }
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-/**
-locate app in list, return EFalse if it isn't present
-search is regardless of screen mode.
-@internalComponent
-*/
-TBool CApaAppListServSession::FindAppInList(CApaAppData*& aApp, TApaAppEntry& aEntry, TUid aAppUid)
-    {
-    // Look for the app with aAppUid in the applist we keep
-    const CApaAppList& list = iAppList;
-    aApp = list.AppDataByUid(aAppUid);
-    if (aApp)
-        aEntry = aApp->AppEntry();
-    
-    // If the app list is currently in flux, try to nail down the app by looking for it specifically
-    const TBool appPendingOnLangChange = (aApp && list.IsLanguageChangePending() && aApp->IsPending());
-
-    if ((!aApp || appPendingOnLangChange) && !list.IsIdleUpdateComplete())
-        {
-        // 1. App wasn't found, but an app scan is currently in progress,
-        // so try to find and add the specific app we're looking for to the list
-        
-        // 2. On language change event, current app scan could not yet update the found app, 
-        // so try to update the specific app we're looking for, in the list.
-        if(aAppUid != KNullUid)
-            {
-            CApaAppData* app = NULL;
-            TRAPD(err, app = FindSpecificAppL(aAppUid));
-            if (!err && app)
-                {
-                // app has been found and added to the app list
-                aApp = app;
-                aEntry = aApp->AppEntry();
-                }
-            }
-        }
-
-    return (aApp != NULL);
-    }
-
-#else
-/**
-locate app in list, return EFalse if it isn't present
-search is regardless of screen mode.
-@internalComponent
-*/
-TBool CApaAppListServSession::FindAppInList(CApaAppData*& aApp, TApaAppEntry& aEntry, TUid aAppUid)
-    {
-    // Look for the application with aAppUid in the applist
-    const CApaAppList& list = iAppList;
-    aApp = list.AppDataByUid(aAppUid);
-   
-    TBool appListChanging= (list.IsLanguageChangePending()||!list.IsIdleUpdateComplete());
-   //If the application is not in the applist and applist is still getting updated then find the 
-   //requested application specifically and add to applist.
-    TInt err=KErrNone;
-    if( (!aApp && appListChanging) || (aApp && aApp->IsLangChangePending()))
-        TRAP(err, aApp=FindSpecificAppL(aAppUid));
-
-    if (!err && aApp)
-        aEntry = aApp->AppEntry(); 
-    
-    return (aApp != NULL);
-    }
-
-#endif
+	return *app;
+	}
 
 void CApaAppListServSession::SendArrayL(const MArrayItemWriter& aArrayItemWriter,const RMessage2& aMessage) const
 	{
@@ -1259,23 +1027,6 @@ void CApaAppArcServSession::InsertDataMappingL(const RMessage2& aMessage)
               }
           else
               {
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK          
-              Usif::RSoftwareComponentRegistry scrCon;
-              User::LeaveIfError(scrCon.Connect());
-              CleanupClosePushL(scrCon);
-              TApaAppEntry appEntry=appData->AppEntry();
-              
-			  //If component id of an application is non-zero then it is installed by installer
-			  //after phone marketed.
-              TBool isInstalledApp=(scrCon.GetComponentIdForAppL(appEntry.iUidType[2])!=0);
-
-              //data priority for UnTrusted apps would be capped if it is greater than the threshold priority i.e, KMaxTInt16.
-              if (!isSidTrusted && isInstalledApp) 
-                  {
-                  priority = KDataTypeUnTrustedPriorityThreshold; 
-                  }
-              CleanupStack::PopAndDestroy(); //scrCon
-#else
               TPtrC registrationFilePath = appData->RegistrationFileName();
               TInt match = registrationFilePath.MatchF (
                                           KLitPathForUntrustedRegistrationResourceFiles );
@@ -1287,7 +1038,6 @@ void CApaAppArcServSession::InsertDataMappingL(const RMessage2& aMessage)
                   // than UnTrusted apps Threshold priority
                   priority = KDataTypeUnTrustedPriorityThreshold;
                   }
-#endif
               }
           }
 	   else
@@ -1457,7 +1207,7 @@ void CApaAppListServSession::GetAppInfoL(TUid aUid, TApaAppInfo& aInfo)
 	}
 	
 TPtrC8 CApaAppArcServSession::DoRecognizeUnpackLC(HBufC*& aName, RChunk& aLocalChunk, const RMessage2& aMessage)
-    {
+	{
     ASSERT(aName==NULL);
     
     aName=HBufC::NewLC(User::LeaveIfError(aMessage.GetDesLength(1)));
@@ -1494,21 +1244,21 @@ TPtrC8 CApaAppArcServSession::DoRecognizeUnpackLC(HBufC*& aName, RChunk& aLocalC
     
     TPtrC8 bufPtr(NULL,0); //Never executed. To make compiler happy
     return bufPtr;
-    }
+	}
 
 void CApaAppArcServSession::RecognizeDataL(const RMessage2& aMessage)
 // Recognize the data type of an object
-    {
-    HBufC* name=NULL;
+	{
+	HBufC* name=NULL;
     RChunk localChunk;
     
-    TPtrC8 bufPtr=DoRecognizeUnpackLC(name, localChunk, aMessage);
+	TPtrC8 bufPtr=DoRecognizeUnpackLC(name, localChunk, aMessage);
 
-    const TDataRecognitionResult result = iServ.RecognizeDataL(*name, bufPtr);
+	const TDataRecognitionResult result = iServ.RecognizeDataL(*name, bufPtr);
 
-    CleanupStack::PopAndDestroy(2); // name & buffer or localChunk
-    aMessage.WriteL(0,TPckgC<TDataRecognitionResult>(result));
-    }
+	CleanupStack::PopAndDestroy(2); // name & buffer or localChunk
+	aMessage.WriteL(0,TPckgC<TDataRecognitionResult>(result));
+	}
 
 
 void CApaAppArcServSession::RecognizeFilesL(const RMessage2& aMessage)
@@ -1783,17 +1533,17 @@ void CApaAppArcServSession::RecognizeDataPassedByFileHandleL(const RMessage2& aM
 	
 void CApaAppArcServSession::RecognizeSpecificDataL(const RMessage2& aMessage)
 // Determine whether an object is of a specific data type
-    {
-    HBufC* name=NULL;
-    RChunk localChunk;
-    
-    TPtrC8 bufPtr=DoRecognizeUnpackLC(name, localChunk, aMessage);
-    TDataType dataType;
-    {TPckg<TDataType> dataType_asDescriptor(dataType);
-    aMessage.ReadL(0, dataType_asDescriptor);}
-    aMessage.Complete(iServ.RecognizeDataL(*name,bufPtr,dataType));
-    CleanupStack::PopAndDestroy(2); // name & buffer or localChunk
-    }
+	{
+	HBufC* name=NULL;
+	RChunk localChunk;
+	
+	TPtrC8 bufPtr=DoRecognizeUnpackLC(name, localChunk, aMessage);
+	TDataType dataType;
+	{TPckg<TDataType> dataType_asDescriptor(dataType);
+	aMessage.ReadL(0, dataType_asDescriptor);}
+	aMessage.Complete(iServ.RecognizeDataL(*name,bufPtr,dataType));
+	CleanupStack::PopAndDestroy(2); // name & buffer or localChunk
+	}
 
 void CApaAppArcServSession::RecognizeSpecificDataPassedByFileHandleL(const RMessage2& aMessage)
 	{
@@ -1952,17 +1702,50 @@ TBool CApaAppListServSession::AppIsControlPanelItem(const CApaAppData& aAppData)
 	return (capabilityBuf().iAttributes & TApaAppCapability::EControlPanelItem);
 	}
 
+/**
+locate app in list, return EFalse if it isn't present
+search is regardless of screen mode.
+@internalComponent
+*/
+TBool CApaAppListServSession::FindAppInList(CApaAppData*& aApp, TApaAppEntry& aEntry, TUid aAppUid)
+	{
+	// Look for the app with aAppUid in the app list we keep
+	const CApaAppList& list = iAppList;
+	aApp = list.AppDataByUid(aAppUid);
+	if (aApp)
+		aEntry = aApp->AppEntry();
+	
+	// If the app list is currently in flux, try to nail down the app by looking for it specifically
+	const TBool appPendingOnLangChange = (aApp && list.IsLanguageChangePending() && aApp->IsPending());	
+	if ((!aApp || appPendingOnLangChange) && !list.IsIdleUpdateComplete())
+		{
+		// 1. App wasn't found, but an app scan is currently in progress,
+		// so try to find and add the specific app we're looking for to the list
+		
+		// 2. On language change event, current app scan could not yet update the found app, 
+		// so try to update the specific app we're looking for, in the list.
+		if(aAppUid != KNullUid)
+			{
+			CApaAppData* app = NULL;
+			TRAPD(err, app = FindSpecificAppL(aAppUid));
+			if (!err && app)
+				{
+				// app has been found and added to the app list
+				aApp = app;
+				aEntry = aApp->AppEntry();
+				}
+ 			}
+ 		}
+
+	return (aApp != NULL);
+	}
 
 CApaAppData* CApaAppListServSession::FindSpecificAppL(TUid aAppUid)
 	{
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    CApaAppData* app = iAppList.FindAndAddSpecificAppL(aAppUid);	
-#else
-    //Scans the drives and folder lists for the specific app
-    CApaAppRegFinder* regFinder = CApaAppRegFinder::NewLC(iFs);    
-    CApaAppData* app = iAppList.FindAndAddSpecificAppL(regFinder, aAppUid);
-    CleanupStack::PopAndDestroy(regFinder);
-#endif
+	//Scans the drives and folder lists for the specific app
+	CApaAppRegFinder* regFinder = CApaAppRegFinder::NewLC(iFs);
+	CApaAppData* app = iAppList.FindAndAddSpecificAppL(regFinder, aAppUid);
+	CleanupStack::PopAndDestroy(regFinder);
 	return app;
 	}
 
@@ -2008,79 +1791,34 @@ void CApaAppListServSession::SetNotify(const RMessage2& aMessage)
 	else
 		{
 		const TBool completeImmediatelyIfNoScanImpendingOrInProgress=aMessage.Int0();
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-        if ((!completeImmediatelyIfNoScanImpendingOrInProgress) ||
-            iAppList.AppScanInProgress())   
-#else
-        if ((!completeImmediatelyIfNoScanImpendingOrInProgress) ||
-            iAppArcSrv.AppFsMonitor().AnyNotificationImpending() ||
-            iAppList.AppScanInProgress())		
-#endif
+		if ((!completeImmediatelyIfNoScanImpendingOrInProgress) ||
+			iAppArcSrv.AppFsMonitor().AnyNotificationImpending() ||
+			iAppList.AppScanInProgress())
 			iNotifyMessage=aMessage;
 		else
 			aMessage.Complete(KErrNone);
 		}
-	
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
-	iNotificationRequested=ETrue;
-#endif	
 	}
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
-void CApaAppArcServSession::NotifyClients(TInt aReason, CArrayFixFlat<TApaAppUpdateInfo>* aUpdatedAppsInfo)
-#else
 void CApaAppArcServSession::NotifyClients(TInt aReason)
-#endif
-
 	{
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	iAppListSession->NotifyClients(aReason, aUpdatedAppsInfo);
-#else
-	iAppListSession->NotifyClients(aReason);	
-#endif
+	iAppListSession->NotifyClients(aReason);
 	}
-
 
 void CApaAppListServSession::CancelNotify()
 	{
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK     
-	NotifyClients(KErrCancel, NULL);
-#else
 	NotifyClients(KErrCancel);
-#endif
 	}
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
-void CApaAppListServSession::NotifyClients(TInt aReason, CArrayFixFlat<TApaAppUpdateInfo>* aUpdatedAppsInfo)
-#else
 void CApaAppListServSession::NotifyClients(TInt aReason)
-#endif
 	{
 	if (!iNotifyMessage.IsNull())
 		iNotifyMessage.Complete(aReason);
 	
 	//Notify client for scan complete.
 	NotifyScanComplete();
-	
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
-	if(aUpdatedAppsInfo && iNotificationRequested)
-	    {
-        //Append the updated applications information to iAppsUpdated
-        TInt count=aUpdatedAppsInfo->Count();
-        for(TInt index=0; index<count; index++)
-            {
-            TRAPD(err, iAppsUpdated.AppendL((*aUpdatedAppsInfo)[index]));
-            if(err != KErrNone)
-                {
-                iAppsUpdated.Reset();
-                break;
-                }
-            }
-	    }
-#endif	
 	}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 void CApaAppListServSession::AppInfoProvidedByRegistrationFileL(const RMessage2& aMessage)
 	{
 	// get UID of required app
@@ -2093,8 +1831,6 @@ void CApaAppListServSession::AppInfoProvidedByRegistrationFileL(const RMessage2&
 	TPckgC<TBool> pckg(registrationFileUsed);
 	aMessage.WriteL(1, pckg);
 	}
-#endif
-
 
 void CApaAppListServSession::IconFileNameL(const RMessage2& aMessage)
 	{
@@ -2104,27 +1840,20 @@ void CApaAppListServSession::IconFileNameL(const RMessage2& aMessage)
 	// locate app in list
 	const CApaAppData& app = FindAppInListL(uid);
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
-	if (!app.RegistrationFileUsed())     
-	    User::Leave(KErrNotSupported);     
-	 else     
-	 { 
-#endif
-	 
-        TPtrC iconFileName(app.IconFileName());
-        if (iconFileName.Length() == 0)
-            User::Leave(KErrNotFound);
-        else
-            {
-            TFileName fileName = iconFileName;
-            TPckgC<TFileName> pckg(fileName);
-            aMessage.WriteL(1, pckg);
-            }
-        
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	 }
-#endif
-	
+	if (!app.RegistrationFileUsed())
+		User::Leave(KErrNotSupported);
+	else
+		{
+		TPtrC iconFileName(app.IconFileName());
+		if (iconFileName.Length() == 0)
+			User::Leave(KErrNotFound);
+		else
+			{
+			TFileName fileName = iconFileName;
+			TPckgC<TFileName> pckg(fileName);
+			aMessage.WriteL(1, pckg);
+			}
+		}
 	}
 
 void CApaAppListServSession::ViewIconFileNameL(const RMessage2& aMessage)
@@ -2139,38 +1868,31 @@ void CApaAppListServSession::ViewIconFileNameL(const RMessage2& aMessage)
 	// locate app in list
 	const CApaAppData& app = FindAppInListL(uid);
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
-    if (!app.RegistrationFileUsed())     
-        User::Leave(KErrNotSupported);     
-     else     
-     { 
-#endif
-	
-        const CArrayPtr<CApaAppViewData>& viewDataArray = *app.Views();
-        const TInt count = viewDataArray.Count();
-        for (TInt ii=0; ii<count; ii++)
-            {
-            const CApaAppViewData& appViewData = *viewDataArray[ii];
-            if (appViewData.Uid() == viewUid)
-                {
-                viewIconFileName.Set(appViewData.IconFileName());
-                break;
-                }
-            }
-    
-        if (viewIconFileName.Length() == 0)
-            User::Leave(KErrNotFound);
-        else
-            {
-            TFileName fileName = viewIconFileName;
-            TPckgC<TFileName> pckg(fileName);
-            aMessage.WriteL(2, pckg);
-            }
+	if (!app.RegistrationFileUsed())
+		User::Leave(KErrNotSupported);
+	else
+		{
+		const CArrayPtr<CApaAppViewData>& viewDataArray = *app.Views();
+		const TInt count = viewDataArray.Count();
+		for (TInt ii=0; ii<count; ii++)
+			{
+			const CApaAppViewData& appViewData = *viewDataArray[ii];
+			if (appViewData.Uid() == viewUid)
+				{
+				viewIconFileName.Set(appViewData.IconFileName());
+				break;
+				}
+			}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-     }
-#endif
-    
+		if (viewIconFileName.Length() == 0)
+			User::Leave(KErrNotFound);
+		else
+			{
+			TFileName fileName = viewIconFileName;
+			TPckgC<TFileName> pckg(fileName);
+			aMessage.WriteL(2, pckg);
+			}
+		}
 	}
 
 void CApaAppArcServSession::GetAppServicesL(const RMessage2& aMessage)
@@ -2369,87 +2091,9 @@ void CApaAppListServSession::NotifyScanComplete()
 		{
 		iNotifyOnScanCompleteMsg.Complete(KErrNone);
 		}
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	iNonNativeApplicationsManager->NotifyScanComplete();
-#endif	
 	} //lint !e1762 Suppress member function could be made const
 	
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-
-//Update applist based on the information provided by the installers.
-void CApaAppListServSession::UpdateAppListL(const RMessage2& aMessage)
-{
-    //Create the update info array from the buffer.
-    TInt bufferSize = aMessage.GetDesLength(0);
-    User::LeaveIfError(bufferSize);
-    HBufC8* const buffer=HBufC8::NewLC(bufferSize);
-    TPtr8 buffer_asWritable(buffer->Des());
-    aMessage.ReadL(0,buffer_asWritable);
-        
-    RDesReadStream readStream(*buffer);
-    CleanupClosePushL(readStream);
-    const TUint count=readStream.ReadUint32L();
-
-    RArray<TApaAppUpdateInfo> *appUpdateInfo=new (ELeave) RArray<TApaAppUpdateInfo>(5);
-    CleanupStack::PushL(appUpdateInfo);
-    
-    for(TUint index=0; index<count; index++)
-        {
-        TApaAppUpdateInfo appInfo;
-        readStream>>appInfo;
-        appUpdateInfo->AppendL(appInfo);
-        }
-    CleanupStack::Pop(appUpdateInfo);
-    CleanupStack::PopAndDestroy(2, buffer); //delete readStream, buffer
-    
-    iAppArcSrv.UpdateAppListL(appUpdateInfo, TUid::Uid(aMessage.SecureId()));
-}
-
-
-void CApaAppListServSession::UpdatedAppsInfoL(const RMessage2& aMessage)
-    {
-    //Read the buffer size
-    TInt sizeOfBuffer=aMessage.Int1();
-    TInt count=iAppsUpdated.Count();
-    TInt sizeRequired= sizeof(TInt)+(sizeof(TApaAppUpdateInfo) * count);
-
-    TPckgBuf<TInt> pckg(sizeRequired);
-    
-    //If size of the buffer is not enough write the required size and leave.
-    if(sizeOfBuffer<sizeRequired)
-        {
-        aMessage.WriteL(1, pckg);    
-        User::Leave(KErrOverflow);
-        }
-    
-    //If the passed buffer size is enough, create a buffer to write updates application information.
-    CBufFlat* buffer=CBufFlat::NewL(sizeRequired);
-    CleanupStack::PushL(buffer);
-    buffer->ExpandL(0, sizeRequired);
-    
-    RBufWriteStream writeStream;
-    writeStream.Open(*buffer);
-    
-    //Write count to stream.
-    writeStream.WriteUint32L(count);
-    
-    //Write updated applications information to stream.
-    for(TInt index=0; index<count; index++)
-        {
-        writeStream<<iAppsUpdated[index];
-        }
-    //Write the buffer into passed buffer.
-    aMessage.WriteL(0, buffer->Ptr(0));
-    //Write size of the buffer
-    aMessage.WriteL(1, pckg);
-    
-    CleanupStack::PopAndDestroy(buffer); 
-    iAppsUpdated.Reset();
-    iNotificationRequested=EFalse;
-    }
-#endif
-
 // TSizeArrayItemWriter
 
 TInt TSizeArrayItemWriter::ArrayItemCount() const

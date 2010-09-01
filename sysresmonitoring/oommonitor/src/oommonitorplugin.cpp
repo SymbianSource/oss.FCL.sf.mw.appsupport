@@ -87,7 +87,16 @@ EXPORT_C RWsSession& COomMonitorPlugin::WsSession()
     return iMemoryMonitor->iWs;
     }
 
-
+//-----------------------------------------------------------------------------
+// Function: AppId
+// Function returns the UID3 of the application which implements the 
+// plugin
+//-----------------------------------------------------------------------------
+//
+EXPORT_C const TUid COomMonitorPlugin::AppId() const
+    {
+    return KNullUid;
+    }
 
 EXPORT_C void COomMonitorPluginV2::FreeRam()
     {
@@ -137,3 +146,15 @@ void CAppOomMonitorPlugin::SendMessageToApp(TInt aMessage)
         }
     while (wgId>0);
     }
+
+//-----------------------------------------------------------------------------
+// Function: AppId
+// Function returns the UID3 of the application which implements the 
+// plugin
+//-----------------------------------------------------------------------------
+//
+const TUid CAppOomMonitorPlugin::AppId() const
+    {
+    return iAppUid;
+    }
+

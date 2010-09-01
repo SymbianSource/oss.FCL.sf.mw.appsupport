@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -44,6 +44,6 @@
 
 #define qtn_about_dialog_title "About"
 
-#define qtn_about_dialog_text "t_oomdummyapp Version 1.0.0\n\nAuthor: \n\nSupport: support@mycompany.com\n\n(c) Your copyright notice"
+#define qtn_about_dialog_text "t_oomdummyapp Version 1.0.0\n\nAuthor: \n\nSupport:\n"
 
 // End of File

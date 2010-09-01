@@ -40,8 +40,6 @@ TUid CSysApApp::AppDllUid() const
 CApaDocument* CSysApApp::CreateDocumentL()
     {
     return new( ELeave ) CSysApDocument( *this );
-    
-    // return CSysApDocument::NewL(*this);
     }
 
 // ===================== OTHER EXPORTED FUNCTIONS ============================

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -35,6 +35,7 @@
 #include "CFTestDelay.h"
 #include "cffakeenv.h"
 #include "ScriptEventNotifierSession.h"
+#include "cfenvutils.h"
 
 // CONSTANTS
 
@@ -65,6 +66,8 @@ mt_basicoperationsplugin* mt_basicoperationsplugin::NewLC()
 // Destructor (virtual by CBase)
 mt_basicoperationsplugin::~mt_basicoperationsplugin()
     {
+    // Enable screen saver
+    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -78,6 +81,9 @@ void mt_basicoperationsplugin::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
+    
+    // Disable screen saver
+    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 //  METHODS

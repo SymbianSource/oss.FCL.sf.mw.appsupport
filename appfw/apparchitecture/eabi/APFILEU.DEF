@@ -92,11 +92,11 @@ EXPORTS
 	_ZTV14CAppSidChecker @ 91 NONAME ABSENT ; #<VT>#
 	_ZNK16CApaAppRegFinder9DriveListEv @ 92 NONAME ABSENT
 	_ZN16CApaAppRegFinder26FindAllRemovableMediaAppsLEv @ 93 NONAME ABSENT
-	_ZN26CApaAppInstallationMonitor4NewLEP16CApaAppArcServer @ 94 NONAME ABSENT
-	_ZN26CApaAppInstallationMonitor5StartEv @ 95 NONAME ABSENT
-	_ZN26CApaAppInstallationMonitorD0Ev @ 96 NONAME ABSENT
-	_ZN26CApaAppInstallationMonitorD1Ev @ 97 NONAME ABSENT
-	_ZN26CApaAppInstallationMonitorD2Ev @ 98 NONAME ABSENT
+	_ZN26CApaAppInstallationMonitor4NewLEP16CApaAppArcServer @ 94 NONAME
+	_ZN26CApaAppInstallationMonitor5StartEv @ 95 NONAME
+	_ZN26CApaAppInstallationMonitorD0Ev @ 96 NONAME
+	_ZN26CApaAppInstallationMonitorD1Ev @ 97 NONAME
+	_ZN26CApaAppInstallationMonitorD2Ev @ 98 NONAME
 	_ZN21CApfMimeContentPolicy12IsClosedTypeERK7TDesC16 @ 99 NONAME
 	_ZN21CApfMimeContentPolicy13IsClosedFileLER5RFile @ 100 NONAME
 	_ZN21CApfMimeContentPolicy13IsClosedFileLERK7TDesC16 @ 101 NONAME

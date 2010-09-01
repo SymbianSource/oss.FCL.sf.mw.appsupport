@@ -21,7 +21,7 @@
 #define COREAPPLICATIONUISPRIVATEPSKEYS_H
 
 // INCLUDES
-#include "coreapplicationuisinternalpskeys.h"
+#include "CoreApplicationUIsInternalPSKeys.h"
 
 #endif      // COREAPPLICATIONUISPRIVATEPSKEYS_H
 

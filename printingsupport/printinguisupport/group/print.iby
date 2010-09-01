@@ -18,7 +18,7 @@
 #ifndef __PRINT_IBY__
 #define __PRINT_IBY__
 
-#ifndef __UPNP_PRINT_FRAMEWORK
+#ifdef SYMBIAN_EXCLUDE_PRINT
 REM Feature PRINT is not included in this ROM
 #else
 REM Print

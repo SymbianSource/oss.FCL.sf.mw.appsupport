@@ -24,7 +24,7 @@
 
 // INCLUDES
 #include <e32base.h>
-#include <msssettingsobserver.h>
+#include <MSSSettingsObserver.h>
 
 // FORWARD DECLARATIONS
 class CSysApAppUi;

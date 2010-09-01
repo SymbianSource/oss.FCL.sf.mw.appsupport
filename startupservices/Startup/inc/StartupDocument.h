@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -21,7 +21,7 @@
 #define STARTUPDOCUMENT_H
 
 // INCLUDES
-#include <eikdoc.h>
+#include <AknDoc.h>
 
 // FORWARD DECLARATIONS
 class   CEikAppUi;
@@ -31,14 +31,14 @@ class   CEikAppUi;
 /**
 *  CStartupDocument application class.
 */
-class CStartupDocument : public CEikDocument
+class CStartupDocument : public CAknDocument
 {
     public:
 
         /**
         *   C++ default constructor.
         */
-        CStartupDocument(CEikApplication& aApp): CEikDocument(aApp) { }
+        CStartupDocument(CEikApplication& aApp): CAknDocument(aApp) { }
 
         /**
         *   Two-phased constructor.

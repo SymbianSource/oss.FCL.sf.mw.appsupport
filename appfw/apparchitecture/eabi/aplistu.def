@@ -1,22 +1,22 @@
 EXPORTS
 	_ZN11CApaAppData16CanUseScreenModeEi @ 1 NONAME
 	_ZN11CApaAppData16SetShortCaptionLERK7TDesC16 @ 2 NONAME
-	_ZN11CApaAppData4NewLERK12TApaAppEntryR3RFs @ 3 NONAME ABSENT
+	_ZN11CApaAppData4NewLERK12TApaAppEntryR3RFs @ 3 NONAME
 	_ZN11CApaAppDataD0Ev @ 4 NONAME
 	_ZN11CApaAppDataD1Ev @ 5 NONAME
 	_ZN11CApaAppDataD2Ev @ 6 NONAME
-	_ZN11CApaAppList12RestartScanLEv @ 7 NONAME ABSENT
+	_ZN11CApaAppList12RestartScanLEv @ 7 NONAME
 	_ZN11CApaAppList16StartIdleUpdateLEP19MApaAppListObserver @ 8 NONAME
 	_ZN11CApaAppList16StartIdleUpdateLEv @ 9 NONAME
-	_ZN11CApaAppList22AddForcedRegistrationLERK7TDesC16 @ 10 NONAME ABSENT
-	_ZN11CApaAppList22FindAndAddSpecificAppLEP16CApaAppRegFinder4TUid @ 11 NONAME ABSENT
+	_ZN11CApaAppList22AddForcedRegistrationLERK7TDesC16 @ 10 NONAME
+	_ZN11CApaAppList22FindAndAddSpecificAppLEP16CApaAppRegFinder4TUid @ 11 NONAME
 	_ZN11CApaAppList23AddCustomAppInfoInListLE4TUid9TLanguageRK7TDesC16 @ 12 NONAME
-	_ZN11CApaAppList24ResetForcedRegistrationsEv @ 13 NONAME ABSENT
+	_ZN11CApaAppList24ResetForcedRegistrationsEv @ 13 NONAME
 	_ZN11CApaAppList28UpdateAppListByShortCaptionLEv @ 14 NONAME
 	_ZN11CApaAppList4NewLER3RFsii @ 15 NONAME
 	_ZN11CApaAppList4SelfEv @ 16 NONAME
-	_ZN11CApaAppList6PurgeLEv @ 17 NONAME ABSENT
-	_ZN11CApaAppList8StopScanEi @ 18 NONAME ABSENT
+	_ZN11CApaAppList6PurgeLEv @ 17 NONAME
+	_ZN11CApaAppList8StopScanEi @ 18 NONAME
 	_ZN11CApaAppList9InitListLEP19MApaAppListObserver @ 19 NONAME
 	_ZN11CApaAppListD0Ev @ 20 NONAME
 	_ZN11CApaAppListD1Ev @ 21 NONAME
@@ -30,10 +30,10 @@ EXPORTS
 	_ZN14CAppSidCheckerD0Ev @ 29 NONAME
 	_ZN14CAppSidCheckerD1Ev @ 30 NONAME
 	_ZN14CAppSidCheckerD2Ev @ 31 NONAME
-	_ZN16CApaAppRegFinder12FindAllAppsLENS_10TScanScopeE @ 32 NONAME ABSENT
-	_ZN16CApaAppRegFinder4NewLERK3RFs @ 33 NONAME ABSENT
-	_ZN16CApaAppRegFinder5NewLCERK3RFs @ 34 NONAME ABSENT
-	_ZN16CApaAppRegFinder5NextLER12TApaAppEntryRK12CDesC16Array @ 35 NONAME ABSENT
+	_ZN16CApaAppRegFinder12FindAllAppsLENS_10TScanScopeE @ 32 NONAME
+	_ZN16CApaAppRegFinder4NewLERK3RFs @ 33 NONAME
+	_ZN16CApaAppRegFinder5NewLCERK3RFs @ 34 NONAME
+	_ZN16CApaAppRegFinder5NextLER12TApaAppEntryRK12CDesC16Array @ 35 NONAME
 	_ZNK11CApaAppData10CapabilityER5TDes8 @ 36 NONAME
 	_ZNK11CApaAppData10IconSizesLEv @ 37 NONAME
 	_ZNK11CApaAppData10OpaqueDataEv @ 38 NONAME
@@ -44,16 +44,16 @@ EXPORTS
 	_ZNK11CApaAppData17ImplementsServiceE4TUid @ 43 NONAME
 	_ZNK11CApaAppData19ApplicationLanguageEv @ 44 NONAME
 	_ZNK11CApaAppData19DefaultScreenNumberEv @ 45 NONAME
-	_ZNK11CApaAppData20RegistrationFileNameEv @ 46 NONAME ABSENT
-	_ZNK11CApaAppData20RegistrationFileUsedEv @ 47 NONAME ABSENT
+	_ZNK11CApaAppData20RegistrationFileNameEv @ 46 NONAME
+	_ZNK11CApaAppData20RegistrationFileUsedEv @ 47 NONAME
 	_ZNK11CApaAppData24NonNativeApplicationTypeEv @ 48 NONAME
-	_ZNK11CApaAppData27LocalisableResourceFileNameEv @ 49 NONAME ABSENT
+	_ZNK11CApaAppData27LocalisableResourceFileNameEv @ 49 NONAME
 	_ZNK11CApaAppData4IconE5TSize @ 50 NONAME
 	_ZNK11CApaAppData4IconEi @ 51 NONAME
 	_ZNK11CApaAppData5ViewsEv @ 52 NONAME
 	_ZNK11CApaAppData8AppEntryEv @ 53 NONAME
 	_ZNK11CApaAppData8DataTypeERK9TDataType @ 54 NONAME
-	_ZNK11CApaAppData9IsPendingEv @ 55 NONAME ABSENT
+	_ZNK11CApaAppData9IsPendingEv @ 55 NONAME
 	_ZNK11CApaAppList12AppDataByUidE4TUid @ 56 NONAME
 	_ZNK11CApaAppList17AppDataByFileNameERK7TDesC16 @ 57 NONAME
 	_ZNK11CApaAppList17AppScanInProgressEv @ 58 NONAME
@@ -78,31 +78,24 @@ EXPORTS
 	_ZNK15CApaAppViewData14NonMbmIconFileEv @ 77 NONAME
 	_ZNK15CApaAppViewData3UidEv @ 78 NONAME
 	_ZNK15CApaAppViewData4IconERK5TSize @ 79 NONAME
-	_ZNK16CApaAppRegFinder9DriveListEv @ 80 NONAME ABSENT
+	_ZNK16CApaAppRegFinder9DriveListEv @ 80 NONAME
 	_ZTI11CApaAppData @ 81 NONAME
 	_ZTI11CApaAppList @ 82 NONAME
 	_ZTI12CApaAppEntry @ 83 NONAME
 	_ZTI14CAppSidChecker @ 84 NONAME
 	_ZTI15CApaAppViewData @ 85 NONAME
-	_ZTI16CApaAppRegFinder @ 86 NONAME ABSENT
+	_ZTI16CApaAppRegFinder @ 86 NONAME
 	_ZTI17CApaAppInfoReader @ 87 NONAME
 	_ZTV11CApaAppData @ 88 NONAME
 	_ZTV11CApaAppList @ 89 NONAME
 	_ZTV12CApaAppEntry @ 90 NONAME
 	_ZTV14CAppSidChecker @ 91 NONAME
 	_ZTV15CApaAppViewData @ 92 NONAME
-	_ZTV16CApaAppRegFinder @ 93 NONAME ABSENT
+	_ZTV16CApaAppRegFinder @ 93 NONAME
 	_ZTV17CApaAppInfoReader @ 94 NONAME
 	_ZN11CApaAppData11SetCaptionLERK7TDesC16 @ 95 NONAME
 	_ZN11CApaAppData9SetIconsLERK7TDesC16i @ 96 NONAME
 	_ZN11CApaAppList36UpdateAppListByIconCaptionOverridesLEv @ 97 NONAME
-	_ZN11CApaAppList20AppListUpdatePendingEv @ 98 NONAME ABSENT
+	_ZN11CApaAppList20AppListUpdatePendingEv @ 98 NONAME
 	_ZN11CApaAppList19UninstalledAppArrayEv @ 99 NONAME
-	_ZN11CApaAppData4NewLERKN4Usif28CApplicationRegistrationDataER3RFsRKNS0_26RSoftwareComponentRegistryE @ 100 NONAME
-	_ZN11CApaAppList22FindAndAddSpecificAppLE4TUid @ 101 NONAME
-	_ZN11CApaAppList18InitializeApplistLEP19MApaAppListObserver @ 102 NONAME
-	_ZN11CApaAppData19IsLangChangePendingEv @ 103 NONAME
-	_ZN11CApaAppList14UpdateApplistLEP19MApaAppListObserverP6RArrayI17TApaAppUpdateInfoE4TUid @ 104 NONAME
-	_ZN11CApaAppList15UpdatedAppsInfoEv @ 105 NONAME
-	_ZN11CApaAppList28UpdateApplistByForceRegAppsLER13RPointerArrayIN4Usif28CApplicationRegistrationDataEE @ 106 NONAME
 

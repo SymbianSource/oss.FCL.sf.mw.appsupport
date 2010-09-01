@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -21,7 +21,7 @@
 #include <platform_paths.hrh>
 
 
-TARGET			mmkeybearer.dll
+TARGET			MMKeyBearer.dll
 
 // CAPABILITY      CAP_ECOM_PLUGIN 
 // capabilities are required as that of remconbearerplugin.dll
@@ -41,7 +41,7 @@ SOURCE			MMKeyBearerObserver.cpp
 SOURCEPATH      .
 
 START RESOURCE 10207235.rss
-target mmkeybearer.rsc
+target MMKeyBearer.rsc
 END
 
 
@@ -52,14 +52,15 @@ USERINCLUDE     ../../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY 		euser.lib 
-LIBRARY			ecom.lib
+LIBRARY			ECom.lib
 LIBRARY 		c32.lib 
 LIBRARY 		remconbearerplugin.lib 
 LIBRARY 		remcontypes.lib
 LIBRARY 		flogger.lib
+LIBRARY         avkon.lib
+LIBRARY         akncapserverclient.lib
 LIBRARY         apparc.lib
 LIBRARY         eikcore.lib
-LIBRARY         lockclient.lib
 
 #include <comms-infras/commsdebugutility.mmh>
 #include "../../group/mediakeys.mmh"

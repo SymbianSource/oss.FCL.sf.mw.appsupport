@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2004 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -22,6 +22,7 @@ PRJ_PLATFORMS
 DEFAULT
 
 PRJ_EXPORTS
+../loc/accfwnotifier.loc                        MW_LAYER_LOC_EXPORT_PATH(accfwnotifier.loc)
 ../rom/accfwuinotifier.iby                      CORE_MW_LAYER_IBY_EXPORT_PATH(accfwuinotifier.iby)
 ../rom/accfwuinotifierresources.iby 		LANGUAGE_MW_LAYER_IBY_EXPORT_PATH(accfwuinotifierresources.iby)
 

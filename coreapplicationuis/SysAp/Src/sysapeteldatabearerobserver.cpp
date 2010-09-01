@@ -110,11 +110,11 @@ void CSysApEtelDataBearerObserver::RunL()
     if ( newHsdpaState != iHsdpaActive )
         {
         iHsdpaActive = newHsdpaState;
-//        TRAPD( err, iSysApAppUi.SetSignalIndicatorL() );
+        TRAPD( err, iSysApAppUi.SetSignalIndicatorL() );
         
-//        if ( err != KErrNone )
+        if ( err != KErrNone )
             {
-//            TRACES( RDebug::Print( _L("CSysApEtelDataBearerObserver::RunL: err=%d"), err ) );
+            TRACES( RDebug::Print( _L("CSysApEtelDataBearerObserver::RunL: err=%d"), err ) );
             }
         }
     }

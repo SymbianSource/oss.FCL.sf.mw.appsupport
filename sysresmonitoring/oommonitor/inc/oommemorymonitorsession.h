@@ -42,6 +42,7 @@ private:
 #endif
     CMemoryMonitor& Monitor();
     void ServiceL(const RMessage2& aMessage);
+
 private:
     RMessagePtr2 iRequestFreeRam;
 #ifndef CLIENT_REQUEST_QUEUE

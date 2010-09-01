@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,12 +27,6 @@
 #include <badesca.h>
 #include <s32file.h>
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-#include <usif/scr/scr.h>
-#include <usif/scr/appregentries.h>
-#include <apgcli.h>
-#endif
-
 // classes defined:
 class CApaAppList;
 class CApaAppViewData;
@@ -40,9 +34,7 @@ class CApaAppViewData;
 class CApaMaskedBitmap;
 class TEntry;
 class RFs;
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 class CApaAppRegFinder;
-#endif
 class CApaAppIconArray;
 class CApaIconLoader;
 class TApaAppEntry;
@@ -80,26 +72,19 @@ Its functionality should be accessed through the Apparc Server.
 */
 class CApaAppList : public CBase
 	{
+public: 
+	IMPORT_C static CApaAppList* NewL(RFs& aFs, TBool aLoadMbmIconsOnDemand, TInt aTimeoutDelay = 50000); // takes ownership of aAppRegFinder
 public:
-    IMPORT_C static CApaAppList* NewL(RFs& aFs, TBool aLoadMbmIconsOnDemand, TInt aTimeoutDelay = 50000); 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 	IMPORT_C void PurgeL();
-    IMPORT_C CApaAppData* FindAndAddSpecificAppL(CApaAppRegFinder* aFinder, TUid aAppUid);	
-    IMPORT_C void StopScan(TBool aNNAInstall = EFalse);
-    IMPORT_C void RestartScanL(); 
-    IMPORT_C TBool AppListUpdatePending();    
-    IMPORT_C void AddForcedRegistrationL(const TDesC& aRegistrationFile);
-    IMPORT_C void ResetForcedRegistrations();
-#else
-    IMPORT_C CApaAppData* FindAndAddSpecificAppL(TUid aAppUid);    
-#endif
-    
 	IMPORT_C TInt Count() const;
 	IMPORT_C CApaAppData* FirstApp() const;
 	IMPORT_C CApaAppData* FirstApp(TInt aScreenMode) const; 
 	IMPORT_C CApaAppData* NextApp(const CApaAppData* aApp) const;
 	IMPORT_C CApaAppData* NextApp(const CApaAppData* aApp, TInt aScreenMode) const;
 	IMPORT_C CApaAppData* AppDataByUid(TUid aAppUid) const;
+	IMPORT_C void StopScan(TBool aNNAInstall = EFalse);
+	IMPORT_C void RestartScanL();
+	IMPORT_C TBool AppListUpdatePending();
 	// ER5
 	IMPORT_C TUid PreferredDataHandlerL(const TDataType& aDataType) const;
 	IMPORT_C void StartIdleUpdateL();
@@ -114,12 +99,15 @@ public:
 	IMPORT_C CBufFlat* ServiceImplArrayBufferL(TUid aServiceUid, const TDataType& aDataType) const;	
 	IMPORT_C CBufFlat* ServiceUidBufferL(TUid aAppUid) const;
 	IMPORT_C CBufFlat* ServiceOpaqueDataBufferL(TUid aAppUid, TUid aServiceUid) const;
+	IMPORT_C CApaAppData* FindAndAddSpecificAppL(CApaAppRegFinder* aFinder, TUid aAppUid);
 	IMPORT_C TUid PreferredDataHandlerL(const TDataType& aDataType, const TUid* aServiceUid, 
 		TInt& aPriority) const;
 	IMPORT_C ~CApaAppList();
 	// 9.1
 	IMPORT_C CApaAppData* AppDataByFileName(const TDesC& aFullFileName) const;
 	/*IMPORT_C*/ RFs& ShareProtectedFileServer();
+	IMPORT_C void AddForcedRegistrationL(const TDesC& aRegistrationFile);
+	IMPORT_C void ResetForcedRegistrations();
 	IMPORT_C TBool IsLanguageChangePending() const;
 	IMPORT_C static CApaAppList* Self();
     IMPORT_C CArrayFixFlat<TUid>* UninstalledAppArray();
@@ -137,15 +125,6 @@ public:
 	IMPORT_C void AddCustomAppInfoInListL(TUid aAppUid, TLanguage aLanguage, const TDesC& aShortCaption);
 	IMPORT_C void UpdateAppListByShortCaptionL();
 	IMPORT_C void UpdateAppListByIconCaptionOverridesL();
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	IMPORT_C void InitializeApplistL(MApaAppListObserver* aObserver);
-	void InitializeLangAppListL();
-	IMPORT_C void UpdateApplistL(MApaAppListObserver* aObserver, RArray<TApaAppUpdateInfo>* aAppUpdateInfo, TUid aSecureID);
-	IMPORT_C void UpdateApplistByForceRegAppsL(RPointerArray<Usif::CApplicationRegistrationData>& aForceRegAppsInfo);
-	IMPORT_C CArrayFixFlat<TApaAppUpdateInfo>* UpdatedAppsInfo();
-#endif
-	
 private:
 	enum
 		{
@@ -155,11 +134,15 @@ private:
 		ELangChangePending = 0x08 // This flag is used to check if applist update is in progress on language change event.
 		};
 private:
-    CApaAppList(RFs& aFs, TBool aLoadMbmIconsOnDemand, TInt aIdlePeriodicDelay); 
+	CApaAppList(RFs& aFs, TBool aLoadMbmIconsOnDemand, TInt aIdlePeriodicDelay);
+	void UpdateNextAppL(const TApaAppEntry& aAppEntry,TBool& aHasChanged);
 	void AddToList( CApaAppData* aAppData );
+	static void SetPending(CApaAppData* aAppData);
+	static void SetNotFound(CApaAppData* aAppData, TBool& aHasChanged);
 	static TInt IdleUpdateCallbackL(TAny* aObject);
 	TInt IdleUpdateL();
 	void ScanComplete();
+	void UndoSetPending(CApaAppData* aAppData);
 
 	void StopIdler();
 	void DeleteAppData();
@@ -171,16 +154,6 @@ private:
 	void DeleteAppsListBackUpAndTempFiles();
 	void ScanRemovableDrivesAndUpdateL();
 	void CreateDefaultAppIconFileNameL();
-	
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    void UndoSetPending(CApaAppData* aAppData);
-    static void SetPending(CApaAppData* aAppData);
-    static void SetNotFound(CApaAppData* aAppData, TBool& aHasChanged);
-    void UpdateNextAppL(const TApaAppEntry& aAppEntry,TBool& aHasChanged);
-#else
-    TInt FindAndDeleteApp(TUid aAppUid);
-#endif
-    
 private: 
 	// Persistence Layer
 	void RestoreL();
@@ -263,18 +236,13 @@ private:
 	MApaAppListObserver* iObserver;
 	CApaAppData* iValidFirstAppData; //First valid app data in linked list!
 	TInt iFlags;
-	TInt iIdlePeriodicDelay;    // idle timeout periodic delay	
+	CApaAppRegFinder* iAppRegFinder;
+	TInt iIdlePeriodicDelay; 	// idle timeout periodic delay
 	RFs iFsShareProtected;
 	mutable CApaAppIconArray* iDefaultIconArray;
 	mutable TInt iDefaultIconUsageCount;
+	CDesCArray* iForcedRegistrations;
 	class CApaLangChangeMonitor; //inner class of CApaAppList.
-	
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
-	class CApaScrAppInfo;
-#else
-   CDesCArray* iForcedRegistrations;
-#endif
-	
 	CApaLangChangeMonitor* iAppLangMonitor; // Active Object used for language change monitoring.		
 
 	RBuf iAppsListCacheFileName;
@@ -288,17 +256,8 @@ private:
 	RPointerArray<CCustomAppInfoData> iCustomAppList;
 	CApaIconCaptionOverrides* iIconCaptionOverrides;
 	CApaIconCaptionCenrepObserver* iIconCaptionObserver;
-    CArrayFixFlat<TUid>* iUninstalledApps;
-    
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
-    Usif::RSoftwareComponentRegistry iScr;
-    CApaScrAppInfo *iScrAppInfo;
-    RArray<TUid> iForceRegAppUids;
-    CArrayFixFlat<TApaAppUpdateInfo>* iAppsUpdated;
-#else
-    CApaAppRegFinder* iAppRegFinder;
-    TBool iNNAInstallation; 
-#endif
+	TBool iNNAInstallation;	
+    CArrayFixFlat<TUid>* iUninstalledApps; 	
     
 private:
 	friend class CApaLangChangeMonitor;

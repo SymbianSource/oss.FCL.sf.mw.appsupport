@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -18,13 +18,11 @@
 
 // SYSTEM INCLUDES
 #include <w32std.h>
-#include <eikenv.h>
 #include <coedef.h>
 #include <data_caging_path_literals.hrh>
+#include <splashscreen.mbg>
+#include <AknIconSrvClient.h>
 #include <startupdomainpskeys.h>
-#include <SVGEngineInterfaceImpl.h>
-#include <gdi.h>
-#include <coemain.h> 
 
 // USER INCLUDES
 #include "SplashScreen.h"
@@ -245,6 +243,7 @@ void CWsClient::ConstructL()
 	// construct redrawer
 	iRedrawer=new (ELeave) CWsRedrawer;
 	iRedrawer->ConstructL(this);
+    User::LeaveIfError( RAknIconSrvClient::Connect() );
 	// construct main window
 	ConstructMainWindowL();
 
@@ -262,6 +261,7 @@ void CWsClient::ConstructL()
 CWsClient::~CWsClient()
 	{
     TRACES("CWsClient::~CWsClient(): Start");
+    RAknIconSrvClient::Disconnect();
 	// neutralize us as an active object
 	Deque(); // cancels and removes from scheduler
 	// get rid of scheduler and all attached objects
@@ -301,6 +301,11 @@ void CWsClient::DoCancel()
     TRACES("CWsClient::DoCancel(): End");
 	}
 
+void CWsClient::ConstructMainWindowL()
+	{
+    TRACES("CWsClient::ConstructMainWindowL()");
+	}
+
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -331,57 +336,6 @@ CMainWindow::~CMainWindow ()
     TRACES("CMainWindow::~CMainWindow(): End");
 	}
 
-CFbsBitmap* CMainWindow::ReadSVGL (TFileName aFileName)
-	{
-	TRACES("CMainWindow::ReadSVGL(): Start");    
-	TFontSpec fontspec;
-    TDisplayMode mode = EColor16MA;    
-	TSize size(SIZE_X, SIZE_Y);
-
-	//if ( mode >= (TDisplayMode)13 )  { mode = EColor16MA; }
-
-	CFbsBitmap* frameBuffer = new ( ELeave ) CFbsBitmap;
-    CleanupStack::PushL( frameBuffer );
-    frameBuffer->Create( size, mode );
-	
-	CSvgEngineInterfaceImpl* svgEngine = NULL;
-	svgEngine = CSvgEngineInterfaceImpl::NewL(frameBuffer, NULL, fontspec );    
-	
-	if (svgEngine == NULL)
-		{
-		TRACES("CMainWindow::ReadSVGL(): Splashscreen SVG engine creation failed");    
-		}
-	
-	CleanupStack::PushL( svgEngine );
-	TInt domHandle = 0;
-    svgEngine->PrepareDom( aFileName, domHandle ) ;
-	if (domHandle == 0)
-		{
-		TRACES("CMainWindow::ReadSVGL(): Splashscreen DOM handle creation failed");    
-		}
-
-	CFbsBitmap* bitmap = new(ELeave) CFbsBitmap;    
-    CleanupStack::PushL( bitmap );
-    User::LeaveIfError( bitmap->Create( size, EColor64K ) );
-
-	svgEngine->UseDom( domHandle, bitmap, NULL ) ;
-	
-    MSvgError* err;
-    svgEngine->Start( err );
-	if (err->HasError())
-		{
-		TRACES("CMainWindow::ReadSVGL(): Splashscreen SVG Engine Start failed");   
-		}
-
-	svgEngine->DeleteDom( domHandle );
-    CleanupStack::Pop( bitmap );
-    CleanupStack::PopAndDestroy( svgEngine );
-    CleanupStack::PopAndDestroy( frameBuffer );
-	
-    TRACES("CMainWindow::ReadSVGL(): End");
-	return bitmap;
-	}
-
 void CMainWindow::ConstructL (const TRect& aRect, CWindow* aParent)
 	{
     TRACES("CMainWindow::ConstructL(): Start");
@@ -407,7 +361,9 @@ void CMainWindow::ConstructL (const TRect& aRect, CWindow* aParent)
     if ( !err )
         {
         TRACES("CMainWindow::ConstructL(): Image found");
-		iBitmap = ReadSVGL(fp->FullName());
+        iBitmap = AknIconUtils::CreateIconL( fp->FullName(), EMbmSplashscreenQgn_startup_screen );
+        AknIconUtils::ExcludeFromCache(iBitmap);
+        AknIconUtils::SetSize( iBitmap, iRect.Size(), EAspectRatioPreservedAndUnusedSpaceRemoved );
         }
     else
         {
@@ -472,7 +428,8 @@ void CMainWindow::Draw(const TRect& aRect)
 void CMainWindow::HandlePointerEvent (TPointerEvent& /*aPointerEvent*/)
     {
     TRACES("CMainWindow::HandlePointerEvent(): Start");
-	
+//	TPoint point = aPointerEvent.iPosition;
+//	(void)point;
     TRACES("CMainWindow::HandlePointerEvent(): End");
 	}
 

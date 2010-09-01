@@ -1,5 +1,5 @@
 @rem
-@rem Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+@rem Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 @rem All rights reserved.
 @rem This component and the accompanying materials are made available
 @rem under the terms of "Eclipse Public License v1.0"
@@ -78,10 +78,6 @@ call :test T_StartDoc
 call :test T_Wgnam 
 call :test T_WindowChaining 
 ::call :test T_RecUpgrade  This test can not run on emulator as it requires loading, unloading and deletion of a plug-in and Windows OS don’t allow deletion of loaded binaries 
-call :test T_UpdateAppList
-call :test T_ForceReg
-call :test T_ClientNotif
-call :test T_NonNativeTest
 
 call sysstart_apparc_run.bat
 type \epoc32\winscw\c\logs\testexecute\sysstart_apparctest_summary.txt >> %APPARCTEST_SUMMARY%

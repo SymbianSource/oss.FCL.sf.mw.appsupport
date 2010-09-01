@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -27,12 +27,11 @@ CAPABILITY      CAP_GENERAL_DLL
 VENDORID        VID_DEFAULT
 
 
-SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
 USERINCLUDE     ../inc
 
 
-//APP_LAYER_SYSTEMINCLUDE
-MW_LAYER_SYSTEMINCLUDE
+APP_LAYER_SYSTEMINCLUDE
+
 
 SOURCEPATH      ../src
 SOURCE          lafshut.cpp
@@ -41,7 +40,7 @@ LIBRARY         euser.lib
 LIBRARY         efsrv.lib
 LIBRARY         bafl.lib
 LIBRARY         ws32.lib
-LIBRARY		HbWidgets.lib
+LIBRARY         aknnotify.lib
 
 SOURCEPATH      ../resource
 START RESOURCE  lafmemorywatcher.rss
@@ -50,7 +49,4 @@ TARGETPATH      RESOURCE_FILES_DIR
 LANGUAGE_IDS
 END
 
-
-SMPSAFE
 // End of file.
-

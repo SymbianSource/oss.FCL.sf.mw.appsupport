@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -27,6 +27,7 @@
 #include <cfcontextsourcesettingparameter.h>
 #include <cfkeyvaluepair.h>
 
+#include "cfenvutils.h"
 
 //  INTERNAL INCLUDES
 
@@ -66,6 +67,9 @@ MT_CFContextSourceSettingsManager* MT_CFContextSourceSettingsManager::NewLC()
 MT_CFContextSourceSettingsManager::~MT_CFContextSourceSettingsManager()
     {
     Teardown();
+
+    // Enable screen saver
+    CFEnvUtils::EnableScreenSaver( ETrue );
     }
 
 // Default constructor
@@ -79,6 +83,9 @@ void MT_CFContextSourceSettingsManager::ConstructL()
     // The ConstructL from the base class CEUnitTestSuiteClass must be called.
     // It generates the test case table.
     CEUnitTestSuiteClass::ConstructL();
+
+    // Disable screen saver
+    CFEnvUtils::EnableScreenSaver( EFalse );
     }
 
 //  METHODS

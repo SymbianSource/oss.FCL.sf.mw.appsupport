@@ -20,14 +20,14 @@
 
 
 // Build target
-TARGET          startupmediatorplugin.dll
+TARGET          StartupMediatorPlugin.dll
 CAPABILITY      CAP_ECOM_PLUGIN
 TARGETTYPE      PLUGIN
 UID             0x10009D8D 0x102750AF
 VENDORID        VID_DEFAULT
 
 START RESOURCE  ../src/102750AF.rss
-TARGET          startupmediatorplugin.rsc
+TARGET          StartupMediatorPlugin.rsc
 TARGETPATH      resource/plugins
 END
 
@@ -45,16 +45,13 @@ MW_LAYER_SYSTEMINCLUDE
 
 
 LIBRARY         euser.lib               // Core
-LIBRARY         ecom.lib                // ECom
-LIBRARY         mediatorclient.lib      // Mediator client
-LIBRARY         mediatorpluginbase.lib  // Mediator client
+LIBRARY         ECom.lib                // ECom
+LIBRARY         MediatorClient.lib      // Mediator client
+LIBRARY         MediatorPluginBase.lib  // Mediator client
 LIBRARY         featmgr.lib             // FeatureManager
 LIBRARY         centralrepository.lib   // Central Repository
 
 // Logger
 DEBUGLIBRARY    flogger.lib
 
-
-SMPSAFE
 // End of File
-

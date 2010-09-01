@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -61,60 +61,8 @@
 #if !defined(__E32TEST_H__)
 #include <e32test.h>
 #endif
-#include "T_SisFileInstaller.h"
 
-_LIT(KTstAppStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TSTAPP_standalone.sis");
-_LIT(KTstAppStandAloneComponent, "TSTAPP_standalone");
-
-_LIT(KZeroSizeIconAppSisFile, "z:\\apparctest\\apparctestsisfiles\\zerosizedicontestapp.sis");
-_LIT(KZeroSizeIconAppComponent, "zerosizedicontestapp");
-
-_LIT(KApparcTestAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TApparcTestApp.sis");
-_LIT(KApparcTestAppComponent, "TApparcTestApp");
-
-_LIT(KGroupNameTestAppSisFile, "z:\\apparctest\\apparctestsisfiles\\t_groupname.sis");
-_LIT(KGroupNameTestAppComponent, "T_groupname");
-
-_LIT(KAppNotEmbeddableSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppNotEmbeddable_v2.sis");
-_LIT(KAppNotEmbeddableComponent, "TAppNotEmbeddable_v2");
-
-_LIT(KAppEmbeddableOnlySisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableOnly_v2.sis");
-_LIT(KAppEmbeddableOnlyComponent, "TAppEmbeddableOnly_v2");
-
-_LIT(KAppEmbeddableStandaloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddable_standalone.sis");
-_LIT(KAppEmbeddableStandaloneComponent, "TAppEmbeddable_standalone");
-
-_LIT(KAppEmbeddableEmbeddedSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddable_embedded.sis");
-_LIT(KAppEmbeddableEmbeddedComponent, "TAppEmbeddable_embedded");
-
-_LIT(KAppEmbeddableUiNotStandAloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableUiNotStandAlone_v2.sis");
-_LIT(KAppEmbeddableUiNotStandAloneComponent, "TAppEmbeddableUiNotStandAlone_v2");
-
-_LIT(KAppEmbeddableUiOrStandAloneEmbeddedSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableUiOrStandAlone_embedded.sis");
-_LIT(KAppEmbeddableUiOrStandAloneEmbeddedComponent, "TAppEmbeddableUiOrStandAlone_embedded");
-
-_LIT(KAppEmbeddableUiOrStandAloneStandaloneSisFile, "z:\\apparctest\\apparctestsisfiles\\TAppEmbeddableUiOrStandalone_standalone.sis");
-_LIT(KAppEmbeddableUiOrStandAloneStandaloneComponent, "TAppEmbeddableUiOrStandalone_standalone");
-
-_LIT(KSimpleAppSisFile, "z:\\apparctest\\apparctestsisfiles\\SimpleApparcTestApp.sis");
-_LIT(KSimpleAppComponent, "SimpleApparcTestApp");
-
-_LIT(KWinChainAppSisFile, "z:\\apparctest\\apparctestsisfiles\\t_winchainLaunch.sis");
-_LIT(KWinChainAppComponent, "t_winchainLaunch");
-
-_LIT(KServerApp7SisFile, "z:\\apparctest\\apparctestsisfiles\\serverapp7.sis");
-_LIT(KServerApp7Component, "serverapp7");
-
-_LIT(KTestTrustedPriorityApp1SisFile, "z:\\apparctest\\apparctestsisfiles\\TestTrustedPriorityApp1.sis");
-_LIT(KTestTrustedPriorityApp1Component, "TestTrustedPriorityApp1");
-
-_LIT(KTestUnTrustedPriorityApp1SisFile, "z:\\apparctest\\apparctestsisfiles\\TestUnTrustedPriorityApp1.sis");
-_LIT(KTestUnTrustedPriorityApp1Component, "TestUnTrustedPriorityApp1");
-
-_LIT(KTestTrustedPriorityApp2SisFile, "z:\\apparctest\\apparctestsisfiles\\TestTrustedPriorityApp2.sis");
-_LIT(KTestTrustedPriorityApp2Component, "TestTrustedPriorityApp2");
-
-// Literals & Constants 
+// Literals & Constants
 _LIT(KCompleted, "Completed.");
 const TUint KBytesToRead=100;
 
@@ -548,19 +496,35 @@ void CT_RApaLsSessionTestStep::TestAppListInvalidSetupL()
 	{
 	INFO_PRINTF1(_L("Setting up Applist invalid test."));
 	
-    TRequestStatus status;
-    iLs.SetNotify(EFalse,status);
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
-    sisFileInstaller.InstallSisL(KTstAppStandAloneSisFile);
+	_LIT(KTempAppDir, "C:\\private\\10003a3f\\import\\apps\\");
+	_LIT(KTempRegPath, "C:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc");
+	TFullName regPath=_L("z:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc");
+	
+	CFileMan* iAppListInvalidTestFileMan = CFileMan::NewL (iFs);
+	CleanupStack::PushL(iAppListInvalidTestFileMan);
+	
+	INFO_PRINTF1(_L("Copy tstapp files to C: drive......."));
+	TInt rtn=iFs.MkDirAll(KTempAppDir);
+	TEST(rtn==KErrNone||rtn==KErrAlreadyExists); 
+	TEST(iAppListInvalidTestFileMan->Copy(regPath, KTempRegPath)==KErrNone);	//Just to start the idle update.
 
 	INFO_PRINTF1(_L("Get app list......."));
 	TInt ret = iLs.GetAllApps();
 	TEST(ret==KErrNone);
+
+	INFO_PRINTF1(_L("Remove temp files from C: drive......."));
+	TRequestStatus status;
+	TTime tempTime(0); // added tempTime to avoid asynch CFileMan::Attribs request completing with KErrArgument
+	TEST(iAppListInvalidTestFileMan->Attribs(KTempAppDir,0,KEntryAttReadOnly, tempTime, CFileMan::ERecurse, status)==KErrNone);
 	
 	User::WaitForRequest(status);
+	TEST(status.Int() == KErrNone);
+	INFO_PRINTF1(_L("Deleting Reg file......."));
+	TEST(iAppListInvalidTestFileMan->Delete(KTempRegPath)==KErrNone);	//Just to start the idle update.
+	INFO_PRINTF1(_L("Removing App dir......."));
+	TEST(iAppListInvalidTestFileMan->RmDir(KTempAppDir)==KErrNone);
+	CleanupStack::PopAndDestroy(iAppListInvalidTestFileMan);
 
-	sisFileInstaller.UninstallSisAndWaitForAppListUpdateL(KTstAppStandAloneComponent);
 	INFO_PRINTF1(KCompleted);
 	}
 
@@ -1782,13 +1746,12 @@ void CT_RApaLsSessionTestStep::TestGetAppIcon1L()
 
 	HBufC* fullIconFileName = NULL;
 	ret = iLs.GetAppViewIcon(TUid::Uid(KGroupNameApp), viewInfo.iUid, fullIconFileName);
-
-    TEST(ret == KErrNone);
-    TEST(fullIconFileName != NULL);
-    INFO_PRINTF2(_L("The View icon's UID is - %X"), viewInfo.iUid);
-    TEST(!fullIconFileName->Compare(_L("file://c/resource/apps/tcheckiconapp.xyz")));
-    INFO_PRINTF2(_L("View's icon file name is - %S"), fullIconFileName);
-
+	TEST(ret == KErrNone);
+	TEST(fullIconFileName != NULL);
+	INFO_PRINTF2(_L("The View icon's UID is - %X"), viewInfo.iUid);
+	TEST(!fullIconFileName->Compare(_L("file://c/resource/apps/tcheckiconapp.xyz")));
+	INFO_PRINTF2(_L("View's icon file name is - %S"), fullIconFileName);
+	
 	delete fullIconFileName;		
 	CleanupStack::PopAndDestroy(appViews);
 	
@@ -1864,7 +1827,7 @@ void CT_RApaLsSessionTestStep::TestGetAppIconForSVGIconsL()
 	TInt err = iLs.GetAppIcon(TUid::Uid(KApparcTestApp), svgIconFile);
 	TEST(err == KErrNone);
 	
-	_LIT(KSVGIconFileName, "c:\\resource\\apps\\svg_icon.svg");
+	_LIT(KSVGIconFileName, "z:\\resource\\apps\\svg_icon.svg");
 	//Get the name of the icon file 
 	TBuf<KMaxFileName> svgIconFileName;	
 	svgIconFile.FullName(svgIconFileName);
@@ -1932,15 +1895,27 @@ void CT_RApaLsSessionTestStep::TestGetAppIconForSVGIconsL()
  */
 void CT_RApaLsSessionTestStep::TestAppListInstallationL()
  	{ 
+ 	_LIT(KTestAppDestDir, "C:\\private\\10003a3f\\import\\apps\\" );
+ 	_LIT(KTestAppSource, "Z:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc" );
+ 	_LIT(KTestAppDest, "C:\\private\\10003a3f\\import\\apps\\tstapp_reg.rsc" );
+
+ 	_LIT(KTestWaitingForApplistUpdate,"Waiting %d microseconds for applist to be updated");
+ 	const TInt KApplistUpdateTime = 10000000;
 
  	// Copy App files around and delete them to check whether 
 	// the app list updates and stores the cache correctly.
+ 	RFs	theFS;
+ 	theFS.Connect();
+ 
+ 	// Remove Test app from the file system
+ 	CFileMan* fileManager = CFileMan::NewL (theFS);
+ 
+ 	INFO_PRINTF1(_L("Copying the app to C"));
+ 	TEST(KErrNone == fileManager->Copy (KTestAppSource, KTestAppDest, CFileMan::ERecurse));
  	
-    INFO_PRINTF1(_L("Installing the app from C"));
- 	CSisFileInstaller sisInstaller;
- 	INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTstAppStandAloneSisFile);
- 	sisInstaller.InstallSisAndWaitForAppListUpdateL(KTstAppStandAloneSisFile);
- 	
+ 	INFO_PRINTF2(KTestWaitingForApplistUpdate, KApplistUpdateTime);
+ 	User::After(KApplistUpdateTime);
+ 
  	TApaAppInfo aInfo;
  	TEST(KErrNone == iLs.GetAppInfo (aInfo, KUidTestApp));
 
@@ -1950,8 +1925,18 @@ void CT_RApaLsSessionTestStep::TestAppListInstallationL()
 	TEST(parse.Drive ().CompareF (KCdrive) == 0);
  
  	INFO_PRINTF1(_L("Removing the app from C"));
-	sisInstaller.UninstallSisAndWaitForAppListUpdateL(KTstAppStandAloneComponent);
-	
+	TRequestStatus status;
+	TTime tempTime(0); // added tempTime to avoid asynch CFileMan::Attribs request completing with KErrArgument
+	TEST(fileManager->Attribs(KTestAppDest,0,KEntryAttReadOnly, tempTime, CFileMan::ERecurse, status)==KErrNone);
+	User::WaitForRequest(status);
+	TEST(status.Int() == KErrNone);
+ 	TEST(KErrNone == fileManager->Delete (KTestAppDest, CFileMan::ERecurse));
+	INFO_PRINTF1(_L("Removing the app dir from C"));
+	TEST(fileManager->RmDir(KTestAppDestDir)==KErrNone);
+ 	
+	INFO_PRINTF2(KTestWaitingForApplistUpdate, KApplistUpdateTime);
+	User::After(KApplistUpdateTime);
+ 
  	// That should put the file in the right place
  	TEST(KErrNone == iLs.GetAppInfo( aInfo, KUidTestApp));
 
@@ -1960,10 +1945,12 @@ void CT_RApaLsSessionTestStep::TestAppListInstallationL()
 	INFO_PRINTF1(_L("Comparing App drive location is Z:... "));
  	TEST((parse1.Drive().CompareF(KZdrive)) == 0);
 
+ 	delete fileManager;
+ 	theFS.Close();
+
  	INFO_PRINTF1(_L("Test TestAppListInstallationL completed"));
  	}
  	
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 /**
    @SYMTestCaseID T-RApaLsSessionTestStep-TestAppListInstallation1L
   
@@ -2052,7 +2039,6 @@ void CT_RApaLsSessionTestStep::TestAppListInstallation1L()
 
  	INFO_PRINTF1(_L("Test TestAppListInstallation1L completed"));
  	} 	
-#endif
 
 	/**
    @SYMTestCaseID APPFWK-APPARC-0107
@@ -2077,6 +2063,18 @@ void CT_RApaLsSessionTestStep::TestZeroSizedIconFileL()
     
     INFO_PRINTF1(_L("Test TestZeroSizedIconFileL Started.........."));
     
+    _LIT(KTestAppDestDir, "C:\\private\\10003a3f\\import\\apps\\" );
+    _LIT(KTestAppResourceDir, "C:\\resource\\apps\\" );
+    
+    _LIT(KTestAppSource, "Z:\\apparctest\\zerosizedicon_reg.rsc" );
+    _LIT(KTestAppDest, "C:\\private\\10003a3f\\import\\apps\\zerosizedicon_reg.rsc" );
+    
+    _LIT(KTestMbmSource, "Z:\\resource\\apps\\zerosizedicon.mbm");
+    _LIT(KTestMbmDest, "C:\\resource\\apps\\zerosizedicon.mbm");
+    
+    _LIT(KTestLocSource, "Z:\\apparctest\\zerosizedicon_loc.rsc");
+    _LIT(KTestLocDest, "C:\\resource\\apps\\zerosizedicon_loc.rsc");
+   
     TRequestStatus appScanCompleted=KRequestPending; 
     iLs.SetNotify(EFalse,appScanCompleted); 
     
@@ -2084,17 +2082,33 @@ void CT_RApaLsSessionTestStep::TestZeroSizedIconFileL()
     CleanupClosePushL(utils);
     TEST(KErrNone == utils.Connect());
   
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KZeroSizeIconAppSisFile);
-    sisFileInstaller.InstallSisL(KZeroSizeIconAppSisFile);
-    
+    INFO_PRINTF1(_L("Creating directory C:\\private\\10003a3f\\import\\apps\\ folder"));
+    TInt err=utils.CreateDirectoryL(KTestAppDestDir);
+    TESTEL((err==KErrNone) ||  (err==KErrAlreadyExists),err);
+
+    INFO_PRINTF1(_L("Creating directory C:\\resource\\apps\\ folder"));
+    err=utils.CreateDirectoryL(KTestAppResourceDir);
+    TESTEL((err==KErrNone) ||  (err==KErrAlreadyExists),err);
+
+    INFO_PRINTF1(_L("Copying _reg.rsc to C:\\private\\10003a3f\\import\\apps\\ folder"));    
+    User::LeaveIfError(utils.CopyFileL(KTestAppSource,KTestAppDest));
+    INFO_PRINTF1(_L("Copying the mbm and _loc.rsc to C:\\resource\\apps\\ folder"));
+    User::LeaveIfError(utils.CopyFileL(KTestMbmSource,KTestMbmDest));
+    User::LeaveIfError(utils.CopyFileL(KTestLocSource,KTestLocDest));
+
     User::WaitForRequest(appScanCompleted);
     TEST(appScanCompleted.Int()==MApaAppListServObserver::EAppListChanged);
 
 	appScanCompleted=KRequestPending;
 	iLs.SetNotify(EFalse,appScanCompleted);
-
-	sisFileInstaller.UninstallSisL(KZeroSizeIconAppComponent);
+    INFO_PRINTF1(_L("Removing _reg.rsc from C:\\private\\10003a3f\\import\\apps\\ folder"));
+    TEST(KErrNone == DeleteFileL(utils, KTestAppDest));
+    INFO_PRINTF1(_L("Removing the mbm and _loc.rsc from C:\\resource\\apps\\ folder"));
+    TEST(KErrNone == DeleteFileL(utils, KTestMbmDest));
+    TEST(KErrNone == DeleteFileL(utils, KTestLocDest));
+    INFO_PRINTF1(_L("Removing the C:\\private\\10003a3f\\import\\apps\\ dir "));
+    TEST(KErrNone == utils.DeleteDirectoryL(KTestAppDestDir));
+  
 	User::WaitForRequest(appScanCompleted);
     CleanupStack::PopAndDestroy(&utils);//utils
     INFO_PRINTF1(_L("Test TestZeroSizedIconFileL completed"));
@@ -2123,8 +2137,7 @@ TInt CT_RApaLsSessionTestStep::DeleteFileL(RSmlTestUtils &aFs, const TDesC &aFil
     return(err);
 }
 
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	
 /**
    @SYMTestCaseID T-RApaLsSessionTestStep-TestAppFolderNonRomDrivesL
   
@@ -2200,8 +2213,7 @@ void CT_RApaLsSessionTestStep::TestAppFolderNonRomDrivesL()
 
  	INFO_PRINTF1(_L("Test scanning of app folder for non-ROM drives completed"));
  	}
-#endif
-
+ 	
 /**
    @SYMTestCaseID T-RApaLsSessionTestStep-DoNumDefIconsTestL
   
@@ -2433,7 +2445,7 @@ void CT_RApaLsSessionTestStep::TestNotifyOnDataMappingChangeL()
 void CT_RApaLsSessionTestStep::TestDataPriorityForUnTrustedApps()
 	{
 	INFO_PRINTF1(_L("TestDataPriorityForUnTrustedApps about to start..."));
-	const TUid KUidUnTrustedApp = {0x80207f8C};
+	const TUid KUidUnTrustedApp = {0x10207f8C};
 	const TUid KUidTrustedApp = {0x10207f8D};
 	TInt ret;
 	TBool insertVal = EFalse;
@@ -2515,29 +2527,24 @@ void CT_RApaLsSessionTestStep::RunTestCasesL()
 	bufferAllocator->Create(TSize(200,1), EColor16M);
 	CleanupStack::PopAndDestroy(bufferAllocator);
 
-    TRequestStatus status;
-    iLs.SetNotify(ETrue, status);
-    User::WaitForRequest(status);
-    
-	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestAppListInvalidL(), iLs.ClearAppInfoArray() );
+	
+	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestAppListInvalidL(), iLs.ClearAppInfoArray() );
 	//DONT_CHECK due to file system changes
 	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestAppListInstallationL(), NO_CLEANUP);
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestAppListInstallation1L(), NO_CLEANUP);
+	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestAppListInstallation1L(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestAppFolderNonRomDrivesL(), NO_CLEANUP);
-#endif	
     HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestZeroSizedIconFileL(), NO_CLEANUP);
     HEAP_TEST_LS_SESSION(iLs, 0, 0, IconLoadingTestCasesL(), NO_CLEANUP);
-	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, AppInfoTestCasesL(), iLs.ClearAppInfoArray(); NO_CLEANUP);
-	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, EmbeddedAppsTestCases(), iLs.ClearAppInfoArray() );
+	HEAP_TEST_LS_SESSION(iLs, 0, 0, AppInfoTestCasesL(), iLs.ClearAppInfoArray(); NO_CLEANUP);
+	HEAP_TEST_LS_SESSION(iLs, 0, 0, EmbeddedAppsTestCases(), iLs.ClearAppInfoArray() );
 	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, DoNumDefIconsTestL(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestMatchesSecurityPolicy(), NO_CLEANUP);
 	//DONT_CHECK since there's a new typestore
 	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestNotifyOnDataMappingChangeL(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestAppListRecognizeDataBufferOnlyL(), iLs.FlushRecognitionCache() );
 	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestAppListRecognizeDataPassedByBufferL(), iLs.FlushRecognitionCache() );
-	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestAppListRecognizeDataL(), iLs.FlushRecognitionCache() );
-	HEAP_TEST_LS_SESSION(iLs, 0, DONT_CHECK, TestDataPriorityForUnTrustedApps(), NO_CLEANUP);
+	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestAppListRecognizeDataL(), iLs.FlushRecognitionCache() );
+	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestDataPriorityForUnTrustedApps(), NO_CLEANUP);
 	HEAP_TEST_LS_SESSION(iLs, 0, 0, TestDataPriorityForUnTrustedAppsRegFile(), NO_CLEANUP);
 	TestIconLoaderAndIconArrayMemoryLeaksL();
 	}
@@ -2579,42 +2586,9 @@ CT_RApaLsSessionTestStep::CT_RApaLsSessionTestStep()
  */
 TVerdict CT_RApaLsSessionTestStep::doTestStepPreambleL()
 	{
-    CSisFileInstaller sisFIleInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KApparcTestAppSisFile);
-    sisFIleInstaller.InstallSisL(KApparcTestAppSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KGroupNameTestAppSisFile);
-    sisFIleInstaller.InstallSisL(KGroupNameTestAppSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppNotEmbeddableSisFile);
-    sisFIleInstaller.InstallSisL(KAppNotEmbeddableSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableOnlySisFile);
-    sisFIleInstaller.InstallSisL(KAppEmbeddableOnlySisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableStandaloneSisFile);
-    sisFIleInstaller.InstallSisL(KAppEmbeddableStandaloneSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableEmbeddedSisFile);
-    sisFIleInstaller.InstallSisL(KAppEmbeddableEmbeddedSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableUiNotStandAloneSisFile);
-    sisFIleInstaller.InstallSisL(KAppEmbeddableUiNotStandAloneSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableUiOrStandAloneEmbeddedSisFile);
-    sisFIleInstaller.InstallSisL(KAppEmbeddableUiOrStandAloneEmbeddedSisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KSimpleAppSisFile);
-    sisFIleInstaller.InstallSisL(KSimpleAppSisFile);   
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KWinChainAppSisFile);
-    sisFIleInstaller.InstallSisL(KWinChainAppSisFile); 
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KServerApp7SisFile);
-    sisFIleInstaller.InstallSisL(KServerApp7SisFile);
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTestTrustedPriorityApp1SisFile);
-    sisFIleInstaller.InstallSisL(KTestTrustedPriorityApp1SisFile);    
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTestUnTrustedPriorityApp1SisFile);
-    sisFIleInstaller.InstallSisL(KTestUnTrustedPriorityApp1SisFile);   
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KTestTrustedPriorityApp2SisFile);
-    sisFIleInstaller.InstallSisL(KTestTrustedPriorityApp2SisFile);       
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KAppEmbeddableUiOrStandAloneStandaloneSisFile);
-    sisFIleInstaller.InstallSisAndWaitForAppListUpdateL(KAppEmbeddableUiOrStandAloneStandaloneSisFile);
-       
 	SetTestStepResult(EPass);
 	return TestStepResult();
 	}
-
 
 /**
    @return - TVerdict code
@@ -2622,22 +2596,6 @@ TVerdict CT_RApaLsSessionTestStep::doTestStepPreambleL()
  */
 TVerdict CT_RApaLsSessionTestStep::doTestStepPostambleL()
 	{
-    CSisFileInstaller sisFIleInstaller;
-    sisFIleInstaller.UninstallSisL(KApparcTestAppComponent);
-    sisFIleInstaller.UninstallSisL(KGroupNameTestAppComponent); 
-    sisFIleInstaller.UninstallSisL(KAppNotEmbeddableComponent);
-    sisFIleInstaller.UninstallSisL(KAppEmbeddableOnlyComponent);
-    sisFIleInstaller.UninstallSisL(KAppEmbeddableStandaloneComponent);    
-    sisFIleInstaller.UninstallSisL(KAppEmbeddableEmbeddedComponent);
-    sisFIleInstaller.UninstallSisL(KAppEmbeddableUiNotStandAloneComponent);
-    sisFIleInstaller.UninstallSisL(KAppEmbeddableUiOrStandAloneEmbeddedComponent);
-    sisFIleInstaller.UninstallSisL(KAppEmbeddableUiOrStandAloneStandaloneComponent);
-    sisFIleInstaller.UninstallSisL(KSimpleAppComponent);
-    sisFIleInstaller.UninstallSisL(KWinChainAppComponent);    
-    sisFIleInstaller.UninstallSisL(KServerApp7Component); 
-    sisFIleInstaller.UninstallSisL(KTestTrustedPriorityApp1Component);       
-    sisFIleInstaller.UninstallSisL(KTestUnTrustedPriorityApp1Component);   
-    sisFIleInstaller.UninstallSisL(KTestTrustedPriorityApp2Component);    
 	return TestStepResult();
 	}
 
@@ -2645,15 +2603,7 @@ TVerdict CT_RApaLsSessionTestStep::doTestStepPostambleL()
 TVerdict CT_RApaLsSessionTestStep::doTestStepL()
 	{
 	INFO_PRINTF1(_L("Testing Apparc...T_RApaLsSession Test Cases Running..."));
-	
-	TApaAppInfo info;
-	TUid uid = {0xABCD0000};
-	TInt err = iLs.GetAppInfo(info, uid);
-	if(err == KErrNone)
-	{       
-	CSisFileInstaller sisFileInstaller;
-	sisFileInstaller.UninstallSisL(KZeroSizeIconAppComponent);
-	}
+
 	TRAPD(ret,RunTestCasesL())
 	TEST(ret==KErrNone);
 	

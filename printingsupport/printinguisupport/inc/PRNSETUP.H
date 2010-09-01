@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,6 +27,10 @@
 #endif
 #if !defined(__PRNINF_H__)
 #include <prninf.h>
+#endif
+
+#ifndef SYMBIAN_ENABLE_MIXED_HEADERS
+#include <printinguisupport/prnpath.h>
 #endif
 
 /** 

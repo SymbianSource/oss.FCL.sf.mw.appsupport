@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -180,6 +180,14 @@ public:
     TBool GripNotSupported() const;
     
     /**
+	* Returns whether SlideSupported is set.
+	*
+	* @since S60 9.2
+	* @return ETrue if feature is set
+	*/  
+    TBool SlideSupported() const;
+    
+    /**
     * Returns whether Cover Display is supported.
     *
     * @since S60 3.2
@@ -209,7 +217,7 @@ public:
     * @since S60 3.2
     * @return ETrue if feature is supported
     */ 
-    // TBool FmTxSupported() const;
+    TBool FmTxSupported() const;
 
     /**
     * Returns whether pen is enabled.
@@ -244,7 +252,25 @@ public:
     * @since S60 5.1
     * @return ETrue if feature is supported
     */
-    // TBool FmTxRdsTextSupported() const;
+    TBool FmTxRdsTextSupported() const;
+    
+    
+    /**
+     * Returns whether a short press of the power key
+     * triggers the keylock
+     * 
+     * @since S60 5.2
+     * @return ETrue if feature is supported 
+     */
+    TBool PowerKeyIsLockKey() const;
+
+    /**
+    * Returns whether GAN is supported.
+    *
+    * @since S60 3.2
+    * @return ETrue if feature is supported
+    */
+    TBool GanSupported() const;
 
 private:
 
@@ -322,6 +348,11 @@ private:
     TBool iGripNotSupported;
     
     /**
+	* Slide supported status.
+	*/ 
+	TBool iSlideSupported;
+    
+    /**
     * Cover display support status.
     */
     TBool iCoverDisplaySupported;
@@ -339,7 +370,7 @@ private:
     /**
     * FM TX supported status
     */
-    // TBool iFmTxSupported;
+    TBool iFmTxSupported;
     
     /**
     * Pen enabled status.
@@ -359,7 +390,19 @@ private:
     /**
     * FM TX RDS Text support status.
     */
-    // TBool iFmTxRdsTextSupported;
+    TBool iFmTxRdsTextSupported;
+    
+    
+    /**
+     * Short press of power key invokes keylock
+     */
+    TBool iPowerKeyIsLockKey;
+
+    /**
+    * Generic Access Network (GAN) supported status.
+    */ 
+    TBool iGanSupported;
+
 };
 
 #endif // SYSAPFEATUREMANAGER_H

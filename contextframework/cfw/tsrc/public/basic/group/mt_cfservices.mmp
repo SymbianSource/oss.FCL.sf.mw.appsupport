@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -29,6 +29,9 @@ VENDORID                VID_DEFAULT
 SOURCEPATH              ../mt_cfservices
 SOURCE                  mt_cfservicesdllmain.cpp
 SOURCE                  mt_cfservices.cpp
+ 
+SOURCEPATH		../common
+SOURCE			cfenvutils.cpp
 
 USERINCLUDE             ../../../../inc/cfservices
 USERINCLUDE             ../../../../inc/cfserver

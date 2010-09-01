@@ -38,12 +38,8 @@ MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 macro UI_FRAMEWORKS_V1_REMNANT_FOR_JAVA_MIDLET_INSTALLER
 
-source			APFREC.CPP APFSTD.CPP APRuleBased.CPP ApLaunchChecker.cpp
+source			APFREC.CPP APFSTD.CPP APRuleBased.CPP ApLaunchChecker.cpp apinstallationmonitor.cpp
 source			apfmimecontentpolicy.cpp
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-source apinstallationmonitor.cpp
-#endif
 
 library         euser.lib efsrv.lib apparc.lib apgrfx.lib bafl.lib apserv.lib ecom.lib 
 library			apmime.lib caf.lib
@@ -56,12 +52,6 @@ END
 
 START MARM
 END
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	deffile APFILE.DEF
-#else
-	deffile apfile_legacy.def
-#endif
 
 // For the benefit of Eshell which cannot build a resource registration file
 START RESOURCE	eshell_reg.rss

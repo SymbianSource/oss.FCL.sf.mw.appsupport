@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,37 +26,23 @@
 #include "APFREC.H"
 #include "APSSES.H"
 #include "APSSTD.H"
+#include "../aplist/aplappregfinder.h"
 #include "../aplist/aplapplistitem.h"
 #include "APSSCAN.H"
 #include "APSSTD.H"
 #include "APASVST.H"
 #include <datastor.h>
 #include "APSRECCACHE.h"
+#include "apsnnapps.h"
+#include "../apfile/apinstallationmonitor.h"
 #include "../apgrfx/apprivate.h"
 #include "apgnotif.h"
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-#include<usif/scr/scr.h>
-#include<usif/scr/appregentries.h>
-#include<swi/sisregistrysession.h>
-#else
-#include "../aplist/aplappregfinder.h"
-#include "apsnnapps.h"
-#include "../apfile/apinstallationmonitor.h"
-#endif
-
-
 _LIT(KAppArcServerSemaphore,"AppArcServerSemaphore");
 _LIT(KAppArcServerThread,"AppArcServerThread");
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 _LIT(KAppRegistrationFileImportLocation, "?:\\private\\10003a3f\\import\\apps\\");
 _LIT(KAppResourceAppsLocation, "?:\\resource\\apps\\");
 _LIT(KNonNativeApplicationTypeRegistry, ":\\private\\10003a3f\\NonNativeTypes.dat");
-
-//To monitor all drives.
-const TInt KApaMonitorAllDrives = 0x3FFFFFF;
-#endif
 
 /*
  * patchable const data values defined in ApsConstData.cpp
@@ -68,6 +54,9 @@ IMPORT_C extern const TInt KApaDrivesToMonitor;
 IMPORT_C extern const TInt KApaLoadMbmIconsOnDemand;
 
 const TUint8 KPolicyElementWriteDeviceData = 0;
+
+//To monitor all drives.
+const TInt KApaMonitorAllDrives = 0x3FFFFFF;
 
 const TUint KRangeCount = 3; 
 
@@ -150,10 +139,8 @@ CApaAppArcServer::CApaAppArcServer(TInt aPriority)
 	iAppList(0),
 	iTypeStoreModified(0),
 	iLoadRecognizersOnDemand(KApaLoadDataRecognizersOnDemand),
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
-	iForceRegistrationStatus(EForceRegistrationNone),
-#endif
-	iLoadMbmIconsOnDemand(KApaLoadMbmIconsOnDemand)
+	iLoadMbmIconsOnDemand(KApaLoadMbmIconsOnDemand),
+	iForceRegistrationStatus(EForceRegistrationNone)
 	{
 	
 #ifdef __WINS__
@@ -176,16 +163,7 @@ void CApaAppArcServer::ConstructL()
 	StartL(KAppListServerName);
 	User::LeaveIfError(Dll::SetTls(this));
 	User::LeaveIfError(iFs.Connect());
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
-    //Connect to sisregistrysession to initially populate the applications information and 
-    //store it to SCR. 
-    Swi::RSisRegistrySession sisReg;
-    sisReg.Connect();
-    sisReg.Close();
-#endif
-
-    
+		
 	// Get the idle timeout delay from the commandline if specified. The default is 50000ms
 	const TInt cmdLineLen = User::CommandLineLength();
 	TInt idlePeriodicDelay=50000; //default value
@@ -248,15 +226,12 @@ void CApaAppArcServer::ConstructL()
 	
 	iAppList=CApaAppList::NewL(iFs, iLoadMbmIconsOnDemand, idlePeriodicDelay); // takes ownership of scanner
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	// If the phone rebooted halfway through processing updates, there will be a log file left
 	// look for one and recover if neccessary
 	CApsNonNativeApplicationsManager::RecoverFromUpdateLogL(iFs);
-#endif	
 
 	iMimeTypeRecognizer=CApaScanningDataRecognizer::NewL(iFs, !iLoadRecognizersOnDemand);
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	ConstructPathsToMonitorL();	
 
 	if ( iAppFsMonitor )
@@ -264,8 +239,6 @@ void CApaAppArcServer::ConstructL()
 		iAppFsMonitor->Start(ENotifyFile);
 		iAppFsMonitor->SetBlocked(ETrue);			
 		}
-#endif
-	
 	TRAP_IGNORE(iAppList->InitListL(this));
 	
 	//
@@ -287,29 +260,22 @@ void CApaAppArcServer::ConstructL()
 	iBaBackupSessionWrapper=CBaBackupSessionWrapper::NewL();
 	iBaBackupSessionWrapper->RegisterBackupOperationObserverL(*((MBackupOperationObserver*)this));
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	TRAP_IGNORE(InitNonNativeApplicationTypeArrayL());
-#else
-    //
-    TChar sysDrive = RFs::GetSystemDriveChar();
-    TInt maxSizeofFileName = KNonNativeApplicationTypeRegistry().Length() + 1;
-    iNonNativeApplicationTypeRegistry.CreateL(maxSizeofFileName);
-    iNonNativeApplicationTypeRegistry.Append(sysDrive);
-    iNonNativeApplicationTypeRegistry.Append(KNonNativeApplicationTypeRegistry());
-	
-    TRAP_IGNORE(InternalizeNonNativeApplicationTypeArrayL());   // We don't want a corrupt file to prevent from starting	
-#endif
-    
+	//
+	TChar sysDrive = RFs::GetSystemDriveChar();
+	TInt maxSizeofFileName = KNonNativeApplicationTypeRegistry().Length() + 1;
+	iNonNativeApplicationTypeRegistry.CreateL(maxSizeofFileName);
+	iNonNativeApplicationTypeRegistry.Append(sysDrive);
+	iNonNativeApplicationTypeRegistry.Append(KNonNativeApplicationTypeRegistry());
+
+	TRAP_IGNORE(InternalizeNonNativeApplicationTypeArrayL());	// We don't want a corrupt file to prevent from starting
 	if(iLoadRecognizersOnDemand)
 		iRecognizerUnloadTimer=CPeriodic::NewL(EPriorityNormal);
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+	//
 	iAppInstallationMonitor = CApaAppInstallationMonitor::NewL(this);
 	iAppInstallationMonitor->Start();
-#endif	
 	}
 	
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 void CApaAppArcServer::ConstructPathsToMonitorL()
 	{
 	TInt drivesToMonitor = KApaDrivesToMonitor;
@@ -371,20 +337,16 @@ void CApaAppArcServer::ConstructPathsToMonitorL()
 		iAppFsMonitor->AddLocationL(KAppResourceAppsLocation);
 		}	
 	}
-#endif
-
+	
 EXPORT_C CApaAppArcServer::~CApaAppArcServer()
 	{
 	if(iBaBackupSessionWrapper)
 		iBaBackupSessionWrapper->DeRegisterBackupOperationObserver(*this);
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	delete iAppInstallationMonitor;
-    delete iAppFsMonitor;
-    iNonNativeApplicationTypeRegistry.Close();    
-#endif
 	delete iAppList; // deletes scanners
 	delete iMimeTypeRecognizer;
 	delete iMimeTypeToAppMappingsManager;
+	delete iAppFsMonitor;	
 	delete iTypeStoreMonitor;
 	delete iBaBackupSessionWrapper;
 	delete iRecognitionCache;
@@ -399,9 +361,9 @@ EXPORT_C CApaAppArcServer::~CApaAppArcServer()
 	iNonNativeApplicationTypeArray.Close();
 
 	delete iRecognizerUnloadTimer;
+	iNonNativeApplicationTypeRegistry.Close();
 	}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK  
 EXPORT_C void CApaAppArcServer::HandleInstallationStartEvent()
 	{
 	if ( iAppFsMonitor )
@@ -419,7 +381,6 @@ EXPORT_C void CApaAppArcServer::HandleInstallationEndEventL()
 		}
 	AppList().RestartScanL();
 	}
-#endif
 
 CSession2* CApaAppArcServer::NewSessionL(const TVersion& aVersion,const RMessage2&/* aMessage*/) const
 // Create a new server session.
@@ -435,7 +396,7 @@ CSession2* CApaAppArcServer::NewSessionL(const TVersion& aVersion,const RMessage
 //
 // scanning code here
 //
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+
 EXPORT_C TCallBack CApaAppArcServer::RescanCallBack()
 	{
 	return TCallBack(&AppFsNotifyWithForcedRegistrationsResetCallBack,this);
@@ -454,7 +415,6 @@ TInt CApaAppArcServer::AppFsNotifyCallBack(TAny* aObject)
 	reinterpret_cast<CApaAppArcServer*>(aObject)->UpdateApps();
 	return KErrNone;
 	}
-#endif
 
 TInt CApaAppArcServer::PlugInNotifyCallBack(TAny* aObject)
 	{
@@ -471,7 +431,6 @@ TInt CApaAppArcServer::TypeStoreNotifyCallback(TAny* aObject)
 	return KErrNone;
 	}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 void CApaAppArcServer::UpdateApps()
 // update the list
 	{
@@ -487,8 +446,7 @@ void CApaAppArcServer::UpdateAppsByForceRegistration()
     {
     iForceRegistrationStatus|=EForceRegistrationRequested;
     UpdateApps();
-    }	
-#endif
+    }
 
 void CApaAppArcServer::NotifyUpdate(TInt aReason)
 // tell all sessions to update their clients
@@ -522,23 +480,10 @@ void CApaAppArcServer::NotifyUpdate(TInt aReason)
         if(modificationStatus)
             TRAP_IGNORE(iMimeTypeToAppMappingsManager->StoreL());
         }
-   
+    
 	// iterate through sessions
 	iSessionIter.SetToFirst();
 	CApaAppArcServSession* ses=static_cast<CApaAppArcServSession*>(&(*iSessionIter++));
-	
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    //Get the updated application information from iAppList
-    CArrayFixFlat<TApaAppUpdateInfo>* updatedAppsInfo=iAppList->UpdatedAppsInfo();
-
-    while (ses!=NULL)
-        {
-        //Call session object NotifyClients and pass the updated application information.
-        ses->NotifyClients(aReason, updatedAppsInfo);    
-        ses=static_cast<CApaAppArcServSession*>(&(*iSessionIter++));
-        }
-#else
-	
 	while (ses!=NULL)
 		{
 		if(iForceRegistrationStatus & EForceRegistrationRequested)
@@ -565,7 +510,6 @@ void CApaAppArcServer::NotifyUpdate(TInt aReason)
          //If this function is called not because of force registration, clear force registration applist change status. 
         iForceRegistrationStatus &= (~EForceRegistrationAppListChanged);        
          }
-#endif     
 	}
 
 void CApaAppArcServer::UpdatePlugIns()
@@ -632,20 +576,16 @@ void CApaAppArcServer::HandleBackupOperationEventL(const TBackupOperationAttribu
 	case MBackupOperationObserver::EAbort:
 		break;
 	case MBackupOperationObserver::EStart:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK   
 		if ( iAppFsMonitor )
 			{
 			iAppFsMonitor->SetBlocked(ETrue);	
 			}
-#endif		
 		break;
 	case MBackupOperationObserver::EEnd:
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	    
 		if ( iAppFsMonitor )
 			{
 			iAppFsMonitor->SetBlocked(EFalse);	
 			}
-#endif		
 		break;
 	default:
 		Panic(EEventFromBackupObserverError);
@@ -655,12 +595,10 @@ void CApaAppArcServer::HandleBackupOperationEventL(const TBackupOperationAttribu
 
 void CApaAppArcServer::InitialListPopulationComplete()
 	{
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	if ( iAppFsMonitor )
 		{
 		iAppFsMonitor->SetBlocked(EFalse);	
 		}
-#endif	
 	
 	// notify clients (whoever is interested) that initial population of list is completed
 	iSessionIter.SetToFirst();
@@ -673,90 +611,41 @@ void CApaAppArcServer::InitialListPopulationComplete()
 		}
 	}
 
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-
-/* 
- * Cleanup RPointerArray
- */
-void CleanupAndDestroyLauncherArray(TAny* aRPrray)
-    {
-    RPointerArray<Usif::CLauncherExecutable>* rpArray = (static_cast<RPointerArray<Usif::CLauncherExecutable>*>(aRPrray));
-    rpArray->ResetAndDestroy();
-    rpArray->Close();
-    }
-
-
-/* 
- * Gets non-native type to its run time mapping information from SCR and initialzes 
- * a mapping array
- */
-void CApaAppArcServer::InitNonNativeApplicationTypeArrayL()
-    {
-     Usif::RSoftwareComponentRegistry scrSession;
-     User::LeaveIfError(scrSession.Connect());
-     CleanupClosePushL(scrSession);
-     
-     RPointerArray<Usif::CLauncherExecutable> launchers;
-     //Get non-native type to its run-time mappings 
-     scrSession.GetApplicationLaunchersL(launchers);
-     TCleanupItem cleanup(CleanupAndDestroyLauncherArray, &launchers); 
-     CleanupStack::PushL(cleanup);     
-
-     //Get each mapping and add it to mapping array
-     for(TInt index=0;index<launchers.Count();index++)
-         {
-         Usif::CLauncherExecutable* launcherInfo=launchers[index];
-         SNonNativeApplicationType nonNativeApplicationType;
-         nonNativeApplicationType.iTypeUid.iUid=launcherInfo->TypeId();
-         nonNativeApplicationType.iNativeExecutable=launcherInfo->Launcher().AllocLC();
-         iNonNativeApplicationTypeArray.AppendL(nonNativeApplicationType);
-         CleanupStack::Pop(nonNativeApplicationType.iNativeExecutable);     
-         }
-     CleanupStack::PopAndDestroy(2, &scrSession);
-    }
-
-void CApaAppArcServer::UpdateAppListL(RArray<TApaAppUpdateInfo>* aAppUpdateInfo, TUid aSecureID)
-{
-   iAppList->UpdateApplistL(this, aAppUpdateInfo, aSecureID);
-}
-#else
-
 void CApaAppArcServer::RegisterNonNativeApplicationTypeL(TUid aApplicationType, const TDesC& aNativeExecutable)
-    {
-    for (TInt i=iNonNativeApplicationTypeArray.Count()-1; i>=0; --i)
-        {
-        if (iNonNativeApplicationTypeArray[i].iTypeUid.iUid==aApplicationType.iUid)
-            User::Leave(KErrAlreadyExists);
-        }
-        
-    SNonNativeApplicationType nonNativeApplicationType;
-    nonNativeApplicationType.iTypeUid.iUid=aApplicationType.iUid;
-    nonNativeApplicationType.iNativeExecutable=aNativeExecutable.AllocLC();
-    iNonNativeApplicationTypeArray.AppendL(nonNativeApplicationType);
-    CleanupStack::Pop(nonNativeApplicationType.iNativeExecutable);
-    CleanupStack::PushL(TCleanupItem(DeleteLastNonNativeApplicationType, this));
-    ExternalizeNonNativeApplicationTypeArrayL();
-    CleanupStack::Pop(this); // the TCleanupItem
-    }
+	{
+	for (TInt i=iNonNativeApplicationTypeArray.Count()-1; i>=0; --i)
+		{
+		if (iNonNativeApplicationTypeArray[i].iTypeUid.iUid==aApplicationType.iUid)
+			User::Leave(KErrAlreadyExists);
+		}
+		
+	SNonNativeApplicationType nonNativeApplicationType;
+	nonNativeApplicationType.iTypeUid.iUid=aApplicationType.iUid;
+	nonNativeApplicationType.iNativeExecutable=aNativeExecutable.AllocLC();
+	iNonNativeApplicationTypeArray.AppendL(nonNativeApplicationType);
+	CleanupStack::Pop(nonNativeApplicationType.iNativeExecutable);
+	CleanupStack::PushL(TCleanupItem(DeleteLastNonNativeApplicationType, this));
+	ExternalizeNonNativeApplicationTypeArrayL();
+	CleanupStack::Pop(this); // the TCleanupItem
+	}
 
 void CApaAppArcServer::DeregisterNonNativeApplicationTypeL(TUid aApplicationType)
-    {
-    TInt i;
-    for (i=iNonNativeApplicationTypeArray.Count()-1; i>=0; --i)
-        {
-        if (iNonNativeApplicationTypeArray[i].iTypeUid.iUid==aApplicationType.iUid)
-            break;
-        }
-        
-    if (i>=0)
-        {
-        ExternalizeNonNativeApplicationTypeArrayL(i);
-        delete iNonNativeApplicationTypeArray[i].iNativeExecutable;
-        iNonNativeApplicationTypeArray[i].iNativeExecutable = NULL;
-        iNonNativeApplicationTypeArray.Remove(i);
-        }
-    }
+	{
+	TInt i;
+	for (i=iNonNativeApplicationTypeArray.Count()-1; i>=0; --i)
+		{
+		if (iNonNativeApplicationTypeArray[i].iTypeUid.iUid==aApplicationType.iUid)
+			break;
+		}
+		
+	if (i>=0)
+		{
+		ExternalizeNonNativeApplicationTypeArrayL(i);
+		delete iNonNativeApplicationTypeArray[i].iNativeExecutable;
+		iNonNativeApplicationTypeArray[i].iNativeExecutable = NULL;
+		iNonNativeApplicationTypeArray.Remove(i);
+		}
+	}
 
 void CApaAppArcServer::InternalizeNonNativeApplicationTypeArrayL()
 	{
@@ -784,39 +673,37 @@ void CApaAppArcServer::InternalizeNonNativeApplicationTypeArrayL()
 	CleanupStack::PopAndDestroy(&file);
 	}
 
-
 void CApaAppArcServer::ExternalizeNonNativeApplicationTypeArrayL(TInt aIndexToIgnore/*=-1*/) const
-    {
-    RFs& fs=const_cast<RFs&>(iFs);
-    fs.MkDirAll(iNonNativeApplicationTypeRegistry); // ignore any error
-    RFile file;
-    CleanupClosePushL(file);
-    User::LeaveIfError(file.Replace(fs, iNonNativeApplicationTypeRegistry, EFileShareExclusive|EFileStream|EFileWrite));
-    RFileWriteStream targetStream;
-    targetStream.Attach(file); // file gets closed by this call, but that's okay, we don't need it any more (targetStream has its own copy of this RFile object that it owns)
-    CleanupClosePushL(targetStream);
-    const TInt arrayCount(iNonNativeApplicationTypeArray.Count());
-    TInt arrayCountToExternalize=arrayCount;
-    if (aIndexToIgnore>=0)
-        --arrayCountToExternalize;
+	{
+	RFs& fs=const_cast<RFs&>(iFs);
+	fs.MkDirAll(iNonNativeApplicationTypeRegistry); // ignore any error
+	RFile file;
+	CleanupClosePushL(file);
+	User::LeaveIfError(file.Replace(fs, iNonNativeApplicationTypeRegistry, EFileShareExclusive|EFileStream|EFileWrite));
+	RFileWriteStream targetStream;
+	targetStream.Attach(file); // file gets closed by this call, but that's okay, we don't need it any more (targetStream has its own copy of this RFile object that it owns)
+	CleanupClosePushL(targetStream);
+	const TInt arrayCount(iNonNativeApplicationTypeArray.Count());
+	TInt arrayCountToExternalize=arrayCount;
+	if (aIndexToIgnore>=0)
+		--arrayCountToExternalize;
 
-    TCardinality(arrayCountToExternalize).ExternalizeL(targetStream);
-    for (TInt i=0; i<arrayCount; ++i)
-        {
-        if (i!=aIndexToIgnore)
-            {
-            const SNonNativeApplicationType& nonNativeApplicationType=iNonNativeApplicationTypeArray[i];
-            targetStream.WriteUint32L(nonNativeApplicationType.iTypeUid.iUid);
-            targetStream << *nonNativeApplicationType.iNativeExecutable;
-            }
-        }
-        
-    targetStream.CommitL();
-    CleanupStack::PopAndDestroy(2, &file);
-    }
-#endif
+	TCardinality(arrayCountToExternalize).ExternalizeL(targetStream);
+	for (TInt i=0; i<arrayCount; ++i)
+		{
+		if (i!=aIndexToIgnore)
+			{
+			const SNonNativeApplicationType& nonNativeApplicationType=iNonNativeApplicationTypeArray[i];
+			targetStream.WriteUint32L(nonNativeApplicationType.iTypeUid.iUid);
+			targetStream << *nonNativeApplicationType.iNativeExecutable;
+			}
+		}
+		
+	targetStream.CommitL();
+	CleanupStack::PopAndDestroy(2, &file);
+	}
 
-TPtrC CApaAppArcServer::NativeExecutableL(TUid aNonNativeApplicationType)
+TPtrC CApaAppArcServer::NativeExecutableL(TUid aNonNativeApplicationType) const
 	{
 	for (TInt i=iNonNativeApplicationTypeArray.Count()-1; i>=0; --i)
 		{
@@ -824,55 +711,10 @@ TPtrC CApaAppArcServer::NativeExecutableL(TUid aNonNativeApplicationType)
 		if (nonNativeApplicationType.iTypeUid.iUid==aNonNativeApplicationType.iUid)
 			return *nonNativeApplicationType.iNativeExecutable;
 		}
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-	//If the mapping is not available in the list, search in SCR and add it to the list.
-	TPtrC nativeExecutableName=FindAndAddNonNativeRuntimeMappingL(aNonNativeApplicationType);
-	if(nativeExecutableName==KNullDesC())
-	    User::Leave(KErrNotSupported); // not KErrNotFound
-
-	return nativeExecutableName;
-#else
+		
 	User::Leave(KErrNotSupported); // not KErrNotFound
 	return KNullDesC();
-#endif	
 	}
-
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-TPtrC CApaAppArcServer::FindAndAddNonNativeRuntimeMappingL(TUid aNonNativeApplicationType)
-{
-    //If non-native type to its runtime is not available search in SCR and update in list 
-    Usif::RSoftwareComponentRegistry scrSession;
-    User::LeaveIfError(scrSession.Connect());
-    CleanupClosePushL(scrSession);
-    
-    RPointerArray<Usif::CLauncherExecutable> launchers;
-    //Get non-native type to its run-time mappings 
-    scrSession.GetApplicationLaunchersL(launchers);
-    TCleanupItem cleanup(CleanupAndDestroyLauncherArray, &launchers); 
-    CleanupStack::PushL(cleanup);     
-
-    //Search for mapping and add it mapping list.
-    for(TInt index=0;index<launchers.Count();index++)
-        {
-        Usif::CLauncherExecutable* launcherInfo=launchers[index];
-        if(aNonNativeApplicationType.iUid==launcherInfo->TypeId())
-            {
-            SNonNativeApplicationType nonNativeApplicationType;
-            nonNativeApplicationType.iTypeUid.iUid=launcherInfo->TypeId();
-            nonNativeApplicationType.iNativeExecutable=launcherInfo->Launcher().AllocLC();
-            iNonNativeApplicationTypeArray.AppendL(nonNativeApplicationType);
-            CleanupStack::Pop(nonNativeApplicationType.iNativeExecutable);
-            CleanupStack::PopAndDestroy(2, &scrSession);
-            return *nonNativeApplicationType.iNativeExecutable;
-            }
-        }
-    
-    CleanupStack::PopAndDestroy(2, &scrSession);    
-    return KNullDesC();
-}
-#endif
 
 void CApaAppArcServer::DeleteLastNonNativeApplicationType(TAny* aThis)
 	{ // static
@@ -894,13 +736,6 @@ void CApaAppArcServer::NotifyScanComplete()
 	// iterate through sessions
 	iSessionIter.SetToFirst();
 	CApaAppArcServSession* ses=static_cast<CApaAppArcServSession*>(&(*iSessionIter++));
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    while (ses)
-        {
-        ses->NotifyScanComplete();  
-        ses=static_cast<CApaAppArcServSession*>(&(*iSessionIter++));
-        }	
-#else
 	while (ses)
 		{
 		if((iForceRegistrationStatus & EForceRegistrationRequested) ||
@@ -925,7 +760,6 @@ void CApaAppArcServer::NotifyScanComplete()
 	    }
 	//Clear force registration request status
         iForceRegistrationStatus &= (~EForceRegistrationRequested);
-#endif        
 	}
 
 /*

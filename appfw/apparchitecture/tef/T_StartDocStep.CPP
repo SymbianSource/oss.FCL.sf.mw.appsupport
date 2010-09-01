@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,12 +22,6 @@
 #include "testableapalssession.h"
 #include "T_StartDocStep.h"
 #include "TStartDoc.h"
-#include "T_SisFileInstaller.h"
-
-_LIT(KStartDocAppSisFile, "z:\\apparctest\\apparctestsisfiles\\TStartDocApp_v2.sis");
-_LIT(KStartDocAppComponent, "TStartDocApp_v2");
-
-
 
 /**
    @SYMTestCaseID T-StartDocStep-TestStartDocL
@@ -125,23 +119,6 @@ void CT_StartDocStep::TestStartDocL(RApaLsSession& aLs)
 	User::After(1500000);
 	}
 
-TVerdict CT_StartDocStep::doTestStepPreambleL()
-    {
-    CSisFileInstaller sisInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KStartDocAppSisFile);
-    sisInstaller.InstallSisAndWaitForAppListUpdateL(KStartDocAppSisFile);
-    
-    SetTestStepResult(EPass);
-    return TestStepResult();    
-    }
-
-TVerdict CT_StartDocStep::doTestStepPostambleL()
-    {
-    CSisFileInstaller sisInstaller;
-    sisInstaller.UninstallSisL(KStartDocAppComponent);
-    return TestStepResult();    
-    }
-
 TVerdict CT_StartDocStep::doTestStepL()
 {
 	INFO_PRINTF1(_L("Test Started"));
@@ -154,7 +131,7 @@ TVerdict CT_StartDocStep::doTestStepL()
 	User::After(1500000);
 
 	// run the test
-	HEAP_TEST_LS_SESSION(ls, 0, DONT_CHECK, TestStartDocL(ls), NO_CLEANUP);
+	HEAP_TEST_LS_SESSION(ls, 0, 0, TestStartDocL(ls), NO_CLEANUP);
 	
 	CleanupStack::PopAndDestroy(&ls);
 

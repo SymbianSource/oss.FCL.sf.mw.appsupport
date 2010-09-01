@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -24,6 +24,10 @@
 #include <bautils.h>
 #include <e32property.h>
 #include <UikonInternalPSKeys.h>
+#include <aknglobalnote.h>
+#include <secondarydisplay/aknsecondarydisplaydefs.h>
+#include <aknsddata.h>
+#include <avkon.rsg>
 #include <data_caging_path_literals.hrh>
 #include <coreapplicationuisdomainpskeys.h>
 
@@ -722,6 +726,7 @@ CLafShutdownManager::CGlobalQueryActive* CLafShutdownManager::CGlobalQueryActive
 CLafShutdownManager::CGlobalQueryActive::~CGlobalQueryActive()
     {
     TRACES("CLafShutdownManager::CGlobalQueryActive::~CGlobalQueryActive");        
+    delete iQuery;
     delete iMessageInfo[ECritical];
     delete iMessageInfo[EWarning];
     delete iMessageInfo[EWarningMMC];
@@ -796,21 +801,50 @@ void CLafShutdownManager::CGlobalQueryActive::DisplayL(TMessageType aType, TBool
         return;
         }
 
-      if (aType != ECallBack)
+    if (!iQuery)
+        {
+        iQuery = CAknGlobalNote::NewL();
+        iQuery->SetSoftkeys(R_AVKON_SOFTKEYS_OK_EMPTY);        
+        }
+
+    if (aType != ECallBack)
         {
         iMessageType = aType;
         }
 
     CleanupL();
 
-          
-        CHbDeviceMessageBoxSymbian* globalNote = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EWarning);
-        CleanupStack::PushL(globalNote);
-        globalNote->SetTextL((iMessageInfo[iMessageType]->iMessage)->Des());
-        globalNote->SetTimeoutL(0);
-        globalNote->ExecL();
-        CleanupStack::PopAndDestroy(globalNote);
+    if (iMessageType != ENone && (iMessageInfo[iMessageType]->iNoteId == KErrNotFound || aForcedNote))
+        {
+        TInt dialogId = 0;
+        switch(iMessageType)
+            {
+        case EWarning:
+            dialogId = EAknDiskWarnignNote;
+            break;
+        case ECritical:
+            dialogId = EAknDiskFullNote;
+            break;
+        case ECriticalMMC:    
+            dialogId = EAknMMCFullNote;
+            break;
+        default:
+            dialogId = EAknMMCWarningNote;
+            break;            
+            }
         
+        CAknSDData* sd = CAknSDData::NewL(KAknSecondaryDisplayCategory, dialogId, KNullDesC8);
+        iQuery->SetSecondaryDisplayData(sd);
+        
+        TInt noteid = iQuery->ShowNoteL(EAknGlobalWarningNote,
+                                        (iMessageInfo[iMessageType]->iMessage)->Des());
+                                        
+        if (noteid != KErrNotFound) // Note was added to queue successfully.
+            {
+            iMessageInfo[iMessageType]->iNoteId = noteid;
+            }
+        }
+
     iMessageType = ENone;
     TRACES("CLafShutdownManager::CGlobalQueryActive::DisplayL: End");
     }
@@ -843,7 +877,11 @@ void CLafShutdownManager::CGlobalQueryActive::CleanupL(TBool aCancel)
             break;
             }
 
-         }
+        if (cancelNoteId != KErrNotFound && aCancel)
+            {
+            iQuery->CancelNoteL(cancelNoteId);
+            }
+        }
     TRACES("CLafShutdownManager::CGlobalQueryActive::CleanupL: End");
     }
 

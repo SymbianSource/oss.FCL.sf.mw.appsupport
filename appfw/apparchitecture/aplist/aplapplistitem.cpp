@@ -25,9 +25,6 @@
 #include "aplappinforeader.h"
 #include <e32uid.h>
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-#include <usif/scr/appregentries.h>
-#endif
 
 // Delays in the pseudo idle object that builds the application list
 //
@@ -236,196 +233,43 @@ void CApaAppEntry::ConstructL(const TDesC& aFileName)
 // Class CApaAppData
 //
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-CApaAppData::CApaAppData(RFs& aFs)
-    :iCaption(NULL), iShortCaption(NULL), 
-    iFs(aFs),
-    iNonMbmIconFile(EFalse),
-    iApplicationLanguage(ELangNone), iIndexOfFirstOpenService(-1),
-    iShortCaptionFromResourceFile(NULL)
-    {
-    }
-EXPORT_C CApaAppData* CApaAppData::NewL(const Usif::CApplicationRegistrationData& aAppInfo, RFs& aFs, const Usif::RSoftwareComponentRegistry& aScrCon)
-    {
-    CApaAppData* self=new(ELeave) CApaAppData(aFs);
-    CleanupStack::PushL(self);
-    self->ConstructL(aAppInfo, aScrCon);
-    CleanupStack::Pop(self); // self
-    return self;
-    }
-
-void CApaAppData::ConstructL(const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScrCon)
-    {
-    iCapabilityBuf.FillZ(iCapabilityBuf.MaxLength());
-    iIcons = CApaAppIconArray::NewL();
-    iViewDataArray=new(ELeave) CArrayPtrFlat<CApaAppViewData>(1);
-    iOwnedFileArray=new(ELeave) CDesCArraySeg(1);
-    User::LeaveIfError(ReadApplicationInformationFromSCRL(aAppInfo, aScrCon));   
-    }
-
-//Initializes the CApaAppData object with information read from SCR. Leaves if any error occurs during initialization.
-
-TInt CApaAppData::ReadApplicationInformationFromSCRL(const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScrCon)
-    {
-    HBufC* caption = NULL;
-    HBufC* shortCaption = NULL;
-
-    CApaAppInfoReader* appInfoReader = NULL;
-    appInfoReader = CApaAppInfoReader::NewL(iFs, aAppInfo, aScrCon); 
-    CleanupStack::PushL(appInfoReader);
-    TBool readSuccessful=EFalse;
-    readSuccessful= appInfoReader->ReadL();
-    
-    iFullName=appInfoReader->AppBinaryFullName();
-    
-    iUidType = appInfoReader->AppBinaryUidType();
-
-    caption = appInfoReader->Caption();
-    shortCaption = appInfoReader->ShortCaption();
-
-    CApaAppIconArray* icons = appInfoReader->Icons();
-    if(icons)
-        {
-        delete iIcons;
-        iIcons = icons;
-        iIconLoader = appInfoReader->IconLoader();
-        }
-    else
-        {           
-        TRAPD(err, icons = CApaAppIconArray::NewL());
-        if(err == KErrNone)
-            {
-            delete iIcons;
-            iIcons = icons;
-            }
-        }
-        
-               
-    iOpaqueData = appInfoReader->OpaqueData();
-
-    if (readSuccessful)
-        {
-        appInfoReader->Capability(iCapabilityBuf);
-
-        iDefaultScreenNumber = appInfoReader->DefaultScreenNumber();
-
-        delete iIconFileName;
-        iIconFileName = appInfoReader->IconFileName();
-        iNonMbmIconFile = appInfoReader->NonMbmIconFile();
-        iNumOfAppIcons = appInfoReader->NumOfAppIcons();
-        iApplicationLanguage = appInfoReader->AppLanguage();
-                
-        // views
-        iViewDataArray->ResetAndDestroy();
-        CArrayPtrFlat<CApaAppViewData>* viewDataArray = appInfoReader->Views();
-        if (viewDataArray)
-            {
-            delete iViewDataArray;
-            iViewDataArray = viewDataArray;
-            
-            if(!iIconLoader && ViewMbmIconsRequireLoading())
-                {
-                //if VIEW_DATA contains a MBM icon we need to initialize iIconLoader
-                iIconLoader = appInfoReader->IconLoader();
-                }
-            }
-
-            // owned files
-            iOwnedFileArray->Reset();
-            CDesCArray* const ownedFileArray = appInfoReader->OwnedFiles();
-            if (ownedFileArray)
-                {
-                delete iOwnedFileArray;
-                iOwnedFileArray = ownedFileArray;
-                }
-            
-            UpdateServiceArray(appInfoReader->ServiceArray(iIndexOfFirstOpenService));
-            }
-
-    CleanupStack::PopAndDestroy(appInfoReader);
-
-    if (!caption)
-        {
-        TParsePtrC parse (*iFullName);
-        caption = parse.Name().Alloc();
-        }
-
-    // Put the captions into place
-    if (caption)
-        {
-        if (!shortCaption)
-            {
-            shortCaption = caption->Alloc();
-            if (!shortCaption)
-                {
-                delete caption;
-                caption = NULL;
-                }
-            }
-
-        delete iCaption;
-        iCaption = caption;
-        delete iShortCaption;
-        iShortCaption = shortCaption;
-        }
-    
-    return caption ? KErrNone : KErrNoMemory;
-    }
-
-
-EXPORT_C TUid CApaAppData::NonNativeApplicationType() const
-/** @internalComponent */
-    {
-    if (iCapabilityBuf().iAttributes & TApaAppCapability::ENonNative)
-        return iUidType[1];
-    else
-        return TUid::Null();
-    }
-
-EXPORT_C TBool CApaAppData::IsLangChangePending()
-{
-    return iIsLangChangePending;
-}
-
-#else
-CApaAppData::CApaAppData(RFs& aFs)
-    :iCaption(NULL), iShortCaption(NULL), 
-    iIsPresent(CApaAppData::EIsPresent), iFs(aFs),
-    iNonMbmIconFile(EFalse),
-    iApplicationLanguage(ELangNone), iIndexOfFirstOpenService(-1),
-    iNonNativeApplicationType(TUid::Null()),
-    iShortCaptionFromResourceFile(NULL)
-    {
-    }
-
 EXPORT_C CApaAppData* CApaAppData::NewL(const TApaAppEntry& aAppEntry, RFs& aFs)
-    {
-    CApaAppData* self=new(ELeave) CApaAppData(aFs);
-    CleanupStack::PushL(self);
-    self->ConstructL(aAppEntry);
-    CleanupStack::Pop(); // self
-    return self;
-    }
+	{
+	CApaAppData* self=new(ELeave) CApaAppData(aFs);
+	CleanupStack::PushL(self);
+	self->ConstructL(aAppEntry);
+	CleanupStack::Pop(); // self
+	return self;
+	}
+
+CApaAppData::CApaAppData(RFs& aFs)
+	:iCaption(NULL), iShortCaption(NULL), 
+	iIsPresent(CApaAppData::EIsPresent), iFs(aFs),
+	iNonMbmIconFile(EFalse),
+	iApplicationLanguage(ELangNone), iIndexOfFirstOpenService(-1),
+	iNonNativeApplicationType(TUid::Null()),
+	iShortCaptionFromResourceFile(NULL)
+	{
+	}
 
 void CApaAppData::ConstructL(const TApaAppEntry& aAppEntry)
-    {
-    iUidType = aAppEntry.iUidType; // if the 2nd UID is KUidAppRegistrationFile, iUidType will be updated in ReadApplicationInformationFromResourceFiles() to reflect the TUidType for the application binary
+	{
+	iUidType = aAppEntry.iUidType; // if the 2nd UID is KUidAppRegistrationFile, iUidType will be updated in ReadApplicationInformationFromResourceFiles() to reflect the TUidType for the application binary
+	if (ApaUtils::TypeUidIsForRegistrationFile(aAppEntry.iUidType))
+		{
+		iRegistrationFile = aAppEntry.iFullName.AllocL();
+		}
+	else
+		{
+		iFullName = aAppEntry.iFullName.AllocL();
+		}
 
-    if (ApaUtils::TypeUidIsForRegistrationFile(aAppEntry.iUidType))
-        {
-        iRegistrationFile = aAppEntry.iFullName.AllocL();
-        }
-    else
-        {
-        iFullName = aAppEntry.iFullName.AllocL();
-        }
-    
-    iCapabilityBuf.FillZ(iCapabilityBuf.MaxLength());
-    iIcons = CApaAppIconArray::NewL();
-    iViewDataArray=new(ELeave) CArrayPtrFlat<CApaAppViewData>(1);
-    iOwnedFileArray=new(ELeave) CDesCArraySeg(1);
-    User::LeaveIfError(ReadApplicationInformationFromResourceFiles());    
-    }
+	iCapabilityBuf.FillZ(iCapabilityBuf.MaxLength());
+	iIcons = CApaAppIconArray::NewL();
+	iViewDataArray=new(ELeave) CArrayPtrFlat<CApaAppViewData>(1);
+	iOwnedFileArray=new(ELeave) CDesCArraySeg(1);
+	User::LeaveIfError(ReadApplicationInformationFromResourceFiles());
+	}
 
 // Return a standard error code
 // The value returned only reflect the caption status
@@ -437,330 +281,172 @@ void CApaAppData::ConstructL(const TApaAppEntry& aAppEntry)
 // 2. Be very careful in this method, because it can be called on a newly constructed object,
 //    or on an existing object, so don't assume member data pointers will be NULL
 TInt CApaAppData::ReadApplicationInformationFromResourceFiles()
-    {
-    HBufC* caption = NULL;
-    HBufC* shortCaption = NULL;
+	{
+	HBufC* caption = NULL;
+	HBufC* shortCaption = NULL;
 
-    iTimeStamp = TTime(0); // cannot init in constructor because this function can be called on an existing CApaAppData object
+	iTimeStamp = TTime(0); // cannot init in constructor because this function can be called on an existing CApaAppData object
 
-    if(iRegistrationFile)
-        {
-        CApaAppInfoReader* appInfoReader = NULL;
-        TRAP_IGNORE(appInfoReader = CApaAppInfoReader::NewL(iFs, *iRegistrationFile, iUidType[2])); 
-        if (!appInfoReader)
-            {
-            if (!iFullName)
-                {
-                // assume that if iFullName is NULL, this method has been called as part
-                // of constructing a new app data object. The CApaAppInfoReader derived object
-                // could not be created, therefore we have no way to determine the full filename
-                // of the app binary, so give up
-                return KErrNoMemory;
-                }
-            }
-        else
-            {
-            TBool readSuccessful=EFalse;
-            TRAP_IGNORE(readSuccessful= appInfoReader->ReadL());
+	if(iRegistrationFile)
+		{
+		CApaAppInfoReader* appInfoReader = NULL;
+		TRAP_IGNORE(appInfoReader = CApaAppInfoReader::NewL(iFs, *iRegistrationFile, iUidType[2]));	
+		if (!appInfoReader)
+			{
+			if (!iFullName)
+				{
+				// assume that if iFullName is NULL, this method has been called as part
+				// of constructing a new app data object. The CApaAppInfoReader derived object
+				// could not be created, therefore we have no way to determine the full filename
+				// of the app binary, so give up
+				return KErrNoMemory;
+				}
+			}
+		else
+			{
+			TBool readSuccessful=EFalse;
+			TRAP_IGNORE(readSuccessful= appInfoReader->ReadL());
 
-            HBufC* const appBinaryFullName = appInfoReader->AppBinaryFullName();
-            if (appBinaryFullName)
-                {
-                delete iFullName;
-                iFullName = appBinaryFullName;
-                }
-                
-            if (!iFullName)
-                {
-                delete appInfoReader;
-                return KErrNoMemory;
-                }
-                
-            // if this object has just been constructed, iUidType is currently the TUidType
-            // of the registration file, it should be the TUidType of the app binary file
-            TUidType uidType = appInfoReader->AppBinaryUidType();
-            if (uidType[1].iUid != KNullUid.iUid)
-                iUidType = uidType;
+			HBufC* const appBinaryFullName = appInfoReader->AppBinaryFullName();
+			if (appBinaryFullName)
+				{
+				delete iFullName;
+				iFullName = appBinaryFullName;
+				}
+				
+			if (!iFullName)
+				{
+				delete appInfoReader;
+				return KErrNoMemory;
+				}
+				
+			// if this object has just been constructed, iUidType is currently the TUidType
+			// of the registration file, it should be the TUidType of the app binary file
+			TUidType uidType = appInfoReader->AppBinaryUidType();
+			if (uidType[1].iUid != KNullUid.iUid)
+				iUidType = uidType;
 
-            // must get captions regardless of value of readSuccessful,
-            // because the V1 reader might have read captions
-            // this is done to maintain behavioural compatibility with V1
-            caption = appInfoReader->Caption();
-            shortCaption = appInfoReader->ShortCaption();
+			// must get captions regardless of value of readSuccessful,
+			// because the V1 reader might have read captions
+			// this is done to maintain behavioural compatibility with V1
+			caption = appInfoReader->Caption();
+			shortCaption = appInfoReader->ShortCaption();
 
-            CApaAppIconArray* icons = appInfoReader->Icons();
-            if(icons)
-                {
-                delete iIcons;
-                iIcons = icons;
-                iIconLoader = appInfoReader->IconLoader();
-                }
-            else
-                {           
-                TRAPD(err, icons = CApaAppIconArray::NewL());
-                if(err == KErrNone)
-                    {
-                    delete iIcons;
-                    iIcons = icons;
-                    }
-                }
-                
-            iTimeStamp = appInfoReader->TimeStamp();
-            delete iLocalisableResourceFileName;
-            iLocalisableResourceFileName = appInfoReader->LocalisableResourceFileName();
-            iLocalisableResourceFileTimeStamp = appInfoReader->LocalisableResourceFileTimeStamp();
+			CApaAppIconArray* icons = appInfoReader->Icons();
+			if(icons)
+				{
+				delete iIcons;
+				iIcons = icons;
+				iIconLoader = appInfoReader->IconLoader();
+				}
+			else
+				{			
+				TRAPD(err, icons = CApaAppIconArray::NewL());
+				if(err == KErrNone)
+					{
+					delete iIcons;
+					iIcons = icons;
+					}
+				}
+				
+			iTimeStamp = appInfoReader->TimeStamp();
+			delete iLocalisableResourceFileName;
+			iLocalisableResourceFileName = appInfoReader->LocalisableResourceFileName();
+			iLocalisableResourceFileTimeStamp = appInfoReader->LocalisableResourceFileTimeStamp();
 
-            const TBool isNonNativeApp = 
-                (TParsePtrC(*iRegistrationFile).Path().CompareF(KLitPathForNonNativeResourceAndIconFiles) == 0);
-                
-            if (isNonNativeApp)
-                {
-                // In the case of a non-native app, the resource file has been prefixed with a
-                // TCheckedUid, the second of whose UIDs is the non-native application type uid.
-                TEntry entry;
-                const TInt error=iFs.Entry(*iRegistrationFile, entry);
-                if (error!=KErrNone)
-                    {
-                    delete appInfoReader;
-                    return error;
-                    }
-                    
-                __ASSERT_DEBUG(entry.iType[0].iUid==KUidPrefixedNonNativeRegistrationResourceFile, Panic(EPanicUnexpectedUid));
-                iNonNativeApplicationType=entry.iType[1];
-                }
+			const TBool isNonNativeApp = 
+				(TParsePtrC(*iRegistrationFile).Path().CompareF(KLitPathForNonNativeResourceAndIconFiles) == 0);
+				
+			if (isNonNativeApp)
+				{
+				// In the case of a non-native app, the resource file has been prefixed with a
+				// TCheckedUid, the second of whose UIDs is the non-native application type uid.
+				TEntry entry;
+				const TInt error=iFs.Entry(*iRegistrationFile, entry);
+				if (error!=KErrNone)
+					{
+					delete appInfoReader;
+					return error;
+					}
+					
+				__ASSERT_DEBUG(entry.iType[0].iUid==KUidPrefixedNonNativeRegistrationResourceFile, Panic(EPanicUnexpectedUid));
+				iNonNativeApplicationType=entry.iType[1];
+				}
 
-            delete iOpaqueData;
-            iOpaqueData = appInfoReader->OpaqueData();
+			delete iOpaqueData;
+			iOpaqueData = appInfoReader->OpaqueData();
 
-            if (readSuccessful)
-                {
-                appInfoReader->Capability(iCapabilityBuf);
+			if (readSuccessful)
+				{
+				appInfoReader->Capability(iCapabilityBuf);
 
-                iDefaultScreenNumber = appInfoReader->DefaultScreenNumber();
+				iDefaultScreenNumber = appInfoReader->DefaultScreenNumber();
 
-                delete iIconFileName;
-                iIconFileName = appInfoReader->IconFileName();
-                iIconFileTimeStamp = appInfoReader->IconFileTimeStamp();
-                iNonMbmIconFile = appInfoReader->NonMbmIconFile();
-                iNumOfAppIcons = appInfoReader->NumOfAppIcons();
-                iApplicationLanguage = appInfoReader->AppLanguage();
-                        
-                // views
-                iViewDataArray->ResetAndDestroy();
-                CArrayPtrFlat<CApaAppViewData>* viewDataArray = appInfoReader->Views();
-                if (viewDataArray)
-                    {
-                    delete iViewDataArray;
-                    iViewDataArray = viewDataArray;
-                    
-                    if(!iIconLoader && ViewMbmIconsRequireLoading())
-                        {
-                        //if VIEW_DATA contains a MBM icon we need to initialize iIconLoader
-                        iIconLoader = appInfoReader->IconLoader();
-                        }
-                    }
+				delete iIconFileName;
+				iIconFileName = appInfoReader->IconFileName();
+				iIconFileTimeStamp = appInfoReader->IconFileTimeStamp();
+				iNonMbmIconFile = appInfoReader->NonMbmIconFile();
+				iNumOfAppIcons = appInfoReader->NumOfAppIcons();
+				iApplicationLanguage = appInfoReader->AppLanguage();
+						
+				// views
+				iViewDataArray->ResetAndDestroy();
+				CArrayPtrFlat<CApaAppViewData>* viewDataArray = appInfoReader->Views();
+				if (viewDataArray)
+					{
+					delete iViewDataArray;
+					iViewDataArray = viewDataArray;
+					
+					if(!iIconLoader && ViewMbmIconsRequireLoading())
+					    {
+					    //if VIEW_DATA contains a MBM icon we need to initialize iIconLoader
+					    iIconLoader = appInfoReader->IconLoader();
+					    }
+					}
 
-                // owned files
-                iOwnedFileArray->Reset();
-                CDesCArray* const ownedFileArray = appInfoReader->OwnedFiles();
-                if (ownedFileArray)
-                    {
-                    delete iOwnedFileArray;
-                    iOwnedFileArray = ownedFileArray;
-                    }
-                
-                UpdateServiceArray(appInfoReader->ServiceArray(iIndexOfFirstOpenService));
-                }
+				// owned files
+				iOwnedFileArray->Reset();
+				CDesCArray* const ownedFileArray = appInfoReader->OwnedFiles();
+				if (ownedFileArray)
+					{
+					delete iOwnedFileArray;
+					iOwnedFileArray = ownedFileArray;
+					}
+				
+				UpdateServiceArray(appInfoReader->ServiceArray(iIndexOfFirstOpenService));
+				}
 
-            delete appInfoReader;
-            }
-        }
-        
-    if (!caption)
-        {
-        TParsePtrC parse (*iFullName);
-        caption = parse.Name().Alloc();
-        }
+			delete appInfoReader;
+			}
+		}
+		
+	if (!caption)
+		{
+		TParsePtrC parse (*iFullName);
+		caption = parse.Name().Alloc();
+		}
 
-    // Put the captions into place
-    if (caption)
-        {
-        if (!shortCaption)
-            {
-            shortCaption = caption->Alloc();
-            if (!shortCaption)
-                {
-                delete caption;
-                caption = NULL;
-                }
-            }
+	// Put the captions into place
+	if (caption)
+		{
+		if (!shortCaption)
+			{
+			shortCaption = caption->Alloc();
+			if (!shortCaption)
+				{
+				delete caption;
+				caption = NULL;
+				}
+			}
 
-        delete iCaption;
-        iCaption = caption;
-        delete iShortCaption;
-        iShortCaption = shortCaption;
-        }
+		delete iCaption;
+		iCaption = caption;
+		delete iShortCaption;
+		iShortCaption = shortCaption;
+		}
 
-    return caption ? KErrNone : KErrNoMemory;
-    }
-
-
-/** Returns true if app info was provided by a registration file
-
-@return true if app info was provided by a registration file
-*/
-EXPORT_C TBool CApaAppData::RegistrationFileUsed() const
-    {
-    return iRegistrationFile != NULL;
-    }
-
-/** Returns the full filename of the registration resource file
-
-@return The full path and filename of the registration resource file.
-@internalTechnology
-*/
-EXPORT_C TPtrC CApaAppData::RegistrationFileName() const
-    {
-    if (iRegistrationFile)
-        {
-        return *iRegistrationFile;
-        }
-    else
-        {
-        return TPtrC(KNullDesC);
-        }
-    }
-
-
-/** Returns the full filename of the localisable resource file
-
-@return The full path and filename of the localisable resource file.
-@internalTechnology
-*/
-EXPORT_C TPtrC CApaAppData::LocalisableResourceFileName() const
-    {
-    if (iLocalisableResourceFileName)
-        {
-        return *iLocalisableResourceFileName;
-        }
-    else
-        {
-        return TPtrC(KNullDesC);
-        }
-    }
-
-
-TBool CApaAppData::Update()
-// returns true if changes were made to the cached data
-    {
-    __APA_PROFILE_START(17);
-    TBool changed=EFalse;
-
-    // Get app info file entry
-    TEntry entry;
-    TInt ret;
-    if (iRegistrationFile != NULL)
-        {
-        ret = iFs.Entry(*iRegistrationFile, entry);
-        if (ret==KErrNone && entry.iModified!=iTimeStamp)
-            {
-            // assume registration file may have changed
-            changed = ETrue;
-            }
-        else
-            {
-            if (iLocalisableResourceFileName)
-                {
-                // see if localisable resource information might have changed
-                TParse parse;
-                ret = parse.SetNoWild(KAppResourceFileExtension, iLocalisableResourceFileName, NULL);
-                if (ret == KErrNone)
-                    {
-                    TFileName resourceFileName(parse.FullName());
-                    TLanguage language;
-                    BaflUtils::NearestLanguageFileV2(iFs, resourceFileName, language);
-                    (void)language;
-                    if (resourceFileName.CompareF(*iLocalisableResourceFileName)!=0)
-                        {
-                        changed = ETrue;
-                        }
-                    else
-                        {
-                        ret = iFs.Entry(*iLocalisableResourceFileName, entry);
-                        if ((ret==KErrNotFound && iLocalisableResourceFileTimeStamp!=TTime(0)) ||
-                            (ret==KErrNone && entry.iModified!=iLocalisableResourceFileTimeStamp))
-                            {
-                            changed = ETrue;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    if (changed)
-        {
-        // re-read data
-        // Ignore result, nothing we can do in case failure
-        // and the old values should be preserved
-        const TInt ignore = ReadApplicationInformationFromResourceFiles();
-        } //lint !e529 Symbol 'ignore' not subsequently referenced
-        
-    else 
-        {
-        if (iIconFileName)
-            {
-            ret = iFs.Entry(*iIconFileName, entry);
-            // See if the icon file has been "modified"
-            // It could have been replaced with a differnt version, deleted or added 
-            // if the icon file specified in the resource was missing
-            if ((ret==KErrNotFound && iIconFileTimeStamp!=TTime(0)) ||
-                    (ret==KErrNone && entry.iModified!=iIconFileTimeStamp))
-                    {
-                    // Assume the icon file has changed
-                    iIconFileTimeStamp = entry.iModified;
-                    changed = ETrue;
-                    }
-            }
-        }
-
-    __APA_PROFILE_END(17);
-    return changed;
-    }
-
-EXPORT_C TBool CApaAppData::IsPending() const
-/* Returns true if the app info is not yet updated by the current scan. */
-    {
-    return (iIsPresent==CApaAppData::EPresentPendingUpdate 
-        || iIsPresent==CApaAppData::ENotPresentPendingUpdate);
-    }
-
-EXPORT_C TUid CApaAppData::NonNativeApplicationType() const
-/** @internalComponent */
-    {
-    return iNonNativeApplicationType;
-    }
-
-void CApaAppData::SetAppPending()
-    {
-    if (iIsPresent == CApaAppData::ENotPresent 
-        || iIsPresent == CApaAppData::ENotPresentPendingUpdate)
-        {
-        iIsPresent = CApaAppData::ENotPresentPendingUpdate;
-        }
-    else
-        {
-        iIsPresent = CApaAppData::EPresentPendingUpdate;
-        }
-    }
-#endif
-
-EXPORT_C TApaAppEntry CApaAppData::AppEntry() const
-/** Constructs an application entry based on this object.
-
-@return The application entry. */
-    {
-    return TApaAppEntry(iUidType,*iFullName);
-    }
+	return caption ? KErrNone : KErrNoMemory;
+	}
 
 EXPORT_C CApaAppData::~CApaAppData()
 // Just delete components, NOT iNext (next CApaAppData in the list).
@@ -779,19 +465,16 @@ EXPORT_C CApaAppData::~CApaAppData()
 		}
 	delete iOwnedFileArray;
 	delete iIconFileName;
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	delete iLocalisableResourceFileName;
-    delete iRegistrationFile;	
-#endif	
 	if (iServiceArray)
 		{
 		CleanupServiceArray(iServiceArray);
 		iServiceArray = NULL;
 		}
 	delete iOpaqueData;
+	delete iRegistrationFile;
 	iNext = NULL;
 	}
-
 
 void CApaAppData::UpdateServiceArray(CArrayFixFlat<TApaAppServiceInfo>* aNewServiceArray)
 	{
@@ -893,6 +576,14 @@ EXPORT_C CArrayFixFlat<TSize>* CApaAppData::IconSizesL()const
 	return iIcons->IconSizesL();
 	}
 
+EXPORT_C TApaAppEntry CApaAppData::AppEntry() const
+/** Constructs an application entry based on this object.
+
+@return The application entry. */
+	{
+	return TApaAppEntry(iUidType,*iFullName);
+	}
+
 
 EXPORT_C void CApaAppData::Capability(TDes8& aCapabilityBuf)const
 /** Gets the application's capabilities.
@@ -923,6 +614,82 @@ EXPORT_C CDesCArray* CApaAppData::OwnedFiles() const
 	return iOwnedFileArray;
 	}
 
+TBool CApaAppData::Update()
+// returns true if changes were made to the cached data
+	{
+	__APA_PROFILE_START(17);
+	TBool changed=EFalse;
+
+	// Get app info file entry
+	TEntry entry;
+	TInt ret;
+	if (iRegistrationFile != NULL)
+		{
+		ret = iFs.Entry(*iRegistrationFile, entry);
+		if (ret==KErrNone && entry.iModified!=iTimeStamp)
+			{
+			// assume registration file may have changed
+			changed = ETrue;
+			}
+		else
+			{
+			if (iLocalisableResourceFileName)
+				{
+				// see if localisable resource information might have changed
+				TParse parse;
+				ret = parse.SetNoWild(KAppResourceFileExtension, iLocalisableResourceFileName, NULL);
+				if (ret == KErrNone)
+					{
+					TFileName resourceFileName(parse.FullName());
+					TLanguage language;
+					BaflUtils::NearestLanguageFileV2(iFs, resourceFileName, language);
+					(void)language;
+					if (resourceFileName.CompareF(*iLocalisableResourceFileName)!=0)
+						{
+						changed = ETrue;
+						}
+					else
+						{
+						ret = iFs.Entry(*iLocalisableResourceFileName, entry);
+						if ((ret==KErrNotFound && iLocalisableResourceFileTimeStamp!=TTime(0)) ||
+							(ret==KErrNone && entry.iModified!=iLocalisableResourceFileTimeStamp))
+							{
+							changed = ETrue;
+							}
+						}
+					}
+				}
+			}
+		}
+	if (changed)
+		{
+		// re-read data
+		// Ignore result, nothing we can do in case failure
+		// and the old values should be preserved
+		const TInt ignore = ReadApplicationInformationFromResourceFiles();
+		} //lint !e529 Symbol 'ignore' not subsequently referenced
+		
+	else 
+		{
+		if (iIconFileName)
+			{
+			ret = iFs.Entry(*iIconFileName, entry);
+			// See if the icon file has been "modified"
+			// It could have been replaced with a differnt version, deleted or added 
+			// if the icon file specified in the resource was missing
+			if ((ret==KErrNotFound && iIconFileTimeStamp!=TTime(0)) ||
+					(ret==KErrNone && entry.iModified!=iIconFileTimeStamp))
+					{
+					// Assume the icon file has changed
+					iIconFileTimeStamp = entry.iModified;
+					changed = ETrue;
+					}
+			}
+		}
+
+	__APA_PROFILE_END(17);
+	return changed;
+	}
 
 EXPORT_C TDataTypePriority CApaAppData::DataType(const TDataType& aDataType) const
 // returns the priority of the data type
@@ -952,6 +719,12 @@ not supported. */
 	}
 
 
+EXPORT_C TBool CApaAppData::IsPending() const
+/* Returns true if the app info is not yet updated by the current scan. */
+	{
+	return (iIsPresent==CApaAppData::EPresentPendingUpdate 
+		|| iIsPresent==CApaAppData::ENotPresentPendingUpdate);
+	}
 
 EXPORT_C TBool CApaAppData::CanUseScreenMode(TInt aScreenMode)
 /** Tests whether the specified screen mode is valid for any of 
@@ -1002,6 +775,51 @@ EXPORT_C TUint CApaAppData::DefaultScreenNumber() const
 	return iDefaultScreenNumber;
 	}
 
+/** Returns true if app info was provided by a registration file
+
+@return true if app info was provided by a registration file
+*/
+EXPORT_C TBool CApaAppData::RegistrationFileUsed() const
+	{
+	return iRegistrationFile != NULL;
+	}
+
+/** Returns the full filename of the registration resource file
+
+@return The full path and filename of the registration resource file.
+@internalTechnology
+*/
+EXPORT_C TPtrC CApaAppData::RegistrationFileName() const
+	{
+	if (iRegistrationFile)
+		{
+		return *iRegistrationFile;
+		}
+	else
+		{
+		return TPtrC(KNullDesC);
+		}
+	}
+
+
+/** Returns the full filename of the localisable resource file
+
+@return The full path and filename of the localisable resource file.
+@internalTechnology
+*/
+EXPORT_C TPtrC CApaAppData::LocalisableResourceFileName() const
+	{
+	if (iLocalisableResourceFileName)
+		{
+		return *iLocalisableResourceFileName;
+		}
+	else
+		{
+		return TPtrC(KNullDesC);
+		}
+	}
+
+
 /** Returns the non-native application opaque data
 
 @return The non-native application opaque data.
@@ -1019,6 +837,11 @@ EXPORT_C TPtrC8 CApaAppData::OpaqueData() const
 		}
 	}
 
+EXPORT_C TUid CApaAppData::NonNativeApplicationType() const
+/** @internalComponent */
+	{
+	return iNonNativeApplicationType;
+	}
 
 /** Returns the full filename of the file containing application icons
 
@@ -1168,9 +991,7 @@ EXPORT_C void CApaAppData::SetIconsL(const TDesC& aFileName, TInt aNumIcons)
 	 	iIconFileNameFromResourceFile = iIconFileName;
 	 	iIconFileName = NULL;
 	 	iNonMbmIconFileFromResourceFile = iNonMbmIconFile;
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	 	
 	 	iIconFileTimeStampFromResourceFile = iIconFileTimeStamp;
-#endif	 	
 		}
 		
 	iNonMbmIconFile = !CApaAppInfoReader::FileIsMbmWithGenericExtensionL(aFileName);
@@ -1204,19 +1025,29 @@ EXPORT_C void CApaAppData::SetIconsL(const TDesC& aFileName, TInt aNumIcons)
 		}
 	}
 
+void CApaAppData::SetAppPending()
+	{
+	if (iIsPresent == CApaAppData::ENotPresent 
+		|| iIsPresent == CApaAppData::ENotPresentPendingUpdate)
+		{
+		iIsPresent = CApaAppData::ENotPresentPendingUpdate;
+		}
+	else
+		{
+		iIsPresent = CApaAppData::EPresentPendingUpdate;
+		}
+	}
+
 void CApaAppData::InternalizeL(RReadStream& aReadStream)
 /** Internalizes the appdata from the AppsList.bin file */
 	{
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK    
 	TUint highTime = aReadStream.ReadUint32L();
 	TUint lowTime = aReadStream.ReadUint32L();
 	iTimeStamp = TTime(MAKE_TINT64(highTime, lowTime));
-	
+
 	highTime = aReadStream.ReadUint32L();
 	lowTime = aReadStream.ReadUint32L();
 	iIconFileTimeStamp = TTime(MAKE_TINT64(highTime, lowTime));
-#endif
-	
 	iCaption = HBufC::NewL(aReadStream, KMaxFileName);	// Caption
 	iShortCaption = HBufC::NewL(aReadStream, KMaxFileName);	// Shortcaption
 	iFullName = HBufC::NewL(aReadStream, KMaxFileName);		// Filename of application binary
@@ -1230,9 +1061,7 @@ void CApaAppData::InternalizeL(RReadStream& aReadStream)
 	iUidType = TUidType(uid1, uid2, uid3);	// Application UID
 	
 	aReadStream >> iCapabilityBuf;
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	iRegistrationFile = HBufC::NewL(aReadStream, KMaxFileName);	// Registration Filename
-#endif	
 	iDefaultScreenNumber = aReadStream.ReadUint32L();	// Default Screen number
 	iNumOfAppIcons = aReadStream.ReadInt32L();	// No. of icons
 	iNonMbmIconFile = aReadStream.ReadUint32L();
@@ -1263,7 +1092,6 @@ void CApaAppData::InternalizeL(RReadStream& aReadStream)
 		TRAP_IGNORE(iIcons = CApaAppIconArray::NewDefaultIconsL()); // Creates and Loads Default Icons.
 		}
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
 	HBufC* localisableResourceFileName = HBufC::NewL(aReadStream, KMaxFileName);	// Registration Filename
 	if (*localisableResourceFileName != KNullDesC)
 		iLocalisableResourceFileName = localisableResourceFileName;
@@ -1273,13 +1101,10 @@ void CApaAppData::InternalizeL(RReadStream& aReadStream)
 	highTime = aReadStream.ReadUint32L();
 	lowTime = aReadStream.ReadUint32L();
 	iLocalisableResourceFileTimeStamp = TTime(MAKE_TINT64(highTime, lowTime));	// Localisable file timestamp
-#endif
-	
+
 	iApplicationLanguage = (TLanguage)aReadStream.ReadInt32L();	// Application Language
 	iIndexOfFirstOpenService = aReadStream.ReadUint32L();		// Index of first open service
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	iNonNativeApplicationType.iUid = aReadStream.ReadUint32L();
-#endif
 
 	HBufC8* opaqueData = HBufC8::NewL(aReadStream, KMaxFileName);	// Opaque Data
 	if (*opaqueData != KNullDesC8)
@@ -1378,7 +1203,6 @@ TBool CApaAppData::MbmIconsRequireLoading() const
 
 void CApaAppData::ExternalizeL(RWriteStream& aWriteStream) const
 	{
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK     
 	aWriteStream.WriteUint32L(I64HIGH(iTimeStamp.Int64()));
 	aWriteStream.WriteUint32L(I64LOW(iTimeStamp.Int64()));
 
@@ -1392,7 +1216,6 @@ void CApaAppData::ExternalizeL(RWriteStream& aWriteStream) const
 		aWriteStream.WriteUint32L(I64HIGH(iIconFileTimeStamp.Int64()));
 		aWriteStream.WriteUint32L(I64LOW(iIconFileTimeStamp.Int64()));
 		}
-#endif	
 	
 	if (iCaptionFromResourceFile) // Caption present in the resource file would be externalized if the one in applist has dynamically changed
 		{
@@ -1415,9 +1238,7 @@ void CApaAppData::ExternalizeL(RWriteStream& aWriteStream) const
 		aWriteStream << iUidType[i];	// Uid Type
 
 	aWriteStream << iCapabilityBuf;
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 	
 	aWriteStream << RegistrationFileName();	// Registration filename
-#endif	
 	aWriteStream.WriteUint32L(iDefaultScreenNumber);	// Default screen number
 
 	if (iIconFileNameFromResourceFile)
@@ -1432,20 +1253,17 @@ void CApaAppData::ExternalizeL(RWriteStream& aWriteStream) const
 		aWriteStream.WriteUint32L(iNonMbmIconFile);
 		aWriteStream << IconFileName();
 		}
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
+
 	aWriteStream << LocalisableResourceFileName();
 
 	aWriteStream.WriteUint32L(I64HIGH(iLocalisableResourceFileTimeStamp.Int64()));
 	aWriteStream.WriteUint32L(I64LOW(iLocalisableResourceFileTimeStamp.Int64()));
-#endif	
 
 	aWriteStream.WriteInt32L(iApplicationLanguage);
 
 	aWriteStream.WriteUint32L(iIndexOfFirstOpenService);
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK 
 	aWriteStream.WriteUint32L(iNonNativeApplicationType.iUid);
-#endif
 
 	aWriteStream << OpaqueData();
 	

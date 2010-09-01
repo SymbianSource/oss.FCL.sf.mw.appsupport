@@ -22,7 +22,7 @@
 #include <e32base.h>
 
 class CBSUtil;
-// class CBatteryPopupControl;
+class CBatteryPopupControl;
 
 /**
  *  Controller for enhanced battery information.
@@ -101,6 +101,12 @@ public:
      */
      void BatteryStatusUpdated( const TInt aValue );
 
+     /**
+     * Check if battery status is above the threshold level 
+     *
+     */
+     TBool IsBatteryInfoAboveThreshold() const;
+
 private:
 
     /**
@@ -151,7 +157,7 @@ private: // data
     * Battery popup control.
     * Own.
     */
-    // CBatteryPopupControl* iBatteryPopup;
+    CBatteryPopupControl* iBatteryPopup;
     };
 
 

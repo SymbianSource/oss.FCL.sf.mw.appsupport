@@ -19,14 +19,14 @@
 #ifndef __RFSPDPOBSERVER_H
 #define __RFSPDPOBSERVER_H
 
-#include <hbdeviceprogressdialogsymbian.h>
+#include <AknWaitDialog.h>
 
 // P&S KEYS FROM SIP & PDP CONNECTION
 #include <e32property.h>
 #include <pdpcontextmanagerpskeys.h>
 #include <sipsystemstatemonitorpskeys.h>
 
-#include "rfscontimer.h"
+#include "rfsConTimer.h"
 
 class CRfsConTimer;
 
@@ -36,7 +36,7 @@ enum TRfsConnectionCloseState
     EPdpConnectionClose // this should be the last enum
     };
 
-NONSHARABLE_CLASS( CRfsConnectionObserver ): public CActive,public MHbDeviceProgressDialogObserver
+NONSHARABLE_CLASS( CRfsConnectionObserver ): public CActive
     {      
 public:
     
@@ -49,11 +49,6 @@ public:
      * Destructor
      */
     virtual ~CRfsConnectionObserver();
-    
-    void ProgressDialogCancelled(const CHbDeviceProgressDialogSymbian* iDialog);
-                    
-    void ProgressDialogClosed(const CHbDeviceProgressDialogSymbian *  iDialog) ;
-
         
 public:
     /**
@@ -140,8 +135,9 @@ private:
     /**
      * Own: Wait dialog
      */
-     CHbDeviceProgressDialogSymbian* iDialog ;
-       /**
+    CAknWaitDialog* iWaitDialog;
+    
+    /**
      * Own: PDP property
      */
     RProperty iPDPProperty;
@@ -177,8 +173,6 @@ private:
     TBool iIsSipInformedForClosingAllConnection;
     TBool iIsPDPInformedforClosingAllConnection;
     TBool iIsClosingConnectionsApplicable;
-    //for synchronous dialog handling
-    CActiveSchedulerWait *iWait;
     
     
 public:

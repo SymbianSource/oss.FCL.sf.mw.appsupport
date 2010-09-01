@@ -56,13 +56,13 @@ EXPORTS
 	_ZNK16CUpdatedAppsList8IsInListERK7TDesC16 @ 55 NONAME ABSENT
 	_ZTIN16CUpdatedAppsList15CUpdatedAppInfoE @ 56 NONAME ABSENT ; #<TI>#
 	_ZTVN16CUpdatedAppsList15CUpdatedAppInfoE @ 57 NONAME ABSENT ; #<VT>#
-	_ZN16CApaAppArcServer14RescanCallBackEv @ 58 NONAME ABSENT
+	_ZN16CApaAppArcServer14RescanCallBackEv @ 58 NONAME
 	_ZTI18CCustomAppInfoData @ 59 NONAME ABSENT ; #<TI>#
 	_ZTV18CCustomAppInfoData @ 60 NONAME ABSENT ; #<VT>#
 	KApaLoadDataRecognizersOnDemand @ 61 NONAME DATA 4
 	KApaUnloadRecognizersTimeout @ 62 NONAME DATA 4
-	_ZN16CApaAppArcServer27HandleInstallationEndEventLEv @ 63 NONAME ABSENT
-	_ZN16CApaAppArcServer28HandleInstallationStartEventEv @ 64 NONAME ABSENT
+	_ZN16CApaAppArcServer27HandleInstallationEndEventLEv @ 63 NONAME
+	_ZN16CApaAppArcServer28HandleInstallationStartEventEv @ 64 NONAME
 	KApaDrivesToMonitor @ 65 NONAME DATA 4
 	KApaLoadMbmIconsOnDemand @ 66 NONAME DATA 4
 	_ZTI21CApaAppArcServSession @ 67 NONAME

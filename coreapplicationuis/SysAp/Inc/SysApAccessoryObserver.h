@@ -25,7 +25,6 @@
 #include <e32base.h>
 #include <AccessoryMode.h>
 #include <AccessoryServer.h>
-#include <AccessoryConnection.h>
 
 // FORWARD DECLARATIONS
 class CSysApAppUi;
@@ -57,7 +56,6 @@ class CSysApAccessoryObserver : public CActive
         * @return Current accessory mode
         */
         TAccMode GetAccessoryMode() const;
-        TInt GetAccessoryConnectionType() const;
 
     private:
         /**
@@ -120,8 +118,6 @@ class CSysApAccessoryObserver : public CActive
         * notifications due change in audio output status.
         */
         TAccMode iPreviousMode;
-        RAccessoryConnection iAccessoryConnection;
-        TInt iPhysicalConnectionType;
         
     };
 

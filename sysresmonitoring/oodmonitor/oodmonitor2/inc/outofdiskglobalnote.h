@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -22,8 +22,7 @@
 // SYSTEM INCLUDES
 #include <uiklaf/private/lafshut.h>
 #include <coemain.h>
-#include "hbdevicemessageboxsymbian.h"
-
+#include <AknGlobalNote.h>
 
 // USER INCLUDES
 
@@ -45,7 +44,7 @@ public:
 *  @lib None
 *  @since S60 3.2
 */
-NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public MHbDeviceMessageBoxObserver
+NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public CActive
     {
     public:
         COutOfDiskGlobalNote( COutOfDiskMonitor* aOutOfDiskMonitor, RFs& aFs  );    
@@ -53,21 +52,20 @@ NONSHARABLE_CLASS(COutOfDiskGlobalNote) : public MHbDeviceMessageBoxObserver
         ~COutOfDiskGlobalNote();        
         void DisplayL(const TDesC& aMessage);
         void ShowGlobalQueryL(TInt aStatus, TInt aDrive);
+        void CancelNoteL();
         TBool NoteOnDisplay();
         TNoteInfo GetNoteInfo();
-                                   
-        void MessageBoxClosed(const CHbDeviceMessageBoxSymbian* aMessageBox,
-                CHbDeviceMessageBoxSymbian::TButtonId aButton);
-
     private:
         void ConstructL();
         HBufC* FormatStringL(const TDesC& aSource, const MDesCArray& aStrings);
-       	         
+    private: // From CActive    
+    	void DoCancel();
+    	void RunL();                
     private: // Data
         COutOfDiskMonitor*  iOutOfDiskMonitor; //uses
         RFs&                iFs;
+        CAknGlobalNote*     iQuery;
         RResourceFile       iOODResourceFile;
         TNoteInfo           iNoteInfo;
-        CHbDeviceMessageBoxSymbian *iNote;
     };
 #endif //__OUTOFDISKGLOBALNOTE_H__

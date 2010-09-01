@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -41,11 +41,12 @@ enum TRfsType
 
 // FORWARD DECLARATIONS
 
+class CAknQueryDialog;
+class CAknInformationNote;
 class CEikonEnv;
 class CSecurityHandler;
 class CRfsSecurityHandler;
 class CRfsPdpObserver;
-class CHbDeviceMessageBoxSymbian;
 
 // CLASS DECLARATION
 
@@ -163,7 +164,7 @@ class CRfsHandler : public CBase
         TInt iFlags;
 
         // confirmation query
-        CHbDeviceMessageBoxSymbian* iQuery;
+        CAknQueryDialog* iQuery;
 
         // for security code query when using SecUI
         CSecurityHandler* iSecurityHandler;

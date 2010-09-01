@@ -23,7 +23,7 @@
 #include <e32base.h>
 #include <badesca.h>
 
-#include <cfactionpluginconst.hrh>
+#include <CFActionPlugInConst.hrh>
 
 class CCFActionPlugInImpl;
 class CCFActionIndication;

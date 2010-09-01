@@ -1,0 +1,54 @@
+/*
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Localisation file for BatIndicatorPanePlugin plug-in
+*
+*/
+
+
+// LOCALISATION STRINGS
+
+
+// ---[ touch support: strings for preview popup ]---
+
+
+// d: Link Label for a preview popup.
+// d: Popup is shown when user taps the battery indicator from status pane popup.
+// l: popup_battery_window_t2/opt1
+// r:5.0
+//
+#define qtn_battery_link_deactivate_power_saving    "Deactivate power saving"
+
+// d: Link Label for a preview popup.
+// d: Popup is shown when user taps the battery indicator from status pane popup.
+// l: popup_battery_window_t2/opt1
+// r:5.0
+//
+#define qtn_battery_link_activate_power_saving    "Activate power saving"
+
+// d: Label for a preview popup.
+// d: Popup is shown when user taps the battery indicator from status pane popup.
+// d: If battery status is low, "Battery low" is shown instead of battery capacity
+// l: popup_battery_window_t1/opt1
+// r:5.0
+//
+#define qtn_battery_low_preview_popup    "Battery low"
+
+// d: Label for a preview popup.
+// d: Popup is shown when user taps the battery indicator from status pane popup.
+// d: %N is the battery capacity in percents.
+// l: popup_battery_window_t1
+// r:5.0
+//
+#define qtn_battery_status_popup    "%N %"
+

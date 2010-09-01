@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -68,7 +68,7 @@ public:
     IMPORT_C TInt Connect();
 
     /**
-    * Request that the OOM monitor attempts to free some paged memory.
+    * Request that the OOM monitor attempts to free some memory.
     * This function may take several seconds to execute, depending on
     * the memory state. It will not return until the attempt to recover
     * memory has completed.
@@ -80,8 +80,8 @@ public:
     IMPORT_C TInt RequestFreeMemory(TInt aBytesRequested);
 
     /**
-    * Request that the OOM monitor attempts to free some paged memory.
-    * This is an asynchronous version of the request for free paged memory.
+    * Request that the OOM monitor attempts to free some memory.
+    * This is an asynchronous version of the request for free memory.
     * @param aBytesRequested The number of bytes of free memory that the client requests.
     * @param aStatus will be completed when the attempt to recover memory
     *        has finished. This may take several seconds, depending on

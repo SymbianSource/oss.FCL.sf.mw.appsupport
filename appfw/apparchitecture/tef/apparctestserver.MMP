@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,7 +16,7 @@
 target			apparctestserver.exe
 targettype		exe
 UID             0x1000007A 0x101F289C
-CAPABILITY  	AllFiles WriteDeviceData PowerMgmt Protserv SwEvent ReadUserData
+CAPABILITY  	AllFiles WriteDeviceData PowerMgmt Protserv SwEvent
 
 
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
@@ -32,12 +32,7 @@ SOURCE			apparctestserver.cpp
 //-------START 
 
 SOURCE		T_Foreground.cpp
-SOURCE		T_ProStep.cpp T_OOMStep.cpp
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-SOURCE		T_File2Step.cpp T_File3Step.cpp
-#endif
-
+SOURCE		T_ProStep.cpp T_OOMStep.cpp T_File2Step.cpp T_File3Step.cpp
 SOURCE		T_BackupStep.cpp T_MdrStep.cpp
 SOURCE		T_Serv2Step.CPP  T_Serv3Step.cpp
 SOURCE		T_MRUStep.CPP T_WgnamStep.CPP
@@ -80,15 +75,6 @@ SOURCE		t_mimecontentpolicystep.cpp
 SOURCE		t_servicebasestep.cpp
 SOURCE		T_RecUpgrade.cpp
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-SOURCE		t_updateapplist.cpp
-SOURCE		t_forceregstep.cpp
-SOURCE		t_clientnotifstep.cpp
-SOURCE		t_nonnativetest.cpp
-#endif
-
-source 		t_sisfileinstaller.cpp
-
 
 resource		t_rapalssessionstep.rss
 start resource	t_rapalssessionstep.rss
@@ -96,9 +82,7 @@ TARGETPATH		/system/test/t_rapalssessionstep
 lang			SC
 end
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 // START resource files for service registration and discovery tests
-
 start resource	serverapp_loc.RSS
 HEADER
 targetpath	/resource/apps
@@ -170,7 +154,6 @@ start resource	CustomiseDefaultIconApp_reg.RSS
 targetpath	/private/10003a3f/import/apps
 lang		SC 
 end
-#endif
 
 start bitmap		default_app_icon.m02
 targetpath		/resource/apps
@@ -180,7 +163,6 @@ end
 //END resource files for customising the default icon wrt locale
 
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 start resource	TestUnTrustedPriorityApp1_reg.rss 
 targetpath	/private/10003a3f/import/apps
 lang		sc
@@ -233,7 +215,6 @@ resource  		T_groupnamever2_reg.rss
 start resource 		T_groupnamever2_reg.rss
 targetpath 		/private/10003a3f/apps
 end
-#endif
 
 //-------END 
 
@@ -246,13 +227,7 @@ LIBRARY		apparc.lib efsrv.lib estor.lib gdi.lib fbscli.lib
 LIBRARY     	apfile.lib apgrfx.lib  bafl.lib apmime.lib apserv.lib
 LIBRARY		eikcore.lib appfwk_test_utils.lib serviceregistry.lib
 LIBRARY		aplist.lib
-LIBRARY     	ticonloaderandiconarrayforleaks.lib centralrepository.lib
-
-LIBRARY     	sif.lib
-LIBRARY     	siftransport.lib
-LIBRARY		scsclient.lib
-LIBRARY		scrclient.lib sisregistryclient.lib scrdatabase.lib sishelper.lib
-
+LIBRARY     ticonloaderandiconarrayforleaks.lib centralrepository.lib
 // We're quite heavy on the stack... 4k in WinS isn't enough...
 EPOCSTACKSIZE	0xf000
 

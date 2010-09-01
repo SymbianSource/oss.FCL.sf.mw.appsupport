@@ -331,15 +331,7 @@ EXPORTS
 	?IsPending@CApaAppData@@QBEHXZ @ 330 NONAME ABSENT ; int CApaAppData::IsPending(void) const
 	?GetAppIcon@RApaLsSession@@QBEHVTUid@@AAVRFile@@@Z @ 331 NONAME ; int RApaLsSession::GetAppIcon(class TUid, class RFile &) const
 	?CheckAppSecurity@CApaSecurityUtils@@SAHABVTPtrC16@@AAH1@Z @ 332 NONAME ; int CApaSecurityUtils::CheckAppSecurity(class TPtrC16 const &, int &, int &)
-	X @ 333 NONAME ABSENT
-	X @ 334 NONAME ABSENT
+	X @ 333 NONAME ABSENT ;
+	X @ 334 NONAME ABSENT ;
 	?ForceCommitNonNativeApplicationsUpdatesL@RApaLsSession@@QAEXXZ @ 335 NONAME ; void RApaLsSession::ForceCommitNonNativeApplicationsUpdatesL(void)
-	?RecognizeData@RApaLsSession@@QBEHABVTDesC8@@AAVTDataRecognitionResult@@@Z @ 336 NONAME ; TInt RecognizeData(const TDesC8& aBuffer, TDataRecognitionResult& aDataType) const
-	??0TApaAppUpdateInfo@@QAE@XZ @ 337 NONAME ; TApaAppUpdateInfo::TApaAppUpdateInfo(void)
-	?InternalizeL@TApaAppUpdateInfo@@QAEXAAVRReadStream@@@Z @ 338 NONAME ; void TApaAppUpdateInfo::InternalizeL(class RReadStream &)
-	?UpdateAppListL@RApaLsSession@@QAEHAAV?$RArray@VTApaAppUpdateInfo@@@@@Z @ 339 NONAME ; int RApaLsSession::UpdateAppListL(class RArray<class TApaAppUpdateInfo> &)
-	?ExternalizeL@TApaAppUpdateInfo@@QBEXAAVRWriteStream@@@Z @ 340 NONAME ; void TApaAppUpdateInfo::ExternalizeL(class RWriteStream &) const
-	??0TApaAppUpdateInfo@@QAE@VTUid@@W4TApaAppAction@0@@Z @ 341 NONAME ; TApaAppUpdateInfo::TApaAppUpdateInfo(class TUid, enum TApaAppUpdateInfo::TApaAppAction)
-	?ForceRegistration@RApaLsSession@@QAEHABV?$RPointerArray@VCApplicationRegistrationData@Usif@@@@@Z @ 342 NONAME ; int RApaLsSession::ForceRegistration(class RPointerArray<class Usif::CApplicationRegistrationData> const &)
-	?UpdatedAppsInfoL@RApaLsSession@@QAEHAAV?$RArray@VTApaAppUpdateInfo@@@@@Z @ 343 NONAME ; int RApaLsSession::UpdatedAppsInfoL(class RArray<class TApaAppUpdateInfo> &)
-
+	?RecognizeData@RApaLsSession@@QBEHABVTDesC8@@AAVTDataRecognitionResult@@@Z @336 NONAME;TInt RecognizeData(const TDesC8& aBuffer, TDataRecognitionResult& aDataType) const

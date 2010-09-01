@@ -19,7 +19,7 @@
 #include <remcon/remconservercaps.mmh> // RemCon has defined capabilities
 #include <platform_paths.hrh>
 
-TARGET          advancedtspcontroller.dll
+TARGET          AdvancedTspController.dll
 TARGETTYPE      PLUGIN
 UID             0x10009d8d 0x10282CD5
 
@@ -33,7 +33,7 @@ SOURCE          remconeventtable.cpp
 SOURCE          tsptriggerevents.cpp
 
 START RESOURCE  ../data/10282CD5.rss
-target          advancedtspcontroller.rsc
+target          AdvancedTspController.rsc
 END
 
 USERINCLUDE     ../inc
@@ -47,8 +47,8 @@ LIBRARY         cone.lib
 LIBRARY         apparc.lib
 LIBRARY         remcontargetselectorplugin.lib
 LIBRARY         remcontypes.lib
-LIBRARY         cfclient.lib
-LIBRARY         cfservices.lib
+LIBRARY         CFClient.lib
+LIBRARY         CFServices.lib
 LIBRARY         ws32.lib
 LIBRARY         apgrfx.lib
 LIBRARY         tspclientmapper.lib

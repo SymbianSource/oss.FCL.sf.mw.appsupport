@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include "../inc/common/cftraceconfiguration.hrh"
 
-TARGET		  	cfserver.exe
+TARGET		  	CFServer.exe
 TARGETTYPE	    	exe
 UID			0 0x10282BC4
 

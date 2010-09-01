@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -27,7 +27,10 @@ NAME    RFS        // 4 letter ID
 #include "rfs.loc"
 #include <eikon.rsg>
 #include <eikon.rh>
-
+#include <avkon.rsg>
+#include <avkon.rh>
+#include <avkon.hrh>
+#include <avkon.mbg>
 
 // RESOURCE DEFINITIONS 
 
@@ -39,12 +42,76 @@ RESOURCE TBUF r_active_calls { buf = qtn_rfs_note_active_calls; }
 
 RESOURCE TBUF r_device_restart { buf = qtn_rfs_note_device_restart; }
 
+// -----------------------------------------------------------------------------
+// R_CONFIRM_RFS
+// -----------------------------------------------------------------------------
 
-RESOURCE TBUF r_confirm_rfs { buf = qtn_rfs_restore_query; }
+RESOURCE DIALOG r_confirm_rfs
+    {
+    flags = EGeneralQueryFlags;
 
-RESOURCE TBUF r_confirm_deep_rfs { buf = qtn_rfs_reset_phone_settings; }
+    buttons = R_AVKON_SOFTKEYS_YES_NO__YES;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control = AVKON_CONFIRMATION_QUERY 
+                { 
+                layout = EConfirmationLayout;
+                label = qtn_rfs_restore_query;
+                };
+            }
+        };
+    }
 
-RESOURCE TBUF r_closing_connections { buf = qtn_rfs_note_closing_connections; }
+// -----------------------------------------------------------------------------
+// R_CONFIRM_DEEP_RFS
+// -----------------------------------------------------------------------------
+//
+RESOURCE DIALOG r_confirm_deep_rfs
+    {
+    flags = EGeneralQueryFlags;
 
+    buttons = R_AVKON_SOFTKEYS_YES_NO__YES;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control = AVKON_CONFIRMATION_QUERY
+                {
+                layout = EConfirmationLayout;
+                label = qtn_rfs_reset_phone_settings;
+                };
+            }
+        };
+    }
+
+// -----------------------------------------------------------------------------
+// R_CLOSING_CONNECTIONS
+// -----------------------------------------------------------------------------
+//
+RESOURCE DIALOG r_closing_connections
+    {
+    flags = EAknWaitNoteFlags | EEikDialogFlagWait;
+    buttons = R_AVKON_SOFTKEYS_CANCEL;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtNote;
+            id = EGeneralNote;
+            control = AVKON_NOTE
+                {
+                layout = EWaitLayout;
+                singular_label = qtn_rfs_note_closing_connections;
+                animation = R_QGN_GRAF_WAIT_BAR_ANIM;
+                };
+            }
+        };
+    }
 
 // End of File

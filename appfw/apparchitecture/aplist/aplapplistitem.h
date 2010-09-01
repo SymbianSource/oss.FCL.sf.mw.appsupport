@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -29,13 +29,6 @@
 #include <badesca.h>
 #include <s32file.h>
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-#include<usif/scr/appregentries.h>
-#include<usif/scr/scr.h>
-#endif
-
-
- 
 // classes defined:
 class CApaAppData;
 class CApaAppList;
@@ -101,25 +94,15 @@ caption, capabilities and icons. This should be accessed through the Apparc Serv
 */
 class CApaAppData : public CBase
 	{
-public:    
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    IMPORT_C static CApaAppData* NewL(const Usif::CApplicationRegistrationData& aAppInfo, RFs& aFs, const Usif::RSoftwareComponentRegistry& aScrCon);
-    IMPORT_C TBool IsLangChangePending();
-#else
-    IMPORT_C static CApaAppData* NewL(const TApaAppEntry& aAppEntry, RFs& aFs);
-    inline TBool IsPresent() const;  
-    IMPORT_C TBool RegistrationFileUsed() const;  
-    IMPORT_C TPtrC RegistrationFileName() const;   
-    IMPORT_C TBool IsPending()const;
-    IMPORT_C TPtrC LocalisableResourceFileName() const;    
-#endif
-
+public:
+	IMPORT_C static CApaAppData* NewL(const TApaAppEntry& aAppEntry, RFs& aFs);
 	IMPORT_C ~CApaAppData();
 	IMPORT_C TApaAppEntry AppEntry() const;
 	inline TPtrC Caption() const;
 	inline TPtrC ShortCaption() const;
 	IMPORT_C CApaMaskedBitmap* Icon(TInt aIconIndex) const;
 	IMPORT_C void Capability(TDes8& aCapabilityBuf)const;
+	inline TBool IsPresent() const;
 	// ER5
 	IMPORT_C TDataTypePriority DataType(const TDataType& aDataType) const;
 	// ER6
@@ -133,17 +116,22 @@ public:
 	IMPORT_C void GetIconInfo(TInt& aIconCount, TInt& aDefaultIconsUsed) const;
 	// 8.1
 	IMPORT_C TUint DefaultScreenNumber() const;
+	IMPORT_C TBool RegistrationFileUsed() const;
 	IMPORT_C TPtrC IconFileName() const;
 	IMPORT_C TBool NonMbmIconFile() const;
+
 	// 9.0
 	IMPORT_C TBool ImplementsService(TUid aServiceUid) const;
 	TInt ImplementsServiceWithDataType(TUid aServiceUid, const TDataType& aDataType) const;
 
 	// 9.1
 	IMPORT_C TLanguage ApplicationLanguage() const;
+	IMPORT_C TPtrC RegistrationFileName() const;
 	IMPORT_C TPtrC8 OpaqueData() const;
-    IMPORT_C TUid NonNativeApplicationType() const;
+	IMPORT_C TUid NonNativeApplicationType() const;
+	IMPORT_C TPtrC LocalisableResourceFileName() const;
 	IMPORT_C void SetShortCaptionL(const TDesC& aShortCaption);
+	IMPORT_C TBool IsPending()const;
 	// 9.5
 	IMPORT_C void SetCaptionL(const TDesC& aCaption);
 	IMPORT_C void SetIconsL(const TDesC& aFileName, TInt aNumIcons);
@@ -154,21 +142,15 @@ public:
 	inline CApaAppData* Next() const;
 private:
 	CApaAppData(RFs& aFs);
+	TBool Update();
+	void SetAppPending();
+
+	void ConstructL(const TApaAppEntry& aAppEntry);
+	TInt ReadApplicationInformationFromResourceFiles();
 	void UpdateServiceArray(CArrayFixFlat<TApaAppServiceInfo>* aNewServiceArray);
 	TDataTypePriority DataType(const TDataType& aDataType, const CArrayFixFlat<TDataTypeWithPriority>& aDataTypeArray) const;
 	void InternalizeL(RReadStream& aReadStream);
 	TBool ViewMbmIconsRequireLoading() const;
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    void ConstructL(const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScrCon);	
-    TInt ReadApplicationInformationFromSCRL(const Usif::CApplicationRegistrationData& aAppInfo, const Usif::RSoftwareComponentRegistry& aScrCon);
-#else
-    TBool Update();
-    void SetAppPending();
-    void ConstructL(const TApaAppEntry& aAppEntry);	
-    TInt ReadApplicationInformationFromResourceFiles();
-#endif
-	
 private:
 	enum { ENotPresent, ENotPresentPendingUpdate, EPresentPendingUpdate, EIsPresent, ESuperseded };
 private:
@@ -176,43 +158,35 @@ private:
 	HBufC* iCaption;
 	HBufC* iShortCaption;
 	HBufC* iFullName; // filename of application binary
-	TUid iUid;
-    TUidType iUidType;  	
+	TInt iIsPresent; // uses enum
+	TUidType iUidType;
 	CApaAppData* iNext;
 	TApaAppCapabilityBuf iCapabilityBuf;
 	CApaAppEntry* iSuccessor;
+	TTime iTimeStamp;
 	CArrayPtrFlat<CApaAppViewData>* iViewDataArray;
 	CDesCArray* iOwnedFileArray;
  	RFs& iFs;
+ 	HBufC* iRegistrationFile;
  	TUint iDefaultScreenNumber;
  	HBufC* iIconFileName;
  	TBool iNonMbmIconFile;
+ 	HBufC* iLocalisableResourceFileName;
+ 	TTime iLocalisableResourceFileTimeStamp;
+	TTime iIconFileTimeStamp;
  	TLanguage iApplicationLanguage;
  	CArrayFixFlat<TApaAppServiceInfo>* iServiceArray;
  	TInt iIndexOfFirstOpenService;
+	TUid iNonNativeApplicationType;
 	HBufC8* iOpaqueData;
  	TInt iNumOfAppIcons;
 	TInt iNumOfAppIconsFromResourceFile;
  	HBufC* iIconFileNameFromResourceFile; // Icon file name as found in the localisable resource file
  	TBool iNonMbmIconFileFromResourceFile; // A Flag that tells whether the icon in resource file is non MBM file format
+ 	TTime iIconFileTimeStampFromResourceFile;
 	HBufC* iShortCaptionFromResourceFile;	// Short Caption as found in the localisable resource file
 	HBufC* iCaptionFromResourceFile;		// Caption as found in the localisable resource file
 	CApaIconLoader* iIconLoader;
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    TInt iIsPresent; // uses enum	
-    TTime iTimeStamp;  
-    HBufC* iRegistrationFile; 
-    HBufC* iLocalisableResourceFileName;
-    TTime iLocalisableResourceFileTimeStamp;
-    TTime iIconFileTimeStamp;    
-    TUid iNonNativeApplicationType;  
-    TTime iIconFileTimeStampFromResourceFile;
-#endif
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-    TBool iIsLangChangePending;
-#endif
-    
 private:
 	friend class CApaAppList;
 	};
@@ -275,13 +249,11 @@ inline TPtrC CApaAppData::Caption() const
 inline TPtrC CApaAppData::ShortCaption() const
 	{ return *iShortCaption; }
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 /** Tests whether the application is present or not on the device.
 
 @return True if application exists, else false. */
 inline TBool CApaAppData::IsPresent() const
 	{ return iIsPresent; }
-#endif
 
 /** Gets the Next Appdata in the list
 

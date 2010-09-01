@@ -65,7 +65,7 @@ EXPORT_C TInt RASCliSession::Connect()
 	TInt startupAttempts = KNumberOfServerStartupAttempts;
 	for(;;)
 		{
-		TInt ret = CreateSession(ASCliDefinitions::ServerAndThreadName(), ASCliDefinitions::Version(), KAlarmServerAsynchronousSlotCount);
+		TInt ret = CreateSession(ASCliDefinitions::ServerAndThreadName(), ASCliDefinitions::Version());
 
 		if	(ret != KErrNotFound && ret != KErrServerTerminated)
 			{

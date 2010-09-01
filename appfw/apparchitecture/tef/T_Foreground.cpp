@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -54,15 +54,10 @@
 #include <eikenv.h>
 
 #include "t_foreground.h"
-#include "T_SisFileInstaller.h"
 
 _LIT(KAppName, "SimpleApparcTestApp");
-_LIT(KAppFileName, "c:\\sys\\bin\\SimpleApparcTestApp.exe");
+_LIT(KAppFileName, "z:\\sys\\bin\\SimpleApparcTestApp.exe");
 _LIT(KAppFile, "c:\\logs\\testApp.txt");
-
-_LIT(KSimpleAppSisFile, "z:\\apparctest\\apparctestsisfiles\\SimpleApparcTestApp.sis");
-_LIT(KSimpleAppComponent, "SimpleApparcTestApp");
-
 const TInt KNonExistantWgId = KErrNotFound;
 
 //
@@ -306,25 +301,6 @@ void CTestForegroundStep::ConstructAppL(CCoeEnv* aCoe)
 	CTestForegroundAppUi* appUi= new (ELeave) CTestForegroundAppUi(this);
     aCoe->SetAppUi(appUi);
     appUi->ConstructL();
-    }
-
-
-TVerdict CTestForegroundStep::doTestStepPreambleL()
-    {
-    CSisFileInstaller sisFileInstaller;
-    INFO_PRINTF2(_L("Installing sis file from -> %S"), &KSimpleAppSisFile);
-    sisFileInstaller.InstallSisL(KSimpleAppSisFile);
-    
-    SetTestStepResult(EPass);
-    return TestStepResult();
-    }
-
-TVerdict CTestForegroundStep::doTestStepPostambleL()
-    {
-    CSisFileInstaller sisFileInstaller;
-    sisFileInstaller.UninstallSisL(KSimpleAppComponent);
-    
-    return TestStepResult();    
     }
 
 

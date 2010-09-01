@@ -460,7 +460,7 @@ EXPORT_C TInt RApaLsSession::RecognizeData(const RFile& aFile, TDataRecognitionR
 
 
 /** Tests whether data taken from a named file has the specified 
-data (MIME) type.
+ * data (MIME) type.
 
 @param aName The name of the file containing the data.
 @param aBuffer A buffer containing data taken from the specified file; Provide preferred size of buffer 

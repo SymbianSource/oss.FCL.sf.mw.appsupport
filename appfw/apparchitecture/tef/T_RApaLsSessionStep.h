@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -112,9 +112,7 @@ private:
 	void TestAppListRecognizeDataPassedByBufferL();
 	void TestAppListInstallationL();
 	void TestAppListInstallation1L();
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK	
 	void TestAppFolderNonRomDrivesL();
-#endif	
 	void TestZeroSizedIconFileL();
 
 	void EmbeddedAppsTestCases();

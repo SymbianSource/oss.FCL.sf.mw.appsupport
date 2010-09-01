@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -23,8 +23,6 @@
 #include <e32std.h>
 #include <e32base.h>
 #include <eiknotapi.h>
-#include <eikenv.h>
-
 
 // CONSTANTS
 const TUid KAccFwUiNoteNotifierUid = { 0x10205061 };
@@ -34,7 +32,7 @@ CArrayPtr<MEikSrvNotifierBase2>* NotifierArray();
 
 // FORWARD DECLARATIONS
 class CCoeEnv;
-
+class CAknNoteDialog;
 
 // CLASS DECLARATION
 /**
@@ -99,11 +97,13 @@ class CAccFwUiNoteNotifier : public CActive, public MEikSrvNotifierBase2
 		RMessagePtr2 iMessage;
         // Indication whether notifier cancelled
         TBool iIsCancelled;
-	    
+	    // Note
+        CAknNoteDialog* iNote;
+	    // Indication whether to show not supported note in cover display
+        TBool iPublishNote;
 	    // Text to show in note
         HBufC* iNoteText;
-        
-       
+
     };
 
 #endif      // __CACCFWUINOTENOTIFIER_H

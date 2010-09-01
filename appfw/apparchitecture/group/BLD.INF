@@ -29,7 +29,7 @@ PRJ_EXPORTS
 // specify the source file followed by its destination here
 // copy will be used to copy the source file to its destination
 // If there's no destination then the source file will be copied
-// to the same name in /epoc32/include
+// to the same name in \epoc32\include
 
 // Files from aincc.prj
 ../inc/APACLN.H SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(apacln.h)
@@ -60,17 +60,11 @@ PRJ_EXPORTS
 ../inc/APFCTLF.H SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(apfctlf.h)
 ../inc/APRuleBased.h SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(aprulebased.h)
 ../inc/ApLaunchChecker.h SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(aplaunchchecker.h)
-
 ../inc/ApSidChecker.h SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(apsidchecker.h)
 
 // Files from gincc.prj
 ../inc/APGAPLST.H SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(apgaplst.h)
 ../inc/APGCLI.H SYMBIAN_MW_LAYER_PUBLIC_EXPORT_PATH(apgcli.h)
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-../inc/apgupdate.h SYMBIAN_MW_LAYER_PUBLIC_EXPORT_PATH(apgupdate.h)
-#endif
-
 ../inc/APGDOOR.H SYMBIAN_MW_LAYER_PUBLIC_EXPORT_PATH(apgdoor.h)
 ../inc/APGICNFL.H SYMBIAN_MW_LAYER_PUBLIC_EXPORT_PATH(apgicnfl.h)
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
@@ -95,7 +89,7 @@ PRJ_EXPORTS
 
 ../group/apparc.iby /epoc32/rom/include/apparc.iby
 
-// File from ../inc (which is relocated from app-framework/aiftool/inc)
+// File from ..\inc (which is relocated from app-framework\aiftool\inc)
 ../inc/AIFTOOL.RH /epoc32/include/aiftool.rh
 
 //Backup and restore exports
@@ -136,28 +130,13 @@ PRJ_TESTMMPFILES
 // i.e. tests where no user input is required.  The default will apply if neither "manual"
 // or "support" is specified.
 ../tef/apparctestserver.MMP
-
 ../tef/TAppInstall/TestAppInstall.mmp
-../tef/CustomiseDefaultIconApp.mmp	support
-../tef/TCtrlPnlApp.mmp	support
-../tef/T_DataPrioritySystem3.mmp	support
-../tef/T_groupname.mmp	support
-../tef/T_groupname_ver1.mmp	support
-../tef/T_groupname_ver2.mmp	support
-../tef/TestTrustedPriorityApp1.mmp	support
-../tef/TestTrustedPriorityApp2.mmp	support
-../tef/TestUnTrustedPriorityApp1.mmp support
-../tef/TestUnTrustedPriorityApp2.mmp support
-../tef/openservice1app.mmp	support
-../tef/openservice2app.mmp	support
-../tef/serverapp.mmp	support
-../tef/serverapp2.mmp	support
-../tef/serverapp3.mmp	support
-../tef/serverapp4.mmp	support
-../tef/serverapp6.mmp	support
-../tef/serverapp7.mmp	support
+../tef/TSTAPP_embedded.MMP 	support
+../tef/TSTAPP_standalone.MMP	support
+../tef/m_ctrl_v2.mmp	support
 ../tef/SimpleApparcTestApp.mmp	support
 ../tef/zerosizedicontestapp.mmp	support
+../tef/TEXE_V2.MMP 	support
 ../tef/TAppNotEmbeddable_v2.mmp support
 ../tef/TAppEmbeddable_embedded.mmp support
 ../tef/TAppEmbeddable_standalone.mmp support
@@ -168,115 +147,77 @@ PRJ_TESTMMPFILES
 ../tef/TStartDocApp_v2.mmp support
 ../tef/t_winchainChild.mmp support
 ../tef/t_winchainLaunch.mmp support
+../tef/TLongUrlRecognizer_v2.mmp support
+../tef/TRApaLsSessionStartAppTestRecognizer_v2.mmp support
 ../tef/TRApaLsSessionStartAppTestApp_v2.mmp support
 ../tef/tRuleBasedApps/tRuleBasedApp1.mmp support
 ../tef/tRuleBasedApps/tRuleBasedApp2.mmp support
 ../tef/tRuleBasedApps/tRuleBasedApp3.mmp support
 ../tef/tRuleBasedApps/tRuleBasedApp4.mmp support
+../tef/TCmdLineExe.mmp 	support
 ../tef/TApparcTestApp.mmp support
+../tef/TAppLaunchChecker.mmp support
+../tef/TAppLaunchChecker2.mmp support
+../tef/TNonNativeAppLaunchChecker.mmp support
 ../tef/app_CTRL.MMP
+../tef/app_CTRL2.MMP
 ../tef/T_EnvSlots/T_EnvSlots.MMP
+../tef/TESTREC/TESTREC.MMP
 ../tef/ParentProcess.mmp
 ../tef/ChildI.mmp
 ../tef/ChildII.mmp
 ../tef/ChildIII.mmp
+../tef/tssaac/tssaac.mmp
+../tef/tssaac/tssaac_tapp.mmp
 ../tef/T_DataPrioritySystem1/T_DataPrioritySystem1.MMP
 ../tef/T_DataPrioritySystem2/T_DataPrioritySystem2.MMP
+../tef/TBufferOnlyRec/TBufferOnlyRec.mmp
+../tef/TNonNative/TNonNativeRec.mmp
 ../tef/TNonNative/TNNApp1.mmp
 ../tef/TNonNative/TNNApp2.mmp
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 ../tef/TSidChecker/TestSidChecker.mmp
-#endif
-
+../tef/TMimeRec/recmime.MMP
 ../tef/TEndTaskTestApp/EndTaskTestApp.mmp
 ../tef/tlargestack/tlargestackapp.mmp
 ../tef/UnProctectedUidApp.mmp	support
+../tef/TIconLoaderAndIconArrayForLeaks.mmp
+//  RecMime_1 binaries are used to install and uninstall the mime type recognizer during runtime in TRApaLsSessionTestStep.
+//../tef/TMimeRec1/RecMime_1.MMP
 ../tef/tupgradeiconapp/tupgradeiconapp.mmp
 ../tef/tnotifydrivesapp/tnotifydrivesapp.mmp
-../tef/ticoncaptionoverride.mmp
+../tef/TRecUpgrade/recupgrade.mmp
+//*****************************************************************************************************************************************************************************************************
+//recupgrade_1 plug-in is used to upgrade the mime type recognizer during runtime in T_RecUpgrade test.  
+//              It is build for armv5 and rename to recupgrade_armv5_rel.dll and copied to apparc\Tdata before actual code builds.  If you are making any change in recupgrade_1.cpp then uncomment 
+//              “recupgrade_1.MMP” , build , rename (.dll) and copy as mentioned above .
+//*****************************************************************************************************************************************************************************************************
+//../tef/TRecUpgrade_1/recupgrade_1.MMP
+
 ../tef/testapp/testforceregistrationapp1/testforceregistrationapp1.mmp
 
+// ***************************************************************************************************************************************************************************************************
+// recupgrade_2 plug-in is used to upgrade the mime type recognizer during runtime in T_RecUpgrade test.  
+//              It is build for armv5 and rename to recupgrade2_armv5_rel.dll and copied to apparc\Tdata before actual code builds.  If you are making any change in recupgrade_2.cpp then uncomment 
+//              “recupgrade_2.MMP” , build , rename (.dll) and copy as mentioned above .
+// ***************************************************************************************************************************************************************************************************
+//../tef/TRecUpgrade_2/recupgrade_2.MMP
+../tef/ticoncaptionoverride.mmp
 // testupdregappuninstallation is used in t_serviceregistry test. If any changes done to
 // this application, uncomment testupdregappuninstallation.mmp file and build it.
-// Then comment it and copy the testupdregappuninstallation_reg.rsc file to ../tdata folder.
+// Then comment it and copy the testupdregappuninstallation_reg.rsc file to ..\tdata folder.
 // Delete any testupdregappuninstallation* files from epoc32 directory.
 //../tef/testapp/testupdregappuninstallation/testupdregappuninstallation.mmp
 
 // testupgradeupdregappuninstallation is used in t_serviceregistry test. If any changes done to
 // this application, uncomment testupdregappuninstallation.mmp file and build it.
-// Then comment it and copy the testupgradeupdregappuninstallation_reg.rsc file to ../tdata folder.
+// Then comment it and copy the testupgradeupdregappuninstallation_reg.rsc file to ..\tdata folder.
 // Delete any testupdregappuninstallation* files from epoc32 directory.
 //../tef/testapp/testupgradeupdregappuninstallation/testupgradeupdregappuninstallation.mmp
 
 
-//plugins
-../tef/TNonNativeAppLaunchChecker.mmp support
-../tef/TAppLaunchChecker.mmp support
-../tef/TAppLaunchChecker2.mmp support
-../tef/TESTREC/TESTREC.MMP
-../tef/TBufferOnlyRec/TBufferOnlyRec.mmp
-../tef/TMimeRec/recmime.MMP
-//  RecMime_1 binaries are used to install and uninstall the mime type recognizer during runtime in TRApaLsSessionTestStep.
-//../tef/TMimeRec1/RecMime_1.MMP
-
-
-../tef/m_ctrl_v2.mmp	support
-../tef/m_ctrl_v2_Stub.mmp
-../tef/TSTAPP_embedded.MMP 	support
-../tef/TCmdLineExe.mmp 	support
-../tef/app_CTRL2.MMP
-../tef/app_CTRL2_stub.MMP
-../tef/tssaac/tssaac.mmp
-../tef/tssaac/tssaac_tapp.mmp
-../tef/TEXE_V2.MMP 	support
-
-
-../tef/TSTAPP_standalone.MMP	support
-../tef/TSTAPP_standalone_Stub.MMP
-../tef/TNonNative/TNonNativeRec.mmp
-../tef/TLongUrlRecognizer_v2.mmp support
-../tef/TRApaLsSessionStartAppTestRecognizer_v2.mmp support
-
-../tef/TIconLoaderAndIconArrayForLeaks.mmp
-
-../tef/TRecUpgrade/recupgrade.mmp
-../tef/refnativeplugin/refnativeplugin.mmp
-
-//*****************************************************************************************************************************************************************************************************
-//recupgrade_1 plug-in is used to upgrade the mime type recognizer during runtime in T_RecUpgrade test.  
-//              It is build for armv5 and rename to recupgrade_armv5_rel.dll and copied to apparc/Tdata before actual code builds.  If you are making any change in recupgrade_1.cpp then uncomment 
-//              “recupgrade_1.MMP” , build , rename (.dll) and copy as mentioned above .
-//*****************************************************************************************************************************************************************************************************
-//../tef/TRecUpgrade_1/recupgrade_1.MMP
-
-
-// ***************************************************************************************************************************************************************************************************
-// recupgrade_2 plug-in is used to upgrade the mime type recognizer during runtime in T_RecUpgrade test.  
-//              It is build for armv5 and rename to recupgrade2_armv5_rel.dll and copied to apparc/Tdata before actual code builds.  If you are making any change in recupgrade_2.cpp then uncomment 
-//              “recupgrade_2.MMP” , build , rename (.dll) and copy as mentioned above .
-// ***************************************************************************************************************************************************************************************************
-//../tef/TRecUpgrade_2/recupgrade_2.MMP
-
-
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-../tef/forceregapps/forceregapp1.mmp
-../tef/forceregapps/forceregapp2.mmp
-../tef/forceregapps/TForceRegAppRec.mmp
-../tef/tnonnativeruntime/tnonnativeruntime.mmp
-#endif
-
-makefile ../tef/testpkg/preparesis.fil
-makefile ../tef/testpkg/preparesis_stub.fil
-
 PRJ_TESTEXPORTS
 
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 ../group/apparcTest.iby /epoc32/rom/include/apparctest.iby
-#else
-../group/apparcTest_new.iby /epoc32/rom/include/apparctest.iby
-#endif
-
 
 ../tef/scripts/hardware/apparctest_run.bat                  z:/apparctest/apparctest_run.bat
 ../tef/scripts/emulator/apparctest_run.bat                  /epoc32/release/winscw/udeb/apparctest_run.bat
@@ -335,12 +276,6 @@ PRJ_TESTEXPORTS
 ../tef/scripts/apparctest_t_servicebase.script				z:/apparctest/apparctest_t_servicebase.script
 ../tef/scripts/apparctest_t_RecUpgrade.script         		z:/apparctest/apparctest_t_recupgrade.script
 
-#ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-../tef/scripts/apparctest_t_UpdateAppList.script			z:/apparctest/apparctest_t_updateapplist.script
-../tef/scripts/apparctest_t_forcereg.script					z:/apparctest/apparctest_t_forcereg.script
-../tef/scripts/apparctest_t_clientnotif.script				z:/apparctest/apparctest_t_clientnotif.script
-../tef/scripts/apparctest_t_nonnativetest.script			z:/apparctest/apparctest_t_nonnativetest.script
-#endif
 
 //SysStart Apparc Scripts
 ../tef/scripts/apparctest_T_TestStartApp1L.script			z:/apparctest/apparctest_t_teststartapp1l.script		
@@ -376,38 +311,17 @@ PRJ_TESTEXPORTS
 ../tef/tssaac/scripts/emulator/sysstart_apparc_setup.bat			/epoc32/release/winscw/urel/z/apparctest/sysstart_apparc_setup.bat
 ../tef/tssaac/scripts/emulator/sysstart_apparc_checkEpocWind.bat	/epoc32/release/winscw/urel/z/apparctest/sysstart_apparc_checkepocwind.bat
 
-../tef/tupgradeiconapp/tupgradeiconapp.mbm					/epoc32/release/winscw/udeb/z/apparctestregfiles/tupgradeiconapp.mbm
+../tef/tupgradeiconapp/tupgradeiconapp.mbm					/epoc32/winscw/c/resource/apps/tupgradeiconapp.mbm
 
-// epoc32/data
-
-// export certificates for creating sis files
-../tef/testpkg/Nokia_RnDCert_02.der							/epoc32/tools/Nokia_RnDCert_02.der
-../tef/testpkg/Nokia_RnDCert_02.key							/epoc32/tools/Nokia_RnDCert_02.key
-../tef/testpkg/swicertstore.dat								/epoc32/release/winscw/udeb/z/resource/swicertstore.dat
-
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-../tef/tstnnapp.mbm											/epoc32/data/z/resource/apps/tstnnapp.mbm
-../tdata/AAA_reg.Rsc 										/epoc32/data/z/apparctest/aaa_reg.rsc
-#endif
-
-../tdata/forcegtestapp1.frg1								/epoc32/data/z/apparctest/forcegtestapp1.frg1
-../tdata/forcegtestapp2.frg2								/epoc32/data/z/apparctest/forcegtestapp2.frg2
-../tdata/scr_test.db										/epoc32/data/z/apparctest/scr_test.db
-
-../tef/tstappviewneg.mbm									/epoc32/data/z/resource/apps/tstappviewneg.mbm
-../tef/App_ctrl.MBM											/epoc32/release/winscw/udeb/z/apparctestregfiles/app_ctrl.mbm
-../tef/svg_icon.svg											/epoc32/release/winscw/udeb/z/apparctestregfiles/svg_icon.svg
-../tef/zerosizedicon.mbm									/epoc32/release/winscw/udeb/z/apparctestregfiles/zerosizedicon.mbm
-../tdata/Corrupted_reg.RSC									/epoc32/data/z/apparctest/corrupted_reg.rsc
-
-../tdata/testfile4.txt 										/epoc32/data/z/system/data/testpath/filtertests/testfile4.txt
-../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/apparctestregfiles/tstappviewneg.xyz
+// epoc32\data
 ../tef/tstappviewneg.xyz									/epoc32/data/z/resource/apps/tstappviewneg.xyz
-../tdata/GIF.NNA1 											/epoc32/data/z/private/101f289c/gif.nna1
-../tdata/HTML.NNA2 											/epoc32/data/z/private/101f289c/html.nna2
-../tdata/CONTACT.NNA3 										/epoc32/data/z/private/101f289c/contact.nna3
-../tdata/TXT.NNA4 											/epoc32/data/z/private/101f289c/txt.nna4
+../tef/tstappviewneg.mbm									/epoc32/data/z/resource/apps/tstappviewneg.mbm
+../tef/tstnnapp.mbm									/epoc32/data/z/resource/apps/tstnnapp.mbm
+../tef/App_ctrl.MBM											/epoc32/data/z/system/data/app_ctrl.mbm
+../tef/zerosizedicon.mbm									/epoc32/data/Z/resource/apps/zerosizedicon.mbm
+../tef/svg_icon.svg											/epoc32/data/z/system/data/svg_icon.svg
+../tdata/AAA_reg.Rsc 										/epoc32/data/z/apparctest/aaa_reg.rsc
+../tdata/Corrupted_reg.RSC									/epoc32/data/z/apparctest/corrupted_reg.rsc
 ../tdata/TSTAPPU.DOC 										/epoc32/data/z/system/data/tstapp.doc
 ../tdata/zero_len.txt 										/epoc32/data/z/system/data/zero_len.txt
 ../tdata/one_byte.txt 										/epoc32/data/z/system/data/one_byte.txt
@@ -417,48 +331,34 @@ PRJ_TESTEXPORTS
 ../tdata/testfile1.txt 										/epoc32/data/z/system/data/testpath/filtertests/testfile1.txt
 ../tdata/testfile2.txt 										/epoc32/data/z/system/data/testpath/filtertests/testfile2.txt
 ../tdata/testfile3.txt 										/epoc32/data/z/system/data/testpath/filtertests/testfile3.txt
+../tdata/testfile4.txt 										/epoc32/data/z/system/data/testpath/filtertests/testfile4.txt
+../tdata/GIF.NNA1 											/epoc32/data/z/private/101f289c/gif.nna1
+../tdata/HTML.NNA2 											/epoc32/data/z/private/101f289c/html.nna2
+../tdata/CONTACT.NNA3 										/epoc32/data/z/private/101f289c/contact.nna3
+../tdata/TXT.NNA4 											/epoc32/data/z/private/101f289c/txt.nna4
 ../tdata/FileWithUnknownMimeType.UnrecognisableExtention	/epoc32/data/z/system/data/filewithunknownmimetype.unrecognisableextention
 ../tdata/TApsRecogAppTest.mmr								/epoc32/data/z/system/data/tapsrecogapptest.mmr
 
-../tdata/TApsRecogUpgradeTest.upg				/epoc32/data/z/system/data/tapsrecogupgradetest.upg
-../tdata/TApsRecogUpgradeTest.upr				/epoc32/data/z/system/data/tapsrecogupgradetest.upr
+../tdata/TApsRecogUpgradeTest.upg								/epoc32/data/z/system/data/tapsrecogupgradetest.upg
+../tdata/TApsRecogUpgradeTest.upr								/epoc32/data/z/system/data/tapsrecogupgradetest.upr
 ../tdata/mimecontentpolicy/sd_goo.dcf			/epoc32/data/z/system/data/sd_goo.dcf
 ../tdata/mimecontentpolicy/fl_goo.dm			/epoc32/data/z/system/data/fl_goo.dm
-../tdata/mimecontentpolicy/jpeg_wes.dm			/epoc32/data/z/system/data/jpeg_wes.dm
-../tdata/mimecontentpolicy/gif_wallpaper.gif	/epoc32/data/z/system/data/gif_wallpaper.gif
+../tdata/mimecontentpolicy/jpeg_wes.dm		/epoc32/data/z/system/data/jpeg_wes.dm
+../tdata/mimecontentpolicy/gif_wallpaper.gif		/epoc32/data/z/system/data/gif_wallpaper.gif
 ../tdata/mimecontentpolicy/propelli.jpg	 		/epoc32/data/z/system/data/propelli.jpg
 ../tdata/mimecontentpolicy/type-r.jpg			/epoc32/data/z/system/data/type-r.jpg
 ../tdata/1028583d.txt 							/epoc32/data/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
 ../tdata/10003a3f.txt 							/epoc32/data/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
 
-
 // WINSCW UDEB
-// exporting db & certstore for winscw
-../tdata/scr.db										/epoc32/release/winscw/udeb/z/sys/install/scr/provisioned/scr.db
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/resource/apps/tstappviewneg.xyz
+../tef/tstappviewneg.mbm									/epoc32/release/winscw/udeb/z/resource/apps/tstappviewneg.mbm
 ../tef/tstnnapp.mbm									/epoc32/release/winscw/udeb/z/resource/apps/tstnnapp.mbm
 ../tef/App_ctrl.MBM											/epoc32/release/winscw/udeb/z/resource/apps/app_ctrl.mbm
+../tef/zerosizedicon.mbm									/epoc32/release/winscw/udeb/z/resource/apps/zerosizedicon.mbm
 ../tef/svg_icon.svg											/epoc32/release/winscw/udeb/z/resource/apps/svg_icon.svg
 ../tdata/AAA_reg.Rsc 										/epoc32/release/winscw/udeb/z/apparctest/aaa_reg.rsc 
-../tdata/102081cf_reg.rsc									/epoc32/release/winscw/udeb/z/system/data/102081cf_reg.rsc
-../tdata/102081ce_reg.rsc									/epoc32/release/winscw/udeb/z/system/data/102081ce_reg.rsc
-../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/winscw/udeb/z/system/data/testupdregappuninstallation_reg.rsc
-../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/winscw/udeb/z/system/data/testupgradeupdregappuninstallation_reg.rsc
-../tef/zerosizedicon.mbm									/epoc32/release/winscw/udeb/z/apparctestregfiles/zerosizedicon.mbm
-../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/apparctestregfiles/tstappviewneg.xyz
-#endif
-
-../tdata/scr_test.db										/epoc32/release/winscw/udeb/z/apparctest/scr_test.db
-../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/resource/apps/tstappviewneg.xyz
-../tef/tstappviewneg.mbm									/epoc32/release/winscw/udeb/z/apparctestregfiles/tstappviewneg.mbm
-../tef/tstappviewneg.mbm									/epoc32/release/winscw/udeb/z/resource/apps/tstappviewneg.mbm
 ../tdata/Corrupted_reg.RSC									/epoc32/release/winscw/udeb/z/apparctest/corrupted_reg.rsc
-
-../tdata/GIF.NNA1 											/epoc32/release/winscw/udeb/z/private/101f289c/gif.nna1
-../tdata/HTML.NNA2 											/epoc32/release/winscw/udeb/z/private/101f289c/html.nna2
-../tdata/CONTACT.NNA3 										/epoc32/release/winscw/udeb/z/private/101f289c/contact.nna3
-../tdata/TXT.NNA4 											/epoc32/release/winscw/udeb/z/private/101f289c/txt.nna4
 ../tdata/TSTAPPU.DOC 										/epoc32/release/winscw/udeb/z/system/data/tstapp.doc
 ../tdata/zero_len.txt 										/epoc32/release/winscw/udeb/z/system/data/zero_len.txt
 ../tdata/one_byte.txt 										/epoc32/release/winscw/udeb/z/system/data/one_byte.txt
@@ -469,42 +369,38 @@ PRJ_TESTEXPORTS
 ../tdata/testfile2.txt									 	/epoc32/release/winscw/udeb/z/system/data/testpath/filtertests/testfile2.txt
 ../tdata/testfile3.txt									 	/epoc32/release/winscw/udeb/z/system/data/testpath/filtertests/testfile3.txt
 ../tdata/testfile4.txt 										/epoc32/release/winscw/udeb/z/system/data/testpath/filtertests/testfile4.txt
+../tdata/GIF.NNA1 											/epoc32/release/winscw/udeb/z/private/101f289c/gif.nna1
+../tdata/HTML.NNA2 											/epoc32/release/winscw/udeb/z/private/101f289c/html.nna2
+../tdata/CONTACT.NNA3 										/epoc32/release/winscw/udeb/z/private/101f289c/contact.nna3
+../tdata/TXT.NNA4 											/epoc32/release/winscw/udeb/z/private/101f289c/txt.nna4
 ../tdata/UpdatedAppsList.bin								/epoc32/release/winscw/udeb/z/system/data/updatedappslist.bin
+../tdata/102081cf_reg.rsc									/epoc32/release/winscw/udeb/z/system/data/102081cf_reg.rsc
+../tdata/102081ce_reg.rsc									/epoc32/release/winscw/udeb/z/system/data/102081ce_reg.rsc
 ../tdata/FileWithUnknownMimeType.UnrecognisableExtention	/epoc32/release/winscw/udeb/z/system/data/filewithunknownmimetype.unrecognisableextention	
 ../tdata/TApsRecogAppTest.mmr								/epoc32/release/winscw/udeb/z/system/data/tapsrecogapptest.mmr
-../tdata/recmime_1.rsc										/epoc32/release/winscw/udeb/z/system/data/recmime_1.rsc
+../tdata/recmime_1.rsc									/epoc32/release/winscw/udeb/z/system/data/recmime_1.rsc
 ../tdata/recmime_winscw.dll									/epoc32/release/winscw/udeb/z/system/data/recmime_winscw.dll
 
 ../tdata/mimecontentpolicy/sd_goo.dcf			/epoc32/release/winscw/udeb/z/system/data/sd_goo.dcf
 ../tdata/mimecontentpolicy/fl_goo.dm			/epoc32/release/winscw/udeb/z/system/data/fl_goo.dm
-../tdata/mimecontentpolicy/jpeg_wes.dm			/epoc32/release/winscw/udeb/z/system/data/jpeg_wes.dm
-../tdata/mimecontentpolicy/gif_wallpaper.gif	/epoc32/release/winscw/udeb/z/system/data/gif_wallpaper.gif
+../tdata/mimecontentpolicy/jpeg_wes.dm		/epoc32/release/winscw/udeb/z/system/data/jpeg_wes.dm
+../tdata/mimecontentpolicy/gif_wallpaper.gif		/epoc32/release/winscw/udeb/z/system/data/gif_wallpaper.gif
 ../tdata/mimecontentpolicy/propelli.jpg	 		/epoc32/release/winscw/udeb/z/system/data/propelli.jpg
 ../tdata/mimecontentpolicy/type-r.jpg			/epoc32/release/winscw/udeb/z/system/data/type-r.jpg
 ../tdata/1028583d.txt 							/epoc32/release/winscw/udeb/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
 ../tdata/10003a3f.txt 							/epoc32/release/winscw/udeb/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
-
+../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/winscw/udeb/z/system/data/testupdregappuninstallation_reg.rsc
+../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/winscw/udeb/z/system/data/testupgradeupdregappuninstallation_reg.rsc
 
 // WINSCW UREL
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
-../tef/tstnnapp.mbm											/epoc32/release/winscw/urel/z/resource/apps/tstnnapp.mbm
+../tef/tstappviewneg.xyz									/epoc32/release/winscw/urel/z/resource/apps/tstappviewneg.xyz
+../tef/tstappviewneg.mbm									/epoc32/release/winscw/urel/z/resource/apps/tstappviewneg.mbm
+../tef/tstnnapp.mbm									/epoc32/release/winscw/urel/z/resource/apps/tstnnapp.mbm
 ../tef/App_ctrl.MBM											/epoc32/release/winscw/urel/z/resource/apps/app_ctrl.mbm
+../tef/zerosizedicon.mbm									/epoc32/release/winscw/urel/z/resource/apps/zerosizedicon.mbm
 ../tef/svg_icon.svg											/epoc32/release/winscw/urel/z/resource/apps/svg_icon.svg
 ../tdata/AAA_reg.Rsc 										/epoc32/release/winscw/urel/z/apparctest/aaa_reg.rsc 
 ../tdata/Corrupted_reg.RSC									/epoc32/release/winscw/urel/z/apparctest/corrupted_reg.rsc
-../tdata/testupdregappuninstallation_reg.rsc				/epoc32/release/winscw/urel/z/system/data/testupdregappuninstallation_reg.rsc
-../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/winscw/urel/z/system/data/testupgradeupdregappuninstallation_reg.rsc
-../tef/zerosizedicon.mbm									/epoc32/release/winscw/udeb/z/apparctestregfiles/zerosizedicon.mbm
-../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/apparctestregfiles/tstappviewneg.xyz
-#endif
-
-../tef/tstappviewneg.mbm									/epoc32/release/winscw/urel/z/resource/apps/tstappviewneg.mbm
-../tef/tstappviewneg.xyz									/epoc32/release/winscw/urel/z/resource/apps/tstappviewneg.xyz
-../tdata/GIF.NNA1 											/epoc32/release/winscw/urel/z/private/101f289c/gif.nna1
-../tdata/HTML.NNA2 											/epoc32/release/winscw/urel/z/private/101f289c/html.nna2
-../tdata/CONTACT.NNA3 										/epoc32/release/winscw/urel/z/private/101f289c/contact.nna3
-../tdata/TXT.NNA4 											/epoc32/release/winscw/urel/z/private/101f289c/txt.nna4
 ../tdata/TSTAPPU.DOC 										/epoc32/release/winscw/urel/z/system/data/tstapp.doc
 ../tdata/zero_len.txt 										/epoc32/release/winscw/urel/z/system/data/zero_len.txt
 ../tdata/one_byte.txt 										/epoc32/release/winscw/urel/z/system/data/one_byte.txt
@@ -515,41 +411,35 @@ PRJ_TESTEXPORTS
 ../tdata/testfile2.txt									 	/epoc32/release/winscw/urel/z/system/data/testpath/filtertests/testfile2.txt
 ../tdata/testfile3.txt									 	/epoc32/release/winscw/urel/z/system/data/testpath/filtertests/testfile3.txt
 ../tdata/testfile4.txt 										/epoc32/release/winscw/urel/z/system/data/testpath/filtertests/testfile4.txt
+../tdata/GIF.NNA1 											/epoc32/release/winscw/urel/z/private/101f289c/gif.nna1
+../tdata/HTML.NNA2 											/epoc32/release/winscw/urel/z/private/101f289c/html.nna2
+../tdata/CONTACT.NNA3 										/epoc32/release/winscw/urel/z/private/101f289c/contact.nna3
+../tdata/TXT.NNA4 											/epoc32/release/winscw/urel/z/private/101f289c/txt.nna4
 ../tdata/FileWithUnknownMimeType.UnrecognisableExtention	/epoc32/release/winscw/urel/z/system/data/filewithunknownmimetype.unrecognisableextention	
 ../tdata/TApsRecogAppTest.mmr 								/epoc32/release/winscw/urel/z/system/data/tapsrecogapptest.mmr
-../tdata/recmime_1.rsc										/epoc32/release/winscw/urel/z/system/data/recmime_1.rsc
+../tdata/recmime_1.rsc									/epoc32/release/winscw/urel/z/system/data/recmime_1.rsc
 ../tdata/recmime_winscw.dll									/epoc32/release/winscw/urel/z/system/data/recmime_winscw.dll
-../tdata/mimecontentpolicy/sd_goo.dcf						/epoc32/release/winscw/urel/z/system/data/sd_goo.dcf
-../tdata/mimecontentpolicy/fl_goo.dm						/epoc32/release/winscw/urel/z/system/data/fl_goo.dm
-../tdata/mimecontentpolicy/jpeg_wes.dm						/epoc32/release/winscw/urel/z/system/data/jpeg_wes.dm
-../tdata/mimecontentpolicy/gif_wallpaper.gif				/epoc32/release/winscw/urel/z/system/data/gif_wallpaper.gif
-../tdata/mimecontentpolicy/propelli.jpg	 					/epoc32/release/winscw/urel/z/system/data/propelli.jpg
-../tdata/mimecontentpolicy/type-r.jpg						/epoc32/release/winscw/urel/z/system/data/type-r.jpg
-../tdata/1028583d.txt 										/epoc32/release/winscw/urel/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
-../tdata/10003a3f.txt 										/epoc32/release/winscw/urel/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
+../tdata/mimecontentpolicy/sd_goo.dcf			/epoc32/release/winscw/urel/z/system/data/sd_goo.dcf
+../tdata/mimecontentpolicy/fl_goo.dm			/epoc32/release/winscw/urel/z/system/data/fl_goo.dm
+../tdata/mimecontentpolicy/jpeg_wes.dm		/epoc32/release/winscw/urel/z/system/data/jpeg_wes.dm
+../tdata/mimecontentpolicy/gif_wallpaper.gif		/epoc32/release/winscw/urel/z/system/data/gif_wallpaper.gif
+../tdata/mimecontentpolicy/propelli.jpg	 		/epoc32/release/winscw/urel/z/system/data/propelli.jpg
+../tdata/mimecontentpolicy/type-r.jpg			/epoc32/release/winscw/urel/z/system/data/type-r.jpg
+../tdata/1028583d.txt 							/epoc32/release/winscw/urel/z/private/10202be9/1028583d.txt //test Central Repository initialisation file
+../tdata/10003a3f.txt 							/epoc32/release/winscw/urel/z/private/10202be9/10003a3f.txt //Test repository file contains closed content and extension information
+../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/winscw/urel/z/system/data/testupdregappuninstallation_reg.rsc
+../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/winscw/urel/z/system/data/testupgradeupdregappuninstallation_reg.rsc
 
 
 // ARMV5 UDEB
-
-// exporting db & certstore for armv5 
-../tdata/scr.db										/epoc32/data/z/sys/install/scr/provisioned/scr.db
-../tef/testpkg/swicertstore.dat						/epoc32/data/z/resource/swicertstore.dat
-
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+../tef/tstappviewneg.xyz									/epoc32/release/armv5/udeb/z/resource/apps/tstappviewneg.xyz
+../tef/tstappviewneg.mbm									/epoc32/release/armv5/udeb/z/resource/apps/tstappviewneg.mbm
 ../tef/tstnnapp.mbm									/epoc32/release/armv5/udeb/z/resource/apps/tstnnapp.mbm
+../tef/App_ctrl.MBM											/epoc32/release/armv5/udeb/z/resource/apps/app_ctrl.mbm
+../tef/zerosizedicon.mbm									/epoc32/release/armv5/udeb/z/resource/apps/zerosizedicon.mbm
+../tef/svg_icon.svg											/epoc32/release/armv5/udeb/z/resource/apps/svg_icon.svg
 ../tdata/AAA_reg.Rsc 										/epoc32/release/armv5/udeb/z/apparctest/aaa_reg.rsc 
 ../tdata/Corrupted_reg.RSC									/epoc32/release/armv5/udeb/z/apparctest/corrupted_reg.rsc
-../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/armv5/udeb/z/system/data/testupdregappuninstallation_reg.rsc
-../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/armv5/udeb/z/system/data/testupgradeupdregappuninstallation_reg.rsc
-#endif
-../tef/tstappviewneg.mbm									/epoc32/release/armv5/udeb/z/resource/apps/tstappviewneg.mbm
-../tef/tstappviewneg.xyz									/epoc32/release/armv5/udeb/z/resource/apps/tstappviewneg.xyz
-
-../tdata/GIF.NNA1 											/epoc32/release/armv5/udeb/z/private/101f289c/gif.nna1
-../tdata/HTML.NNA2 											/epoc32/release/armv5/udeb/z/private/101f289c/html.nna2
-../tdata/CONTACT.NNA3 										/epoc32/release/armv5/udeb/z/private/101f289c/contact.nna3
-../tdata/TXT.NNA4 											/epoc32/release/armv5/udeb/z/private/101f289c/txt.nna4
 ../tdata/TSTAPPU.DOC 										/epoc32/release/armv5/udeb/tstapp.doc
 ../tdata/zero_len.txt 										/epoc32/release/armv5/udeb/zero_len.txt
 ../tdata/one_byte.txt 										/epoc32/release/armv5/udeb/one_byte.txt
@@ -560,6 +450,10 @@ PRJ_TESTEXPORTS
 ../tdata/testfile2.txt									 	/epoc32/release/armv5/udeb/z/system/data/testpath/filtertests/testfile2.txt
 ../tdata/testfile3.txt									 	/epoc32/release/armv5/udeb/z/system/data/testpath/filtertests/testfile3.txt
 ../tdata/testfile4.txt 										/epoc32/release/armv5/udeb/z/system/data/testpath/filtertests/testfile4.txt
+../tdata/GIF.NNA1 											/epoc32/release/armv5/udeb/z/private/101f289c/gif.nna1
+../tdata/HTML.NNA2 											/epoc32/release/armv5/udeb/z/private/101f289c/html.nna2
+../tdata/CONTACT.NNA3 										/epoc32/release/armv5/udeb/z/private/101f289c/contact.nna3
+../tdata/TXT.NNA4 											/epoc32/release/armv5/udeb/z/private/101f289c/txt.nna4
 ../tdata/FileWithUnknownMimeType.UnrecognisableExtention	/epoc32/release/armv5/udeb/z/system/data/filewithunknownmimetype.unrecognisableextention	
 ../tdata/TApsRecogAppTest.mmr								/epoc32/release/armv5/udeb/z/system/data/tapsrecogapptest.mmr
 ../tdata/recmime_1.rsc									/epoc32/release/armv5/udeb/z/system/data/recmime_1.rsc
@@ -577,34 +471,19 @@ PRJ_TESTEXPORTS
 ../tdata/recupgrade2.rsc								/epoc32/release/armv5/udeb/z/system/data/recupgrade2.rsc
 ../tdata/recupgrade_armv5_rel.dll						/epoc32/release/armv5/udeb/z/system/data/recupgrade_armv5_rel.dll
 ../tdata/recupgrade2_armv5_rel.dll						/epoc32/release/armv5/udeb/z/system/data/recupgrade2_armv5_rel.dll
+../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/armv5/udeb/z/system/data/testupdregappuninstallation_reg.rsc
+../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/armv5/udeb/z/system/data/testupgradeupdregappuninstallation_reg.rsc
 
 
 // ARMV5 UREL
-
-#ifndef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
+../tef/tstappviewneg.xyz									/epoc32/release/armv5/urel/z/resource/apps/tstappviewneg.xyz
+../tef/tstappviewneg.mbm									/epoc32/release/armv5/urel/z/resource/apps/tstappviewneg.mbm
 ../tef/tstnnapp.mbm									/epoc32/release/armv5/urel/z/resource/apps/tstnnapp.mbm
 ../tef/App_ctrl.MBM											/epoc32/release/armv5/urel/z/resource/apps/app_ctrl.mbm
+../tef/zerosizedicon.mbm									/epoc32/release/armv5/urel/z/resource/apps/zerosizedicon.mbm
 ../tef/svg_icon.svg											/epoc32/release/armv5/urel/z/resource/apps/svg_icon.svg
 ../tdata/AAA_reg.Rsc 										/epoc32/release/armv5/urel/z/apparctest/aaa_reg.rsc 
 ../tdata/Corrupted_reg.RSC									/epoc32/release/armv5/urel/z/apparctest/corrupted_reg.rsc
-../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/armv5/urel/z/system/data/testupdregappuninstallation_reg.rsc
-../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/armv5/urel/z/system/data/testupgradeupdregappuninstallation_reg.rsc
-../tef/zerosizedicon.mbm									/epoc32/release/winscw/udeb/z/apparctestregfiles/zerosizedicon.mbm
-../tef/tstappviewneg.xyz									/epoc32/release/winscw/udeb/z/apparctestregfiles/tstappviewneg.xyz
-#endif
-../tef/tstappviewneg.xyz									/epoc32/release/armv5/urel/z/resource/apps/tstappviewneg.xyz
-../tef/tstappviewneg.mbm									/epoc32/release/armv5/urel/z/resource/apps/tstappviewneg.mbm
-../tef/tstappviewneg.mbm									/epoc32/data/z/apparctestregfiles/tstappviewneg.mbm
-../tef/App_ctrl.MBM											/epoc32/data/z/apparctestregfiles/App_ctrl.MBM
-../tef/svg_icon.svg											/epoc32/data/z/apparctestregfiles/svg_icon.svg
-../tef/tstappviewneg.xyz									/epoc32/data/z/apparctestregfiles/tstappviewneg.xyz
-../tef/tupgradeiconapp/tupgradeiconapp.mbm					/epoc32/data/z/apparctestregfiles/tupgradeiconapp.mbm
-../tef/zerosizedicon.mbm									/epoc32/data/z/apparctestregfiles/zerosizedicon.mbm
-
-../tdata/GIF.NNA1 											/epoc32/release/armv5/urel/z/private/101f289c/gif.nna1
-../tdata/HTML.NNA2 											/epoc32/release/armv5/urel/z/private/101f289c/html.nna2
-../tdata/CONTACT.NNA3 										/epoc32/release/armv5/urel/z/private/101f289c/contact.nna3
-../tdata/TXT.NNA4 											/epoc32/release/armv5/urel/z/private/101f289c/txt.nna4
 ../tdata/TSTAPPU.DOC 										/epoc32/release/armv5/urel/tstapp.doc
 ../tdata/zero_len.txt 										/epoc32/release/armv5/urel/zero_len.txt
 ../tdata/one_byte.txt 										/epoc32/release/armv5/urel/one_byte.txt
@@ -615,6 +494,10 @@ PRJ_TESTEXPORTS
 ../tdata/testfile2.txt					 					/epoc32/release/armv5/urel/z/system/data/testpath/filtertests/testfile2.txt
 ../tdata/testfile3.txt									 	/epoc32/release/armv5/urel/z/system/data/testpath/filtertests/testfile3.txt
 ../tdata/testfile4.txt 										/epoc32/release/armv5/urel/z/system/data/testpath/filtertests/testfile4.txt
+../tdata/GIF.NNA1 											/epoc32/release/armv5/urel/z/private/101f289c/gif.nna1
+../tdata/HTML.NNA2 											/epoc32/release/armv5/urel/z/private/101f289c/html.nna2
+../tdata/CONTACT.NNA3 										/epoc32/release/armv5/urel/z/private/101f289c/contact.nna3
+../tdata/TXT.NNA4 											/epoc32/release/armv5/urel/z/private/101f289c/txt.nna4
 ../tdata/FileWithUnknownMimeType.UnrecognisableExtention	/epoc32/release/armv5/urel/z/system/data/filewithunknownmimetype.unrecognisableextention	
 ../tdata/TApsRecogAppTest.mmr 								/epoc32/release/armv5/urel/z/system/data/tapsrecogapptest.mmr
 ../tdata/recmime_1.rsc									/epoc32/release/armv5/urel/z/system/data/recmime_1.rsc
@@ -632,4 +515,6 @@ PRJ_TESTEXPORTS
 ../tdata/recupgrade2.rsc								/epoc32/release/armv5/urel/z/system/data/recupgrade2.rsc
 ../tdata/recupgrade_armv5_rel.dll						/epoc32/release/armv5/urel/z/system/data/recupgrade_armv5_rel.dll
 ../tdata/recupgrade2_armv5_rel.dll						/epoc32/release/armv5/urel/z/system/data/recupgrade2_armv5_rel.dll
+../tdata/testupdregappuninstallation_reg.rsc			/epoc32/release/armv5/urel/z/system/data/testupdregappuninstallation_reg.rsc
+../tdata/testupgradeupdregappuninstallation_reg.rsc			/epoc32/release/armv5/urel/z/system/data/testupgradeupdregappuninstallation_reg.rsc
 

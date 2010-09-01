@@ -36,9 +36,9 @@ PRJ_EXPORTS
 
  ../loc/startup.loc                         MW_LAYER_LOC_EXPORT_PATH(startup.loc)
 
- ../data/backup_registration.xml            /epoc32/data/z/private/100058f4/backup_registration.xml
- ../data/backup_registration.xml            /epoc32/release/winscw/udeb/z/private/100058f4/backup_registration.xml
- ../data/backup_registration.xml            /epoc32/release/winscw/urel/z/private/100058f4/backup_registration.xml
+ ../data/backup_registration.xml            /epoc32/data/z/private/100058F4/backup_registration.xml
+ ../data/backup_registration.xml            /epoc32/release/winscw/udeb/z/private/100058F4/backup_registration.xml
+ ../data/backup_registration.xml            /epoc32/release/winscw/urel/z/private/100058F4/backup_registration.xml
 
 PRJ_EXTENSIONS
 START EXTENSION s60/mifconv

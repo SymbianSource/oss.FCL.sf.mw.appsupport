@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -22,7 +22,7 @@
 #include <e32base.h>
 #include <ssm/ssmcustomcommand.h>
 
-
+class CAknGlobalNote;
 
 /**
  *  A custom command for displaying a note about unrecoverable
@@ -79,6 +79,11 @@ private: // data
     // Custom command environment. Not owned. Set in Initialize.
     CSsmCustomCommandEnv* iEnv;
 
+    /** Global note object used to show the notification on UI. Own */
+    CAknGlobalNote* iNote;
+
+    /** Global note id for cancelling the note. */
+    TInt iNoteId;
     };
 
 #endif // SYSERRCMD_H

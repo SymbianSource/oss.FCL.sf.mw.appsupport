@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include "../inc/ApplicationStateSourcePluginConst.hrh"
 
-TARGET          applicationstatesourceplugin.dll
+TARGET          ApplicationStateSourcePlugIn.dll
 TARGETTYPE      PLUGIN
 UID             0x10009D8D KApplicationStateSourcePluginDllUid
 CAPABILITY      CAP_ECOM_PLUGIN
@@ -39,7 +39,7 @@ MW_LAYER_SYSTEMINCLUDE
 
 SOURCEPATH      ../data
 START RESOURCE  ApplicationStateSourcePlugIn.rss
-TARGET          applicationstatesourceplugin.rsc
+TARGET          ApplicationStateSourcePlugIn.rsc
 TARGETPATH      /resource/plugins
 END
 
