@@ -41,3 +41,5 @@ LIBRARY         euser.lib
 LIBRARY         stiftestinterface.lib
 
 MACRO __FUNC_TRACE__
+
+UNPAGED

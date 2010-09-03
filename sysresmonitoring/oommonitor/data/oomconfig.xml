@@ -1,5 +1,5 @@
 <!--
- Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+ Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
  All rights reserved.
  This component and the accompanying materials are made available
  under the terms of the License "Eclipse Public License v1.0"
@@ -53,7 +53,7 @@ threshold values are used.
 		<app uid="20001f63" low_ram_threshold="4637" good_ram_threshold="5900"></app> <!-- Maps -->
 		<app uid="101f857a" low_ram_threshold="5637" good_ram_threshold="6900"></app> <!-- camera -->
 		<app uid="10282822" low_ram_threshold="5637" good_ram_threshold="6900"></app> <!-- Widget UI -->
-		<app uid="200009ee" low_ram_threshold="8637" good_ram_threshold="9900"></app> <!-- Photos -->
+		<app uid="20000A14" low_ram_threshold="8637" good_ram_threshold="9900"></app> <!-- Photos -->
 		<app uid="20007b39" low_ram_threshold="10637" good_ram_threshold="11900"></app> <!-- NGage -->
 	</app_specific_thresholds>
 
@@ -128,7 +128,7 @@ threshold values are used.
 			<app_close_idle_priority idle_time="15" priority="60"></app_close_idle_priority>
 			<foreground_app_priority if_foreground_app_id="10207218" priority="NEVER_CLOSE"></foreground_app_priority> <!-- Fast swap --> 
 		</close_app> <!-- Matrix UI -->
-		<close_app uid="10207a89" priority="NEVER_CLOSE" sync_mode="check">
+		<close_app uid="2002FF4E" priority="NEVER_CLOSE" sync_mode="check">
 			<app_close_idle_priority idle_time="43200" priority="20"></app_close_idle_priority>
 		</close_app> <!-- Radio -->
 	</app_close_settings>

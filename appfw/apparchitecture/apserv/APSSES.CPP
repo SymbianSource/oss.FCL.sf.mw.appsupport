@@ -2410,7 +2410,7 @@ void CApaAppListServSession::UpdateAppListL(const RMessage2& aMessage)
 void CApaAppListServSession::UpdatedAppsInfoL(const RMessage2& aMessage)
     {
     //Read the buffer size
-    TInt sizeOfBuffer=aMessage.Int1();
+    TInt sizeOfBuffer=aMessage.GetDesMaxLengthL(0);
     TInt count=iAppsUpdated.Count();
     TInt sizeRequired= sizeof(TInt)+(sizeof(TApaAppUpdateInfo) * count);
 

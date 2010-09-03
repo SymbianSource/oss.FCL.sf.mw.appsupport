@@ -465,6 +465,10 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
         MMCStatusChangedL();
         iHideFirstBeep = EFalse;
 #else // RD_MULTIPLE_DRIVE
+		if(iSysApDriveList == NULL)
+			{
+				iSysApDriveList = CSysApDriveList::NewL( iEikonEnv->FsSession() );
+			}
         iSysApDriveList->MountDrive( iSysApDriveList->DefaultMemoryCard() );
         UpdateInsertedMemoryCardsL();
 #endif // RD_MULTIPLE_DRIVE
@@ -472,6 +476,11 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
 		
 	if ( iSysApFeatureManager->MmcHotSwapSupported() )
         {
+        if(iSysApMMCObserver == NULL)
+        	{
+        	iSysApMMCObserver = CSysApMMCObserver::NewL(
+            iEikonEnv->FsSession(), *iSysApDriveList, *this, iSysApFeatureManager->MmcHotSwapSupported() );
+        	}
         iSysApMMCObserver->StartMountObserver();
         }    
    
@@ -565,23 +574,7 @@ void CSysApAppUi::DoStateChangedL(const RStarterSession::TGlobalState aSwState)
     if( IsStateNormal() )
         {
         TRACES( RDebug::Print(_L("CSysApAppUi::DoStateChangedL to normal state.") ) );
-        
-        if ( iSysApFeatureManager->MmcSupported() )
-            {
-#ifndef RD_MULTIPLE_DRIVE
-            MountMMC();
-            MMCStatusChangedL();
-            iHideFirstBeep = EFalse;
-#else // RD_MULTIPLE_DRIVE
-            iSysApDriveList->MountDrive( iSysApDriveList->DefaultMemoryCard() );
-            UpdateInsertedMemoryCardsL();
-#endif // RD_MULTIPLE_DRIVE
-            }
-        if ( iSysApFeatureManager->MmcHotSwapSupported() )
-            {
-            iSysApMMCObserver->StartMountObserver();
-            }
-        
+               
         iSysApBtController = CreateSysApBtControllerL( *this );
         iSysApBtSapController = CreateSysApBtSapControllerL( *this );
 
@@ -2772,10 +2765,6 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
         if (response)
             {
             //Do nothing:: To supress warning
-            }
-        if (iSysApKeyManagement && aKeyEvent.iCode != EKeyPowerOff && aKeyEvent.iCode != 'E')
-            {
-            response = iSysApKeyManagement->HandleKeyEventL(aKeyEvent, aType );
             }
         
         if( aType == EEventKey )

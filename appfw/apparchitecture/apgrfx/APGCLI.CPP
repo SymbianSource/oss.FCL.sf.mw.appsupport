@@ -2105,8 +2105,10 @@ EXPORT_C TInt RApaLsSession::UpdatedAppsInfoL(RArray<TApaAppUpdateInfo>& aUpdate
     //If the size of the buffer is not enough expand it to required size and pass it again.
     if(returnValue==KErrOverflow)
         {
-        buffer->ExpandL(0, sizeRequired);
-        returnValue=SendReceiveWithReconnect(EAppListUpdatedAppsInfo,TIpcArgs(&ptr, &pckg));
+        sizeRequired=pckg();
+        buffer->ResizeL(sizeRequired);
+        TPtr8 newPtr=buffer->Ptr(0);
+        returnValue=SendReceiveWithReconnect(EAppListUpdatedAppsInfo,TIpcArgs(&newPtr, &pckg));
         }
     
     if(returnValue==KErrNone)

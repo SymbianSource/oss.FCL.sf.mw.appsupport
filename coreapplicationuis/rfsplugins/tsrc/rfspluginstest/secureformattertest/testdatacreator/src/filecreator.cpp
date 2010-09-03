@@ -66,7 +66,7 @@ void CFileCreator::CreateOneFileL( const TDesC& aName, TInt aSizeInBytes )
     RFile file;
     TInt err = file.Replace( iFs, aName, EFileWrite );
     ERROR_1( err, "Failed to create file %S", &aName );
-    User::LeaveIfError( err );
+    //User::LeaveIfError( err );
     CleanupClosePushL( file );
 
     TInt blockSize = iWriteBuf->Size();

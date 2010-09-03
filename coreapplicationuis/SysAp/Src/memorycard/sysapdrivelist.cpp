@@ -55,7 +55,6 @@ void CSysApDriveList::ConstructL()
     {
     // Get the default memory card. If memory card is unavailable,
     // then get the next best suitable drive.
-    iDefaultMemoryCard = 0;
     
     TInt err( DriveInfo::GetDefaultDrive(
         DriveInfo::EDefaultRemovableMassStorage, iDefaultMemoryCard ) );

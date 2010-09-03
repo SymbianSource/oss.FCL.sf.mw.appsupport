@@ -25,6 +25,7 @@
 
 // Drive to be cleaned in the tests
 _LIT( KRootDir, "d:\\" );
+_LIT( KDefaultExcludeListPath,"d:\\private\\100059C9\\" );
 // Default exclude list location
 _LIT( KDefaultExcludeList, "d:\\private\\100059C9\\excludelist.txt" );
 // String passed to secureformatter in case default exclude list not used
@@ -65,8 +66,10 @@ static void RunSecureFormatterL( const TDesC& aExcludeList, const TDesC& aDriveT
     process.Resume();
     User::WaitForRequest( status );
     ERROR( status.Int(), "secure formatter failed" );
-    User::LeaveIfError( status.Int() );
-
+    //User::LeaveIfError( status.Int() );
+    
+    //RDebug::Print(_L("RunSecureFormatterL : before process.Kill(KErrNone)"));
+    //process.Kill(KErrNone);
     CleanupStack::PopAndDestroy( &process );
     CleanupStack::PopAndDestroy( arg );
     }
@@ -108,8 +111,10 @@ static void RunTestDataCreatorL(
     process.Resume();
     User::WaitForRequest( status );
     ERROR( status.Int(), "testdatacreator.exe failed" );
-    User::LeaveIfError( status.Int() );
+    //User::LeaveIfError( status.Int() );
 
+    //RDebug::Print(_L("RunTestDataCreatorL : before process.Kill(KErrNone)"));
+    //process.Kill(KErrNone);
     CleanupStack::PopAndDestroy( &process );
     }
 
@@ -249,7 +254,26 @@ CSecureFormatterTest::CSecureFormatterTest( CTestModuleIf& aTestModuleIf )
 void CSecureFormatterTest::ConstructL()
     {
     FUNC_LOG;
+    RFs fs;
+    TInt err = fs.Connect();
+    RDebug::Print(_L("Connect to file server  returned with = %d"),err);
+    User::LeaveIfError( err );
+    CleanupClosePushL( fs );
 
+    err = fs.MkDirAll(KAppSpecificExcludeListFolder);
+    RDebug::Print(_L("fs.MkDirAll(KAppSpecificExcludeListFolder) err = %d"), err);
+    if( err != KErrNone && err != KErrAlreadyExists )
+        {
+        User::Leave( err );
+        }
+
+    err = fs.MkDirAll(KDefaultExcludeListPath);
+    RDebug::Print(_L("fs.MkDirAll(KDefaultExcludeListPath)= %d"), err);
+    if( err != KErrNone && err != KErrAlreadyExists )
+        {
+        User::Leave( err );
+        }
+    CleanupStack::PopAndDestroy( &fs );
     RunTestDataCreatorL( KNullDesC ); // Run one time to stabilize request count
     }
 
@@ -441,6 +465,7 @@ void CSecureFormatterTest::SetupAppSpecialDataL( CStifItemParser& aItem,
     
     do
         {
+        
         err = aItem.GetNextString( name );
         if ( err == KErrNone )
             {

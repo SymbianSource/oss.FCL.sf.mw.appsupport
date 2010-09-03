@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -259,13 +259,27 @@ int main(int argc, char* argv[])
 			if((fflag))
 				{
 				if(rem<=(proc.FileName()).Length()+5)
-					Result.ReAlloc((proc.FileName()).Length()+Result.MaxLength());
+				    {
+					c = Result.ReAlloc((proc.FileName()).Length()+Result.MaxLength());
+					if(c!=KErrNone)
+					    {
+					    printf("Error") ;
+					    exit(1);
+					    }                   
+				    }
 				Result.AppendFormat(_L(" [%s]"),(proc.FileName()).PtrZ());
 				}
 			else 
 				{
 				if(rem<=procname.Length())
-					Result.ReAlloc(procname.Length()+Result.MaxLength());
+				    {
+					c = Result.ReAlloc(procname.Length()+Result.MaxLength());
+					if(c!=KErrNone)
+					    {
+					    printf("Error") ;
+					    exit(1);
+					    }					    
+				    }
 				Result.Append(procname);		
 				}
 				
