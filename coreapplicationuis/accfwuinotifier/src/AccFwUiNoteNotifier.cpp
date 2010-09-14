@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -221,7 +221,7 @@ void CAccFwUiNoteNotifier::StartL(
 		API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Read default enhancement string" );
         defaultText = iCoeEnv->AllocReadResourceLC( R_TEXT_DEFAULT_ENHANC );
 
-  		TPtrC enhancement;
+  		HBufC* enhancement=NULL;
   		TBool enhancementOk( ETrue );
 
   		if ( value != 0 )
@@ -230,6 +230,7 @@ void CAccFwUiNoteNotifier::StartL(
 
   			enhancementOk = EFalse;
             HBufC8* literals = iCoeEnv->AllocReadResourceAsDes8L( R_SELECTION_DIALOG_LITERALS );
+            CleanupStack::PushL(literals);
             TResourceReader reader;
         	reader.SetBuffer( literals );
 
@@ -247,7 +248,7 @@ void CAccFwUiNoteNotifier::StartL(
 				    {
 					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Literal found!" );
 					// Literal found
-					enhancement.Set( reader.ReadTPtrC() );
+					enhancement=reader.ReadTPtrC().AllocL();
 					enhancementOk = ETrue;
 					break;
 				    }
@@ -258,7 +259,8 @@ void CAccFwUiNoteNotifier::StartL(
 				    }
 			    }
 			    
-			delete literals;
+			CleanupStack::PopAndDestroy(literals);
+			CleanupStack::PushL(enhancement);
   		    }
 
 		if ( enhancementOk )
@@ -275,12 +277,12 @@ void CAccFwUiNoteNotifier::StartL(
 				if ( value != 0 )
 				    {
 					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Show also default information!" );
-				 	noteStr = HBufC::NewL( defaultText->Length() + enhancement.Length() + 3 );
+				 	noteStr = HBufC::NewL( defaultText->Length() + enhancement->Length() + 3 );
 
 				 	TPtr ptr( noteStr->Des() );	
 					ptr.Append( defaultText->Des() );
 					ptr.Append( ' ' );
-					ptr.Append( enhancement );
+					ptr.Append( *enhancement );
 					API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default string ready!" );
 				    }
 
@@ -325,15 +327,16 @@ void CAccFwUiNoteNotifier::StartL(
 			    {
 				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Create default accessory text!" );
 				//only default accessory text
-				noteStr = HBufC::NewL( defaultText->Length() + enhancement.Length() + 1 );
+				noteStr = HBufC::NewL( defaultText->Length() + enhancement->Length() + 1 );
             	TPtr ptr( noteStr->Des() );
 			
 				ptr.Append( defaultText->Des() );
 				ptr.Append( ' ' );
-				ptr.Append( enhancement );
+				ptr.Append( *enhancement );
 				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default accessory text ready!" );
 			    }
 
+			CleanupStack::PopAndDestroy(enhancement);
             // Pass string to member string and free local copies
             CleanupStack::PopAndDestroy( defaultText );
             CleanupStack::PushL( noteStr );

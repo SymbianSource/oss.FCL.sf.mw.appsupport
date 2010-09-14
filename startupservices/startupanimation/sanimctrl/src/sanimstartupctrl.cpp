@@ -24,7 +24,7 @@
 #include <Profile.hrh>
 #include <ProfileEngineSDKCRKeys.h>
 #include "sanimengine.h"
-#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
+#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
 
 #include "sanimstartupctrl.h"
 #include "trace.h"
