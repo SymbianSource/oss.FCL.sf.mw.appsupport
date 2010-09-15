@@ -23,7 +23,7 @@
 #include <CEUnitTestSuiteClass.h>
 #include <EUnitDecorators.h>
 #include <f32file.h>
-#include <cfkeyvaluepair.h>
+#include <CFKeyValuePair.h>
 
 //  INTERNAL INCLUDES
 

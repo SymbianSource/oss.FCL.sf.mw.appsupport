@@ -32,9 +32,9 @@ PRJ_EXPORTS
 ../conf/contextframework_10282BCE.crml 	    MW_LAYER_CRML(contextframework_10282BCE.crml)
 ../conf/contextframework_200159ED.crml 	    MW_LAYER_CRML(contextframework_200159ED.crml)
 
-../data/backup_registration.xml /epoc32/data/Z/private/10282BC4/backup_registration.xml
-../data/backup_registration.xml /epoc32/release/winscw/UDEB/Z/private/10282BC4/backup_registration.xml
-../data/backup_registration.xml /epoc32/release/winscw/UREL/Z/private/10282BC4/backup_registration.xml
+../data/backup_registration.xml /epoc32/data/z/private/10282BC4/backup_registration.xml
+../data/backup_registration.xml /epoc32/release/winscw/udeb/z/private/10282BC4/backup_registration.xml
+../data/backup_registration.xml /epoc32/release/winscw/urel/z/private/10282BC4/backup_registration.xml
 
 #ifdef RD_CONTEXT_FRAMEWORK
 ../rom/ContextFramework.iby CORE_MW_LAYER_IBY_EXPORT_PATH(ContextFramework.iby)

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -49,6 +49,26 @@ private:
 	};
 
 /**
+* CSplashShutdownWatcher
+*/
+class CSplashShutdownWatcher : public CActive
+    {
+private:
+    void ConstructL();  
+    CSplashShutdownWatcher();
+public:
+    static CSplashShutdownWatcher* NewL();
+    ~CSplashShutdownWatcher();
+    void IssueRequest();
+    void DoCancel();
+    void RunL();
+private:
+    RProperty       iProperty;
+    TInt            iPSRemoveSplashState;
+    };
+
+
+/**
 *  Base class for all windows
 *
 *  @lib SplashScreen.lib
@@ -80,8 +100,6 @@ class CWsClient : public CActive
 
 		RWindowGroup Group() {return iGroup;};
 
-        TInt            iPSRemoveSplashState;
-
     protected:
         TInt iLastScreenMode;
 
@@ -90,7 +108,6 @@ class CWsClient : public CActive
 		CWindowGc*      iGc;
 		friend class    CWsRedrawer; // needs to get at session
 		friend class    CWindow; // needs to get at session
-        RProperty       iProperty;
 
 	};
 

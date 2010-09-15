@@ -36,9 +36,9 @@
 
 #include <data_caging_path_literals.hrh>
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
- #include <SecondaryDisplay/SecondaryDisplaySystemStateAPI.h>
+ #include <secondarydisplay/SecondaryDisplaySystemStateAPI.h>
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
+#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
 
 
 // USER INCLUDES
@@ -699,6 +699,8 @@ class CStartupAppUi : public CAknAppUi
         TInt iCounryListIndex;
 
         TTime iTime;
+		// AT command CFUN profile Change
+        TInt iAtcmdCfunProfileChange;
 
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
         TBool iTouchScreenCalibSupport;

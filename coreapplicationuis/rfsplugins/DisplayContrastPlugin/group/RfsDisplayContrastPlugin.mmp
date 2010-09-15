@@ -44,5 +44,5 @@ USERINCLUDE ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY euser.lib       // Base library
-LIBRARY ECom.lib	    // ECom library
+LIBRARY ecom.lib	    // ECom library
 LIBRARY hal.lib         // HAL library

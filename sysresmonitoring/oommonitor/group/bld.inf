@@ -23,9 +23,9 @@ DEFAULT
 
 PRJ_EXPORTS
 ../rom/oommonitor.iby  CORE_MW_LAYER_IBY_EXPORT_PATH(oommonitor.iby)
-../data/oomconfig.xml  /epoc32/RELEASE/winscw/UDEB/Z/private/10207218/oomconfig.xml
-../data/oomconfig.xml  /epoc32/RELEASE/winscw/UREL/Z/private/10207218/oomconfig.xml
-../data/oomconfig.xml  /epoc32/data/Z/private/10207218/oomconfig.xml
+../data/oomconfig.xml  /epoc32/release/winscw/udeb/z/private/10207218/oomconfig.xml
+../data/oomconfig.xml  /epoc32/release/winscw/urel/z/private/10207218/oomconfig.xml
+../data/oomconfig.xml  /epoc32/data/z/private/10207218/oomconfig.xml
 
 PRJ_MMPFILES
 oommonitor.mmp

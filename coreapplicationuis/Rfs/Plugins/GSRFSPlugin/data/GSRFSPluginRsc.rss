@@ -24,7 +24,7 @@ NAME    GRFS // 4 letter ID
 
 #include <avkon.rsg>
 #include <avkon.mbg>
-#include <EIKCORE.rsg>
+#include <eikcore.rsg>
 #include <eikon.rsg>
 #include <avkon.loc>
 #include "gsrfsplugin.hrh"

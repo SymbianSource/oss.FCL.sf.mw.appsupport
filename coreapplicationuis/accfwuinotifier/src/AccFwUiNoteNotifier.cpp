@@ -258,9 +258,12 @@ void CAccFwUiNoteNotifier::StartL(
 					reader.ReadTPtrC();
 				    }
 			    }
-			    
+		    
 			CleanupStack::PopAndDestroy(literals);
-			CleanupStack::PushL(enhancement);
+
+			if(enhancement)
+				CleanupStack::PushL(enhancement);
+
   		    }
 
 		if ( enhancementOk )
@@ -336,7 +339,9 @@ void CAccFwUiNoteNotifier::StartL(
 				API_TRACE_( "[AccFW: ACCFWUINOTIFIER] CAccFwUiNoteNotifier::StartL() - Default accessory text ready!" );
 			    }
 
-			CleanupStack::PopAndDestroy(enhancement);
+			if(enhancement)
+				CleanupStack::PopAndDestroy(enhancement); 
+
             // Pass string to member string and free local copies
             CleanupStack::PopAndDestroy( defaultText );
             CleanupStack::PushL( noteStr );

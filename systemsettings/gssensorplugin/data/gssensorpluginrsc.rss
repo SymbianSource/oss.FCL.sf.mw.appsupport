@@ -22,12 +22,12 @@ NAME SENP
 #include    <avkon.loc> // Avkon localized strings
 #include    <avkon.mbg>
 #include    <avkon.rsg>
-#include    <EIKCORE.rsg>
+#include    <eikcore.rsg>
 #include    <uikon.rh>
 #include    <eikon.rh>
 #include    <eikon.rsg>
 #include    <avkon.rh>
-#include    <GSApp.rsg>
+#include    <gsapp.rsg>
 
 #include    <gs.loc> // Common localized GS strings
 #include    <gscommon.rh> // Common GS resource structures

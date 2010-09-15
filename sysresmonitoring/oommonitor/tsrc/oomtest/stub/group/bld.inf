@@ -21,7 +21,7 @@ PRJ_PLATFORMS
 DEFAULT
 
 PRJ_TESTEXPORTS
-../../data/oomconfig.xml  /epoc32/data/Z/private/10207218/oomconfig.xml
+../../data/oomconfig.xml  /epoc32/data/z/private/10207218/oomconfig.xml
 
 PRJ_TESTMMPFILES
 

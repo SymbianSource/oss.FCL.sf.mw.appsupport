@@ -30,7 +30,7 @@
 #include "cfcontextobjectimpl.h"
 #include "CFContextQueryImpl.h"
 #include "CFContextSubscriptionImpl.h"
-#include "cfkeyvaluepair.h"
+#include "CFKeyValuePair.h"
 #include "cfserviceutils.h"
 #include "cfcontextdataproxy.h"
 #include "cfenvutils.h"

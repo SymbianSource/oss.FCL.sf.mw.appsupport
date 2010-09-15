@@ -28,7 +28,7 @@
 #include <MediatorCommandResponder.h>
 #include <MediatorEventProvider.h>
 #include <w32std.h>   // Remove this when SecondaryDisplayStartupAPI.h includes it properly.
-#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
+#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
 
 #include "SysApAppUi.h"
 

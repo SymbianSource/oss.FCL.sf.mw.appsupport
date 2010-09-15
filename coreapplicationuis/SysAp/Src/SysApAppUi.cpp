@@ -68,7 +68,7 @@
 
 #include "SysApSimChanged.h"
 
-#include <SysAp.rsg>
+#include <sysap.rsg>
 #include "SysApLightsController.h"
 
 #include "SysApPubSubObserver.h"
@@ -490,7 +490,7 @@ void CSysApAppUi::ConstructL()
     TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepHacSettingObserver::NewL") ) );
     iSysApCenRepHacSettingObserver = CSysApCenRepHacSettingObserver::NewL( *this );
     
-    DeactivatePSMifBatteryNotLowL ();
+   
     
     if( iSysApFeatureManager->GanSupported() )
         {
@@ -4558,6 +4558,7 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
     InitializeStatusPaneAreaL();
     CheckSilentModeL();
     HandleAccessoryProfileInStartupL();
+    DeactivatePSMifBatteryNotLowL ();
     
     if ( iSysApFeatureManager->MmcSupported() )
         {
