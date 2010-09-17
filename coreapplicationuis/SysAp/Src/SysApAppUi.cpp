@@ -762,16 +762,14 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
             	TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): Reading value of KStartupSecurityCodeQueryStatus - State Value: %d"),securityQueryState));
             	TInt callState( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) );
 				//Disable keylock if Alarm is active or if a Security code query is active on the display
-				if ( alarmState == ECoreAppUIsDisableKeyguard || securityQueryState == ESecurityQueryActive )
+				if ( alarmState == ECoreAppUIsDisableKeyguard || securityQueryState == ESecurityQueryActive 
+					  || callState == EPSCTsyCallStateRinging || iDeviceLockEnabled)
                  	{
 					KeyLock().DisableWithoutNote();               	
                  	}
 			    else
          		 	{
-                    if( callState != EPSCTsyCallStateConnected && !iDeviceLockEnabled)
-                        {
-                        KeyLock().EnableWithoutNote();
-                        }
+                    KeyLock().EnableWithoutNote();
          			}
                 }
             else

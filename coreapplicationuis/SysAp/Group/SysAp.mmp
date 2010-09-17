@@ -147,8 +147,8 @@ SOURCE sysapremconobserver.cpp
 SOURCE powersavemode/sysappsmcontroller.cpp
 SOURCE sysapbatteryinfocontroller.cpp
 
-SOURCE gan\sysapganpropertylistener.cpp
-SOURCE gan\sysapganhandler.cpp
+SOURCE gan/sysapganpropertylistener.cpp
+SOURCE gan/sysapganhandler.cpp
 
 SOURCE SysApSatObserver.cpp
 LIBRARY	    satclient.lib       // for sat refresh

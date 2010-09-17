@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -36,9 +36,9 @@
 
 #include <data_caging_path_literals.hrh>
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
- #include <secondarydisplay/SecondaryDisplaySystemStateAPI.h>
+ #include <SecondaryDisplay/SecondaryDisplaySystemStateAPI.h>
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
-#include <secondarydisplay/SecondaryDisplayStartupAPI.h>
+#include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
 
 
 // USER INCLUDES

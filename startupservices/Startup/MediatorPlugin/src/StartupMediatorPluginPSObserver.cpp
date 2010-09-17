@@ -22,7 +22,7 @@
 // SYSTEM INCLUDES
 #include <MediatorDomainUIDs.h>
 #include <startupdomainpskeys.h>
-#include <secondarydisplay/SecondaryDisplaySystemStateAPI.h>
+#include <SecondaryDisplay/SecondaryDisplaySystemStateAPI.h>
 #include <avkondomainpskeys.h>
 #include <coreapplicationuisdomainpskeys.h>
 
