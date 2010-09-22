@@ -61,9 +61,9 @@ SOURCE OfflineModeController/SysApOfflineModeControllerImpl.cpp
 
 SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
 SYSTEMINCLUDE		/epoc32/include/mw/hb/hbcore
-
-SYSTEMINCLUDE      	/epoc32/include/mw
-
+SYSTEMINCLUDE		/epoc32/include/mw/QtCore
+SYSTEMINCLUDE		/epoc32/include/mw/QtGui
+SYSTEMINCLUDE		/epoc32/include/stdapis/stlportv5
 
 USERINCLUDE        . 
 USERINCLUDE        ../Inc
@@ -77,7 +77,7 @@ USERINCLUDE        ../PubSub
 USERINCLUDE        ../Src/memorycard
 
 MW_LAYER_SYSTEMINCLUDE 
-APP_LAYER_SYSTEMINCLUDE
+
 
 START RESOURCE ../Data/SysAp.rss
 HEADER
@@ -156,6 +156,7 @@ SOURCE CenRepObservers/SysApCenRepHacSettingObserver.cpp
 SOURCE CenRepObservers/sysapcenreplightsettingsobserver.cpp
 SOURCE CenRepObservers/SysApCenRepLogsObserver.cpp
 SOURCE CenRepObservers/sysapcenrepofflinemodeobserver.cpp
+SOURCE CenRepObservers/SysApCenRepSilentModeObserver.cpp
 
 LIBRARY centralrepository.lib
 LIBRARY cenrepnotifhandler.lib
@@ -230,5 +231,22 @@ LIBRARY customapi.lib
 SOURCE SysApEtelNetworkStatusNspsObserver.cpp SysApEtelConnector.cpp SysApEtelNetworkBarObserver.cpp SysApEtelSmsStoreObserver.cpp sysapeteldatabearerobserver.cpp sysapetelnetworkbargetter.cpp sysapetelnetworkinfoobserver.cpp
 
 LIBRARY etelpckt.lib
+//QtHighway lib for invoking logs app
+LIBRARY xqservice.lib
+LIBRARY xqserviceutil.lib
+LIBRARY		QtCore.lib
 
+//Required to use by EndKey
+LIBRARY		afactivitylauncher.lib
+
+//Required for OpenLibC 
+OPTION CW -cwd include -wchar_t on
+OPTION ARMCC --visibility_inlines_hidden
+#if defined(ARMCC_4_0)
+OPTION ARMCC --import_all_vtbl
+#endif
+OPTION GCCE -fvisibility-inlines-hidden
+
+
+STDCPP
 

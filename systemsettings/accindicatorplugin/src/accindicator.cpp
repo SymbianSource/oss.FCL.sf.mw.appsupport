@@ -96,8 +96,6 @@ bool AccIndicatorPlugin::handleInteraction(InteractionType type)
         // If it is 3-pole ( i.e., HeadSet or TTY ) and TV-Out enable the handleInteraction() to change the settings.
         if(mAccMode == EAccModeWiredHeadset || mAccMode == EAccModeWirelessHeadset || mAccMode == EAccModeTextDevice || mAccMode == EAccModeTVOut )
             {
-            QObject::connect( &mProcess, SIGNAL(error(QProcess::ProcessError)),                       
-                              this, SLOT(processError(QProcess::ProcessError)));
 
             QVariant mode,type;
             mode.setValue((int)mAccMode); 
@@ -106,7 +104,8 @@ bool AccIndicatorPlugin::handleInteraction(InteractionType type)
             mArgs.append(type.toString());
             
             // Launch the process to show the view.
-            mProcess.start("accindicatorsettings" , mArgs);
+            QString program("z://sys//bin//accindicatorsettings.exe");
+		        QProcess::startDetached(program,mArgs);
             handled = true;
             }
         }
@@ -128,7 +127,7 @@ QVariant AccIndicatorPlugin::indicatorData(int role) const
             return type;
             }
         //for displaying the icon in indicator.
-        case MonoDecorationNameRole:
+        case DecorationNameRole:
             {
             QString iconName;
             if(mAccType == KPCWired || mAccType == KPCUSB)
@@ -226,25 +225,5 @@ void AccIndicatorPlugin::prepareDisplayName()
             break;
         default :
             mDisplayName.append(QString("Unknown"));
-        }
-    }
-
-// ----------------------------------------------------------------------------
-// AccIndicator::processError
-// handle the error conditions reurned by the QProcess.
-// ----------------------------------------------------------------------------
-
-void AccIndicatorPlugin::processError(QProcess::ProcessError err)
-    {
-    switch (err) {   
-        case QProcess::FailedToStart: 
-        case QProcess::Crashed: 
-        case QProcess::Timedout: 
-        case QProcess::ReadError: 
-        case QProcess::WriteError: 
-        case QProcess::UnknownError:
-             break;  
-        default:
-            break;
         }
     }

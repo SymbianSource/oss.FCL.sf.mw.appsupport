@@ -39,7 +39,7 @@ PRJ_EXPORTS
 ../inc/prnpath.h SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(printinguisupport/prnpath.h)
 ../inc/PRNUIDS.H SYMBIAN_MW_LAYER_PUBLIC_EXPORT_PATH(prnuids.h)
 
-../group/print.iby		          /epoc32/rom/include/print.iby
+../group/print.iby		          CORE_MW_LAYER_IBY_EXPORT_PATH(print.iby)
 
 PRJ_MMPFILES
 // specify the .mmp files required for building the important component releasables

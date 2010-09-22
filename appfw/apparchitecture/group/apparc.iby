@@ -54,7 +54,7 @@ file=ABI_DIR\BUILD_DIR\apparc.dll			System\Libs\apparc.dll
 file=ABI_DIR\BUILD_DIR\apfile.dll			System\Libs\apfile.dll
 file=ABI_DIR\BUILD_DIR\aplist.dll			System\Libs\aplist.dll
 file=ABI_DIR\BUILD_DIR\apgrfx.dll			System\Libs\apgrfx.dll
-file=ABI_DIR\DEBUG_DIR\apserv.dll			System\Libs\apserv.dll
+file=ABI_DIR\BUILD_DIR\apserv.dll			System\Libs\apserv.dll
 file=ABI_DIR\BUILD_DIR\apsexe.exe			System\Programs\apsexe.exe
 file=ABI_DIR\BUILD_DIR\ServiceRegistry.dll	System\Libs\ServiceRegistry.dll
 

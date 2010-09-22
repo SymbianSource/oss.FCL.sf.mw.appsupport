@@ -25,7 +25,7 @@ PRJ_TESTEXPORTS
 ../rom/rfscustcmdtest.iby        CORE_OS_LAYER_IBY_EXPORT_PATH( rfscustcmdtest.iby )
 ../data/excludelist.txt          /epoc32/release/winscw/udeb/z/private/100059C9/excludelist.txt
 ../data/excludelist.txt          /epoc32/release/winscw/urel/z/private/100059C9/excludelist.txt
-../data/excludelist.txt          /epoc32/data/Z/private/100059C9/excludelist.txt
+../data/excludelist.txt          /epoc32/data/z/private/100059C9/excludelist.txt
 // Export file for emulator. For HW file come from pkg
 ../init/rfscustcmdtest.ini       /epoc32/winscw/c/testframework/rfscustcmdtest.ini
 

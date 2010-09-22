@@ -331,7 +331,7 @@ CMainWindow::~CMainWindow ()
     TRACES("CMainWindow::~CMainWindow(): End");
 	}
 
-CFbsBitmap* CMainWindow::ReadSVGL (TFileName aFileName)
+CFbsBitmap* CMainWindow::ReadSVGL (const TFileName& aFileName)
 	{
 	TRACES("CMainWindow::ReadSVGL(): Start");    
 	TFontSpec fontspec;

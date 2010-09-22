@@ -64,20 +64,20 @@ PRJ_TESTEXPORTS
 ../data/testspec_015.txt        /epoc32/winscw/c/testdata/testspec_015.txt
 
 // Application specific exclude list(s) exported to rom drive
-../data/app_spec_rom_001.exc    /epoc32/data/Z/private/102073ea/excludes/app_spec_001.exc
+../data/app_spec_rom_001.exc    /epoc32/data/z/private/102073ea/excludes/app_spec_001.exc
 ../data/app_spec_rom_001.exc    /epoc32/release/winscw/udeb/z/private/102073ea/excludes/app_spec_001.exc
 ../data/app_spec_rom_001.exc    /epoc32/release/winscw/urel/z/private/102073ea/excludes/app_spec_001.exc
-../data/app_spec_rom_002.exc    /epoc32/data/Z/private/102073ea/excludes/app_spec_002.exc
+../data/app_spec_rom_002.exc    /epoc32/data/z/private/102073ea/excludes/app_spec_002.exc
 ../data/app_spec_rom_002.exc    /epoc32/release/winscw/udeb/z/private/102073ea/excludes/app_spec_002.exc
 ../data/app_spec_rom_002.exc    /epoc32/release/winscw/urel/z/private/102073ea/excludes/app_spec_002.exc
-../data/app_spec_rom_dummy.exc  /epoc32/data/Z/private/102073ea/excludes/app_spec_dummy.exc
+../data/app_spec_rom_dummy.exc  /epoc32/data/z/private/102073ea/excludes/app_spec_dummy.exc
 ../data/app_spec_rom_dummy.exc  /epoc32/release/winscw/udeb/z/private/102073ea/excludes/app_spec_dummy.exc
 ../data/app_spec_rom_dummy.exc  /epoc32/release/winscw/urel/z/private/102073ea/excludes/app_spec_dummy.exc
-../data/app_spec_003.exc        /epoc32/data/Z/private/102073ea/excludes/app_spec_003.exc
-../data/app_spec_004.exc        /epoc32/data/Z/private/102073ea/excludes/app_spec_004.exc
-../data/app_spec_005.exc        /epoc32/data/Z/private/102073ea/excludes/app_spec_005.exc
-../data/app_spec_006.exc        /epoc32/data/Z/private/102073ea/excludes/app_spec_006.exc
-../data/app_spec_007.exc        /epoc32/data/Z/private/102073ea/excludes/app_spec_007.exc
+../data/app_spec_003.exc        /epoc32/data/z/private/102073ea/excludes/app_spec_003.exc
+../data/app_spec_004.exc        /epoc32/data/z/private/102073ea/excludes/app_spec_004.exc
+../data/app_spec_005.exc        /epoc32/data/z/private/102073ea/excludes/app_spec_005.exc
+../data/app_spec_006.exc        /epoc32/data/z/private/102073ea/excludes/app_spec_006.exc
+../data/app_spec_007.exc        /epoc32/data/z/private/102073ea/excludes/app_spec_007.exc
 
 
 // Application specific test specs and exclude lists

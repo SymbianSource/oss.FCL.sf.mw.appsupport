@@ -155,7 +155,7 @@ class CMainWindow : public CWindow
 		CMainWindow (CWsClient* aClient);
 		~CMainWindow ();
 		void Draw (const TRect& aRect);
-		CFbsBitmap* ReadSVGL (TFileName aFileName);
+		CFbsBitmap* ReadSVGL (const TFileName& aFileName);
 		void HandlePointerEvent (TPointerEvent& aPointerEvent);
 		void ConstructL (const TRect& aRect, CWindow* aParent=0);
 	private:

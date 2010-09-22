@@ -123,12 +123,6 @@ void CSysApConfirmationQuery::ShowQueryL( const TSysApConfirmationQueryIds aQuer
 
         switch ( iQueryId )
             {
-            case ESysApRestartPhoneQuery:
-                queryStringBuf = StringLoader::LoadLC( R_QTN_RESTART_QUERY, aLoaderEnv );
-                keys = R_AVKON_SOFTKEYS_OK_EMPTY;
-                anim = R_QGN_NOTE_WARNING_ANIM;
-                secondaryDisplayCmdId = SecondaryDisplay::ECmdShowRestartPhoneQuery;
-                break;
             case ESysApLeaveOfflineModeQuery:
                 queryStringBuf = StringLoader::LoadLC( R_QTN_LEAVE_OFFLINE_MODE_QUERY, aLoaderEnv );
                 keys = R_AVKON_SOFTKEYS_YES_NO;
@@ -282,12 +276,6 @@ void CSysApConfirmationQuery::RunL()
     TRACES( RDebug::Print( _L( "CSysApConfirmationQuery::RunL: iQueryId = %d, iStatus = %d" ), iQueryId, iStatus.Int() ) );
     switch ( iQueryId ) 
         {
-        case ESysApRestartPhoneQuery: 
-            {    
-            TRACES( RDebug::Print( _L( "CSysApConfirmationQuery::RunL: calling CSysApAppUi::DoShutdownL( ETrue, EDataRestoreReset )" ) ) );
-            iSysApAppUi.DoShutdownL( ETrue, RStarterSession::EDataRestoreReset );
-            }
-            break;
         case ESysApLeaveOfflineModeQuery:                  
             if ( iStatus.Int() == EAknSoftkeyYes )
                 {

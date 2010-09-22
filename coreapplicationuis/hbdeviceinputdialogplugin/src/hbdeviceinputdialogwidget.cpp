@@ -42,6 +42,8 @@ HbDeviceInputDialogWidget::HbDeviceInputDialogWidget(const QVariantMap &paramete
        {
         //Translator loaded succesfully then olny construct widgets
         constructDialog(parameters);
+        this->actions()[0]->setEnabled(true);
+
         if (!mPrimaryAction) {
             // If default button provided by HbInputDialog is used, connect into its triggered signal.
             QAction *action = /*primaryAction()*/this->actions().first();

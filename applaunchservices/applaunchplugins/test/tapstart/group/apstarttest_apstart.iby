@@ -21,9 +21,9 @@
 
 data=ABI_DIR\BUILD_DIR\tapstart_server.exe					sys\bin\tapstart_server.exe
 
-//data=DATAZ_\apstarttest\apstarttest_apstart_run.bat		\apstarttest_apstart_run.bat
+data=DATAZ_\apstarttest\apstarttest_apstart_run.bat		\apstarttest_apstart_run.bat
 
-//data=DATAZ_\apstarttest\apstarttest_apstart.script		\apstarttest\apstarttest_apstart.script
+data=DATAZ_\apstarttest\apstarttest_apstart.script		\apstarttest\apstarttest_apstart.script
 
 
 #endif

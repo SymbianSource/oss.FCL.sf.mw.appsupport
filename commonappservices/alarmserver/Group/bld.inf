@@ -37,7 +37,7 @@ PRJ_EXPORTS
 // Console Alarm Alert Server
 ../ConsoleAlarmAlertServer/Include/ConsoleAlarmAlertServerMain.h SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(consolealarmalertservermain.h)
 
-AlarmServer.iby			/epoc32/rom/include/alarmserver.iby   
+AlarmServer.iby			CORE_MW_LAYER_IBY_EXPORT_PATH(alarmserver.iby)
 
 backup_registration.xml  /epoc32/data/z/private/101f5027/backup_registration.xml
 backup_registration.xml  /epoc32/release/winscw/udeb/z/private/101f5027/backup_registration.xml

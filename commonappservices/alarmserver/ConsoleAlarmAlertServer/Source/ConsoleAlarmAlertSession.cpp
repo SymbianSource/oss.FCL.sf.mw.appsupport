@@ -41,8 +41,11 @@ CConsoleAlarmAlertSession::~CConsoleAlarmAlertSession()
 	CancelNotifications();
 	__FLOG_CLOSE;
 	
+	if(iServer != NULL)
+	{	
 	CConsoleAlarmAlertSession* session = iServer->WaitingSession();
 	session = NULL;
+	}
 	delete iSoundLEDFlasher;
 	delete iSoundCallbackTimer;
 	delete iConsole;

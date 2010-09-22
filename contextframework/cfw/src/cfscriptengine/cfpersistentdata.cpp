@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -183,7 +183,7 @@ void CCFPersistentData::ProcessPendingTasksL()
     {
     FUNC_LOG;
     
-    for (TInt i = iPendingTasks.Count(); i > 0; i--)
+    for (TInt i = iPendingTasks.Count()-1; i >= 0; i--)
     	{
     	CCFPendingPersistencyTask* iTask = iPendingTasks[i];
     	if ( iTask->Mode() == CCFPendingPersistencyTask::EStore )

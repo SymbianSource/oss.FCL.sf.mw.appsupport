@@ -39,7 +39,7 @@ PRJ_TESTEXPORTS
 ../data/testsettings/10282BDA.txt\
         /epoc32/data/z/private/10202be9/10282BDA.txt
 ../data/testsettings/10282BDA.txt\
-        /epoc32/release/winscw/udeb/Z/private/10202be9/10282BDA.txt
+        /epoc32/release/winscw/udeb/z/private/10202be9/10282BDA.txt
 
 ../data/testsettings/testcontextsourcesetting1.xml\
     /epoc32/data/z/private/10282BC4/Settings/10002001/testcontextsourcesetting1.xml

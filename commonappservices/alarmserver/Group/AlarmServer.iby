@@ -20,11 +20,6 @@
 
 REM Alarm Server
 
-#include <BackupRestoreNotification.iby>
-#ifdef SYMBIAN_SYSTEM_STATE_MANAGEMENT
-#include <ssmsus.iby>
-#endif
-
 #ifndef DATAZ_
   define DATAZ_ EPOCROOT##epoc32\data\Z
 #endif

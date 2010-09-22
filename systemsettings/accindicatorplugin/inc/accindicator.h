@@ -62,15 +62,11 @@ private:
 private:
 
     QString mDisplayName;
-    QProcess mProcess;
     TAccMode mAccMode;
     int mAccType;
     QStringList mIndicatorTypes;
     QStringList mArgs;
     
-private slots:
-    void processError(QProcess::ProcessError err); // handler for error codes
-
 private:
     Q_DISABLE_COPY(AccIndicatorPlugin)
     int mError;
