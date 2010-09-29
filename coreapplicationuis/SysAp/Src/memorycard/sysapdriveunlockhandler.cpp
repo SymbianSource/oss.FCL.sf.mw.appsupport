@@ -211,7 +211,7 @@ void CSysApDriveUnlockHandler::DoStartQueryIfNeededL()
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KChargingNote);
         TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString         
         return;
         }
@@ -228,7 +228,7 @@ void CSysApDriveUnlockHandler::DoStartQueryIfNeededL()
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KChargingNote);
         TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString    
         iSysApDriveList.MarkDriveUnlockQueryShown( iDriveToUnlock );
         }
@@ -300,7 +300,7 @@ TInt CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()
         HBufC* aString = HBufC16::NewLC(150);
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KUnlockNote);   
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString
         return ETrue;
         }
@@ -311,7 +311,7 @@ TInt CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()
         HBufC* aString = HBufC16::NewLC(150);
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KUnlockDeniedNote);   
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString
         return EFalse;
         }
@@ -322,7 +322,7 @@ TInt CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()
         HBufC* aString = HBufC16::NewLC(150);
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KUnlockAlreadyExistNote);
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString
         return ETrue;
         }
@@ -334,7 +334,7 @@ TInt CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KUnlockNotSupporrtedNote);
         TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString
         return ETrue;
         }
@@ -346,7 +346,7 @@ TInt CSysApDriveUnlockHandler::CheckMemoryDialogIfNeeded()
         TPtrC aStringPointer = aString->Des();
         aStringPointer.Set(KUnlockOperationCancelNote);
         TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-        iSysApAppUi.ShowNoteL( aStringPointer );
+        iSysApAppUi.ShowExampleUiNoteL( aStringPointer );
         CleanupStack::PopAndDestroy(); // aString
         return ETrue;
         }

@@ -95,8 +95,7 @@ enum TSysApNoteIds
     EPowerSaveModeActivated,
     EPowerSaveModeDeactivated,
     ECannotActivatePowerSaveMode,
-    ECannotDeactivatePowerSaveMode,
-    ESysApRestartPhone
+    ECannotDeactivatePowerSaveMode
     };
 
 enum TSysApWaitNoteIds
@@ -115,6 +114,7 @@ enum TSysApMemoryCardStatus
 enum TSysApConfirmationQueryIds
     {
     ESysApNoQuery=0,
+    ESysApRestartPhoneQuery,
     ESysApLeaveOfflineModeQuery,
     ESysApRemoveMmcNote,
     ESysApEjectMmcQuery,

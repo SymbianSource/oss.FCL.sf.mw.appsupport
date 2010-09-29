@@ -63,7 +63,6 @@ class CSysApCenRepController;
 class CSysApCenRepLightSettingsObserver;
 class CSysApCenRepBtObserver;
 class CSysApCenRepHacSettingObserver;
-class CSysApCenRepSilentModeObserver;
 class CSysApAudioRoutingObserver;
 class CSysApSsSettingsObserver;
 class CSystemLock;
@@ -264,15 +263,12 @@ class CSysApAppUi : public CAknAppUi,
         TBool IsEncryptionOperationOngoingL() const;
 //        void ConnectToFileServerL();
 //        void ConnectToWindowServerL();
-        void HandleSendKeyEventL();
-        void HandleEndKeyEventL();
-        
-        void ShowNoteL ( const TDesC& noteText )const;
+        void ShowExampleUiNoteL ( const TDesC& noteText )const;
         void ShowNotificationDialog(const TDesC& noteText)const;
         void PopupNote();
 //        void CreateWindowGroup();
         TBool ResourcesFreed() const;
-        void ShowUiNoteL( const TSysApNoteIds aNote );        
+        void ShowUiNoteL( const TSysApNoteIds aNote ) const;        
         TInt StateOfProperty( const TUid& aCategory, const TUint aKey ) const;
         TBool OfflineModeActive();
         void GoOnlineL( TBool aDoProfileChange = ETrue );
@@ -507,7 +503,6 @@ class CSysApAppUi : public CAknAppUi,
           CSysApCenRepLightSettingsObserver*  iSysApCenRepLightSettingsObserver;
           CSysApCenRepBtObserver*                  iSysApCenRepBtObserver;
           CSysApCenRepHacSettingObserver* iSysApCenRepHacSettingObserver;
-          CSysApCenRepSilentModeObserver* iSysApCenRepSilentModeObserver;
           
           CSysApAudioRoutingObserver* iSysApAudioRoutingObserver;
           CSysApPsmController* iSysApPsmController;
@@ -541,9 +536,6 @@ class CSysApAppUi : public CAknAppUi,
         TBool                           iResourcesFreed;        
         TInt                            iCapturedEKeyPowerOff;
         TInt                            iCapturedEKeyPowerOffUpAndDowns;
-        TInt                            iCapturedEKeySendKey;
-        TInt                            iCapturedEKeyEndKey;
-        
         TBool                           iOfflineModeActive;
         TBool                           iShutdownStarted;
         

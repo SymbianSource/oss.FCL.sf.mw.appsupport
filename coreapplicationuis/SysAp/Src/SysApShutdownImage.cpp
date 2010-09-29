@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -166,7 +166,7 @@ void CSysApShutdownImage::ShowShutdownImageL(TInt aBitmapId)
 // ----------------------------------------------------------------------------
 // CSysApShutdownImage::ShowShutdownImage()
 // ----------------------------------------------------------------------------
-CFbsBitmap* CSysApShutdownImage::ReadSVGL (const TFileName& aFileName)
+CFbsBitmap* CSysApShutdownImage::ReadSVGL (TFileName aFileName)
     {
     TRACES( RDebug::Print(_L("CSysApShutdownImage::ReadSVGL:start" ) ) );    
     TFontSpec fontspec;

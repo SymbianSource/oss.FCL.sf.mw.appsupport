@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -41,7 +41,6 @@
 #include <AknSgcc.h>
 //#include "sysapappui.h"
 #include <w32std.h>
-#include <avkondomainpskeys.h>
 
 
 const TInt KModifierMask( 0 );
@@ -289,8 +288,8 @@ TBool CSysApDefaultKeyHandler::IsDeviceLocked() const
     TInt value(0);
     TBool retval(EFalse);
 
-    RProperty::Get(  KPSUidAvkonDomain, KAknKeyguardStatus, value );
-    if ( value > EKeyguardNotActive )
+    RProperty::Get( KPSUidCoreApplicationUIs, KCoreAppUIsAutolockStatus, value );
+    if ( value > EAutolockOff )
         {
         retval = ETrue;
         }

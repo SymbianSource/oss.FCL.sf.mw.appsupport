@@ -55,7 +55,7 @@
 #include "sysapkeymanagement.h"
 #include "SysApShutdownImage.h"
 #include "SysApKeySndHandler.h"
-#include "SysApCenRepSilentModeObserver.h"
+
 #include "SysApShutdownAnimation.h"
 #include "SysApEtelConnector.h"
 
@@ -74,21 +74,6 @@
 #include <usbpersonalityids.h>
 #include "sysap.rsg"
 #include <hbindicatorsymbian.h>
-//Qt Highway
-#include <xqappmgr.h>
-#include <xqaiwdecl.h>
-#include <xqaiwrequest.h>
-#include <QString.h>
-#include <QVariant.h>
-#include <QMap.h>
-#include <QList.h>
-//For End Key
-#include <APGWGNAM.H>
-//For HS RPropertyKey
-#include <homescreendomainpskeys.h>
-//For Hs Changes
-#include <afactivitylauncher.h>
-#include <apgcli.h>
 
 class CHbSymbianVariant;
 const TInt KModifierMask( 0 );
@@ -171,10 +156,7 @@ void CSysApAppUi::ConstructL()
     RWindowGroup groupWin = iCoeEnv->RootWin();
     User::LeaveIfError ( iCapturedEKeyPowerOff = groupWin.CaptureKey( EKeyPowerOff, KModifierMask, KModifierMask ) );
     User::LeaveIfError ( iCapturedEKeyPowerOffUpAndDowns = groupWin.CaptureKeyUpAndDowns( EStdKeyDevice2, KModifierMask, KModifierMask ) );
-    //Capture SEND and END keys
-    User::LeaveIfError ( iCapturedEKeySendKey = groupWin.CaptureKey( EKeyPhoneSend, KModifierMask, KModifierMask ) );
-    User::LeaveIfError ( iCapturedEKeyEndKey = groupWin.CaptureKey( EKeyPhoneEnd, KModifierMask, KModifierMask ) );
-    
+     
     TRACES ( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CSysApDefaultKeyHandler::NewL()") ) );
     iSysApDefaultKeyHandler = CSysApDefaultKeyHandler::NewL(*this);
     
@@ -274,10 +256,6 @@ void CSysApAppUi::ConstructL()
     TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepHacSettingObserver::NewL") ) );
     iSysApCenRepHacSettingObserver = CSysApCenRepHacSettingObserver::NewL( *this ); 
     
-    TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepSilentModeObserver::NewL") ) );
-    iSysApCenRepSilentModeObserver = CSysApCenRepSilentModeObserver::NewL( ); 
-    
-    
 #ifndef RD_MULTIPLE_DRIVE
     if ( iSysApFeatureManager->MmcSupported() )
         {
@@ -366,17 +344,13 @@ void CSysApAppUi::FreeResources()
     RWindowGroup groupWin = iCoeEnv->RootWin();
     groupWin.CancelCaptureKey( iCapturedEKeyPowerOff );
     groupWin.CancelCaptureKeyUpAndDowns( iCapturedEKeyPowerOffUpAndDowns );
-    //Deregister SendKey
-    groupWin.CancelCaptureKey( iCapturedEKeySendKey );
-    //Deregister EndKey
-    groupWin.CancelCaptureKey( iCapturedEKeyEndKey );
     
     delete iSysApDefaultKeyHandler;
     delete iSysApCenRepLightSettingsObserver;
     delete iSysApCenRepBtObserver;
     delete iSysApCenRepHacSettingObserver;
     delete iSysApCenRepController;
-    delete iSysApCenRepSilentModeObserver;
+
     delete iSysApPubSubObserver;
     
     delete iSysApLightsController;
@@ -691,14 +665,14 @@ TBool CSysApAppUi::ResourcesFreed() const
     return iResourcesFreed;
     }
 
-void CSysApAppUi::ShowNoteL( const TDesC& noteText )const
+void CSysApAppUi::ShowExampleUiNoteL( const TDesC& noteText )const
     {          
- 	TRACES( RDebug::Print( _L("CSysApAppUi::ShowNoteL:: constructing CHbDeviceMessageBoxSymbian:BeGIN") ) );    
+ 	TRACES( RDebug::Print( _L("CSysApAppUi::ShowExampleUiNoteL:: constructing CHbDeviceMessageBoxSymbian:BeGIN") ) );    
     CHbDeviceMessageBoxSymbian *note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
  	CleanupStack::PushL(note);
-    TRACES( RDebug::Print( _L("CSysApAppUi::ShowNoteL:: construction of CHbDeviceMessageBoxSymbian:END") ) ); 
+    TRACES( RDebug::Print( _L("CSysApAppUi::ShowExampleUiNoteL:: construction of CHbDeviceMessageBoxSymbian:END") ) ); 
     note->SetTextL(noteText);
-	note->SetTimeout(3000);
+	note->SetTimeout(300);
  	TRACES( RDebug::Print( _L("CSysApAppUi:: Display of  CHbDeviceMessageBoxSymbian::Begin") ) );    
     note->ShowL();
 	TRACES( RDebug::Print( _L("CSysApAppUi:: Display of  CHbDeviceMessageBoxSymbian::End") ) );
@@ -1289,7 +1263,7 @@ void CSysApAppUi::PopupNote()
     TPtrC aStringPointer = aString->Des();
     aStringPointer.Set(KPowerPressKey);
     TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
-    ShowNoteL( aStringPointer );  
+    ShowExampleUiNoteL( aStringPointer );  
     CleanupStack::PopAndDestroy(); // aString
     }
 
@@ -2082,42 +2056,64 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
 // CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
 // ----------------------------------------------------------------------------
 
-void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) 
+void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote ) const
     {
-	TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL aNote") ) );
+    TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL aNote: %d"), aNote ) );
+    
     TInt swState( StateOfProperty( KPSUidStartup, KPSGlobalSystemState ) );
+
     if( UiReady() || swState == ESwStateSecurityCheck)
-		{
-		TRACES( RDebug::Print( _L("CSysApAppUi::ShowUiNoteL aNote: %d"), aNote ) );
+      {
           switch ( aNote )
             {
             case EBatteryLowNote:
                 {
-                 _LIT(KLowBattery,"Battery low");
-                 ShowNoteL( KLowBattery() );
+                 _LIT(KPowerPressKey,"Battery low");
+                 HBufC* aString = HBufC16::NewLC(100);
+                 TPtrC aStringPointer = aString->Des();
+                 aStringPointer.Set(KPowerPressKey);
+                 TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+                 ShowExampleUiNoteL( aStringPointer );
+                 CleanupStack::PopAndDestroy(); // aString
                 }
                 break;
             case EBatteryFullNote:
                 {
-                _LIT(KBatteryFull,"Battery full");
-                ShowNoteL( KBatteryFull() );
+                _LIT(KPowerPressKey,"Battery full");
+                HBufC* aString = HBufC16::NewLC(100);
+                TPtrC aStringPointer = aString->Des();
+                aStringPointer.Set(KPowerPressKey);
+                TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+                ShowExampleUiNoteL( aStringPointer );
+                CleanupStack::PopAndDestroy(); // aString
                 }
                 break;
             case ERechargeBatteryNote:
                 {
                 iSysApLightsController->BatteryEmptyL( ETrue );
-                _LIT(KRechargeBattery,"Battery empty. Recharge");
-                ShowNoteL( KRechargeBattery() );
+                _LIT(KPowerPressKey,"Battery empty. Recharge");
+                HBufC* aString = HBufC16::NewLC(100);
+                TPtrC aStringPointer = aString->Des();
+                aStringPointer.Set(KPowerPressKey);
+                TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+                ShowExampleUiNoteL( aStringPointer );
+                CleanupStack::PopAndDestroy(); // aString
                 }
                 break;
             case ENotChargingNote:
                 {
-                _LIT(KNotCharging,"Not charging");
-                ShowNoteL( KNotCharging() );
+                _LIT(KPowerPressKey,"Not charging");
+                HBufC* aString = HBufC16::NewLC(100);
+                TPtrC aStringPointer = aString->Des();
+                aStringPointer.Set(KPowerPressKey);
+                TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+                ShowExampleUiNoteL( aStringPointer );
+                CleanupStack::PopAndDestroy(); // aString
                 }
                 break;
             case EBatteryFullUnplugChargerNote:
                 {
+                TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) ); 
                 iSysApLightsController->BatteryEmptyL( ETrue );
                  _LIT(KunplugCharger,"txt_power_dpopinfo_unplug_charger_to_save_energy");                 
                  HBufC* unplugCharger = HbTextResolverSymbian::LoadL(KunplugCharger);
@@ -2128,28 +2124,22 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote )
                 break;
             case EUnplugChargerNote:
                 {
-                _LIT(KUnplugCharger,"Unplug charger from power supply to save energy");
-                ShowNoteL( KUnplugCharger() );
+                _LIT(KPowerPressKey,"Unplug charger from power supply to save energy");
+                HBufC* aString = HBufC16::NewLC(250);
+                TPtrC aStringPointer = aString->Des();
+                aStringPointer.Set(KPowerPressKey);
+                TRACES( RDebug::Print( _L("CSysApWsClient::RunL(): Key EEventKeyUp 01") ) );   
+                ShowExampleUiNoteL( aStringPointer );
+                CleanupStack::PopAndDestroy(); // aString
                 }
-                break;
-            case ESysApRestartPhone:
-                {
-				//Show the restart note
-				_LIT(KRestartPhone,"Phone will be restarted");
-				ShowNoteL( KRestartPhone() );
-				//wait for 3 seconds to close note. Other wise the shutdown will continue
-				//without waiting for note to complete.
-				User::After(4000000);
-				//Now restart the device
-				DoShutdownL( ETrue, RStarterSession::EDataRestoreReset );	                
-				}
                 break;
             default:
                 break;
             }
         }
     }
-	
+
+
 // ----------------------------------------------------------------------------
 // CSysApAppUi::BatteryEmptyL()
 // ----------------------------------------------------------------------------
@@ -2786,30 +2776,6 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
                     Exit();
                     break;
 #endif
-                case EKeyPhoneSend:
-                    {
-                    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, Send  key event received::Start") ) );
-                    if (UiReady()&& aKeyEvent.iRepeats == 0)
-                        {
-                        //Ignore LongPress on SEND key event as Long press generates Short press event too, 
-                        //And there is no Different use case for long press. 
-                        HandleSendKeyEventL();
-                        }
-                    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, Send  key event received::End") ) );
-                    break;
-                    }
-                case EKeyPhoneEnd:
-                    {
-                    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL, End  key event received") ) );
-                    if (UiReady() && aKeyEvent.iRepeats == 0)
-                        {
-                        //Ignore LongPress on END key event as Long press generates Short press event too, 
-                        //And there is no Different use case for long press. 
-                        HandleEndKeyEventL();
-                        }
-                    TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL()::EKeyPhoneEnd: End" ) ) );
-                    break;
-                    }
                 case EKeyPowerOff:
                     //Short power key press
                     iKeyBoardRepeatCount++;
@@ -4089,93 +4055,6 @@ void CSysApAppUi::HandleNetworkNspsNotification( RMmCustomAPI::TNspsStatus aNsps
         }
     }
 
-/**
- * Handles SEND key events
- * If SEND key is pressed in idle Home screen view, This will bring LOGS View without DialPad.
- * otherwise, it brings LOGS&Dial pad.
- */
-void CSysApAppUi::HandleSendKeyEventL()
-    {
-    TRACES( RDebug::Print( _L("CSysApAppUi::HandleSendKeyEventL: START") ) );    
-    //Check whether ForeGround app is HomeScreen
-    TInt hsStatus(EHomeScreenIdleState) ;
-    //Get the RProperty
-    User::LeaveIfError( RProperty::Get(KHsCategoryUid, KHsCategoryStateKey, hsStatus));
-    //Enable dialpad in Non-HS view
-    const TBool enableDialPad( EHomeScreenIdleState != hsStatus ); 
-    
-    //invoke LOGS/Dialer app
-    XQApplicationManager appMgr;
-    QScopedPointer<XQAiwRequest> request(appMgr.create(QString("logs"), XQI_LOGS_VIEW, XQOP_LOGS_SHOW, false));   
-    
-    if (!request.isNull()) 
-        {
-        TRACES( RDebug::Print( _L("CSysApAppUi::HandleSendKeyEventL::Request::Begin") ) );
-        int retValue = -1; 
-        
-        QVariantMap map;
-        map.insert(XQLOGS_VIEW_INDEX, QVariant(0)); 
-        map.insert(XQLOGS_SHOW_DIALPAD, QVariant(enableDialPad));
-        map.insert(XQLOGS_DIALPAD_TEXT, QVariant(QString()));
-        
-        QList<QVariant> arglist;
 
-        arglist.append(QVariant(map));
-        request->setArguments(arglist);
-        QVariant ret(retValue);        
-        request->send(ret);
-        TRACES( RDebug::Print( _L("CSysApAppUi::InvokeApp::Request::End") ) );
-        }
-    
-    TRACES( RDebug::Print( _L("CSysApAppUi::HandleSendKeyEventL: End") ) );
-    }
-
-/**
- * Handles END key events
- * If END key is pressed, Fore ground app will be exits and 
- * Home screen view will brought to Foreground
- */
-void CSysApAppUi::HandleEndKeyEventL()
-    {
-    TRACES( RDebug::Print( _L("CSysApAppUi::HandleEndKeyEventL: Start") ) );
-    //Get ForeGround App
-    TInt foregroundWindowGroupId = iEikonEnv->WsSession().GetFocusWindowGroup();
-    CApaWindowGroupName* doomedApp = CApaWindowGroupName::NewLC(iEikonEnv->WsSession(),foregroundWindowGroupId );
-    
-    //Bring the HS before killing the ForeGround App.
-    _LIT(KHsActivactionUri, "appto://20022F35?activityname=HsIdleView");
-    RApaLsSession apaLsSession;
-    CleanupClosePushL(apaLsSession);
-    User::LeaveIfError(apaLsSession.Connect());
-    CAfActivityLauncher *activityEnabler = CAfActivityLauncher::NewLC(apaLsSession, iEikonEnv->WsSession());
-    activityEnabler->launchActivityL(KHsActivactionUri);
-    CleanupStack::PopAndDestroy(activityEnabler);
-    CleanupStack::PopAndDestroy(&apaLsSession);
-        
-    //End or Kill the Foreground App
-    //If Phone is in HS idle view, End key have no impact.
-    if ( !doomedApp->IsSystem() )
-       {
-       TApaTask task( iEikonEnv->WsSession() );
-       task.SetWgId( foregroundWindowGroupId );
-       TRACES (
-               const TDesC& caption = doomedApp->Caption();
-               const TDesC& docname = doomedApp->DocName();
-               const TDesC& wgname = doomedApp->WindowGroupName();
-               TUid uid = doomedApp->AppUid();
-               RDebug::Print( _L("CSysApAppUi::HandleEndKeyEventL: Closing app \"%S\" (ThreadId %d, WgId %d, UID 0x%X); Docname: %S, WGName : %S"),
-                              &caption,
-                              (TUint)(task.ThreadId()),
-                              foregroundWindowGroupId,
-                              uid.iUid,
-                              &docname,
-                              &wgname);
-               );
-      task.EndTask();
-      TRACES( RDebug::Print(_L("CSysApAppUi::HandleKeyEventL::HandleEndKeyEventL, End  task event triggered") ) );
-       }
-    CleanupStack::PopAndDestroy(doomedApp);//doomedApp
-    TRACES( RDebug::Print( _L("CSysApAppUi::HandleEndKeyEventL: End") ) );    
-    }
 
 //end of file
