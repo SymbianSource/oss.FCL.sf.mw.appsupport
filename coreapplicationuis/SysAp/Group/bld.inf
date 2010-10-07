@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2004-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -45,6 +45,47 @@ PRJ_EXPORTS
 /epoc32/s60/icons/qgn_startup_screen.svg          /epoc32/data/z/resource/apps/qgn_sysap_screen.svg
 /epoc32/s60/icons/qgn_startup_screen.svg          /epoc32/release/winscw/udeb/z/resource/apps/qgn_sysap_screen.svg
 /epoc32/s60/icons/qgn_startup_screen.svg          /epoc32/release/winscw/urel/z/resource/apps/qgn_sysap_screen.svg
+../data/qtg_anim_battery_charging_01.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_01.svg
+../data/qtg_anim_battery_charging_01.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_01.svg
+../data/qtg_anim_battery_charging_02.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_02.svg
+../data/qtg_anim_battery_charging_02.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_02.svg
+../data/qtg_anim_battery_charging_03.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_03.svg
+../data/qtg_anim_battery_charging_03.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_03.svg
+../data/qtg_anim_battery_charging_04.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_04.svg
+../data/qtg_anim_battery_charging_04.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_04.svg
+../data/qtg_anim_battery_charging_05.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_05.svg
+../data/qtg_anim_battery_charging_05.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_05.svg
+../data/qtg_anim_battery_charging_06.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_06.svg
+../data/qtg_anim_battery_charging_06.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_06.svg
+../data/qtg_anim_battery_charging_07.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_07.svg
+../data/qtg_anim_battery_charging_07.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_07.svg
+../data/qtg_anim_battery_charging_08.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_08.svg
+../data/qtg_anim_battery_charging_08.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_08.svg
+../data/qtg_anim_battery_charging_09.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_09.svg
+../data/qtg_anim_battery_charging_09.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_09.svg
+../data/qtg_anim_battery_charging_10.svg /epoc32/data/z/resource/apps/qtg_anim_battery_charging_10.svg
+../data/qtg_anim_battery_charging_10.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_charging_10.svg
+
+../data/qtg_anim_battery_full_01.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_01.svg
+../data/qtg_anim_battery_full_01.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_01.svg
+../data/qtg_anim_battery_full_02.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_02.svg
+../data/qtg_anim_battery_full_02.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_02.svg
+../data/qtg_anim_battery_full_03.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_03.svg
+../data/qtg_anim_battery_full_03.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_03.svg
+../data/qtg_anim_battery_full_04.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_04.svg
+../data/qtg_anim_battery_full_04.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_04.svg
+../data/qtg_anim_battery_full_05.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_05.svg
+../data/qtg_anim_battery_full_05.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_05.svg
+../data/qtg_anim_battery_full_06.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_06.svg
+../data/qtg_anim_battery_full_06.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_06.svg
+../data/qtg_anim_battery_full_07.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_07.svg
+../data/qtg_anim_battery_full_07.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_07.svg
+../data/qtg_anim_battery_full_08.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_08.svg
+../data/qtg_anim_battery_full_08.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_08.svg
+../data/qtg_anim_battery_full_09.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_09.svg
+../data/qtg_anim_battery_full_09.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_09.svg
+../data/qtg_anim_battery_full_10.svg /epoc32/data/z/resource/apps/qtg_anim_battery_full_10.svg
+../data/qtg_anim_battery_full_10.svg /epoc32/release/winscw/udeb/z/resource/apps/qtg_anim_battery_full_10.svg
 PRJ_MMPFILES
 //gnumakefile sysap_icons.mk 
 

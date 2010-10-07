@@ -70,6 +70,10 @@ private:
 private:
     Q_DISABLE_COPY(AccIndicatorPlugin)
     int mError;
+
+#ifdef FCC_UNIT_TEST
+    friend class Cutaccindicatorplugin;
+#endif
     };
 
 #endif // ACCINDICATOR_H

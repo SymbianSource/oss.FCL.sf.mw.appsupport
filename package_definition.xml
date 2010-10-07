@@ -162,8 +162,7 @@
    <component id="dbrecovery" filter="s60,build_as_app" name="Database Recovery">
     <unit bldFile="coreapplicationuis/dbrecovery/group"/>
    </component>
-   <component id="nspswsplugin" filter="s60,build_as_app" name="NSPS WS Plugin" class="plugin">
-    <!-- No Service Power Save? Window Server? Please elaborate-->
+   <component id="nspswsplugin" filter="s60,build_as_app" name="No Service Power Save Window Server Plugin" class="plugin">
     <unit bldFile="coreapplicationuis/nspswsplugin/group"/>
    </component>
    <component id="rfs" filter="s60,build_as_app" name="Restore Factory Settings">
@@ -208,6 +207,9 @@
    </component>
    <component id="devicepowermenuplugin" name="Device Power Menu Plugin" class="plugin" introduced="^4" filter="s60,build_as_app">
       <unit bldFile="coreapplicationuis/devicepowermenuplugin" qt:proFile="devicepowermenuplugin.pro"/>
+   </component>
+   <component id="hbdeviceinputdialogplugin" name="Orbit Device Input Dialog Plugin" class="plugin" introduced="^4" filter="s60,build_as_app">
+      <unit bldFile="coreapplicationuis/hbdeviceinputdialogplugin" qt:proFile="hbdeviceinputdialogplugin.pro"/>
    </component>
   </collection>
   <collection id="flashliteapi_3_1" name="Flash Lite API 3.1" level="specific">

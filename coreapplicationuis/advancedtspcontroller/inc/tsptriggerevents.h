@@ -14,6 +14,9 @@
 * Description: Observes changes in the default player that should be used for a bearer
 */
 
+#ifndef TSPTRIGGEREVENTS_H
+#define TSPTRIGGEREVENTS_H
+
 #include <e32base.h>
 #include <e32property.h>
 #include <w32std.h>
@@ -102,3 +105,4 @@ private:
     CTspClientMapperObserver* iClientMapperObserver;
     };
 
+#endif

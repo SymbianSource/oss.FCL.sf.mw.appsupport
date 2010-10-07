@@ -1,0 +1,9 @@
+#ifndef __TSANIMSVG_IBY__
+#define __TSANIMSVG_IBY__
+
+file=ABI_DIR\BUILD_DIR\tsanimsvg.dll SHARED_LIB_DIR\tsanimsvg.dll
+
+data=\epoc32\data\z\system\data\UI_tsanimSvg.cfg \testframework\UI_tsanimsvg.cfg
+
+
+#endif

@@ -167,6 +167,7 @@ CClockRFSPluginTestModule::~CClockRFSPluginTestModule()
 
     // Delete resources allocated from test methods
     Delete();
+    REComSession::FinalClose();
 
     // Delete logger
     delete iLog; 

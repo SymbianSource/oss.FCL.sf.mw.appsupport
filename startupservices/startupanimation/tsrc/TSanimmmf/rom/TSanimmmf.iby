@@ -1,0 +1,10 @@
+#ifndef __TSANIMMMF_IBY__
+#define __TSANIMMMF_IBY__
+
+file=ABI_DIR\BUILD_DIR\TSanimmmf.dll SHARED_LIB_DIR\TSanimmmf.dll
+
+//data=\epoc32\data\z\system\data\TestFramework.ini             \testframework\TestFramework.ini
+data=\epoc32\data\z\system\data\TSanimmmf.cfg \testframework\TSanimmmf.cfg
+
+
+#endif

@@ -52,8 +52,7 @@ symbian:
 BLD_INF_RULES.prj_exports += \
   "$${LITERAL_HASH}include <platform_paths.hrh>" \
   "qmakepluginstubs/HbDeviceInputDialogPlugin.qtplugin   		/epoc32/data/z/pluginstub/HbDeviceInputDialogPlugin.qtplugin"\
-  ".\rom\hbdeviceinputdialogplugin.iby             				CORE_MW_LAYER_IBY_EXPORT_PATH(hbdeviceinputdialogplugin.iby)" \
-  ".\rom\hbdeviceinputdialogplugin_resources.iby 						LANGUAGE_APP_LAYER_IBY_EXPORT_PATH(hbdeviceinputdialogplugin_resources.iby)"
+  ".\rom\hbdeviceinputdialogplugin.iby             				CORE_MW_LAYER_IBY_EXPORT_PATH(hbdeviceinputdialogplugin.iby)"
 }
 
 

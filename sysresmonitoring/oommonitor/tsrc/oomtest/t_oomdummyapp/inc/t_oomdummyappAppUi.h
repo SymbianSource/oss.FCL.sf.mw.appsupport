@@ -81,12 +81,6 @@ private:
 	 */
 	void HandleStatusPaneSizeChange();
 
-	/**
-	 *  From CCoeAppUi, HelpContextL.
-	 *  Provides help context for the application.
-	 *  size is changed.
-	 */
-	CArrayFix<TCoeHelpContext>* HelpContextL() const;
 
 private:
 	// Data

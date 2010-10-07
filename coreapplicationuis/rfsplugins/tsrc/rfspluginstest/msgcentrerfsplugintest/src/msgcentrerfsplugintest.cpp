@@ -126,16 +126,13 @@ TInt CMsgCentreRfsPluginTest::RunMethodL( CStifItemParser& aItem )
 TInt CMsgCentreRfsPluginTest::CreatePlugin( CStifItemParser& aItem )
     {
     FUNC_LOG;
+    
+    STIF_ASSERT_NOT_LEAVES(iPlugin = CRFSPlugin::NewL( TUid::Uid( 0x20022D82 ) ) );
+    STIF_ASSERT_NOT_NULL( iPlugin );
+    
+    return KErrNone;
 
-    TUint uid(0);
-    TInt ret = aItem.GetNextInt( uid );
-    if ( ret == KErrNone )
-        {
-        TRAP(ret, iPlugin = CRFSPlugin::NewL( TUid::Uid( uid ) ) );
-        }
-    ERROR( ret, "Create plugin failed");
-    LOG_1("CreatePlugin %d", ret);
-    return ret;
+
     }
 
 // ---------------------------------------------------------

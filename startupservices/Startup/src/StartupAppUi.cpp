@@ -854,6 +854,7 @@ void CStartupAppUi::ShowOfflineModeQueryL()
             iOfflineModeQueryShown = ETrue;
             CHbDeviceMessageBoxSymbian *aMessageBox = NULL;
         	aMessageBox = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EQuestion);
+			CleanupStack::PushL(aMessageBox);
        	 	_LIT(KText, "Continue using phone in Offline mode?");
         	aMessageBox->SetTextL(KText);
         	_LIT(KAcceptText, "Yes");
@@ -864,6 +865,8 @@ void CStartupAppUi::ShowOfflineModeQueryL()
         	//define the selection button to hold user's option choice
         	CHbDeviceMessageBoxSymbian::TButtonId selection;
         	selection = aMessageBox->ExecL();
+
+			CleanupStack::PopAndDestroy(aMessageBox);
             if ( selection == CHbDeviceMessageBoxSymbian::EAcceptButton )
                 {
                 TRACES("CStartupAppUi::ShowOfflineModeQueryL(): Offline Mode query: YES -> Boot to Offline");

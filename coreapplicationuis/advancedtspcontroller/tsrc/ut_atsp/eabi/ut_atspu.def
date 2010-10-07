@@ -1,0 +1,8 @@
+EXPORTS
+	_Z9LibEntryLv @ 1 NONAME
+	_Z15SetRequirementsRP16CTestModuleParamRm @ 2 NONAME
+	_ZTI20CRemConTspController @ 3 NONAME
+	_ZTV20CRemConTspController @ 4 NONAME
+	_ZTI21CUt_AtspTspEventsStub @ 5 NONAME
+	_ZTV21CUt_AtspTspEventsStub @ 6 NONAME
+

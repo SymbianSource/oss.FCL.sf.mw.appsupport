@@ -35,6 +35,9 @@ _LIT(KNormalMode, "%c: Normal");
 const TInt KMaxMsgSize = 256;
 #endif // _DEBUG
 
+#ifdef FCC_UNIT_TEST
+class Tut_LafShutdownManager;
+#endif
 // ---------------------------------------------------------
 //
 // ---------------------------------------------------------
@@ -45,7 +48,12 @@ public:
     static CLafShutdownManager* NewL(MShutdownEventObserver& aObserver);
     ~CLafShutdownManager();
 
-private:
+#ifdef FCC_UNIT_TEST
+    public:
+#else              
+    private:
+#endif
+
 
     // ======================================================================
     // Out of disk watcher
@@ -101,7 +109,12 @@ private:
             void ConstructL(RResourceFile& aResFile, TResourceReader& aResReader);
             void CleanupL(TBool aCancel = ETrue);
 
+#ifdef FCC_UNIT_TEST
+        public:
+#else              
         private:
+#endif
+            
             class CMessageInfo : public CBase
                 {
                 public:
@@ -117,7 +130,9 @@ private:
             TMessageType    iMessageType;
             CMessageInfo*   iMessageInfo[4];
         
-        
+#ifdef FCC_UNIT_TEST
+    friend class Tut_LafShutdownManager;
+#endif          
         };
 
     // ======================================================================
@@ -181,6 +196,10 @@ private:
 
 private:
     friend class CLafShutdownManager::COutOfDiskWatcher;
+
+#ifdef FCC_UNIT_TEST
+    friend class Tut_LafShutdownManager;
+#endif    
     };
 
 #endif LAFSHUT_H

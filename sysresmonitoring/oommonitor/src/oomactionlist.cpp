@@ -37,7 +37,9 @@
 #include "oomapplicationconfig.h"
 #include "oomcloseappconfig.h"
 #include "oomrunpluginconfig.h"
-
+#ifdef FCC_UNIT_TEST
+#include "ut_oom.h"
+#endif
 const TUid  KUidMatrixMenuApp = { 0x101F4CD2 };
 
 template <class T>
@@ -698,8 +700,9 @@ void COomActionList::ConstructL(COomConfig& aConfig)
         
         // Create an action acording to the config
         COomRunPlugin* action = COomRunPlugin::NewL(iPluginList->Uid(pluginIndex), pluginConfig, *this, iPluginListV2->Implementation(pluginIndex), &(iPluginListV2->Implementation(pluginIndex)));
-        
+        CleanupStack::PushL(action);
         iRunPluginActions.AppendL(action);
+		CleanupStack::Pop();
         }
 
     //allocate empty COomCloseApp objects
@@ -707,6 +710,8 @@ void COomActionList::ConstructL(COomConfig& aConfig)
     while (appCloseIndex--)        
         {
         COomCloseApp* action = COomCloseApp::NewL(*this, iWs);
+		CleanupStack::PushL(action);
         iCloseAppActions.AppendL(action);
+		CleanupStack::Pop();
         }
     }

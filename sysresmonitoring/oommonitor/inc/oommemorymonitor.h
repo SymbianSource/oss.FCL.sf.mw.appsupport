@@ -63,6 +63,11 @@ class COomClientRequestQueue;
 NONSHARABLE_CLASS(CMemoryMonitor) : public CBase
     {
 public:
+
+#ifdef FCC_UNIT_TEST
+    friend class COomFriendClass;
+#endif
+
     static CMemoryMonitor* NewL();
     ~CMemoryMonitor();
 

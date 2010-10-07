@@ -1,0 +1,110 @@
+*****************************************************************************
+*           CTC++, Test Coverage Analyzer for C/C++, Version 6.5.5          *
+*                                                                           *
+*                         EXECUTION PROFILE LISTING                         *
+*                                                                           *
+*                    Copyright (c) 1993-2009 Testwell Oy                    *
+*****************************************************************************
+
+
+Symbol file(s) used   : MON.sym (Mon Aug 23 12:02:41 2010)
+Data file(s) used     : MON.dat (Mon Aug 23 12:48:55 2010)
+Listing produced at   : Mon Aug 23 13:00:38 2010
+Coverage view         : As instrumented
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimmif/src/TSanimmif.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        30         30      80 FUNCTION CTSanimmif::CTSanimmif()
+        30         30      91 FUNCTION CTSanimmif::ConstructL()
+        30          0     139 FUNCTION CTSanimmif::NewL()
+        30         30     153 FUNCTION CTSanimmif::~CTSanimmif()
+        30         30     169 FUNCTION CTSanimmif::SendTestClassVersion()
+        30          0     190 FUNCTION LibEntryL()
+
+***TER 100 % (  6/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimmif/src/TSanimmif.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimmif/src/testwaiter.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        29          0      30 FUNCTION CTestWaiter::NewL()
+         0          0 -    42 FUNCTION CTestWaiter::~CTestWaiter()
+         0          0 -    52 FUNCTION CTestWaiter::Activate()
+        29         29      65 FUNCTION CTestWaiter::CTestWaiter()
+         0          0 -    77 FUNCTION CTestWaiter::DoCancel()
+         0          0 -    87 FUNCTION CTestWaiter::RunL()
+
+***TER  33 % (  2/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimmif/src/testwaiter.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimmif/src/TSanimmifBlocks.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        30         30      77 FUNCTION CTSanimmif::Delete()
+        32          0      87 FUNCTION CTSanimmif::RunMethodL()
+         0          0 -   146 FUNCTION TMockMifAnimationObserver::UpdateScreen()
+         0          0 -   159 FUNCTION TMockMifAnimationObserver::UpdateScreen()
+        29          0     173 FUNCTION CTSanimmif::SetupEmptyL()
+        27          0     190 FUNCTION CTSanimmif::SetupObjL()
+        13          0     206 FUNCTION CTSanimmif::SetupFileL()
+         1          0     221 FUNCTION CTSanimmif::SetupStillImageNoMaskL()
+         4          0     233 FUNCTION CTSanimmif::SetupStillImageL()
+         1          0     245 FUNCTION CTSanimmif::SetupScaledAnimationL()
+         7          0     257 FUNCTION CTSanimmif::SetupUnscaledAnimationL()
+         3          0     269 FUNCTION CTSanimmif::SetupFinishedL()
+         0          0 -   284 FUNCTION CTSanimmif::Teardown()
+         1          0     306 FUNCTION CTSanimmif::TestConstructorL()
+         1          0     324 FUNCTION CTSanimmif::TestConstructorNoMemoryL()
+         0          0 -   338 FUNCTION CTSanimmif::TestUnknownFileL()
+         0          0 -   353 FUNCTION CTSanimmif::TestCorruptFileL()
+         0          0 -   368 FUNCTION CTSanimmif::TestNoFramesFileL()
+         0          0 -   383 FUNCTION CTSanimmif::TestLoadStillImageL()
+         0          0 -   398 FUNCTION CTSanimmif::TestLoadScaledAnimationL()
+         0          0 -   413 FUNCTION CTSanimmif::TestLoadUnscaledAnimationL()
+         0          0 -   428 FUNCTION CTSanimmif::TestLoadNoMemoryL()
+         0          0 -   443 FUNCTION CTSanimmif::TestCancelLoadL()
+         0          0 -   459 FUNCTION CTSanimmif::TestShowStillImageL()
+         0          0 -   475 FUNCTION CTSanimmif::TestShowAnimationL()
+         0          0 -   491 FUNCTION CTSanimmif::TestCancelStillImageL()
+         0          0 -   507 FUNCTION CTSanimmif::TestCancelAnimationL()
+         0          0 -   523 FUNCTION CTSanimmif::TestCancelNotActiveL()
+         0          0 -   535 FUNCTION CTSanimmif::TestShowBeforeLoadL()
+         0          0 -   547 FUNCTION CTSanimmif::TestSetDisplayModeL()
+         0          0 -   571 FUNCTION CTSanimmif::TestSetSizeL()
+         0          0 -   595 FUNCTION CTSanimmif::TestSetFrameDelayL()
+         0          0 -   619 FUNCTION CTSanimmif::TestBackroundColourL()
+         1          0     634 FUNCTION CTSanimmif::ExampleL()
+
+***TER  38 % ( 13/ 34) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimmif/src/TSanimmifBlocks.cpp
+-----------------------------------------------------------------------------
+
+
+
+
+
+SUMMARY
+=======
+
+Number of monitored source files  : 3
+Number of source lines            : 945
+Number of measurement points      : 92
+TER                               : 46% (function)

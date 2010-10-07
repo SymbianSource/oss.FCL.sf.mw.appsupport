@@ -803,13 +803,18 @@ void CLafShutdownManager::CGlobalQueryActive::DisplayL(TMessageType aType, TBool
 
     CleanupL();
 
-          
+    
+#ifndef FCC_UNIT_TEST
         CHbDeviceMessageBoxSymbian* globalNote = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EWarning);
         CleanupStack::PushL(globalNote);
         globalNote->SetTextL((iMessageInfo[iMessageType]->iMessage)->Des());
         globalNote->SetTimeoutL(0);
         globalNote->ExecL();
         CleanupStack::PopAndDestroy(globalNote);
+#else   
+				iMessageInfo[iMessageType]->iMessage->Des().Fill('s');
+				TRACES("CLafShutdownManager::CGlobalQueryActive::DisplayL change size()");
+#endif    
         
     iMessageType = ENone;
     TRACES("CLafShutdownManager::CGlobalQueryActive::DisplayL: End");

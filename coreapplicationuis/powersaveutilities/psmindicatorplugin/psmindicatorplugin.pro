@@ -33,7 +33,7 @@ symbian {
     pluginstub.sources = psmindicatorplugin.dll
     pluginstub.path = /resource/plugins/indicators
     DEPLOYMENT += pluginstub
-    LIBS += -lcpframework 
+    LIBS += -lcpframework -lxqservice
 
 }
 BLD_INF_RULES.prj_exports += "$${LITERAL_HASH}include <platform_paths.hrh>" \

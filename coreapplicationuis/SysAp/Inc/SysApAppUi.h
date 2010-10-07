@@ -47,6 +47,7 @@
 #endif // RD_MULTIPLE_DRIVE
 
 #include <eikappui.h>
+#include <sysapcharginganimation.h>
 
 
 class CSysApFeatureManager;
@@ -63,6 +64,7 @@ class CSysApCenRepController;
 class CSysApCenRepLightSettingsObserver;
 class CSysApCenRepBtObserver;
 class CSysApCenRepHacSettingObserver;
+class CSysApCenRepSilentModeObserver;
 class CSysApAudioRoutingObserver;
 class CSysApSsSettingsObserver;
 class CSystemLock;
@@ -73,6 +75,7 @@ class MSysApBtController;
 class CSysApCenRepLogsObserver;
 class MSysApUsbIndicator;
 class CKeyguardAccessApi;
+class CSysApChargingAnimation;
 class CHbIndicatorSymbian;	
 class CSysApShutdownAnimation;
 
@@ -182,12 +185,6 @@ class CSysApAppUi : public CAknAppUi,
         */
         void ExecQueryL( TSysapQuery aQuery, TDes8& aReturn, const TDesC8& aParam );
         
-//    private:
-        /**
-        * EPOC default constructor.
-        * @param None
-        * @return void
-        */
         
 #ifdef RD_STARTUP_ANIMATION_CUSTOMIZATION
     void
@@ -209,7 +206,7 @@ class CSysApAppUi : public CAknAppUi,
         * @param aType The type of resources that have changed.
         * @return None.
         */
-//        void HandleResourceChangeL(TInt aType);
+				// void HandleResourceChangeL(TInt aType);
         
     private:
         /**
@@ -229,6 +226,14 @@ class CSysApAppUi : public CAknAppUi,
         void HandleApplicationSpecificEventL(TInt aType,const TWsEvent& aEvent);
       
      public:
+
+				/*
+        * Get pointer to RTelServer
+        *
+        * @return pointer to RTelServer if iSysApEtelConnector is initialized. Otherwise return NULL.
+        */
+        RTelServer* GetTelServer();
+
      	//	void CallFromMain();
      		
      		 /**
@@ -261,14 +266,14 @@ class CSysApAppUi : public CAknAppUi,
         void ActivateKeyeventForwardingForLights(TBool aActivate);
         
         TBool IsEncryptionOperationOngoingL() const;
-//        void ConnectToFileServerL();
-//        void ConnectToWindowServerL();
-        void ShowExampleUiNoteL ( const TDesC& noteText )const;
+        void HandleSendKeyEventL();
+        void HandleEndKeyEventL();
+        
+        void ShowNoteL ( const TDesC& noteText )const;
         void ShowNotificationDialog(const TDesC& noteText)const;
         void PopupNote();
-//        void CreateWindowGroup();
         TBool ResourcesFreed() const;
-        void ShowUiNoteL( const TSysApNoteIds aNote ) const;        
+        void ShowUiNoteL( const TSysApNoteIds aNote );        
         TInt StateOfProperty( const TUid& aCategory, const TUint aKey ) const;
         TBool OfflineModeActive();
         void GoOnlineL( TBool aDoProfileChange = ETrue );
@@ -449,6 +454,9 @@ class CSysApAppUi : public CAknAppUi,
         void UpdateSignalBarsL();
         
         void ReleaseMemoryForMemoryCardDialog();
+        void StartChargingAnimationL();
+        void StopChargingAnimationL();
+        void StartChargingFullAnimationL();
         
      private:
          /**
@@ -483,14 +491,11 @@ class CSysApAppUi : public CAknAppUi,
 #endif // RD_MULTIPLE_DRIVE
         
      private:
-//          CSysApWsClient*                 iSysApWsClient;
           CSysApLightsController*         iSysApLightsController;
           CSysApFeatureManager*           iSysApFeatureManager;
           CSysApNspsHandler*              iSysApNspsHandler;
-          CSysApPubSubObserver*           iSysApPubSubObserver;
-    
+          CSysApPubSubObserver*           iSysApPubSubObserver;    
           CSysApDefaultKeyHandler*          iSysApDefaultKeyHandler;
-//          RWindowGroup                      groupWin;
           CSysApStartupController*        iSysApStartupController;
           MSysApOfflineModeController*    iSysApOfflineModeController;
           RStarterSession                 iStarterSession;
@@ -503,11 +508,11 @@ class CSysApAppUi : public CAknAppUi,
           CSysApCenRepLightSettingsObserver*  iSysApCenRepLightSettingsObserver;
           CSysApCenRepBtObserver*                  iSysApCenRepBtObserver;
           CSysApCenRepHacSettingObserver* iSysApCenRepHacSettingObserver;
+          CSysApCenRepSilentModeObserver* iSysApCenRepSilentModeObserver;
           
           CSysApAudioRoutingObserver* iSysApAudioRoutingObserver;
           CSysApPsmController* iSysApPsmController;
-		  CHbSymbianVariant* iVariantAccState ;
-          CSysApSsSettingsObserver*       iSysApSsSettingsObserver;
+		  		CHbSymbianVariant* iVariantAccState ;
           CSystemLock*                    iSysApSystemLock;
           CSysApCenRepCallForwardingObserver* iSysApCenRepCallForwardingObserver;
           CSysApBatteryInfoController* iSysApBatteryInfoController;
@@ -515,12 +520,12 @@ class CSysApAppUi : public CAknAppUi,
           CPeriodic*                      iSapTimer;
           MSysApBtController*             iSysApBtController;
           CSysApCenRepLogsObserver*                iSysApCenRepLogsObserver;
-		  MSysApUsbIndicator*             iSysApUsbIndicatorController;
-		  CKeyguardAccessApi*             iKeyguardController;
-		  CHbDevicePowerMenuSymbian*            iPowerMenuDialog;
-	      CSysApKeyManagement*            iSysApKeyManagement;
-	      CSysApMMCObserver*              iSysApMMCObserver;
-	      CSysApEtelConnector*            iSysApEtelConnector;
+		  		MSysApUsbIndicator*             iSysApUsbIndicatorController;
+		  		CKeyguardAccessApi*             iKeyguardController;
+		  		CHbDevicePowerMenuSymbian*            iPowerMenuDialog;
+	      	CSysApKeyManagement*            iSysApKeyManagement;
+	      	CSysApMMCObserver*              iSysApMMCObserver;
+	      	CSysApEtelConnector*            iSysApEtelConnector;
 		  
 	public:		  
 		  CHbIndicatorSymbian* 			  iHbIndicatorSymbian;
@@ -536,6 +541,9 @@ class CSysApAppUi : public CAknAppUi,
         TBool                           iResourcesFreed;        
         TInt                            iCapturedEKeyPowerOff;
         TInt                            iCapturedEKeyPowerOffUpAndDowns;
+        TInt                            iCapturedEKeySendKey;
+        TInt                            iCapturedEKeyEndKey;
+        
         TBool                           iOfflineModeActive;
         TBool                           iShutdownStarted;
         
@@ -627,7 +635,8 @@ class CSysApAppUi : public CAknAppUi,
         
         TBool                           iMMCEjectUsed;
         CHbDeviceInputDialogSymbian* iMemCardPwdDialog;
-        
+       
+        CSysApChargingAnimation *iChargingAnimation;		
 	};
 	
 #endif

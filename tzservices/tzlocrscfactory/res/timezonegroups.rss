@@ -83,3 +83,4 @@ RESOURCE TIMEZONE_CITY_GROUP r_tz_group_wet
 	city_group_id = 12;
 	city_group_name = STRING_city_group_name_12;
 	}
+

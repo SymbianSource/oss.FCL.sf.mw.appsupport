@@ -1,0 +1,115 @@
+*****************************************************************************
+*           CTC++, Test Coverage Analyzer for C/C++, Version 6.5.5          *
+*                                                                           *
+*                         EXECUTION PROFILE LISTING                         *
+*                                                                           *
+*                    Copyright (c) 1993-2009 Testwell Oy                    *
+*****************************************************************************
+
+
+Symbol file(s) used   : MON.sym (Mon Aug 23 12:07:03 2010)
+Data file(s) used     : N.A.
+Listing produced at   : Mon Aug 23 12:50:08 2010
+Coverage view         : As instrumented
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvg.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+         0          0 -    80 FUNCTION CTSanimsvg::CTSanimsvg()
+         0          0 -    91 FUNCTION CTSanimsvg::ConstructL()
+         0          0 -   139 FUNCTION CTSanimsvg::NewL()
+         0          0 -   153 FUNCTION CTSanimsvg::~CTSanimsvg()
+         0          0 -   169 FUNCTION CTSanimsvg::SendTestClassVersion()
+         0          0 -   190 FUNCTION LibEntryL()
+
+***TER   0 % (  0/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvg.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvgBlocks.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+         0          0 -    81 FUNCTION CTSanimsvg::Delete()
+         0          0 -    91 FUNCTION CTSanimsvg::RunMethodL()
+         0          0 -   154 FUNCTION TMockSvgAnimationObserver::UpdateScreen()
+         0          0 -   167 FUNCTION TMockSvgAnimationObserver::UpdateScreen()
+         0          0 -   179 FUNCTION CTSanimsvg::SetupEmptyL()
+         0          0 -   196 FUNCTION CTSanimsvg::SetupObjL()
+         0          0 -   212 FUNCTION CTSanimsvg::SetupFileL()
+         0          0 -   227 FUNCTION CTSanimsvg::SetupStillImageL()
+         0          0 -   239 FUNCTION CTSanimsvg::SetupScaledAnimationL()
+         0          0 -   251 FUNCTION CTSanimsvg::SetupUnscaledAnimationL()
+         0          0 -   263 FUNCTION CTSanimsvg::SetupAnimationWithTextL()
+         0          0 -   275 FUNCTION CTSanimsvg::SetupStillImageBinaryL()
+         0          0 -   287 FUNCTION CTSanimsvg::SetupScaledAnimationBinaryL()
+         0          0 -   299 FUNCTION CTSanimsvg::SetupFinishedL()
+         0          0 -   314 FUNCTION CTSanimsvg::Teardown()
+         0          0 -   336 FUNCTION CTSanimsvg::TestConstructorL()
+         0          0 -   354 FUNCTION CTSanimsvg::TestConstructorNoMemoryL()
+         0          0 -   369 FUNCTION CTSanimsvg::TestUnknownFileL()
+         0          0 -   384 FUNCTION CTSanimsvg::TestCorruptFileL()
+         0          0 -   399 FUNCTION CTSanimsvg::TestLoadStillImageL()
+         0          0 -   414 FUNCTION CTSanimsvg::TestLoadScaledAnimationL()
+         0          0 -   429 FUNCTION CTSanimsvg::TestLoadUnscaledAnimationL()
+         0          0 -   444 FUNCTION CTSanimsvg::TestLoadAnimationWithTextL()
+         0          0 -   459 FUNCTION CTSanimsvg::TestLoadStillImageBinaryL()
+         0          0 -   474 FUNCTION CTSanimsvg::TestLoadScaledAnimationBinaryL()
+         0          0 -   489 FUNCTION CTSanimsvg::TestLoadNoMemoryL()
+         0          0 -   504 FUNCTION CTSanimsvg::TestCancelLoadL()
+         0          0 -   520 FUNCTION CTSanimsvg::TestShowStillImageL()
+         0          0 -   536 FUNCTION CTSanimsvg::TestShowAnimationL()
+         0          0 -   551 FUNCTION CTSanimsvg::TestShowNoMemoryL()
+         0          0 -   566 FUNCTION CTSanimsvg::TestCancelStillImageL()
+         0          0 -   582 FUNCTION CTSanimsvg::TestCancelAnimationL()
+         0          0 -   598 FUNCTION CTSanimsvg::TestCancelNotActiveL()
+         0          0 -   610 FUNCTION CTSanimsvg::TestShowBeforeLoadL()
+         0          0 -   622 FUNCTION CTSanimsvg::TestSetDisplayModeL()
+         0          0 -   646 FUNCTION CTSanimsvg::TestSetSizeL()
+         0          0 -   670 FUNCTION CTSanimsvg::TestSetFrameDelayL()
+         0          0 -   695 FUNCTION CTSanimsvg::TestBackroundColourL()
+         0          0 -   709 FUNCTION CTSanimsvg::ExampleL()
+
+***TER   0 % (  0/ 39) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvgBlocks.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/testwaiter.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+         0          0 -    30 FUNCTION CTestWaiter::NewL()
+         0          0 -    42 FUNCTION CTestWaiter::~CTestWaiter()
+         0          0 -    52 FUNCTION CTestWaiter::Activate()
+         0          0 -    65 FUNCTION CTestWaiter::CTestWaiter()
+         0          0 -    77 FUNCTION CTestWaiter::DoCancel()
+         0          0 -    87 FUNCTION CTestWaiter::RunL()
+
+***TER   0 % (  0/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/testwaiter.cpp
+-----------------------------------------------------------------------------
+
+
+
+
+
+SUMMARY
+=======
+
+Number of monitored source files  : 3
+Number of source lines            : 1020
+Number of measurement points      : 102
+TER                               : 0% (function)

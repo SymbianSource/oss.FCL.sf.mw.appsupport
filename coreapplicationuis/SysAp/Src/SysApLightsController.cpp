@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -29,6 +29,8 @@
 #endif // RD_LIGHT_CONTROL_CHANGE
 
 #include "SysApFeatureManager.h"
+#include <startupdomainpskeys.h>
+#include <hwrmpowerstatesdkpskeys.h>
 
 // CONSTANTS
 
@@ -971,14 +973,26 @@ void CSysApLightsController::SetLightsOffL()
 
     TInt err(KErrNone);
     
-#ifdef RD_LIGHT_CONTROL_CHANGE
-    if ( !iLightPluginHandler->HandleCommand( SysApLightExtension::ELightCommandOff ) )
+    TInt state( 0 );
+    TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
+    
+    if ( error == KErrNone && state != ESwStateCharging ) 
+        {
+        #ifdef RD_LIGHT_CONTROL_CHANGE
+            if ( !iLightPluginHandler->HandleCommand( SysApLightExtension::ELightCommandOff ) )
+                {
+                TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
+                }
+        #else //  RD_LIGHT_CONTROL_CHANGE
+            TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
+        #endif // RD_LIGHT_CONTROL_CHANGE       
+        }
+    else
         {
         TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
+        TRAP_IGNORE(iSysApAppUi.StopChargingAnimationL());
         }
-#else //  RD_LIGHT_CONTROL_CHANGE
-    TRAP(err, iLight->LightOffL(CHWRMLight::ESystemTarget));
-#endif // RD_LIGHT_CONTROL_CHANGE            
+         
     // Ignore unreserved in use warnings.
     if ( err != KErrNone && err != KErrInUse )
         {
@@ -1078,6 +1092,27 @@ void CSysApLightsController::SetLightsOnL( TBool aBlinking )
                 iLightsCurrentlyOn = ETrue;
                 iLastLightsOnTime.HomeTime(); 
                 }
+            
+            TInt state( 0 );
+            TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
+            TRACES( RDebug::Print( _L( "CSysApLightsController::SetLightsOnL - KPSGlobalSystemState: %d  Error: %d"), state,error) );
+            if ( error == KErrNone && state == ESwStateCharging ) 
+                {
+                TInt value = iSysApAppUi.StateOfProperty( KPSUidHWRMPowerState, KHWRMChargingStatus );
+                TRACES( RDebug::Print( _L( "CSysApLightsController::SetLightsOnL - KHWRMChargingStatus: %d"), value) );
+                
+                if (value == EChargingStatusChargingComplete )
+                    {
+                    TRAP_IGNORE(iSysApAppUi.StartChargingFullAnimationL());
+                    }
+                else if((value==EChargingStatusCharging)||
+                        (value==EChargingStatusAlmostComplete)||
+                        (value==EChargingStatusChargingContinued))
+                    {
+                    TRAP_IGNORE(iSysApAppUi.StartChargingAnimationL());
+                    }
+                }   
+            
             }
         else
             {

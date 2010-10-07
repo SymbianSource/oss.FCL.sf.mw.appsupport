@@ -22,7 +22,7 @@ file=ABI_DIR\BUILD_DIR\msgcentrerfsplugintest.dll                      SHARED_LI
 
 //data=\epoc32\data\z\system\data\TestFramework.ini             \testframework\TestFramework.ini
 
-data=\epoc32\data\z\system\data\msgcentrerfsplugintest.cfg                      \testframework\msgcentrerfsplugintest.cfg
+data=\epoc32\data\z\system\data\ui_msgcentrerfsplugintest.cfg                      \testframework\ui_msgcentrerfsplugintest.cfg
 
 
 

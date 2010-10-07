@@ -1,0 +1,61 @@
+/*TYPE STIFUNIT*/
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: MMP file for STIF Test Framework's STIFUnit test module.
+*
+*/
+
+#include <platform_paths.hrh>
+
+macro FCC_UNIT_TEST
+#define FCC_UNIT_TEST
+
+SMPSAFE
+
+TARGET          ut_oomwatcher.dll
+TARGETTYPE      dll
+UID             0x1000008D 0x101FB3E7
+
+CAPABILITY      ALL -TCB
+/* Remove comments and replace 0x00000000 with correct vendor id */
+// VENDORID     0x00000000
+/* Remove comments and replace 0x00000000 with correct secure id */
+// SECUREID     0x00000000
+
+//TARGETPATH      ?target_path
+DEFFILE         ut_oomwatcher.def
+
+USERINCLUDE     ../inc
+USERINCLUDE     ../../../inc
+
+OS_LAYER_SYSTEMINCLUDE
+MW_LAYER_SYSTEMINCLUDE
+
+SOURCEPATH      ../src
+SOURCE          ut_oomwatcher.cpp
+SOURCE          ut_oomwatchercases.cpp
+SOURCE          ut_mockoommonitor.cpp
+
+SOURCEPATH      ../../../src
+SOURCE          oomoutofmemorywatcher.cpp
+SOURCE          oommonitorsession.cpp
+SOURCE          oompanic.cpp
+
+LIBRARY         euser.lib
+LIBRARY         stiftestinterface.lib
+LIBRARY         ws32.lib
+LIBRARY         hal.lib
+LIBRARY         cone.lib
+
+LANG            SC

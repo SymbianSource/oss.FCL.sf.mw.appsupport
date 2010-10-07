@@ -61,8 +61,12 @@ GLDEF_C TInt WatcherThreadFunction( TAny* )
 
         if ( err == KErrNone )
             {
+#ifdef FCC_UNIT_TEST
+            scheduler->Error(0);
+#else            
             // start the watchers
             CActiveScheduler::Start();
+#endif            
             }
         }
 

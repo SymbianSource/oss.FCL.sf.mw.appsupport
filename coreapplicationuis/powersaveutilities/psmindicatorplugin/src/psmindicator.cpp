@@ -26,6 +26,10 @@
 #include <hbaction.h>
 #include <cpbasesettingview.h>
 #include <e32debug.h>
+#include <hbmessagebox.h>
+#include <xqaiwrequest.h>
+#include <XQServiceRequest.h>
+#include <QTimer>
 
 
 Q_EXPORT_PLUGIN(PsmIndicatorPlugin)
@@ -33,7 +37,7 @@ const static char IndicatorType[] = "com.nokia.hb.powersavemodeplugin/1.0";
 QString KPsm = "PSM";
 QString KCharging = "Charging";
 
-PsmIndicatorPlugin::PsmIndicatorPlugin():HbIndicatorInterface(IndicatorType,HbIndicatorInterface::NotificationCategory,InteractionActivated)
+PsmIndicatorPlugin::PsmIndicatorPlugin():HbIndicatorInterface(IndicatorType,HbIndicatorInterface::NotificationCategory,InteractionActivated),mRequest(NULL)
     {
     RDebug::Print( _L("PsmIndicatorPlugin constructor begin  ") );  
     iIndicatorTypes << "com.nokia.hb.powersavemodeplugin/1.0";
@@ -107,15 +111,44 @@ bool PsmIndicatorPlugin::handleInteraction(InteractionType type)
     RDebug::Print( _L("PsmIndicatorPlugin handleinteraction begin  ")); 
     if (type == InteractionActivated) 
         {
-         RDebug::Print( _L("PsmIndicatorPlugin handleinteraction inside interactionactivated  ") );	
-         QObject::connect( &iProcess, SIGNAL(error(QProcess::ProcessError)),                       
-                                          this, SLOT(processError(QProcess::ProcessError)));
-                                          
-         // Launch the process to show the view.
-         iProcess.start("CpPsmPluginLauncher");
-         handled = true;
+         RDebug::Print( _L("PsmIndicatorPlugin handleinteractiontype  interactionactivated  ") );	
+       //Qthighway methodology      
+       if (mRequest)
+       	{
+        delete mRequest;
+        mRequest = NULL;
+        }
+    
+        mRequest = mAppMgr.create("com.nokia.symbian.ICpPluginLauncher", "launchSettingView(QString,QVariant)", false);
+
+       if (!mRequest)
+       {
+        return handled;
+       }
+       
+
+
+       // Set arguments for request 
+       QList<QVariant> args;
+       args << QVariant( "cppsmplugin.dll" );
+       args << QVariant ( "psm_view" );
+       mRequest->setArguments(args);
+
+       mRequest->setSynchronous(false);
+    
+       QTimer::singleShot(20* 1000, this, SLOT(closeSettingView()));
+    
+       // Make the request
+       if (!mRequest->send())
+       {
+        //report error  
+        RDebug::Print( _L("PsmIndicatorPlugin handleinteraction error launching the psmview  "));    
+       }
+        
+        
+       handled = true;
                         
-        }   
+       }   
     RDebug::Print( _L("PsmIndicatorPlugin handleinteraction end  ") );         
     return handled;
     }
@@ -172,7 +205,7 @@ bool PsmIndicatorPlugin::handleClientRequest( RequestType type,
             else
               {
             RDebug::Print( _L("PsmIndicatorPlugin handleclientrequest requestactivate charging  ") );   	  	
-            iDisplayName.append(hbTrId("txt_power_management_dblist_charging"));
+            iDisplayName.append(hbTrId("txt_powermgt_dblist_charging"));
             iIcon.append(QString("qtg_mono_flash_charging"));
                }
 
@@ -199,26 +232,10 @@ bool PsmIndicatorPlugin::handleClientRequest( RequestType type,
     }
 
 
-// ----------------------------------------------------------------------------
-// psmIndicator::processError
-// handle the error conditions returned by the QProcess.
-// ----------------------------------------------------------------------------
-
-void PsmIndicatorPlugin::processError(QProcess::ProcessError err)
-    {
-    RDebug::Print( _L("PsmIndicatorPlugin processerror begin  "));   		
-    switch (err)
-        {   
-        case QProcess::FailedToStart: 
-        case QProcess::Crashed: 
-        case QProcess::Timedout: 
-        case QProcess::ReadError: 
-        case QProcess::WriteError: 
-        case QProcess::UnknownError:
-             break;  
-        default:
-            break;
-        }
+void PsmIndicatorPlugin::closeSettingView()
+{   
+    if (mRequest) {
+        delete mRequest;
+        mRequest = NULL;
     }
-
-
+}

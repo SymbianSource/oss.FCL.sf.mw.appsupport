@@ -29,7 +29,11 @@ enum TOomMonitorClientPanic
 
 void PanicClient(const RMessagePtr2& aMessage,TOomMonitorClientPanic aPanic);
 
+#ifndef FCC_UNIT_TEST
 _LIT(KMemoryMonitorServerName, "OomMonitorServer");
+#else
+_LIT(KMemoryMonitorServerName, "MockOomMonitorServer");
+#endif
 
 enum TOomMonitorCmd
     {

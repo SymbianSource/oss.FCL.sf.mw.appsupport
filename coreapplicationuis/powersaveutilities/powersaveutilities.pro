@@ -19,8 +19,7 @@ TEMPLATE = subdirs
 symbian: {
 :BLD_INF_RULES.prj_mmpfiles += $$LITERAL_HASH"include \"bsutil/group/bld.inf\""
 SUBDIRS = cppsmplugin \
-  			  psmindicatorplugin \
-  			  pluginlauncher 
-  			 
+  			  psmindicatorplugin 
+  			    			 
 } 
 CONFIG += ordered

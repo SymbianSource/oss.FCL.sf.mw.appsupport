@@ -1,0 +1,165 @@
+*****************************************************************************
+*           CTC++, Test Coverage Analyzer for C/C++, Version 6.5.5          *
+*                                                                           *
+*                         EXECUTION PROFILE LISTING                         *
+*                                                                           *
+*                    Copyright (c) 1993-2009 Testwell Oy                    *
+*****************************************************************************
+
+
+Symbol file(s) used   : MON.sym (Tue Aug 17 14:09:17 2010)
+Data file(s) used     : MON.dat (Tue Aug 17 14:38:19 2010)
+Listing produced at   : Tue Aug 17 14:38:22 2010
+Coverage view         : As instrumented
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/sanimmockview.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        52          0      29 FUNCTION CSAnimMockView::NewL()
+         0          0 -    46 FUNCTION CSAnimMockView::~CSAnimMockView()
+        25         25      57 FUNCTION CSAnimMockView::SetComponent()
+         0          0 -    70 FUNCTION CSAnimMockView::RemoveComponent()
+        52         52      83 FUNCTION CSAnimMockView::CSAnimMockView()
+        52         52      94 FUNCTION CSAnimMockView::ConstructL()
+       171          0     108 FUNCTION CSAnimMockView::CountComponentControls()
+        50          0     120 FUNCTION CSAnimMockView::ComponentControl()
+        38         38     131 FUNCTION CSAnimMockView::Draw()
+
+***TER  78 % (  7/  9) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/sanimmockview.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/TSanimctrlBlocks.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        41         41      82 FUNCTION CTSanimctrl::Delete()
+        99          0      92 FUNCTION CTSanimctrl::RunMethodL()
+         7          0     165 FUNCTION CTSanimctrl::SetupEmptyCtrL()
+         0          0 -   179 FUNCTION CTSanimctrl::SetupObjCtrL()
+         8          0     194 FUNCTION CTSanimctrl::SetupObjLoadedCtrL()
+         4          0     213 FUNCTION CTSanimctrl::TeardownCtr()
+         2          0     232 FUNCTION CTSanimctrl::TestConstructorCtrL()
+         2          0     248 FUNCTION CTSanimctrl::TestConstructorNoMemoryCtrL()
+         3          0     262 FUNCTION CTSanimctrl::TestLoadEmptyCtrL()
+         0          0 -   280 FUNCTION CTSanimctrl::TestLoadImageCtrL()
+         0          0 -   298 FUNCTION CTSanimctrl::TestLoadToneCtrL()
+         0          0 -   316 FUNCTION CTSanimctrl::TestLoadBothCtrL()
+         0          0 -   334 FUNCTION CTSanimctrl::TestLoadWhenActiveCtrL()
+         0          0 -   359 FUNCTION CTSanimctrl::TestCancelLoadCtrL()
+         0          0 -   378 FUNCTION CTSanimctrl::TestStartCtrL()
+         0          0 -   393 FUNCTION CTSanimctrl::TestCancelStartCtrL()
+         0          0 -   409 FUNCTION CTSanimctrl::TestStartNoMemoryCtrL()
+         0          0 -   425 FUNCTION CTSanimctrl::TestStartWhenActiveCtrL()
+        51         51     449 FUNCTION CTSanimctrl::SetupParamsL()
+        51          0     470 FUNCTION CTSanimctrl::SetupProfileL()
+         4          0     485 FUNCTION CTSanimctrl::InitObjL()
+        26          0     504 FUNCTION CTSanimctrl::SetupEmptyL()
+         1          0     520 FUNCTION CTSanimctrl::SetupEmptyValuesL()
+         1          0     539 FUNCTION CTSanimctrl::SetupUnknownFileL()
+         1          0     557 FUNCTION CTSanimctrl::SetupProtectedFileL()
+         0          0 -   575 FUNCTION CTSanimctrl::SetupExistingImageFileL()
+         1          0     593 FUNCTION CTSanimctrl::SetupExistingToneFileSilentL()
+         1          0     611 FUNCTION CTSanimctrl::SetupExistingToneFileVeryLowVolumeL()
+         1          0     629 FUNCTION CTSanimctrl::SetupExistingToneFileLowVolumeL()
+         1          0     647 FUNCTION CTSanimctrl::SetupExistingToneFileNormalVolumeL()
+         1          0     665 FUNCTION CTSanimctrl::SetupExistingToneFileTooLowVolumeL()
+         1          0     683 FUNCTION CTSanimctrl::SetupExistingToneFileTooHighVolumeL()
+         1          0     701 FUNCTION CTSanimctrl::SetupUnknownToneFileNormalVolumeL()
+        11          0     719 FUNCTION CTSanimctrl::SetupObjL()
+         1          0     737 FUNCTION CTSanimctrl::SetupEmptyShowL()
+         3          0     752 FUNCTION CTSanimctrl::SetupShowL()
+        18          0     767 FUNCTION CTSanimctrl::Teardown()
+         0          0 -   786 FUNCTION CTSanimctrl::TestConstructorL()
+         1          0     803 FUNCTION CTSanimctrl::TestConstructorNoMemoryL()
+         3          0     818 FUNCTION CTSanimctrl::TestLoadNoContentL()
+         7          0     834 FUNCTION CTSanimctrl::TestLoadHasContentL()
+         1          0     850 FUNCTION CTSanimctrl::TestLoadNoMemoryL()
+         1          0     865 FUNCTION CTSanimctrl::TestCancelLoadL()
+         1          0     881 FUNCTION CTSanimctrl::TestLoadWhenActiveL()
+         2          0     900 FUNCTION CTSanimctrl::TestStartL()
+         1          0     915 FUNCTION CTSanimctrl::TestCancelStartL()
+         1          0     931 FUNCTION CTSanimctrl::TestStartWhenActiveL()
+         1          0     953 FUNCTION CTSanimctrl::ExampleL()
+
+***TER  75 % ( 36/ 48) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/TSanimctrlBlocks.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/testwaiter.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        66          0      30 FUNCTION CTestWaiter::NewL()
+        44         44      42 FUNCTION CTestWaiter::~CTestWaiter()
+        23         23      52 FUNCTION CTestWaiter::Activate()
+        66         66      65 FUNCTION CTestWaiter::CTestWaiter()
+         0          0 -    77 FUNCTION CTestWaiter::DoCancel()
+        23         23      87 FUNCTION CTestWaiter::RunL()
+
+***TER  83 % (  5/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/testwaiter.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/TSanimctrl.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        52         52      85 FUNCTION CTSanimctrl::CTSanimctrl()
+        52         52      98 FUNCTION CTSanimctrl::ConstructL()
+        52          0     153 FUNCTION CTSanimctrl::NewL()
+        41         41     167 FUNCTION CTSanimctrl::~CTSanimctrl()
+        52         52     183 FUNCTION CTSanimctrl::SendTestClassVersion()
+        52          0     204 FUNCTION LibEntryL()
+
+***TER 100 % (  6/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/TSanimctrl.cpp
+-----------------------------------------------------------------------------
+
+
+
+MONITORED SOURCE FILE : Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/sanimctrlrootsuite.cpp
+INSTRUMENTATION MODE  : function
+
+    START/       END/
+      TRUE      FALSE    LINE DESCRIPTION
+=============================================================================
+
+        52          0      31 FUNCTION CSAnimCtrlRootSuite::NewL()
+        52          0      44 FUNCTION CSAnimCtrlRootSuite::NewLC()
+         0          0 -    58 FUNCTION CSAnimCtrlRootSuite::~CSAnimCtrlRootSuite()
+        52          0      69 FUNCTION CSAnimCtrlRootSuite::MainView()
+        52         52      80 FUNCTION CSAnimCtrlRootSuite::CSAnimCtrlRootSuite()
+        52         52      90 FUNCTION CSAnimCtrlRootSuite::ConstructL()
+
+***TER  83 % (  5/  6) of SOURCE FILE Z:/startupservices/startupanimation/internal/test/TSanimctrl/src/sanimctrlrootsuite.cpp
+-----------------------------------------------------------------------------
+
+
+
+
+
+SUMMARY
+=======
+
+Number of monitored source files  : 5
+Number of source lines            : 1518
+Number of measurement points      : 150
+TER                               : 79% (function)

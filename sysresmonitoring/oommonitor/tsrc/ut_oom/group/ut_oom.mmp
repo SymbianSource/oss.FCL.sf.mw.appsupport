@@ -1,0 +1,105 @@
+/*TYPE STIFUNIT*/
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: MMP file for STIF Test Framework's STIFUnit test module.
+*
+*/
+
+#include <platform_paths.hrh>
+
+//uncomment both of these macros to use the CLIENT_REQUEST_QUEUE
+macro CLIENT_REQUEST_QUEUE
+#define CLIENT_REQUEST_QUEUE
+
+macro  FCC_UNIT_TEST
+#define FCC_UNIT_TEST
+
+SMPSAFE
+EPOCALLOWDLLDATA
+
+TARGET          ut_oom.dll
+TARGETTYPE      dll
+UID             0x1000008D 0x2002CAD5
+
+CAPABILITY      ALL -TCB
+
+//TARGETPATH      ?target_path
+DEFFILE         ut_oom.def
+
+USERINCLUDE     ../inc
+USERINCLUDE     ../../../inc
+
+OS_LAYER_SYSTEMINCLUDE
+MW_LAYER_SYSTEMINCLUDE
+APP_LAYER_SYSTEMINCLUDE
+
+SOURCEPATH      ../src
+SOURCE          ut_oom.cpp
+SOURCE          ut_oomcases.cpp
+SOURCE          oomfriendclass.cpp
+SOURCE          mock_oomactionlist.cpp
+SOURCE          ut_oomtesttimer.cpp
+
+SOURCEPATH      ../../../src
+SOURCE          oomaction.cpp
+SOURCE          oomactionconfig.cpp
+SOURCE          oomactionlist.cpp
+SOURCE          oomactionref.cpp
+SOURCE          oomidletimerule.cpp
+SOURCE          oomappclosetimer.cpp
+SOURCE          oomappclosewatcher.cpp
+SOURCE          oomapplicationconfig.cpp
+SOURCE          oomcloseapp.cpp
+SOURCE          oomcloseappconfig.cpp
+SOURCE          oomconfig.cpp
+SOURCE          oomconfigparser.cpp
+SOURCE          oomforegroundrule.cpp
+SOURCE          oomglobalconfig.cpp
+SOURCE          oomlog.cpp
+SOURCE          oommemorymonitor.cpp
+SOURCE          oommemorymonitorserver.cpp
+SOURCE          oommemorymonitorsession.cpp
+SOURCE          oommonitor.cpp
+SOURCE          oommonitorplugin.cpp
+SOURCE          oommonitorsession.cpp
+SOURCE          oomoutofmemorywatcher.cpp
+SOURCE          oompanic.cpp
+SOURCE          oompluginwaiter.cpp
+SOURCE          oomrunplugin.cpp
+SOURCE          oomrunpluginconfig.cpp
+SOURCE          oomsubscribehelper.cpp
+SOURCE          oomwindowgrouplist.cpp
+SOURCE          oomwserveventreceiver.cpp
+#ifdef CLIENT_REQUEST_QUEUE
+SOURCE          oomclientrequestqueue.cpp
+#endif
+
+LIBRARY         euser.lib
+LIBRARY         apparc.lib
+LIBRARY         eikcore.lib
+LIBRARY         aknnotify.lib
+LIBRARY         apgrfx.lib
+LIBRARY         ws32.lib
+LIBRARY         apgrfx.lib 
+LIBRARY         bafl.lib
+LIBRARY         ecom.lib
+LIBRARY         hal.lib
+LIBRARY         efsrv.lib
+LIBRARY         xmlframework.lib
+LIBRARY         cone.lib
+LIBRARY         stiftestinterface.lib
+#ifdef _DEBUG
+LIBRARY         flogger.lib
+#endif 
+LANG            SC

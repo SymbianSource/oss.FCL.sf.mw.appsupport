@@ -1,0 +1,9 @@
+#ifndef __TSANIMIHL_IBY__
+#define __TSANIMIHL_IBY__
+
+file=ABI_DIR\BUILD_DIR\TSanimihl.dll SHARED_LIB_DIR\TSanimihl.dll
+
+data=\epoc32\data\z\system\data\UI_TSanimihl.cfg \testframework\UI_TSanimihl.cfg
+
+
+#endif

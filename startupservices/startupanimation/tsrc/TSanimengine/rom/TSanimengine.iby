@@ -1,0 +1,10 @@
+#ifndef __TSANIMENGINE_IBY__
+#define __TSANIMENGINE_IBY__
+
+file=ABI_DIR\BUILD_DIR\TSanimengine.dll SHARED_LIB_DIR\TSanimengine.dll
+
+//data=\epoc32\data\z\system\data\TestFramework.ini \testframework\TestFramework.ini
+data=\epoc32\data\z\system\data\TSanimengine.cfg \testframework\TSanimengine.cfg
+
+
+#endif

@@ -308,7 +308,8 @@ void CMemoryMonitor::RequestFreeMemoryL(TInt aBytesRequested, TBool aDataPaged)
     
     iActionTrigger = EClientServerRequestFreeMemory;
     iDataPaged = aDataPaged;
-    StartFreeSomeRamL(iLowRamThreshold, aBytesRequested + iLowSwapThreshold);
+    
+    StartFreeSomeRamL(iLowRamThreshold+aBytesRequested, aBytesRequested + iLowSwapThreshold);
     }
 
 void CMemoryMonitor::FreeOptionalRamL(TInt aBytesRequested, TInt aPluginId, TBool aDataPaged) // The ID of the plugin that will clear up the allocation, used to determine the priority of the allocation

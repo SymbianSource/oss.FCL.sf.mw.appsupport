@@ -1,0 +1,79 @@
+/*TYPE STIFUNIT*/
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: MMP file for STIF Test Framework's STIFUnit test module.
+*
+*/
+
+#include <platform_paths.hrh>
+
+//uncomment both of these macros to use the CLIENT_REQUEST_QUEUE
+macro CLIENT_REQUEST_QUEUE
+#define CLIENT_REQUEST_QUEUE
+
+SMPSAFE
+
+TARGET          ut_oom_closeapp.dll
+TARGETTYPE      dll
+UID             0x1000008D 0x2002CAD2
+
+CAPABILITY      ALL -TCB
+
+DEFFILE         ut_oom_closeapp.def
+
+USERINCLUDE     ../inc 
+USERINCLUDE     ../../../inc
+
+MW_LAYER_SYSTEMINCLUDE
+OS_LAYER_SYSTEMINCLUDE
+
+SOURCEPATH      ../src
+
+SOURCE          ut_oom_closeapp.cpp
+SOURCE          ut_oom_closeappCases.cpp
+SOURCE          moc_oomactionlist.cpp
+SOURCE          moc_oommemorymonitor.cpp
+SOURCE          mytimer.cpp
+
+SOURCEPATH      ../../../src
+SOURCE		oomcloseapp.cpp
+SOURCE		oomappclosetimer.cpp
+SOURCE		oomappclosewatcher.cpp
+SOURCE		oomactionref.cpp
+SOURCE		oomconfig.cpp
+SOURCE		oommonitorplugin.cpp
+SOURCE		oomaction.cpp
+SOURCE		oomwindowgrouplist.cpp
+SOURCE		oomwserveventreceiver.cpp
+SOURCE		oomglobalconfig.cpp
+SOURCE		oompanic.cpp
+SOURCE		oomactionconfig.cpp
+SOURCE		oomapplicationconfig.cpp
+
+LIBRARY         euser.lib
+LIBRARY         stiftestinterface.lib
+
+LIBRARY         apparc.lib
+LIBRARY         eikcore.lib
+LIBRARY         aknnotify.lib
+LIBRARY         apgrfx.lib
+LIBRARY         ws32.lib
+LIBRARY         bafl.lib
+LIBRARY         ecom.lib
+LIBRARY         hal.lib
+LIBRARY         efsrv.lib
+LIBRARY         xmlframework.lib
+LIBRARY         cone.lib
+
+LANG            SC

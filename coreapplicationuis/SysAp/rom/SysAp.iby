@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -21,6 +21,28 @@
 
 file=ABI_DIR\BUILD_DIR\NspsWsPlugin.dll         SHARED_LIB_DIR\NspsWsPlugin.dll
 data=DATAZ_\resource\apps\qgn_sysap_screen.svg        resource\apps\qgn_sysap_screen.svg
+
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_01.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_01.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_02.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_02.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_03.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_03.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_04.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_04.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_05.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_05.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_06.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_06.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_07.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_07.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_08.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_08.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_09.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_09.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_charging_10.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_charging_10.svg
+
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_01.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_01.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_02.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_02.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_03.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_03.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_04.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_04.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_05.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_05.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_06.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_06.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_07.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_07.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_08.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_08.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_09.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_09.svg
+data=DATAZ_\APP_RESOURCE_DIR\qtg_anim_battery_full_10.svg                                  APP_RESOURCE_DIR\qtg_anim_battery_full_10.svg
 
 S60_APP_EXE(SysAp)
 S60_APP_AIF_RSC(SysAp)

@@ -26,6 +26,7 @@
 #include <hbindicatorinterface.h>
 #include <hbindicatorplugininterface.h>
 #include <hbtranslator.h>
+#include <xqappmgr.h>
 
 
 /**
@@ -63,17 +64,20 @@ private:
 
     QString iDisplayName;
     QString iIcon;
-    QProcess iProcess;
     QStringList iIndicatorTypes;
     HbTranslator *iTrans;
   
     
 private slots:
-    void processError(QProcess::ProcessError err); // handler for error codes
-
+    
+       
+    void closeSettingView();
 private:
     Q_DISABLE_COPY(PsmIndicatorPlugin)
     int mError;
+    //Qthighway methodology
+    XQApplicationManager mAppMgr;
+    XQAiwRequest *mRequest;
     };
 
 #endif // PSMINDICATOR_H

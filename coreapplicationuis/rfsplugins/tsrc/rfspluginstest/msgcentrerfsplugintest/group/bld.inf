@@ -25,8 +25,8 @@ PRJ_TESTEXPORTS
 ../init/msgcentrerfsplugintest.ini /epoc32/winscw/c/testframework/testframework.ini
 ../init/msgcentrerfsplugintest.ini /epoc32/data/z/system/data/TestFramework.ini
 
-../conf/msgcentrerfsplugintest.cfg /epoc32/winscw/c/testframework/msgcentrerfsplugintest.cfg
-../conf/msgcentrerfsplugintest.cfg /epoc32/data/z/system/data/msgcentrerfsplugintest.cfg
+../conf/ui_msgcentrerfsplugintest.cfg /epoc32/winscw/c/testframework/ui_msgcentrerfsplugintest.cfg
+../conf/ui_msgcentrerfsplugintest.cfg /epoc32/data/z/system/data/ui_msgcentrerfsplugintest.cfg
 
 ../rom/msgcentrerfsplugintest.iby                              CORE_MW_LAYER_IBY_EXPORT_PATH(msgcentrerfsplugintest.iby)
 

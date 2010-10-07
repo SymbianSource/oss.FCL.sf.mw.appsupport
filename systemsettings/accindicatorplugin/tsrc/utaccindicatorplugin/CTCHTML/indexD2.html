@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<title>CTC++ Coverage Report - Execution Profile - utaccindicatorplugin.cpp</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="keyword" content="CTC++, Testwell, Test Coverage Analyzer">
+<meta name="date" content="Tue Aug 24 13:33:36 2010">
+<meta name="generator" content="Testwell CTC++ add-on utility ctc2html v2.6">
+<link rel="stylesheet" type="text/css" href="ctc.css">
+<link rel="contents" href="index.html">
+</head>
+<body text="#150040" bgcolor="#ffffff" link="#000088" vlink="#007788">
+<span class="head1">CTC++ Coverage Report - </span>
+<span class="head2">Execution Profile</span>
+<span class="head3">&nbsp;&nbsp;&nbsp;#2/4</span><br><br>
+<span class="black"><a href="indexF.html" target="_top">Directory Summary</a> | <a href="index.html" target="_top">Files Summary</a> | <a href="indexB1.html" target="_top">Functions Summary</a> | <a href="indexD1.html">Execution Profile</a><br>
+To files: <a href="indexD1.html">First</a> | <a href="indexD1.html">Previous</a> | <a href="indexD3.html">Next</a> | <a href="indexD4.html">Last</a> | <a href="indexA.html#a2">Index</a> | <a href="indexD2.html" target="_top">No Index</a></span><br><br>
+<span class="black"><strong>File: W:\sf\mw\appsupport\systemsettings\accindicatorplugin\tsrc\utaccindicatorplugin\src\utaccindicatorplugin.cpp</strong></span><br>
+<span class="black"><strong>Instrumentation&nbsp;mode:&nbsp;</strong>function-decision</span><br>
+<span class="black"><strong>TER: </strong></span><span class="black">100 % (  0/  0)</span><br><br>
+<table cellspacing="0">
+<tr><td align="right" class="black"><strong>Start/</strong>&nbsp;</td><td align="right" class="black"><strong>End/</strong>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td align="right" class="black"><strong>True</strong>&nbsp;</td><td align="right" class="black"><strong>False</strong>&nbsp;</td><td align="right" class="black"><strong>-</strong></td><td align="right" class="black">&nbsp;<a href="indexD2.html#ut1" title="First untested"><strong>Line</strong></a>&nbsp;</td><td class="black"><strong>Source</strong></td></tr>
+<tr><td colspan="5"><hr></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;1&nbsp;</td><td class="black_source">/*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;2&nbsp;</td><td class="black_source">*&nbsp;Copyright&nbsp;(c)&nbsp;2009&nbsp;Nokia&nbsp;Corporation&nbsp;and/or&nbsp;its&nbsp;subsidiary(-ies).&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;3&nbsp;</td><td class="black_source">*&nbsp;All&nbsp;rights&nbsp;reserved.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;4&nbsp;</td><td class="black_source">*&nbsp;This&nbsp;component&nbsp;and&nbsp;the&nbsp;accompanying&nbsp;materials&nbsp;are&nbsp;made&nbsp;available</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;5&nbsp;</td><td class="black_source">*&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;"Eclipse&nbsp;Public&nbsp;License&nbsp;v1.0"</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;6&nbsp;</td><td class="black_source">*&nbsp;which&nbsp;accompanies&nbsp;this&nbsp;distribution,&nbsp;and&nbsp;is&nbsp;available</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;7&nbsp;</td><td class="black_source">*&nbsp;at&nbsp;the&nbsp;URL&nbsp;"http://www.eclipse.org/legal/epl-v10.html".</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;8&nbsp;</td><td class="black_source">*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;9&nbsp;</td><td class="black_source">*&nbsp;Initial&nbsp;Contributors:</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;10&nbsp;</td><td class="black_source">*&nbsp;Nokia&nbsp;Corporation&nbsp;-&nbsp;initial&nbsp;contribution.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;11&nbsp;</td><td class="black_source">*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;12&nbsp;</td><td class="black_source">*&nbsp;Contributors:</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;13&nbsp;</td><td class="black_source">*&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;14&nbsp;</td><td class="black_source">*&nbsp;Description:&nbsp;This&nbsp;file&nbsp;contains&nbsp;STIFUnit&nbsp;module&nbsp;implementation.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;15&nbsp;</td><td class="black_source">*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;16&nbsp;</td><td class="black_source">*/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;17&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;18&nbsp;</td><td class="black_source">/******************************************************************************/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;19&nbsp;</td><td class="black_source">/*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;20&nbsp;</td><td class="black_source">&nbsp;*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;21&nbsp;</td><td class="black_source">&nbsp;*&nbsp;Test&nbsp;module&nbsp;configuration&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;22&nbsp;</td><td class="black_source">*/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;23&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;24&nbsp;</td><td class="black_source">//&nbsp;Version</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;25&nbsp;</td><td class="black_source">#define&nbsp;TEST_MODULE_VERSION_MAJOR&nbsp;0</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;26&nbsp;</td><td class="black_source">#define&nbsp;TEST_MODULE_VERSION_MINOR&nbsp;0</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;27&nbsp;</td><td class="black_source">#define&nbsp;TEST_MODULE_VERSION_BUILD&nbsp;0</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;28&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;29&nbsp;</td><td class="black_source">//&nbsp;Uncomment&nbsp;following&nbsp;defines,&nbsp;if&nbsp;you&nbsp;want&nbsp;to&nbsp;provide&nbsp;implementation</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;30&nbsp;</td><td class="black_source">//&nbsp;of&nbsp;enlisted&nbsp;virtual&nbsp;methods&nbsp;of&nbsp;test&nbsp;module.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;31&nbsp;</td><td class="black_source">//&nbsp;Implementation&nbsp;part&nbsp;is&nbsp;located&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;this&nbsp;file.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;32&nbsp;</td><td class="black_source">//#define&nbsp;STIFUNIT_OOMTESTQUERYL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;33&nbsp;</td><td class="black_source">//#define&nbsp;STIFUNIT_OOMTESTINITIALIZEL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;34&nbsp;</td><td class="black_source">//#define&nbsp;STIFUNIT_OOMHANDLEWARNINGL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;35&nbsp;</td><td class="black_source">//#define&nbsp;STIFUNIT_OOMTESTFINALIZEL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;36&nbsp;</td><td class="black_source">//&nbsp;Uncomment&nbsp;following&nbsp;define,&nbsp;if&nbsp;you&nbsp;want&nbsp;to&nbsp;increase&nbsp;heap&nbsp;or&nbsp;stack&nbsp;size.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;37&nbsp;</td><td class="black_source">//&nbsp;#define&nbsp;STIFUNIT_SETHEAPANDSTACKSIZE</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;38&nbsp;</td><td class="black_source">/******************************************************************************/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;39&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;40&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;41&nbsp;</td><td class="black_source">/*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;42&nbsp;</td><td class="black_source">&nbsp;*&nbsp;Test&nbsp;module&nbsp;internals.&nbsp;Please&nbsp;do&nbsp;not&nbsp;edit&nbsp;them.&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;43&nbsp;</td><td class="black_source">*/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;44&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;45&nbsp;</td><td class="black_source">//&nbsp;Includes</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;46&nbsp;</td><td class="black_source">#include&nbsp;&lt;e32base.h&gt;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;47&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;48&nbsp;</td><td class="black_source">//&nbsp;Literals</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;49&nbsp;</td><td class="black_source">_LIT(&nbsp;KUnitLogPath,&nbsp;"\\logs\\testframework\\"&nbsp;);&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;50&nbsp;</td><td class="black_source">_LIT(&nbsp;KUnitLogFile,&nbsp;"utaccindicatorplugin.txt"&nbsp;);&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;51&nbsp;</td><td class="black_source">_LIT(&nbsp;KLogStart,&nbsp;"utaccindicatorplugin&nbsp;logging&nbsp;starts!"&nbsp;);</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;52&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;53&nbsp;</td><td class="black_source">//&nbsp;Defines</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;54&nbsp;</td><td class="black_source">#define&nbsp;STIF_UNIT_TEST_CASES&nbsp;"../src/utaccindicatorpluginCases.cpp"</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;55&nbsp;</td><td class="black_source">#define&nbsp;STIF_UNIT_MODULE_CLASS_NAME&nbsp;Cutaccindicatorplugin</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;56&nbsp;</td><td class="black_source">#define&nbsp;STIF_UNIT_MODULE_NAME&nbsp;_L("utaccindicatorplugin.dll")</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;57&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;58&nbsp;</td><td class="black_source">//&nbsp;Include&nbsp;STIF&nbsp;unit&nbsp;generic&nbsp;file</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;59&nbsp;</td><td class="black_source">#include&nbsp;&lt;StifUnitGeneric.h&gt;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;60&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;61&nbsp;</td><td class="black_source">/*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;62&nbsp;</td><td class="black_source">&nbsp;*&nbsp;Implementation&nbsp;of&nbsp;setHeapAndStack&nbsp;virtual&nbsp;methods.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;63&nbsp;</td><td class="black_source">&nbsp;*&nbsp;To&nbsp;changes&nbsp;heap&nbsp;and&nbsp;stack&nbsp;size&nbsp;provide&nbsp;new&nbsp;values&nbsp;to&nbsp;iTestThreadStackSize,&nbsp;iTestThreadMinHeap&nbsp;and&nbsp;iTestThreadMaxHeap.&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;64&nbsp;</td><td class="black_source">*/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;65&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;66&nbsp;</td><td class="black_source">#ifdef&nbsp;STIFUNIT_SETHEAPANDSTACKSIZE</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;67&nbsp;</td><td class="black_source">EXPORT_C&nbsp;TInt&nbsp;SetRequirements(&nbsp;CTestModuleParam*&amp;&nbsp;aTestModuleParam,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;68&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TUint32&amp;&nbsp;aParameterValid&nbsp;)</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;69&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;{</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;70&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;aParameterValid&nbsp;=&nbsp;KStifTestModuleParameterChanged;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;71&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;CTestModuleParamVer01*&nbsp;param&nbsp;=&nbsp;CTestModuleParamVer01::NewL();&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;72&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Stack&nbsp;size&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;73&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;param-&gt;iTestThreadStackSize=&nbsp;16384;&nbsp;//&nbsp;16K&nbsp;stack&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;74&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Heap&nbsp;sizes&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;75&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;param-&gt;iTestThreadMinHeap&nbsp;=&nbsp;4096;&nbsp;//&nbsp;4K&nbsp;heap&nbsp;min&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;76&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;param-&gt;iTestThreadMaxHeap&nbsp;=&nbsp;1048576;//&nbsp;1M&nbsp;heap&nbsp;max&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;77&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;78&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;KErrNone;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;79&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;80&nbsp;</td><td class="black_source">#undef&nbsp;STIFUNIT_SETHEAPANDSTACKSIZE</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;81&nbsp;</td><td class="black_source">#endif</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;82&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;83&nbsp;</td><td class="black_source">/*</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;84&nbsp;</td><td class="black_source">&nbsp;*&nbsp;User&nbsp;implementation&nbsp;of&nbsp;OOM&nbsp;virtual&nbsp;methods.</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;85&nbsp;</td><td class="black_source">&nbsp;*&nbsp;Providing&nbsp;own&nbsp;implementation&nbsp;requires&nbsp;uncommenting&nbsp;defines&nbsp;at&nbsp;the</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;86&nbsp;</td><td class="black_source">&nbsp;*&nbsp;beginnig&nbsp;of&nbsp;this&nbsp;file.&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;87&nbsp;</td><td class="black_source">*/</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;88&nbsp;</td><td class="black_source">#ifdef&nbsp;STIFUNIT_OOMTESTQUERYL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;89&nbsp;</td><td class="black_source">TBool&nbsp;Cutaccindicatorplugin::OOMTestQueryL(&nbsp;const&nbsp;TFileName&amp;&nbsp;/*aTestCaseFile*/,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;90&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;TInt&nbsp;aCaseNumber,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;91&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOOMFailureType&amp;&nbsp;aFailureType,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;92&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TInt&amp;&nbsp;aFirstMemFailure,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;93&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TInt&amp;&nbsp;aLastMemFailure)</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;94&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;{</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;95&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;96&nbsp;</td><td class="black_source">#undef&nbsp;STIFUNIT_OOMTESTQUERYL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;97&nbsp;</td><td class="black_source">#endif</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;98&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;99&nbsp;</td><td class="black_source">#ifdef&nbsp;STIFUNIT_OOMTESTINITIALIZEL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;100&nbsp;</td><td class="black_source">void&nbsp;Cutaccindicatorplugin::OOMTestInitializeL(&nbsp;const&nbsp;TFileName&amp;&nbsp;/*aTestCaseFile*/,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;101&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;TInt&nbsp;/*aCaseNumber*/&nbsp;)</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;102&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;{</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;103&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;104&nbsp;</td><td class="black_source">#undef&nbsp;STIFUNIT_OOMTESTINITIALIZEL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;105&nbsp;</td><td class="black_source">#endif</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;106&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;107&nbsp;</td><td class="black_source">#ifdef&nbsp;STIFUNIT_OOMHANDLEWARNINGL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;108&nbsp;</td><td class="black_source">void&nbsp;Cutaccindicatorplugin::OOMHandleWarningL(&nbsp;const&nbsp;TFileName&amp;&nbsp;/*aTestCaseFile*/,</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;109&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;TInt&nbsp;/*aCaseNumber*/,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;110&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TInt&amp;&nbsp;/*aFailNextValue*/)</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;111&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;{</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;112&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;113&nbsp;</td><td class="black_source">#undef&nbsp;STIFUNIT_OOMHANDLEWARNINGL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;114&nbsp;</td><td class="black_source">#endif</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;115&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;116&nbsp;</td><td class="black_source">#ifdef&nbsp;STIFUNIT_OOMTESTFINALIZEL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;117&nbsp;</td><td class="black_source">void&nbsp;Cutaccindicatorplugin::OOMTestFinalizeL(&nbsp;const&nbsp;TFileName&amp;&nbsp;/*aTestCaseFile*/,&nbsp;</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;118&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;TInt&nbsp;/*aCaseNumber*/&nbsp;)</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;119&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;{</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;120&nbsp;</td><td class="black_source">&nbsp;&nbsp;&nbsp;&nbsp;}</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;121&nbsp;</td><td class="black_source">#undef&nbsp;STIFUNIT_OOMTESTFINALIZEL</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;122&nbsp;</td><td class="black_source">#endif</td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;123&nbsp;</td><td class="black_source"></td></tr>
+<tr><td colspan="3" class="black_profile">&nbsp;</td><td align="right" class="black_profile">&nbsp;124&nbsp;</td><td class="black_source">//&nbsp;End&nbsp;of&nbsp;File</td></tr>
+<tr><td colspan="5" class="black"><strong>***TER 100% (0/0) of SOURCE FILE <a name="ut1"></a>utaccindicatorplugin.cpp</strong></td></tr>
+</table><br>
+<span class="black"><a href="indexF.html" target="_top">Directory Summary</a> | <a href="index.html" target="_top">Files Summary</a> | <a href="indexB1.html" target="_top">Functions Summary</a> | <a href="indexD1.html">Execution Profile</a><br>
+To files: <a href="indexD1.html">First</a> | <a href="indexD1.html">Previous</a> | <a href="indexD3.html">Next</a> | <a href="indexD4.html">Last</a> | <a href="indexD2.html">Top</a> | <a href="indexA.html#a2">Index</a> | <a href="indexD2.html" target="_top">No Index</a></span><br><br>
+</body></html>

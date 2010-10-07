@@ -1,0 +1,5 @@
+#include "../ut_oom/group/bld.inf"
+#include "../ut_oom_memorymonitor/group/bld.inf"
+#include "../utoomclientrequestqueue/group/bld.inf"
+#include "../utoomconfigparser/group/bld.inf"
+

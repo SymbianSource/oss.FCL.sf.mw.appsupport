@@ -1,0 +1,9 @@
+#ifndef __TSANIMMIF_IBY__
+#define __TSANIMMIF_IBY__
+
+file=ABI_DIR\BUILD_DIR\TSanimmif.dll SHARED_LIB_DIR\TSanimmif.dll
+
+data=\epoc32\data\z\system\data\UI_TSanimmif.cfg \testframework\UI_TSanimmif.cfg
+
+
+#endif

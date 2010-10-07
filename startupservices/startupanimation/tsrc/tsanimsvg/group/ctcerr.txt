@@ -1,0 +1,436 @@
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwldsym2.exe
+argv[1]: -version
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwldsym2 -version
+*** CTC++/ctcagent command status: 0
+
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwccsym2.exe
+argv[1]: -version
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwccsym2 -version
+*** CTC++/ctcagent command status: 0
+
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwccsym2.exe
+argv[1]: -c
+argv[2]: -align
+argv[3]: 4
+argv[4]: -warnings
+argv[5]: on
+argv[6]: -w
+argv[7]: nohidevirtual,nounusedexpr
+argv[8]: -msgstyle
+argv[9]: gcc
+argv[10]: -enum
+argv[11]: int
+argv[12]: -str
+argv[13]: pool
+argv[14]: -exc
+argv[15]: ms
+argv[16]: -trigraphs
+argv[17]: on
+argv[18]: -cwd
+argv[19]: source
+argv[20]: -g
+argv[21]: -O0
+argv[22]: -inline
+argv[23]: off
+argv[24]: -runtime
+argv[25]: staticmulti
+argv[26]: -wchar_t
+argv[27]: off
+argv[28]: -nostdinc
+argv[29]: -gccdepends
+argv[30]: -MD
+argv[31]: -d
+argv[32]: __SYMBIAN32__
+argv[33]: -d
+argv[34]: __CW32__
+argv[35]: -d
+argv[36]: __WINS__
+argv[37]: -d
+argv[38]: __WINSCW__
+argv[39]: -d
+argv[40]: __SUPPORT_CPP_EXCEPTIONS__
+argv[41]: -d
+argv[42]: _UNICODE
+argv[43]: -d
+argv[44]: _DEBUG
+argv[45]: -d
+argv[46]: __DLL__
+argv[47]: -i-
+argv[48]: -i
+argv[49]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc
+argv[50]: -i
+argv[51]: Z:/startupservices/startupanimation/internal/test/inc
+argv[52]: -i
+argv[53]: Z:/inc
+argv[54]: -i
+argv[55]: Z:/startupservices/startupanimation/sanimengine/inc
+argv[56]: -i
+argv[57]: Z:/epoc32/include
+argv[58]: -i
+argv[59]: Z:/epoc32/include/platform
+argv[60]: -i
+argv[61]: Z:/epoc32/include/platform/loc
+argv[62]: -i
+argv[63]: Z:/epoc32/include/platform/loc/sc
+argv[64]: -i
+argv[65]: Z:/epoc32/include
+argv[66]: -include
+argv[67]: feature_settings.hrh
+argv[68]: -o
+argv[69]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.o
+argv[70]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvg.cpp
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwccsym2 -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d _DEBUG -d __DLL__ -i- -i Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc -i Z:/startupservices/startupanimation/internal/test/inc -i Z:/inc -i Z:/startupservices/startupanimation/sanimengine/inc -i Z:/epoc32/include -i Z:/epoc32/include/platform -i Z:/epoc32/include/platform/loc -i Z:/epoc32/include/platform/loc/sc -i Z:/epoc32/include -include feature_settings.hrh -o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.o Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvg.cpp
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwccsym2.exe
+argv[1]: -c
+argv[2]: -align
+argv[3]: 4
+argv[4]: -warnings
+argv[5]: on
+argv[6]: -w
+argv[7]: nohidevirtual,nounusedexpr
+argv[8]: -msgstyle
+argv[9]: gcc
+argv[10]: -enum
+argv[11]: int
+argv[12]: -str
+argv[13]: pool
+argv[14]: -exc
+argv[15]: ms
+argv[16]: -trigraphs
+argv[17]: on
+argv[18]: -cwd
+argv[19]: source
+argv[20]: -g
+argv[21]: -O0
+argv[22]: -inline
+argv[23]: off
+argv[24]: -runtime
+argv[25]: staticmulti
+argv[26]: -wchar_t
+argv[27]: off
+argv[28]: -nostdinc
+argv[29]: -gccdepends
+argv[30]: -MD
+argv[31]: -d
+argv[32]: __SYMBIAN32__
+argv[33]: -d
+argv[34]: __CW32__
+argv[35]: -d
+argv[36]: __WINS__
+argv[37]: -d
+argv[38]: __WINSCW__
+argv[39]: -d
+argv[40]: __SUPPORT_CPP_EXCEPTIONS__
+argv[41]: -d
+argv[42]: _UNICODE
+argv[43]: -d
+argv[44]: _DEBUG
+argv[45]: -d
+argv[46]: __DLL__
+argv[47]: -i-
+argv[48]: -i
+argv[49]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc
+argv[50]: -i
+argv[51]: Z:/startupservices/startupanimation/internal/test/inc
+argv[52]: -i
+argv[53]: Z:/inc
+argv[54]: -i
+argv[55]: Z:/startupservices/startupanimation/sanimengine/inc
+argv[56]: -i
+argv[57]: Z:/epoc32/include
+argv[58]: -i
+argv[59]: Z:/epoc32/include/platform
+argv[60]: -i
+argv[61]: Z:/epoc32/include/platform/loc
+argv[62]: -i
+argv[63]: Z:/epoc32/include/platform/loc/sc
+argv[64]: -i
+argv[65]: Z:/epoc32/include
+argv[66]: -include
+argv[67]: feature_settings.hrh
+argv[68]: -o
+argv[69]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/testwaiter.o
+argv[70]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/testwaiter.cpp
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwccsym2 -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d _DEBUG -d __DLL__ -i- -i Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc -i Z:/startupservices/startupanimation/internal/test/inc -i Z:/inc -i Z:/startupservices/startupanimation/sanimengine/inc -i Z:/epoc32/include -i Z:/epoc32/include/platform -i Z:/epoc32/include/platform/loc -i Z:/epoc32/include/platform/loc/sc -i Z:/epoc32/include -include feature_settings.hrh -o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/testwaiter.o Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/testwaiter.cpp
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwldsym2.exe
+argv[1]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.prep.def
+argv[2]: -importlib
+argv[3]: -o
+argv[4]: Z:/epoc32/release/winscw/udeb/TSanimsvg.lib
+argv[5]: -addcommand
+argv[6]: out:TSanimsvg.dll
+argv[7]: -warnings
+argv[8]: off
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwldsym2 Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.prep.def -importlib -o Z:/epoc32/release/winscw/udeb/TSanimsvg.lib -addcommand out:TSanimsvg.dll -warnings off
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwccsym2.exe
+argv[1]: -c
+argv[2]: -align
+argv[3]: 4
+argv[4]: -warnings
+argv[5]: on
+argv[6]: -w
+argv[7]: nohidevirtual,nounusedexpr
+argv[8]: -msgstyle
+argv[9]: gcc
+argv[10]: -enum
+argv[11]: int
+argv[12]: -str
+argv[13]: pool
+argv[14]: -exc
+argv[15]: ms
+argv[16]: -trigraphs
+argv[17]: on
+argv[18]: -cwd
+argv[19]: source
+argv[20]: -g
+argv[21]: -O0
+argv[22]: -inline
+argv[23]: off
+argv[24]: -runtime
+argv[25]: staticmulti
+argv[26]: -wchar_t
+argv[27]: off
+argv[28]: -nostdinc
+argv[29]: -gccdepends
+argv[30]: -MD
+argv[31]: -d
+argv[32]: __SYMBIAN32__
+argv[33]: -d
+argv[34]: __CW32__
+argv[35]: -d
+argv[36]: __WINS__
+argv[37]: -d
+argv[38]: __WINSCW__
+argv[39]: -d
+argv[40]: __SUPPORT_CPP_EXCEPTIONS__
+argv[41]: -d
+argv[42]: _UNICODE
+argv[43]: -d
+argv[44]: _DEBUG
+argv[45]: -d
+argv[46]: __DLL__
+argv[47]: -i-
+argv[48]: -i
+argv[49]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc
+argv[50]: -i
+argv[51]: Z:/startupservices/startupanimation/internal/test/inc
+argv[52]: -i
+argv[53]: Z:/inc
+argv[54]: -i
+argv[55]: Z:/startupservices/startupanimation/sanimengine/inc
+argv[56]: -i
+argv[57]: Z:/epoc32/include
+argv[58]: -i
+argv[59]: Z:/epoc32/include/platform
+argv[60]: -i
+argv[61]: Z:/epoc32/include/platform/loc
+argv[62]: -i
+argv[63]: Z:/epoc32/include/platform/loc/sc
+argv[64]: -i
+argv[65]: Z:/epoc32/include
+argv[66]: -include
+argv[67]: feature_settings.hrh
+argv[68]: -o
+argv[69]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvgBlocks.o
+argv[70]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvgBlocks.cpp
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwccsym2 -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d _DEBUG -d __DLL__ -i- -i Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc -i Z:/startupservices/startupanimation/internal/test/inc -i Z:/inc -i Z:/startupservices/startupanimation/sanimengine/inc -i Z:/epoc32/include -i Z:/epoc32/include/platform -i Z:/epoc32/include/platform/loc -i Z:/epoc32/include/platform/loc/sc -i Z:/epoc32/include -include feature_settings.hrh -o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvgBlocks.o Z:/startupservices/startupanimation/internal/test/TSanimsvg/src/TSanimsvgBlocks.cpp
+*** CTC++/ctcagent command status: 0
+
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwccsym2.exe
+argv[1]: -c
+argv[2]: -align
+argv[3]: 4
+argv[4]: -warnings
+argv[5]: on
+argv[6]: -w
+argv[7]: nohidevirtual,nounusedexpr
+argv[8]: -msgstyle
+argv[9]: gcc
+argv[10]: -enum
+argv[11]: int
+argv[12]: -str
+argv[13]: pool
+argv[14]: -exc
+argv[15]: ms
+argv[16]: -trigraphs
+argv[17]: on
+argv[18]: -cwd
+argv[19]: source
+argv[20]: -g
+argv[21]: -O0
+argv[22]: -inline
+argv[23]: off
+argv[24]: -runtime
+argv[25]: staticmulti
+argv[26]: -wchar_t
+argv[27]: off
+argv[28]: -nostdinc
+argv[29]: -gccdepends
+argv[30]: -MD
+argv[31]: -d
+argv[32]: __SYMBIAN32__
+argv[33]: -d
+argv[34]: __CW32__
+argv[35]: -d
+argv[36]: __WINS__
+argv[37]: -d
+argv[38]: __WINSCW__
+argv[39]: -d
+argv[40]: __SUPPORT_CPP_EXCEPTIONS__
+argv[41]: -d
+argv[42]: _UNICODE
+argv[43]: -d
+argv[44]: _DEBUG
+argv[45]: -d
+argv[46]: __DLL__
+argv[47]: -i-
+argv[48]: -i
+argv[49]: Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc
+argv[50]: -i
+argv[51]: Z:/startupservices/startupanimation/internal/test/inc
+argv[52]: -i
+argv[53]: Z:/inc
+argv[54]: -i
+argv[55]: Z:/startupservices/startupanimation/sanimengine/inc
+argv[56]: -i
+argv[57]: Z:/epoc32/include
+argv[58]: -i
+argv[59]: Z:/epoc32/include/platform
+argv[60]: -i
+argv[61]: Z:/epoc32/include/platform/loc
+argv[62]: -i
+argv[63]: Z:/epoc32/include/platform/loc/sc
+argv[64]: -i
+argv[65]: Z:/epoc32/include
+argv[66]: -include
+argv[67]: feature_settings.hrh
+argv[68]: -o
+argv[69]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg_UID_.o
+argv[70]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.UID.CPP
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwccsym2 -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d _DEBUG -d __DLL__ -i- -i Z:/startupservices/startupanimation/internal/test/TSanimsvg/inc -i Z:/startupservices/startupanimation/internal/test/inc -i Z:/inc -i Z:/startupservices/startupanimation/sanimengine/inc -i Z:/epoc32/include -i Z:/epoc32/include/platform -i Z:/epoc32/include/platform/loc -i Z:/epoc32/include/platform/loc/sc -i Z:/epoc32/include -include feature_settings.hrh -o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg_UID_.o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.UID.CPP
+*** CTC++/ctcagent command status: 0
+
+*** CTC++/ctcagent command status: 0
+
+*** CTC++/ctcagent command status: 0
+
+*** CTC++/ctcagent command status: 0
+
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwldsym2.exe
+argv[1]: -msgstyle
+argv[2]: gcc
+argv[3]: -stdlib
+argv[4]: -subsystem
+argv[5]: windows
+argv[6]: -g
+argv[7]: -main
+argv[8]: __Win32DllMain@12
+argv[9]: -shared
+argv[10]: -m
+argv[11]: __E32Dll
+argv[12]: -export
+argv[13]: dllexport
+argv[14]: -nocompactimportlib
+argv[15]: -addcommand
+argv[16]: out:TSanimsvg.dll
+argv[17]: -warnings
+argv[18]: off
+argv[19]: -implib
+argv[20]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.lib
+argv[21]: -o
+argv[22]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.dll
+argv[23]: Z:/epoc32/release/winscw/udeb/edll.lib
+argv[24]: Z:/epoc32/release/winscw/udeb/scppnwdl.lib
+argv[25]: Z:/epoc32/release/winscw/udeb/euser.lib
+argv[26]: Z:/epoc32/release/winscw/udeb/stiftestinterface.lib
+argv[27]: Z:/epoc32/release/winscw/udeb/stiftestengine.lib
+argv[28]: Z:/epoc32/release/winscw/udeb/ecom.lib
+argv[29]: Z:/epoc32/release/winscw/udeb/efsrv.lib
+argv[30]: Z:/epoc32/release/winscw/udeb/sanimengine.lib
+argv[31]: -l
+argv[32]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb
+argv[33]: -search
+argv[34]: @Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg_udeb_objects.lrf
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwldsym2 -msgstyle gcc -stdlib -subsystem windows -g -main __Win32DllMain@12 -shared -m __E32Dll -export dllexport -nocompactimportlib -addcommand out:TSanimsvg.dll -warnings off -implib Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.lib -o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.dll Z:/epoc32/release/winscw/udeb/edll.lib Z:/epoc32/release/winscw/udeb/scppnwdl.lib Z:/epoc32/release/winscw/udeb/euser.lib Z:/epoc32/release/winscw/udeb/stiftestinterface.lib Z:/epoc32/release/winscw/udeb/stiftestengine.lib Z:/epoc32/release/winscw/udeb/ecom.lib Z:/epoc32/release/winscw/udeb/efsrv.lib Z:/epoc32/release/winscw/udeb/sanimengine.lib -l Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb -search @Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg_udeb_objects.lrf
+*** CTC++/ctcagent command status: 0
+
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwldsym2.exe
+argv[1]: -S
+argv[2]: -show
+argv[3]: only,names,unmangled,verbose
+argv[4]: -o
+argv[5]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.inf
+argv[6]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.lib
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwldsym2 -S -show only,names,unmangled,verbose -o Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.inf Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.lib
+*** CTC++/ctcagent command status: 0
+
+
+*******************************************************************************
+
+argv[0]: C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\mwldsym2.exe
+argv[1]: -msgstyle
+argv[2]: gcc
+argv[3]: -stdlib
+argv[4]: -subsystem
+argv[5]: windows
+argv[6]: -g
+argv[7]: -main
+argv[8]: __Win32DllMain@12
+argv[9]: -shared
+argv[10]: -f
+argv[11]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.def
+argv[12]: Z:/epoc32/release/winscw/udeb/edll.lib
+argv[13]: Z:/epoc32/release/winscw/udeb/scppnwdl.lib
+argv[14]: Z:/epoc32/release/winscw/udeb/euser.lib
+argv[15]: Z:/epoc32/release/winscw/udeb/stiftestinterface.lib
+argv[16]: Z:/epoc32/release/winscw/udeb/stiftestengine.lib
+argv[17]: Z:/epoc32/release/winscw/udeb/ecom.lib
+argv[18]: Z:/epoc32/release/winscw/udeb/efsrv.lib
+argv[19]: Z:/epoc32/release/winscw/udeb/sanimengine.lib
+argv[20]: -o
+argv[21]: Z:/epoc32/release/winscw/udeb/TSanimsvg.dll
+argv[22]: -noimplib
+argv[23]: -l
+argv[24]: Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb
+argv[25]: -search
+argv[26]: @Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg_udeb_objects.lrf
+
+*** CTC++/ctcagent command: set PATH=C:\Apps\sbs\win32\mingw\bin;C:\Apps\sbs\win32\cygwin\bin;C:\Apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\PC Connectivity Solution\;C:\WINNT\system32;C:\WINNT;C:\WINNT\System32\Wbem;C:\Program Files\Intel\Wireless\Bin;c:\Program Files\Intel\WiFi\bin\;C:\Program Files\NTRU Cryptosystems\NTRU TCG Software Stack\bin\;C:\Program Files\Wave Systems Corp\Gemalto\Access Client\v5\;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\imaker;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\Nokia\FastTrace;\epoc32\gcc_mingw\bin;C:\APPS\romtools;C:\APPS\bc;C:\APPS\codecollaborator;C:\APPS\actpython\.;C:\APPS\codescanner;C:\APPS\sbs\bin;C:\APPS\symdec;C:\APPS\symrec;C:\APPS\blocks\bin;C:\APPS\helium;C:\APPS\ant\bin;C:\APPS\jdk_1.6.0_11\bin; && C:\APPS\ctc\ctc -c C:\APPS\ctc\sym_cw\winscw.ini @C:\DOCUME~1\praprave\LOCALS~1\Temp\ctc4\ctcopts.rsp mwldsym2 -msgstyle gcc -stdlib -subsystem windows -g -main __Win32DllMain@12 -shared -f Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg.def Z:/epoc32/release/winscw/udeb/edll.lib Z:/epoc32/release/winscw/udeb/scppnwdl.lib Z:/epoc32/release/winscw/udeb/euser.lib Z:/epoc32/release/winscw/udeb/stiftestinterface.lib Z:/epoc32/release/winscw/udeb/stiftestengine.lib Z:/epoc32/release/winscw/udeb/ecom.lib Z:/epoc32/release/winscw/udeb/efsrv.lib Z:/epoc32/release/winscw/udeb/sanimengine.lib -o Z:/epoc32/release/winscw/udeb/TSanimsvg.dll -noimplib -l Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb -search @Z:/epoc32/build/tsanimsvg/c_38dac13c6cc36cd1/tsanimsvg_dll/winscw/udeb/TSanimsvg_udeb_objects.lrf
+*** CTC++/ctcagent command status: 0
+

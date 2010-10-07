@@ -53,6 +53,8 @@
     #undef FUNC_TRACE
 #endif
 
+#define FUNC_TRACE
+
 /**
 * Timestamp tracing on
 */

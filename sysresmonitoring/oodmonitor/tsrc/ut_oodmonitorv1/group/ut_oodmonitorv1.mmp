@@ -1,0 +1,61 @@
+/*TYPE STIFUNIT*/
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: MMP file for STIF Test Framework's STIFUnit test 
+* module.
+*
+*/
+
+#include <platform_paths.hrh>
+
+macro FCC_UNIT_TEST
+#define FCC_UNIT_TEST
+
+SMPSAFE
+
+TARGET          ut_oodmonitorv1.dll
+TARGETTYPE      dll
+UID             0x1000008D 0x200338CE
+
+CAPABILITY      ALL -TCB
+
+DEFFILE         ut_oodmonitor.def
+
+USERINCLUDE     ../inc 
+USERINCLUDE     ../../../inc 
+
+MW_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE   /epoc32/include/mw/hb/hbwidgets
+SYSTEMINCLUDE   /epoc32/include/platform/mw/uiklaf/private
+
+SOURCEPATH      ../src
+SOURCE          ut_oodmonitor.cpp
+SOURCE          ut_oodmonitorCases.cpp 
+SOURCE          ut_lafshutdownmanager.cpp 
+SOURCE          mockshutdowneventobserver.cpp 
+SOURCE          ut_oodmonitor_timer.cpp
+
+SOURCEPATH      ../../../src
+SOURCE          lafshut.cpp
+
+LIBRARY         euser.lib
+LIBRARY         stiftestinterface.lib
+LIBRARY         efsrv.lib
+LIBRARY         bafl.lib
+LIBRARY         ws32.lib
+LIBRARY		    HbWidgets.lib
+
+LANG            SC
+
+

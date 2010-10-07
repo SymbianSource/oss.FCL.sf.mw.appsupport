@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -78,7 +78,6 @@ NONSHARABLE_CLASS(COutOfDiskMonitor)
         TInt GetTopPriorityDrive();
         void SetAsDisplayedL(TInt aDrive, TInt aDriveStatus);
     private: //Data
-        COutOfDiskNotifyObserver*   iOutOfDiskNotifyObserver; //owns
         COutOfDiskPSObserver*       iOutOfDiskPSObserver; //owns
         COutOfDiskGlobalNote*       iOutOfDiskGlobalNote; // owns
         RFs                         iFs;
@@ -91,6 +90,11 @@ NONSHARABLE_CLASS(COutOfDiskMonitor)
         TInt                        iDefaultRomDrive;
         RResourceFile               iResourceFile;
         TInt64                      iOODWarningThresholdMassMemory;
+
+#ifdef FCC_UNIT_TEST
+    public:
+#endif
+        COutOfDiskNotifyObserver*   iOutOfDiskNotifyObserver; //owns
     };
 
 #endif // __OUTOFDISKMONITOR_H__

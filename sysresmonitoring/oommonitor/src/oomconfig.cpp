@@ -55,7 +55,10 @@ void COomConfig::SetAppCloseConfigL(COomCloseAppConfig* aActionConfig)
     if (!applicationConfigPointer)
         {
         applicationConfig = COomApplicationConfig::NewL(aActionConfig->iId);
+		CleanupStack::PushL(applicationConfig);
         iApplicationToConfigMapping.InsertL(aActionConfig->iId, applicationConfig);
+		CleanupStack::Pop();
+
         }
     else
         {

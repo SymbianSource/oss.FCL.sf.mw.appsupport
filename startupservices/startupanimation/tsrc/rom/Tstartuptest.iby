@@ -1,0 +1,7 @@
+#ifndef __TSTARTUPANIMTEST_IBY__
+#define __TSTARTUPANIMTEST_IBY__
+
+
+data=\epoc32\data\z\system\data\TestFramework.ini \testframework\TestFramework.ini
+
+#endif

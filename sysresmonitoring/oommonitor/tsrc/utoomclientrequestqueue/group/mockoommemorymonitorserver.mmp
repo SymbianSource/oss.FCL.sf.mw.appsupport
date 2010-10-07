@@ -1,0 +1,44 @@
+/*
+============================================================================
+ Name		: mockoommemorymonitorserver.mmp
+ Author	  : 
+ Copyright   : Your copyright notice
+ Description : This is the project specification file for w213.
+============================================================================
+*/
+
+TARGET		  mockoommonitorserver.exe
+TARGETTYPE	  exe
+UID			 0 0x2002CAD3
+
+//CAPABILITY    all - TCB
+
+macro CLIENT_REQUEST_QUEUE
+#define CLIENT_REQUEST_QUEUE
+macro FCC_UNIT_TEST
+#define FCC_UNIT_TEST
+
+USERINCLUDE     ../inc 
+USERINCLUDE     ../../../inc 
+
+OS_LAYER_SYSTEMINCLUDE
+MW_LAYER_SYSTEMINCLUDE
+
+SOURCEPATH      ../src
+SOURCE          mockoommemorymonitor.cpp
+
+SOURCEPATH      ../../../src
+SOURCE          oommemorymonitorserver.cpp
+SOURCE          oommemorymonitorsession.cpp
+SOURCE          oompanic.cpp
+SOURCE          oomsubscribehelper.cpp
+#ifdef CLIENT_REQUEST_QUEUE
+SOURCE          oomclientrequestqueue.cpp
+#endif
+
+LIBRARY         euser.lib
+LIBRARY         ws32.lib
+LIBRARY         hal.lib
+
+LANG            SC
+

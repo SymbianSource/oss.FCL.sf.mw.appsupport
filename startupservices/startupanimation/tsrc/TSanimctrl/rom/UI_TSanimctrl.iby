@@ -1,0 +1,10 @@
+#ifndef __TSANIMCTRL_IBY__
+#define __TSANIMCTRL_IBY__
+
+file=ABI_DIR\BUILD_DIR\TSanimctrl.dll SHARED_LIB_DIR\TSanimctrl.dll
+
+//data=\epoc32\data\z\system\data\TestFramework.ini             \testframework\TestFramework.ini
+data=\epoc32\data\z\system\data\TSanimctrl.cfg \testframework\TSanimctrl.cfg
+
+
+#endif

@@ -24,8 +24,11 @@
 #pragma once
 #endif
 
-#include <testscripterinternal.h>
 #include "trace.h"
+#include <StifLogger.h>
+#include <TestScripterInternal.h>
+#include <StifTestModule.h>
+#include <TestclassAssert.h>
 
 // CONSTANTS
 

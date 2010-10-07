@@ -1,0 +1,52 @@
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+
+
+#include <ecom\registryinfo.rh>
+#include <oommonitorplugin.hrh>
+#include "ut_oom.h"
+
+RESOURCE REGISTRY_INFO theInfo
+{
+	dll_uid = 0x2003397f;
+	interfaces =
+	{
+	INTERFACE_INFO
+		{
+		interface_uid = KOomPluginInterfaceUidValue;
+		implementations =
+				{
+				IMPLEMENTATION_INFO
+					{
+					implementation_uid = 0x2003397f;
+					version_no = 1;
+					display_name = "ut_oomplugin 1";
+					default_data = "";
+					opaque_data = "";
+					},
+				IMPLEMENTATION_INFO
+					{
+					implementation_uid = 0x20033980;
+					version_no = 1;
+					display_name = "ut_oomplugin 2";
+					default_data = "";
+					opaque_data = "";
+					}
+				};
+		}
+	};
+}

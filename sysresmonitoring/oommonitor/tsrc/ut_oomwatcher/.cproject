@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<storageModule buildFromInf="true" buildingTestComps="true" cleanLevel="0" concurrentBuildJobs="4" defaultMMPChangedAction="0" extraSBSv2Args="" infBuildComponents="" infFileLocation="group\bld.inf" macrosFile="" makeEngineToUse="make" manageDependencies="true" moduleId="com.nokia.carbide.cdt.builder.carbideCPPBuilder" overrideMakeEngine="false" overrideWorkspaceSettings="false" promptForMMPChangedAction="true" useConcurrentBuilding="true" useDebugMode="false" useIncrementalBuilder="false" useKeepGoing="false" useMMPMacros="true"/>
+<storageModule moduleId="org.eclipse.cdt.core.settings">
+<cconfiguration id="Emulator Debug (WINSCW) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Emulator Debug (WINSCW) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Emulator Debug (WINSCW) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MWLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MWCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SYMBIAN32__;__SUPPORT_CPP_EXCEPTIONS__;__CW32__;__WINS__;__WINSCW__;_DEBUG;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987123576" useMmpMacrosCache="true"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+</cconfiguration>
+<cconfiguration id="Emulator Release (WINSCW) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Emulator Release (WINSCW) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Emulator Release (WINSCW) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MWLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MWCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SYMBIAN32__;__SUPPORT_CPP_EXCEPTIONS__;__CW32__;NDEBUG;__WINS__;__WINSCW__;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987123654" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Debug (ARMV5) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (ARMV5) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (ARMV5) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="_UNICODE;__DLL__;__SUPPORT_CPP_EXCEPTIONS__;__MARM_ARMV5__;__ARMCC__;__ARMCC_2_2__;__SYMBIAN32__;__MARM__;__ARMCC_2__;__EPOC32__;__GENERIC_MARM__;__EABI__;_DEBUG;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987123733" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Release (ARMV5) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (ARMV5) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (ARMV5) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="_UNICODE;__DLL__;__SUPPORT_CPP_EXCEPTIONS__;__MARM_ARMV5__;NDEBUG;__ARMCC__;__ARMCC_2_2__;__SYMBIAN32__;__MARM__;__ARMCC_2__;__EPOC32__;__GENERIC_MARM__;__EABI__;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987123826" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Debug (ARMV6) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (ARMV6) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (ARMV6) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SUPPORT_CPP_EXCEPTIONS__;__MARM_ARMV5__;__ARMCC__;__ARMCC_2_2__;__SYMBIAN32__;__MARM__;__ARMCC_2__;__ARMV6__;__EPOC32__;__GENERIC_MARM__;__EABI__;_DEBUG;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987123904" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Release (ARMV6) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (ARMV6) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (ARMV6) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SUPPORT_CPP_EXCEPTIONS__;__MARM_ARMV5__;NDEBUG;__ARMCC__;__ARMCC_2_2__;__SYMBIAN32__;__MARM__;__ARMCC_2__;__ARMV6__;__EPOC32__;__GENERIC_MARM__;__EABI__;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987123983" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Debug (ARMV7) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (ARMV7) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (ARMV7) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SUPPORT_CPP_EXCEPTIONS__;__ARMV7__;__MARM_ARMV5__;__ARMCC__;__ARMCC_2_2__;__SYMBIAN32__;__MARM__;__ARMCC_2__;__EPOC32__;__GENERIC_MARM__;__EABI__;_DEBUG;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987124076" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Release (ARMV7) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (ARMV7) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (ARMV7) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SUPPORT_CPP_EXCEPTIONS__;__ARMV7__;__MARM_ARMV5__;NDEBUG;__ARMCC__;__ARMCC_2_2__;__SYMBIAN32__;__MARM__;__ARMCC_2__;__EPOC32__;__GENERIC_MARM__;__EABI__;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987124154" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Debug (ARMV9E) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (ARMV9E) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (ARMV9E) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SYMBIAN32__;__SUPPORT_CPP_EXCEPTIONS__;_DEBUG;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987124233" useMmpMacrosCache="true"/>
+</cconfiguration>
+<cconfiguration id="Phone Release (ARMV9E) [92_1027]">
+<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (ARMV9E) [92_1027]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (ARMV9E) [92_1027]">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTLinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="com.nokia.carbide.cdt.builder.RVCTCompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="CarbideConfigurationDataProvider">
+<ENV_VAR_DATA_ID/>
+<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="D:\Symbian\92_1027\epoc32\rom\"/>
+</storageModule>
+<storageModule filesCache="D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\bld.inf;D:\Symbian\92_1027\sf\mw\appsupport\sysresmonitoring\oommonitor\tsrc\ut_oomwatcher\group\ut_oomwatcher.mmp;D:\Symbian\92_1027\epoc32\include\platform_paths.hrh;" includesCache="D:/Symbian/92_1027/sf/mw/appsupport/sysresmonitoring/oommonitor/tsrc/ut_oomwatcher/inc[LOCAL];D:/Symbian/92_1027/epoc32/include;D:/Symbian/92_1027/epoc32/include/platform;D:/Symbian/92_1027/epoc32/include/platform/loc;D:/Symbian/92_1027/epoc32/include/platform/loc/sc;D:/Symbian/92_1027/epoc32/include/oem;" macrosCache="__DLL__;_UNICODE;__SYMBIAN32__;__SUPPORT_CPP_EXCEPTIONS__;NDEBUG;" moduleId="configDataCache" sourcesCache="/ut_oomwatcher/inc;/ut_oomwatcher/src;" timestampCache="1280987124326" useMmpMacrosCache="true"/>
+</cconfiguration>
+</storageModule>
+</cproject>

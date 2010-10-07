@@ -391,6 +391,8 @@ void CMainWindow::ConstructL (const TRect& aRect, CWindow* aParent)
 	CWindow::ConstructL(aRect, aParent);
 
     TParse* fp = new(ELeave) TParse();
+	CleanupStack::PushL( fp );
+
     fp->Set(KSplashBitmapName, &KDC_APP_BITMAP_DIR, NULL);
     TRACES1("CMainWindow::ConstructL(): Load Bitmap from %S", &fp->FullName());
 
@@ -414,7 +416,8 @@ void CMainWindow::ConstructL (const TRect& aRect, CWindow* aParent)
         TRACES("CMainWindow::ConstructL(): Image not found");
         }
 
-    delete fp;
+   
+	CleanupStack::PopAndDestroy(fp);
 
     TRACES("CMainWindow::ConstructL(): End");
 	}

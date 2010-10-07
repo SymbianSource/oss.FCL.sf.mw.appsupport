@@ -1,0 +1,37 @@
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+sbs: warning: Can't set attribute type for element var
+   mwldsym2.exe: Undefined symbol: 'class CSAnimMockView * CSAnimMockView::NewL(void) (?NewL@CSAnimMockView@@SAPAV1@XZ)'
+   mwldsym2.exe: referenced from 'class CTSanimctrl * CTSanimctrl::NewL(class CTestModuleIf &) (?NewL@CTSanimctrl@@SAPAV1@AAVCTestModuleIf@@@Z)' in TSanimctrl.cpp:154
+   mwldsym2.exe: referenced from 'void CTSanimctrl::TestConstructorL(void) (?TestConstructorL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:828
+   mwldsym2.exe: referenced from 'void CTSanimctrl::TestConstructorNoMemoryL(void) (?TestConstructorNoMemoryL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:844
+   mwldsym2.exe: Undefined symbol: 'void CSAnimMockView::SetComponent(class CCoeControl &) (?SetComponent@CSAnimMockView@@QAEXAAVCCoeControl@@@Z)'
+   mwldsym2.exe: referenced from 'void CTSanimctrl::InitObjL(void) (?InitObjL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:548
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupEmptyValuesL(void) (?SetupEmptyValuesL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:584
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupUnknownFileL(void) (?SetupUnknownFileL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:601
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupProtectedFileL(void) (?SetupProtectedFileL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:618
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupExistingImageFileL(void) (?SetupExistingImageFileL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:635
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupExistingToneFileSilentL(void) (?SetupExistingToneFileSilentL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:652
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupExistingToneFileVeryLowVolumeL(void) (?SetupExistingToneFileVeryLowVolumeL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:669
+   mwldsym2.exe: referenced from 'void CTSanimctrl::SetupExistingToneFileLowVolumeL(void) (?SetupExistingToneFileLowVolumeL@CTSanimctrl@@AAEXXZ)' in TSanimctrlBlocks.cpp:686
+   mwldsym2.exe: ...
+   
+   Errors caused tool to abort.
+   
+
+sbs : warnings: 13
+sbs : errors: 3
+
+Run time 2 seconds
+
+sbs: build log in Z:/epoc32/build/Makefile.2010-08-13-14-05-28.log

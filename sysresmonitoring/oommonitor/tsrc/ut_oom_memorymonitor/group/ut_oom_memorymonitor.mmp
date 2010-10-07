@@ -1,0 +1,72 @@
+/*TYPE STIFUNIT*/
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: MMP file for STIF Test Framework's STIFUnit test module.
+*
+*/
+
+#include <platform_paths.hrh>
+
+macro CLIENT_REQUEST_QUEUE
+#define CLIENT_REQUEST_QUEUE
+
+macro FCC_UNIT_TEST
+#define FCC_UNIT_TEST
+
+TARGET          ut_oom_memorymonitor.dll
+TARGETTYPE      dll
+UID 0x1000008D 0x200338CC
+
+CAPABILITY      ALL -TCB
+
+DEFFILE         ut_oom_memorymonitor.def
+
+USERINCLUDE     ..\inc 
+USERINCLUDE     ..\..\..\inc
+OS_LAYER_SYSTEMINCLUDE
+MW_LAYER_SYSTEMINCLUDE
+OS_LAYER_LIBC_SYSTEMINCLUDE
+
+SOURCEPATH      ..\..\..\src
+SOURCE          oommemorymonitor.cpp
+
+SOURCEPATH      ..\src
+SOURCE          ut_oom_memorymonitor.cpp
+SOURCE          ut_oom_memorymonitorCases.cpp
+SOURCE 			mockoomclientrequestqueue.cpp
+SOURCE 			diclog.cpp
+SOURCE 			mockoomwindowgrouplist.cpp
+SOURCE 			mockoomactionconfig.cpp
+SOURCE 			mockoomactionlist.cpp
+SOURCE 			mockoomconfig.cpp
+SOURCE 			mockoomconfigparser.cpp
+SOURCE 			mockoomglobalconfig.cpp
+SOURCE 			mockoomlog.cpp
+SOURCE 			mockoommemorymonitorserver.cpp
+SOURCE 			mockoomoutofmemorywatcher.cpp
+SOURCE 			mockoomrunpluginconfig.cpp
+SOURCE 			mockoomwserveventreceiver.cpp
+SOURCE 			mockoommemorymonitorsession.cpp
+SOURCE 			mockoommonitorplugin.cpp
+SOURCE 			oomfriendclass.cpp
+SOURCE 			mockoompanic.cpp
+SOURCE 			mockoomforegroundrule.cpp
+SOURCE 			mockoomcloseappconfig.cpp
+SOURCE 			mockoomapplicationconfig.cpp
+SOURCE 			mockoomIdletimerule.cpp
+
+LIBRARY         euser.lib
+LIBRARY         stiftestinterface.lib ws32.lib apgrfx.lib hal.lib bafl.lib efsrv.lib estor.lib xmlframework.lib
+
+LANG            SC

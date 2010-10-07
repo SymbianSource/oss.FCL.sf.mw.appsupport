@@ -22,7 +22,7 @@
 #include "tzpersisted.h"
 #include "tzlocalizationdb.h"
 #include <bautils.h>
-#include "cbackuprestorenotification.h"
+#include "CBackupRestoreNotification.h"
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <tzuserdefineddata.h>
 #endif
