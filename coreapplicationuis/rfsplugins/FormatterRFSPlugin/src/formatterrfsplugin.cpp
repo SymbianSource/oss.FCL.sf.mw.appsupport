@@ -30,6 +30,7 @@
 
 // LOCAL CONSTANTS
 const TUid KCRUidCommsDb = { 0xcccccc00 };
+const TUid KCRUidOviMusic = { 0x101ffb51 };
 
 _LIT(KDelimeter, ":");
 _LIT(KPathDelimeter, "\\");
@@ -220,7 +221,7 @@ void CFormatterRFSPlugin::RestoreFactorySettingsL( const TRfsReason /*aType*/ )
         CreateDirectory( KCenRepBurPath );
 
         ResetRepository( KCRUidCommsDb );
-
+				ResetRepository( KCRUidOviMusic );
         TIMESTAMP( "RFS end" );
         }
     }

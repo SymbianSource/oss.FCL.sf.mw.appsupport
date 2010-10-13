@@ -20,7 +20,7 @@ NAME ACCP // 4 letter ID
 
 #include <avkon.rsg>
 #include <gsaccsplugin.loc>
-#include <gsapp.rsg>
+#include <GSApp.rsg>
 #include <uikon.rh>
 
 #include "gsaccessoryplugin.hrh"

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -185,7 +185,7 @@ public:
 	* @since S60 9.2
 	* @return ETrue if feature is set
 	*/  
-    TBool SlideSupported() const;
+    TBool CSysApFeatureManager::SlideSupported() const;
     
     /**
     * Returns whether Cover Display is supported.
@@ -263,14 +263,6 @@ public:
      * @return ETrue if feature is supported 
      */
     TBool PowerKeyIsLockKey() const;
-
-    /**
-    * Returns whether GAN is supported.
-    *
-    * @since S60 3.2
-    * @return ETrue if feature is supported
-    */
-    TBool GanSupported() const;
 
 private:
 
@@ -397,12 +389,6 @@ private:
      * Short press of power key invokes keylock
      */
     TBool iPowerKeyIsLockKey;
-
-    /**
-    * Generic Access Network (GAN) supported status.
-    */ 
-    TBool iGanSupported;
-
 };
 
 #endif // SYSAPFEATUREMANAGER_H

@@ -29,8 +29,6 @@
 #include <gssensorpluginrsc.rsg>
 #include <gscommon.hrh>
 #include <eikbtgpc.h>
-#include <featmgr.h>
-#include <hlplch.h>
 
 
 // ========================= MEMBER FUNCTIONS ================================
@@ -123,52 +121,24 @@ void CGSSenTurnCtrlView::HandleCommandL( TInt aCommand )
             break;
             }
         case EGSCmdOk:
-        case EAknSoftkeyBack:
-            {
-				 // Check selections
+            // Check selections
             Container()->CheckSelections();
             // Store changes and show previous view
             Container()->StoreSelectionsL();
             // cont. to next case
+        case EAknSoftkeyBack:
+            {
             // activate previous view
             iAppUi->ActivateLocalViewL( KGSSensorPluginUid );
             break;
             }
-		case EAknCmdHelp:
-            {   
-            if ( FeatureManager::FeatureSupported( KFeatureIdHelp ) )
-                 {
-                 HlpLauncher::LaunchHelpApplicationL(
-                 iEikonEnv->WsSession(), iAppUi->AppHelpContextL() );
-                 }
-            break;
-            }  
-        case EGSSenMenuExit:
-            {
-         aCommand=EAknCmdExit;
-         iAppUi->HandleCommandL( aCommand );
-          break;
-            }
-
         default:
             iAppUi->HandleCommandL( aCommand );
             break;
         }
     TRACE_( "[GSSensorPlugin] CGSSenTurnCtrlView::HandleCommandL() - return" );
     }
-// ---------------------------------------------------------------------------
-// CGSSenTurnCtrlView::DoDeactivate
-// Deactivates the current view 
-// ---------------------------------------------------------------------------
-void CGSSenTurnCtrlView::DoDeactivate()
-    {
-    // Check selections
-           Container()->CheckSelections();
-           // Store changes and show previous view
-           Container()->StoreSelectionsL();
-           CGSSensorBaseView::DoDeactivate();
-    
-    }
+
 // ---------------------------------------------------------------------------
 // CGSSenTurnCtrlView::Container
 // Returns call container item

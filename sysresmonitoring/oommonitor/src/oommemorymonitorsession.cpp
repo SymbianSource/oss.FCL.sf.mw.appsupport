@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -60,35 +60,6 @@ CMemoryMonitor& CMemoryMonitorSession::Monitor()
     return Server().Monitor();    
 #endif
     }
-#ifndef CLIENT_REQUEST_QUEUE
-TBool CMemoryMonitorSession::IsDataPaged(const RMessage2& aMessage)
-    {
-    RThread clientThread;
-    TInt err = aMessage.Client(clientThread);
-    TBool dataPaged = EFalse;
-    if(err == KErrNone)
-        {
-        RProcess processName;
-        err = clientThread.Process(processName);
-        if(err == KErrNone)
-            {
-            dataPaged = processName.DefaultDataPaged();
-            processName.Close();
-            clientThread.Close();
-            }
-        else
-            {
-            clientThread.Close();                        
-            PanicClient(aMessage, EPanicIllegalFunction);
-            }
-        }
-    else
-        {
-        PanicClient(aMessage, EPanicIllegalFunction);
-        }
-    return dataPaged;            
-    }
-#endif
 
 void CMemoryMonitorSession::ServiceL(const RMessage2& aMessage)
     {
@@ -108,7 +79,7 @@ void CMemoryMonitorSession::ServiceL(const RMessage2& aMessage)
             ClientRequestQueue().RequestFreeMemoryL(aMessage);
 #else
             iRequestFreeRam = aMessage;
-            Monitor().RequestFreeMemoryL(aMessage.Int0(), IsDataPaged(aMessage));
+            Monitor().RequestFreeMemoryL(aMessage.Int0());
 #endif
             break;
 
@@ -132,7 +103,7 @@ void CMemoryMonitorSession::ServiceL(const RMessage2& aMessage)
 #else
             iRequestFreeRam = aMessage;
             iMinimumMemoryRequested = aMessage.Int1();
-            Monitor().FreeOptionalRamL(aMessage.Int0(), aMessage.Int2(), IsDataPaged(aMessage));
+            Monitor().FreeOptionalRamL(aMessage.Int0(), aMessage.Int2());
 #endif            
             break;
             

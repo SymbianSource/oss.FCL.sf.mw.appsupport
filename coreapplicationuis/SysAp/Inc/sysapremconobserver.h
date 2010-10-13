@@ -58,7 +58,7 @@ NONSHARABLE_CLASS( CSysApRemConObserver ) : public CBase,
         /**
          * Open remcon interface and reserve the volume keys
          */
-        void StartRemconInterfaceL();
+        void StartRemconInterface();
         
         /**
          * close the remcon interface and release the volume keys

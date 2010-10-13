@@ -28,7 +28,7 @@ PRJ_TESTEXPORTS
 ../sensordatacompensationdevice.rul /epoc32/data/z/private/10282bc4/rules/sensordatacompensationdevice.rul
 
 // context source setting for test ps keys
-../101FB3E7.xml /epoc32/data/z/private/10282BC4/Settings/10282C74/101FB3E7.xml
+../101FB3E7.xml /epoc32/data/Z/private/10282BC4/Settings/10282C74/101FB3E7.xml
 
 // Iby export
 ../../rom/sensordatacontrollerplgtest.iby CORE_MW_LAYER_IBY_EXPORT_PATH( sensordatacontrollerplgtest.iby )

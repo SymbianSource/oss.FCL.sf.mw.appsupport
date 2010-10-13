@@ -27,14 +27,14 @@ PRJ_TESTEXPORTS
 ../conf/sensordatacompensatorplgtest.cfg /epoc32/winscw/c/TestFramework/sensordatacompensatorplgtest.cfg
 
 // Rule files
-../data/sensordatacompensationui.rul /epoc32/release/winscw/udeb/z/private/10282bc4/rules/sensordatacompensationui.rul
-../data/sensordatacompensationui.rul /epoc32/release/winscw/urel/z/private/10282bc4/rules/sensordatacompensationui.rul
-../data/sensordatacompensationdevice.rul /epoc32/release/winscw/udeb/z/private/10282bc4/rules/sensordatacompensationdevice.rul
-../data/sensordatacompensationdevice.rul /epoc32/release/winscw/urel/z/private/10282bc4/rules/sensordatacompensationdevice.rul
+../data/sensordatacompensationui.rul /epoc32/RELEASE/winscw/UDEB/Z/private/10282bc4/rules/sensordatacompensationui.rul
+../data/sensordatacompensationui.rul /epoc32/RELEASE/winscw/UREL/Z/private/10282bc4/rules/sensordatacompensationui.rul
+../data/sensordatacompensationdevice.rul /epoc32/RELEASE/winscw/UDEB/Z/private/10282bc4/rules/sensordatacompensationdevice.rul
+../data/sensordatacompensationdevice.rul /epoc32/RELEASE/winscw/UREL/Z/private/10282bc4/rules/sensordatacompensationdevice.rul
 
 // context source setting for test ps keys
-../data/101FB3E7.xml /epoc32/release/winscw/udeb/z/private/10282BC4/Settings/10282C74/101FB3E7.xml
-../data/101FB3E7.xml /epoc32/release/winscw/urel/z/private/10282BC4/Settings/10282C74/101FB3E7.xml
+../data/101FB3E7.xml /epoc32/RELEASE/winscw/UDEB/Z/private/10282BC4/Settings/10282C74/101FB3E7.xml
+../data/101FB3E7.xml /epoc32/RELEASE/winscw/UREL/Z/private/10282BC4/Settings/10282C74/101FB3E7.xml
 
 PRJ_TESTMMPFILES
 sensordatacompensatorplgtest.mmp

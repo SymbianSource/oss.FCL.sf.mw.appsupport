@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -44,7 +44,7 @@ public:
     
     // Run the OOM plugin in order to free memory
     // Call the COomAction::MemoryFreed when it is done
-    virtual void FreeMemory(TInt aBytesRequested, TBool aIsDataPaged);
+    virtual void FreeMemory(TInt aBytesRequested);
     
     // Call the memory good function on the plugin but...
     // only if there is an outstanding FreeMemory request
@@ -63,20 +63,8 @@ protected:
     
 private:
     
-    COomRunPlugin(TUint aPluginId, COomRunPluginConfig& aConfig, 
-            MOomActionObserver& aStateChangeObserver, 
-            COomMonitorPlugin& aPlugin, COomMonitorPluginV2* aV2Plugin);
+    COomRunPlugin(TUint aPluginId, COomRunPluginConfig& aConfig, MOomActionObserver& aStateChangeObserver, COomMonitorPlugin& aPlugin, COomMonitorPluginV2* aV2Plugin);
     
-    /**
-     * Function: IsAppDataPaged
-     * Checks whether the application which implements the given 
-     * COomMonitorPlugin is data paged
-     * @param instance of the monitor plugin.
-     * @return ETrue if the application is data paged, else EFalse;
-     */
-    TBool IsAppDataPaged( COomMonitorPlugin& aPlugin ) const;
-    
-private:   
     TUint iPluginId;
     
     COomMonitorPlugin& iPlugin;

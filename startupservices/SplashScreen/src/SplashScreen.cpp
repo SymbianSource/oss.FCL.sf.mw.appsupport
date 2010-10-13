@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -200,15 +200,26 @@ void CTimeout::RunL()
 /////////////////////////// CWsClient implementation ////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 CWsClient::CWsClient()
-: CActive(CActive::EPriorityStandard)
+: CActive(CActive::EPriorityStandard),
+  iPSRemoveSplashState( ESplashRunning )
 	{
     TRACES("CWsClient::CWsClient()");
-    CActiveScheduler::Add(this);    
 	}
 
 void CWsClient::ConstructL()
 	{
     TRACES("CWsClient::ConstructL(): Start");
+
+    RProperty::Define(KPSUidStartup,
+                      KPSSplashShutdown,
+                      RProperty::EInt,
+                      KReadPolicy,
+                      KWritePolicy );
+    RProperty::Set( KPSUidStartup, KPSSplashShutdown, iPSRemoveSplashState );
+	CActiveScheduler::Install(new (ELeave) CActiveScheduler);
+	CActiveScheduler::Add(this);
+    iProperty.Attach( KPSUidStartup, KPSSplashShutdown );
+    iProperty.Subscribe( iStatus );
 
 	// get a session going
 	User::LeaveIfError(iWs.Connect());
@@ -242,6 +253,8 @@ void CWsClient::ConstructL()
 
     TRACES("CWsClient::ConstructL(): About to start CActiveScheduler");
 
+	CActiveScheduler::Start(); // start the active scheduler
+
     TRACES("CWsClient::CWsClient(): End");
 	}
 
@@ -261,6 +274,7 @@ CWsClient::~CWsClient()
 	iGroup.Close();
 	// finish with window server
     Cancel();
+    iProperty.Close();
 	iWs.Close();
     TRACES("CWsClient::~CWsClient(): End");
 	}
@@ -419,79 +433,6 @@ void CMainWindow::HandlePointerEvent (TPointerEvent& /*aPointerEvent*/)
     TRACES("CMainWindow::HandlePointerEvent(): End");
 	}
 
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////// CSplashShutdownWatcher implementation ///////////////////
-/////////////////////////////////////////////////////////////////////////////////////
-
-CSplashShutdownWatcher* CSplashShutdownWatcher::NewL()
-    {
-    CSplashShutdownWatcher* self = new(ELeave)CSplashShutdownWatcher();
-    CleanupStack::PushL(self);
-    self->ConstructL();
-    CleanupStack::Pop(self);
-    return self;
-    }
-
-void CSplashShutdownWatcher::ConstructL()
-    {
-    TRACES("CSplashShutdownWatcher::ConstructL(): Start");
-    RProperty::Define(KPSUidStartup,
-                      KPSSplashShutdown,
-                      RProperty::EInt,
-                      KReadPolicy,
-                      KWritePolicy );
-    RProperty::Set( KPSUidStartup, KPSSplashShutdown, iPSRemoveSplashState );
-    iProperty.Attach( KPSUidStartup, KPSSplashShutdown );
-    CActiveScheduler::Add(this);
-    IssueRequest();
-    TRACES("CSplashShutdownWatcher::ConstructL(): End");
-    }
-
-CSplashShutdownWatcher::CSplashShutdownWatcher():CActive(CActive::EPriorityStandard),iPSRemoveSplashState( ESplashRunning ){}
-
-CSplashShutdownWatcher::~CSplashShutdownWatcher()
-    {
-    TRACES("~CSplashShutdownWatcher: Start");
-    Cancel();
-    iProperty.Close();
-    TRACES("~CSplashShutdownWatcher: End");
-    }
-
-void CSplashShutdownWatcher::IssueRequest()
-    {
-    iProperty.Subscribe( iStatus );
-    SetActive();
-    }
-
-void CSplashShutdownWatcher::DoCancel()
-    {
-    iProperty.Cancel();
-    }
-
-void CSplashShutdownWatcher::RunL()
-    {
-    TRACES("CSplashShutdownWatcher::RunL(): Start");
-    TInt state;
-    RProperty::Get( KPSUidStartup, KPSSplashShutdown, state );
-    TRACES1("CSplashShutdownWatcher::RunL(): Property change event received,Splash Shutdown state = %d", state);
-
-    if ( state == ESplashShutdown )
-            {
-            TRACES("CSplashShutdownWatcher::RunL(): Exit requested");
-            CActiveScheduler::Stop();
-            }
-        else
-            {
-            TRACES("CSplashShutdownWatcher::RunL(): UNEXPECTED state change event received!!, Issue request again");
-            IssueRequest();            
-            }
-    TRACES("CSplashShutdownWatcher::RunL(): End");    
-    }
-
-
 //////////////////////////////////////////////////////////////////////////////
 //					 CSplashWsClient implementation						//
 //////////////////////////////////////////////////////////////////////////////
@@ -568,57 +509,72 @@ void CSplashWsClient::RunL()
 	{
     TRACES("CSplashWsClient::RunL(): Start");
 
-    TRACES("CSplashWsClient::RunL(): WS event");
+    TInt state;
+    RProperty::Get( KPSUidStartup, KPSSplashShutdown, state );
+    TRACES1("CSplashWsClient::RunL(): KPSSplashShutdown state = %d", state);
 
-    // get the event
-    iWs.GetEvent(iWsEvent);
-    const TInt eventType = iWsEvent.Type();
-
-    // take action on it
-    switch (eventType)
+    if ( state != iPSRemoveSplashState )
         {
-        // window-group related event types
-        case EEventKey:
+        TRACES("CSplashWsClient::RunL(): KPSSplashShutdown state has changed -> PS event");
+        if ( state == ESplashShutdown )
             {
-            TRACES("CSplashWsClient::RunL(): EEventKey");
-            TKeyEvent& keyEvent=*iWsEvent.Key(); // get key event
-            HandleKeyEventL (keyEvent);
-            break;
+            TRACES("CSplashWsClient::RunL(): Exit requested");
+            Exit();
             }
-        // window related events
-        case EEventPointer:
-            {
-            TRACES("CSplashWsClient::RunL(): EEventPointer");
-            CWindow* window=(CWindow*)(iWsEvent.Handle()); // get window
-            TPointerEvent& pointerEvent=*iWsEvent.Pointer();
-            window->HandlePointerEvent (pointerEvent);
-            break;
-            }
-        case EEventScreenDeviceChanged:
-            {
-            const TInt currentScreenMode = iScreen->CurrentScreenMode();
-            TRACES2("CSplashWsClient::RunL() - EEventScreenDeviceChanged - iLastScreenMode: %d, currentScreenMode: %d", iLastScreenMode, currentScreenMode);
-            if  ( iLastScreenMode != currentScreenMode )
-                {
-                RDebug::Printf("[SS] CSplashWsClient::RunL() - EEventScreenDeviceChanged - real screen mode change detected!!!!");
-                iScreen->SetAppScreenMode( currentScreenMode );
-                TPixelsTwipsAndRotation currentRot;
-                iScreen->GetScreenModeSizeAndRotation( currentScreenMode, currentRot );
-                iMainWindow->Window().SetExtent( TPoint(0, 0), currentRot.iPixelSize );
-                iMainWindow->Client()->Group().SetOrdinalPosition(0, ECoeWinPriorityAlwaysAtFront + 10000);	// in front of the Status Bar
-                iMainWindow->Window().Invalidate();
-
-                iLastScreenMode = currentScreenMode;
-                }
-            TRACES("CSplashWsClient::RunL() - EEventScreenDeviceChanged - done");
-            }
-            break;
-        default:
-            TRACES("CSplashWsClient::RunL(): default");
-            break;
         }
-    IssueRequest(); // maintain outstanding request
+    else
+        {
+        TRACES("CSplashWsClient::RunL(): WS event");
 
+        // get the event
+	    iWs.GetEvent(iWsEvent);
+	    const TInt eventType = iWsEvent.Type();
+
+        // take action on it
+	    switch (eventType)
+		    {
+    		// window-group related event types
+    		case EEventKey:
+	    		{
+                TRACES("CSplashWsClient::RunL(): EEventKey");
+			    TKeyEvent& keyEvent=*iWsEvent.Key(); // get key event
+    			HandleKeyEventL (keyEvent);
+	            break;
+    			}
+            // window related events
+    		case EEventPointer:
+	    		{
+                TRACES("CSplashWsClient::RunL(): EEventPointer");
+			    CWindow* window=(CWindow*)(iWsEvent.Handle()); // get window
+			    TPointerEvent& pointerEvent=*iWsEvent.Pointer();
+			    window->HandlePointerEvent (pointerEvent);
+    			break;
+	    		}
+            case EEventScreenDeviceChanged:
+                {
+                const TInt currentScreenMode = iScreen->CurrentScreenMode();
+                TRACES2("CSplashWsClient::RunL() - EEventScreenDeviceChanged - iLastScreenMode: %d, currentScreenMode: %d", iLastScreenMode, currentScreenMode);
+                if  ( iLastScreenMode != currentScreenMode )
+                    {
+                    RDebug::Printf("[SS] CSplashWsClient::RunL() - EEventScreenDeviceChanged - real screen mode change detected!!!!");
+                    iScreen->SetAppScreenMode( currentScreenMode );
+                    TPixelsTwipsAndRotation currentRot;
+                    iScreen->GetScreenModeSizeAndRotation( currentScreenMode, currentRot );
+                    iMainWindow->Window().SetExtent( TPoint(0, 0), currentRot.iPixelSize );
+	                iMainWindow->Client()->Group().SetOrdinalPosition(0, ECoeWinPriorityAlwaysAtFront + 10000);	// in front of the Status Bar
+                    iMainWindow->Window().Invalidate();
+
+                    iLastScreenMode = currentScreenMode;
+                    }
+                TRACES("CSplashWsClient::RunL() - EEventScreenDeviceChanged - done");
+                }
+                break;
+		    default:
+                TRACES("CSplashWsClient::RunL(): default");
+    			break;
+	        }
+        IssueRequest(); // maintain outstanding request
+        }
     TRACES("CSplashWsClient::RunL(): End");
 	}
 
@@ -646,14 +602,11 @@ LOCAL_C void DoItL()
 	// make new client
     TRACES("DoItL(): Start");
 
-    CActiveScheduler::Install(new (ELeave) CActiveScheduler);    
 	CSplashWsClient* client=new (ELeave) CSplashWsClient; // allocate new client
 	CleanupStack::PushL(client); // push, just in case
 	client->ConstructL(); // construct and run
-	CSplashShutdownWatcher *shutdownWatcher=CSplashShutdownWatcher::NewL();
-	CleanupStack::PushL(shutdownWatcher);
-    CActiveScheduler::Start(); // start the active scheduler	
-	CleanupStack::PopAndDestroy(2, client); // destruct
+	CleanupStack::PopAndDestroy(); // destruct
+
     TRACES("DoItL(): End");
 	}
 

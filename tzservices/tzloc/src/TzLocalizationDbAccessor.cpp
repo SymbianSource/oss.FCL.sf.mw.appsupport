@@ -103,29 +103,21 @@ void CTzLocalizationDbAccessor::OpenDbL()
 		{
 		//Database file doesn't exist.  Attempt to create a new one.
 		error = iLocalizedTimeZoneDb.Create(iDbsSession,KTzLocalizationDbName,KTzLocalizationDbSecurityPolicy);
-		if (error == KErrNone)
-			{
-			User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
-			User::LeaveIfError(CreateUserCityTableL());
-			}
-		}
-	User::LeaveIfError(error);
-	// Check if both tables are created.
-	CDbColSet *colSet = NULL;
-	TRAP(error, colSet = iLocalizedTimeZoneDb.ColSetL(KCZTableName));
-	delete colSet;
-	if (error)
-		{
-		User::LeaveIfError(CreateFrequentlyUsedZoneTableL());
-		}
-	TRAP(error, colSet = iLocalizedTimeZoneDb.ColSetL(KUCTableName));
-	delete colSet;
-	if (error)
-	        {
-		User::LeaveIfError(CreateUserCityTableL());
-		}
+	 	User::LeaveIfError(error); 
+ 	 
+ 		//Check whether tables exist and create them if they do not	 
+ 		if (!IsTableCreatedL(KCZTableName)) 
+ 			{ 
+			User::LeaveIfError(CreateFrequentlyUsedZoneTableL()); 
+ 			} 
+  		if (!IsTableCreatedL(KUCTableName)) 
+ 			{ 
+ 			User::LeaveIfError(CreateUserCityTableL()); 
+ 			} 
+  		}
 	}
 
+	
 /**
 Destructor
 Closes the database tables, the database and the database session
@@ -142,7 +134,7 @@ void CTzLocalizationDbAccessor::CloseDb()
 	iCityView.Close();
 	iZoneView.Close();
 	iLocalizedTimeZoneDb.Close();
-	if (iZoneMutex.IsHeld())    // it is a leave, so release mutex
+	if (iZoneMutex.Handle() && iZoneMutex.IsHeld())    // it is a leave, so release mutex
 		{
 		iZoneMutex.Signal();
 		}       
@@ -317,3 +309,24 @@ void CTzLocalizationDbAccessor::PrepareZoneViewL()
 
 	User::LeaveIfError(iZoneView.EvaluateAll());
 	}
+TBool CTzLocalizationDbAccessor::IsTableCreatedL(const TDesC& aTableName) const 
+  	{ 
+   	TBool result = EFalse; 
+  	CDbTableNames* tableNames = iLocalizedTimeZoneDb.TableNamesL(); 
+	CleanupStack::PushL(tableNames); 
+	if(tableNames) 
+		{ 
+		const TInt count = tableNames->Count(); 
+  		for(TInt i = 0; i < count; i++) 
+			{ 		 
+			if((*tableNames)[i] == aTableName) 
+				{ 
+				result = ETrue; 
+				break; 
+				} 
+			} 
+		} 
+		CleanupStack::PopAndDestroy(tableNames); 
+ 	return result;	 
+ 	} 
+

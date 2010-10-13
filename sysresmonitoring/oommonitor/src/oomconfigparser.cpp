@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -37,9 +37,6 @@ KOomErrCloseAppSettingsMustComeAfterAppSettings,
 KOomErrAppIdleSettingsMustComeAfterAppCloseSettings,
 KOomErrLowRamErrorInGlobalSettings,
 KOomErrGoodRamErrorInGlobalSettings,
-KOomErrSwapUsageMonitoredErrorInGlobalSettings,
-KOomErrLowSwapErrorInGlobalSettings,
-KOomErrGoodSwapErrorInGlobalSettings,
 KOomErrMaxCloseErrorInGlobalSettings,
 KOomErrDefaultPriorityErrorInGlobalSettings,
 KOomErrMissingUidFromAppCloseConfig,
@@ -121,9 +118,6 @@ _LIT8(KOomConfigForegroundAppPriority, "foreground_app_priority");
 // Global settings attribute names
 _LIT8(KOomAttributeLowRamThreshold, "low_ram_threshold");
 _LIT8(KOomAttributeGoodRamThreshold, "good_ram_threshold");
-_LIT8(KOomAttributeSwapUsageMonitored, "swap_usage_monitored");
-_LIT8(KOomAttributeLowSwapThreshold, "low_swap_threshold");
-_LIT8(KOomAttributeGoodSwapThreshold, "good_swap_threshold");
 _LIT8(KOomAttributeMaxAppCloseBatch, "max_app_close_batch");
 _LIT8(KOomAttributeDefaultWaitAfterPlugin, "default_wait_after_plugin");
 _LIT8(KOomAttributeMaxAppExitTime , "max_app_exit_time");
@@ -389,39 +383,6 @@ void COomConfigParser::SetGlobalSettings(const RAttributeArray& aAttributes)
 
     if (err == KErrNone)
         {
-        TInt swapUsageMonitored;
-        TInt err = GetValueFromBooleanAttributeList(aAttributes, KOomAttributeSwapUsageMonitored, swapUsageMonitored);
-        
-        if (err == KErrNone)
-            iConfig.SetSwapUsageMonitored(swapUsageMonitored);
-        else
-            ConfigError(KOomErrSwapUsageMonitoredErrorInGlobalSettings);
-        }
-    
-    if (err == KErrNone)
-        {
-        TInt defaultLowSwapThreshold;    
-        TInt err = GetValueFromDecimalAttributeList(aAttributes, KOomAttributeLowSwapThreshold, defaultLowSwapThreshold);
-
-        if (err == KErrNone)
-            iConfig.SetDefaultLowSwapThreshold(defaultLowSwapThreshold * KBytesInMegabyte);
-        else
-            ConfigError(KOomErrLowSwapErrorInGlobalSettings);
-        }
-
-    if (err == KErrNone)
-        {
-        TInt defaultGoodSwapThreshold;    
-        TInt err = GetValueFromDecimalAttributeList(aAttributes, KOomAttributeGoodSwapThreshold, defaultGoodSwapThreshold);
-
-        if (err == KErrNone)
-            iConfig.SetDefaultGoodSwapThreshold(defaultGoodSwapThreshold * KBytesInMegabyte);
-        else
-            ConfigError(KOomErrGoodSwapErrorInGlobalSettings);
-        }
-    
-    if (err == KErrNone)
-        {
         TInt defaultMaxCloseAppBatch;    
         TInt err = GetValueFromDecimalAttributeList(aAttributes, KOomAttributeMaxAppCloseBatch, defaultMaxCloseAppBatch);
 
@@ -518,39 +479,6 @@ void COomConfigParser::SetAppConfigL(const RAttributeArray& aAttributes)
             ConfigError(KOomErrBadGoodThresholdValueForAppConfig);
         }
     
-    // Set the app specific swap thresholds (if they exist)
-    // Get the app specific low swap threshold
-    if (err == KErrNone)
-        {
-        TUint lowThreshold;
-        err = GetValueFromDecimalAttributeList(aAttributes, KOomAttributeLowSwapThreshold, lowThreshold);
-        if (err == KErrNone)
-            {
-            appConfig->iLowSwapThreshold = lowThreshold * KBytesInMegabyte;
-            }
-        else if (err == KErrNotFound)
-            err = KErrNone;
-            
-        if (err != KErrNone)
-            ConfigError(KOomErrBadLowThresholdValueForAppConfig);
-        }
-
-    // Get the app specific good swapthreshold
-    if (err == KErrNone)
-        {
-        TUint goodThreshold;
-        err = GetValueFromDecimalAttributeList(aAttributes, KOomAttributeGoodSwapThreshold, goodThreshold);
-        if (err == KErrNone)
-            {
-            appConfig->iGoodSwapThreshold = goodThreshold * KBytesInMegabyte;
-            }
-        else if (err == KErrNotFound)
-            err = KErrNone;
-            
-        if (err != KErrNone)
-            ConfigError(KOomErrBadGoodThresholdValueForAppConfig);
-        }  
-        
     // Add the applciation config to the main config
     if ((err == KErrNone) && (appConfig))
         {

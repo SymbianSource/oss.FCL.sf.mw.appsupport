@@ -50,7 +50,7 @@ LIBRARY         akncapserverclient.lib
 LIBRARY         cfactivatorengine.lib
 LIBRARY         cfservices.lib
 LIBRARY         centralrepository.lib
-LIBRARY         avkon.lib
+LIBRARY         Avkon.lib
 LIBRARY         apgrfx.lib
 #ifdef TRACE_INTO_FILE
 LIBRARY         flogger.lib

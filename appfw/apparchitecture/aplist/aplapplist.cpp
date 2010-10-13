@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -943,7 +943,7 @@ Adds a registration file to the iForcedRegistrations array.
 */
 EXPORT_C void CApaAppList::AddForcedRegistrationL(const TDesC& aRegistrationFile)
 	{
-	TInt err = iForcedRegistrations->InsertIsqL(aRegistrationFile, ECmpFolded);
+	TRAPD(err, iForcedRegistrations->InsertIsqL(aRegistrationFile, ECmpFolded));
 	if (err != KErrAlreadyExists) // We silently ignore attempts to insert duplicates
 		User::LeaveIfError(err);
 	

@@ -71,7 +71,7 @@ LIBRARY   gsecomplugin.lib
 LIBRARY   CommonEngine.lib
 LIBRARY   fbscli.lib
 LIBRARY   AknIcon.lib
-LIBRARY   AKNSKINS.lib
+LIBRARY   aknskins.lib
 
 LIBRARY   hlplch.lib
 LIBRARY   GSFramework.lib

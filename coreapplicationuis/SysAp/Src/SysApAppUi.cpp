@@ -59,7 +59,6 @@
 #include <secui.h>
 #include <settingsinternalcrkeys.h>
 
-#include "sysapganhandler.h"
 #include <AknNotifierController.h>
 #include <eikappui.h>
 #include <es_enum.h>
@@ -68,7 +67,7 @@
 
 #include "SysApSimChanged.h"
 
-#include <sysap.rsg>
+#include <SysAp.rsg>
 #include "SysApLightsController.h"
 
 #include "SysApPubSubObserver.h"
@@ -248,8 +247,7 @@ CSysApAppUi::CSysApAppUi() :
     iSysApAudioRoutingObserver( NULL ),
     iSysApCenRepCallForwardingObserver( NULL ),
     iSysApCenRepMsgWaitingObserver( NULL ),
-    iSysApGanHandler( NULL ),
-  	iKeyBoardRepeatCount(-1)
+	iKeyBoardRepeatCount(-1)
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::CSysApAppUi()") ) );
     }
@@ -490,17 +488,8 @@ void CSysApAppUi::ConstructL()
     TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepHacSettingObserver::NewL") ) );
     iSysApCenRepHacSettingObserver = CSysApCenRepHacSettingObserver::NewL( *this );
     
-   
+    DeactivatePSMifBatteryNotLowL ();
     
-    if( iSysApFeatureManager->GanSupported() )
-        {
-
-
-				RProperty::Define( KPSUidCoreApplicationUIs, KCoreAppUIsGanPropertyGanMode, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy  );
-				RProperty::Define( KPSUidCoreApplicationUIs, KCoreAppUIsGanPropertySignalLevel, RProperty::EInt, KAlwaysPassPolicy, KWriteDeviceDataPolicy  );
-        iSysApGanHandler = CSysApGanHandler::NewL( *this );
-        }
-
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );
     }
 
@@ -580,8 +569,6 @@ CSysApAppUi::~CSysApAppUi()
     delete iSysApPowerKeyMenuObserver;
 
     delete iSysApStartupController;
-
-    delete iSysApGanHandler;
 
 #ifdef RD_MULTIPLE_DRIVE
     iInsertedMemoryCards.Close();
@@ -762,14 +749,16 @@ TKeyResponse CSysApAppUi::HandleKeyEventL(const TKeyEvent& aKeyEvent, TEventCode
             	TRACES( RDebug::Print( _L( "CSysApAppUi::HandleKeyEventL(): Reading value of KStartupSecurityCodeQueryStatus - State Value: %d"),securityQueryState));
             	TInt callState( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallState ) );
 				//Disable keylock if Alarm is active or if a Security code query is active on the display
-				if ( alarmState == ECoreAppUIsDisableKeyguard || securityQueryState == ESecurityQueryActive 
-					  || callState == EPSCTsyCallStateRinging || iDeviceLockEnabled)
+				if ( alarmState == ECoreAppUIsDisableKeyguard || securityQueryState == ESecurityQueryActive )
                  	{
 					KeyLock().DisableWithoutNote();               	
                  	}
 			    else
          		 	{
-                    KeyLock().EnableWithoutNote();
+                    if( callState != EPSCTsyCallStateConnected && !iDeviceLockEnabled)
+                        {
+                        KeyLock().EnableWithoutNote();
+                        }
          			}
                 }
             else
@@ -1903,11 +1892,8 @@ void CSysApAppUi::UpdateSignalBarsL()
 void CSysApAppUi::UpdateSignalBarsL( const TInt aState )
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::UpdateSignalBarsL aState: %d"), aState ) );
-    if( iSysApGanHandler && iSysApGanHandler->IsInGanMode() )
-        {
-        iSignalNotify->SetSignalLevelL( iSysApGanHandler->GanSignalLevel() );
-        }
-	else if( aState == KAknSignalOffLineMode || (iSysApOfflineModeController->OfflineModeActive() && !iEmergencyCallActive) )
+
+    if( aState == KAknSignalOffLineMode || (iSysApOfflineModeController->OfflineModeActive() && !iEmergencyCallActive) )
         {
         iSignalNotify->SetSignalLevelL( KAknSignalOffLineMode );
         }
@@ -1960,39 +1946,22 @@ void CSysApAppUi::SetSignalIndicatorL()
             }
         iSignalNotify->SetWcdmaStateL( EAknSignalWcdmaIndicatorOff );
         iSignalNotify->SetHsdpaStateL( EAknSignalHsdpaIndicatorOff);
-        TRACES( RDebug::Print(_L("CSysApAppUi::SetSignalIndicatorL: gan off" ) ) );
-        iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorOff );
         }
     else
         {
-        if( iSysApGanHandler && iSysApGanHandler->IsInGanMode() )
+        // The device is in Online Mode
+        switch ( networkMode )
             {
-            // Enter GAN: set GAN signal bar
-            SetSignalIndicatorGanL();
-            iGanEnabled = ETrue;
-            }
-        else
-            {
-            if( iGanEnabled )
-                {
-                UpdateSignalBarsL();
-                iGanEnabled = EFalse;
-                }
+            case ESysApGSM:
+                SetSignalIndicatorGsmL();
+                break;
 
-            // The device is in Online Mode
-            switch ( networkMode )
-                {
-                case ESysApGSM:
-                    SetSignalIndicatorGsmL();
-                    break;
+            case ESysApWCDMA:
+                SetSignalIndicatorWcdmaL();
+                break;
 
-                case ESysApWCDMA:
-                    SetSignalIndicatorWcdmaL();
-                    break;
-
-                default:
-                    break;
-                }
+            default:
+                break;
             }
         }
     }
@@ -2240,47 +2209,6 @@ void CSysApAppUi::SetSignalIndicatorWcdmaL()
         {
         iSignalNotify->SetHsdpaStateL( EAknSignalHsdpaIndicatorOff );
         iSignalNotify->SetWcdmaStateL( signalWcdmaIndicatorState );
-        }
-    }
-
-// ----------------------------------------------------------------------------
-// CSysApAppUi::SetSignalIndicatorGanL()
-// ----------------------------------------------------------------------------
-void CSysApAppUi::SetSignalIndicatorGanL()
-    {
-    TRACES( RDebug::Print(_L("CSysApAppUi::SetSignalIndicatorGanL: available" ) ) );
-
-    TInt gprsStatus( 0 );
-    gprsStatus = StateOfProperty( KUidSystemCategory, KPSUidGprsStatusValue );
-
-    TRACES( RDebug::Print( _L("CSysApAppUi::SetSignalIndicatorGanL gprsStatus: %d" ), gprsStatus ) );
-
-    switch ( gprsStatus )
-        {
-        case EPSGprsContextActive:
-            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorContext );
-            break;
-
-        case EPSGprsContextActivating:
-            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorEstablishingContext );
-            break;
-
-        case EPSGprsSuspend:
-            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorSuspended );
-            break;
-
-        case EPSGprsAttach:
-            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorAttached );
-            break;
-
-        case EPSGprsMultibleContextActive:
-            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorMultipdp );
-            break;
-
-        case EPSGprsUnattached:
-        default:
-            iSignalNotify->SetUmaStateL( EAknSignalUmaIndicatorAvailable );
-            break;
         }
     }
 
@@ -4558,7 +4486,6 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
     InitializeStatusPaneAreaL();
     CheckSilentModeL();
     HandleAccessoryProfileInStartupL();
-    DeactivatePSMifBatteryNotLowL ();
     
     if ( iSysApFeatureManager->MmcSupported() )
         {
@@ -6855,7 +6782,8 @@ void CSysApAppUi::HandleBatteryStatusL( const TInt aValue )
             else // default low warning note must be shown
                 {
                 // activate partial power save mode on first low warning
-                iSysApPsmController->DoEnablePartialPsm( ETrue ); // activated on first warning note
+                // Enabling Partial Psm automatically disabled 
+                //iSysApPsmController->DoEnablePartialPsm( ETrue ); // activated on first warning note 
                 //Display Battery Low note.
                 ShowUiNoteL( EBatteryLowNote );    
                 }                
@@ -6938,10 +6866,15 @@ void CSysApAppUi::HandleActivatePsmQueryResponse( TBool aEnable )
         {
         iSysApPsmController->DoEnableFullPsm( ETrue );    
         }
+    
+    // Enabling Partial Psm when the user selects 'No' is diabled.
+    /*
     else
         {
-        iSysApPsmController->DoEnablePartialPsm( ETrue );     
-        }        
+        //iSysApPsmController->DoEnablePartialPsm( ETrue );  // bhaskar     
+        }
+     */
+              
     }
 
 // ----------------------------------------------------------------------------

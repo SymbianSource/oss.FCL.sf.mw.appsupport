@@ -22,12 +22,12 @@ NAME SENP
 #include    <avkon.loc> // Avkon localized strings
 #include    <avkon.mbg>
 #include    <avkon.rsg>
-#include    <eikcore.rsg>
+#include    <EIKCORE.rsg>
 #include    <uikon.rh>
 #include    <eikon.rh>
 #include    <eikon.rsg>
 #include    <avkon.rh>
-#include    <gsapp.rsg>
+#include    <GSApp.rsg>
 
 #include    <gs.loc> // Common localized GS strings
 #include    <gscommon.rh> // Common GS resource structures
@@ -404,9 +404,7 @@ RESOURCE CBA r_gs_sen_softkeys_ok_back__change
 //
 RESOURCE AVKON_VIEW r_gs_checkbox_view
     {
-    //cba = r_gs_sen_softkeys_ok_back__change;  ou1cimx1#467503
-    menubar = r_gs_sen_menubar_change_exit;
-    cba =R_GS_SOFTKEYS_OPTIONS_BACK_CHANGE;
+    cba = r_gs_sen_softkeys_ok_back__change;
     }
 
 // ***   SENSOR ACTIVE STATUS  ***

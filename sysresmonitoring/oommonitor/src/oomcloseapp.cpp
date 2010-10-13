@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -40,7 +40,7 @@ COomCloseApp* COomCloseApp::NewL(MOomActionObserver& aStateChangeObserver, RWsSe
 
 // Close the application in order to free memory
 // Call the COomAction::MemoryFreed when it is done
-void COomCloseApp::FreeMemory(TInt, TBool aIsDataPaged)
+void COomCloseApp::FreeMemory(TInt)
     {
     FUNC_LOG;
 
@@ -56,24 +56,7 @@ void COomCloseApp::FreeMemory(TInt, TBool aIsDataPaged)
     iAppCloseWatcher->Start(iCurrentTask);
     // Tell the app to close
     TRACES1("COomCloseApp::FreeMemory: Closing app with window group id %d",iWgId);
-    
-    RThread thread;
-    TInt err=thread.Open(iCurrentTask.ThreadId());
-    if (err == KErrNone)
-        {
-        RProcess process;
-        err = thread.Process(process);
-        if(err == KErrNone)
-            {
-            TBool isDataPaged = process.DefaultDataPaged();
-            if((aIsDataPaged && isDataPaged) || (!aIsDataPaged && !isDataPaged ))
-                {
-                iCurrentTask.EndTask();
-                }                    
-            process.Close();
-            }
-        thread.Close();
-        }
+    iCurrentTask.EndTask();
     }
 
 COomCloseApp::~COomCloseApp()

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -947,13 +947,12 @@ void CStartupAppUi::DoStartupEndPart()
     	{
     	UpdateStartupUiPhase( EStartupUiPhaseAllDone );
     	}
-	else
+    else
         {
         UpdateStartupUiPhase(EStartupUiPhaseAllDone+1);
         }
 
     //UpdateStartupUiPhase( EStartupUiPhaseAllDone );
-    
     
 #endif // RD_STARTUP_ANIMATION_CUSTOMIZATION
 
@@ -970,7 +969,6 @@ void CStartupAppUi::IsFTUAvailableL(TBool& aFTUAvailable)
 			repo->Get(KPhoneActicationCompleted, aFTUAvailable);
 			CleanupStack::PopAndDestroy(repo);
     }
-
 
 #ifndef RD_STARTUP_ANIMATION_CUSTOMIZATION
 // ---------------------------------------------------------------------------
@@ -1590,10 +1588,7 @@ void CStartupAppUi::SetOfflineModeQueryShown(TBool aValue)
 TBool CStartupAppUi::DosInOfflineModeL()
     {
     TRACES("CStartupAppUi::DosInOfflineModeL()");
-	
-	// Do not display the Offline mode query if the AT cmd  cenrep key (KStartupATcmdCFUNProfileChange) value set to 1 or 2, iAtcmdCfunProfileChange member holds the key  value
-	
-    if ( iOfflineModeSupported && (iAtcmdCfunProfileChange == 0) )
+    if ( iOfflineModeSupported )
         {
         TRACES1("CStartupAppUi::DosInOfflineModeL(): iOfflineModeSupported == %d", iOfflineModeSupported );
         return UiInOfflineMode();
@@ -1656,19 +1651,6 @@ void CStartupAppUi::ShowOfflineModeQueryL()
     RProperty::Get(KPSUidStartup, KPSSimStatus, status);
 
     TInt reply ( 0 );
-	// AT Command   CFUN specifc code
-	CRepository* repository( NULL );
-	TInt errVal;
-	TRAP( errVal, repository = CRepository::NewL(KCRUidStartupConf) );
-	if(errVal == KErrNone)
-		{
-		errVal = repository->Get(KStartupATcmdCFUNProfileChange, iAtcmdCfunProfileChange);
-		if(!errVal && iAtcmdCfunProfileChange >0)
-			{
-			errVal = repository->Set(KStartupATcmdCFUNProfileChange, 0);
-			}        
-		}
-	delete repository;
     if (status == ESimUsable || status == ESimReadable || status == ESimNotReady || !iSimSupported)
         {
         TRACES("CStartupAppUi::ShowOfflineModeQueryL(): Show offline mode query if needed");
@@ -1719,18 +1701,6 @@ void CStartupAppUi::ShowOfflineModeQueryL()
         }
 #endif
 
-	// AT Command CFUN  specifc code
-	// AT command CFUN implementation  plugin sets  the  key  KStartupATcmdCFUNProfileChange to 1 in the case of Offline to Online profile change
-	// AT command CFUN implementation  plugin sets  the  key  KStartupATcmdCFUNProfileChange to 2 in the case of Online  to Offline profile change	
-	if(iAtcmdCfunProfileChange == 1)
-		{
-		reply = 0;
-		}
-	else if(iAtcmdCfunProfileChange == 2)
-		{
-		reply = 1;
-		}
-	// End AT Command  CFUN specifc code	
     TRACES1("CStartupAppUi::ShowOfflineModeQueryL(): BootIntoOffline=%d.", reply);
     TInt err = RProperty::Set( KPSUidStartup,
                                KStartupBootIntoOffline,

@@ -172,6 +172,13 @@ void CSysApShutdownAnimation::RunL()
     else if ( iState == EPlaying )
         {
         iState = EFinished;
+		if ( iCtrl )
+			{
+			iCtrl->Cancel();
+			iView.RemoveComponent();
+			delete iCtrl;
+			iCtrl = NULL;
+			}	
         iCallBack.CallBack();
         }
 

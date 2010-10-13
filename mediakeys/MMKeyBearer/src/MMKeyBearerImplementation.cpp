@@ -342,7 +342,7 @@ void CMMKeyBearer::ReceivedKeyEvent(TInt aEnumValue, TInt aKeyType)
     INFO_3( "Received key: enumValue = %d, keyType = %d, usbFileTransfer = %d",
         aEnumValue, aKeyType, iUSBFileTransfer );
 
-	//Start the listener once again
+    //Start the listener once again
     if (aKeyType == ESideVolumeKeys)
         {
         iMMKeyBearerObserver->Start();

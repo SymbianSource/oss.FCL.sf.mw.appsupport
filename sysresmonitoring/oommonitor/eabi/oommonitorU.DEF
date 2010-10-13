@@ -23,5 +23,4 @@ EXPORTS
 	_ZTV19COomMonitorPluginV2 @ 22 NONAME ; #<VT>#
 	_ZN18ROomMonitorSession18RequestOptionalRamEiiiR14TRequestStatus @ 23 NONAME
 	_ZN18ROomMonitorSession14SetOomPriorityENS_12TOomPriorityE @ 24 NONAME
-	_ZNK17COomMonitorPlugin5AppIdEv @ 25 NONAME
 

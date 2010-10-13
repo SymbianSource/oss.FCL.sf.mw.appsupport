@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -262,14 +262,6 @@ const TUint32 KShutdownToneVolume = 0x00000015;
 * Example: "20070000:090000" - 01.01.2007 09:00 AM.
 */
 const TUint32 KStartupDefaultTime = 0x00000016;
-
-/**
-* AT command  CFun  specifc key
-* Default value is 0
-* Offline to Online profile  transition  value is 1
-* Online to Offline profile  transition value is 2
-*/
-const TUint32 KStartupATcmdCFUNProfileChange = 0x0000001A;
 
 #endif // STARTUPDOMAINCRKEYS_H
 

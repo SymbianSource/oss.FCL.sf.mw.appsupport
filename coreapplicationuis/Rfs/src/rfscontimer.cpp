@@ -17,7 +17,7 @@
 */
 
 
-#include "rfsConTimer.h"
+#include "rfscontimer.h"
 #include "RfsTraces.h"
 
 const TInt KRfsConnectionTimeOut = 60000000;

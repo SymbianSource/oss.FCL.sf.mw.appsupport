@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -83,9 +83,6 @@ public:
     
     inline void SetDefaultLowRamThreshold(TInt aLowRamThreshold);
     inline void SetDefaultGoodRamThreshold(TInt aGoodRamThreshold);
-    inline void SetSwapUsageMonitored(TBool aMonitored);
-    inline void SetDefaultLowSwapThreshold(TInt aLowSwapThreshold);
-    inline void SetDefaultGoodSwapThreshold(TInt aGoodSwapThreshold);
     inline void SetMaxCloseAppBatch(TUint MaxCloseAppBatch);
     inline void SetDefaultWaitAfterPlugin(TInt aMilliseconds);
     inline void SetMaxAppExitTime(TInt aMilliseconds);

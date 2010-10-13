@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -327,16 +327,10 @@ void COomActionList::FreeMemory(TInt aMaxPriority)
     TInt maxBatchSize = globalConfig.iMaxCloseAppBatch;
     TInt numberOfRunningActions = 0;
     
-    TInt freeRamEstimate = 0; // The amount of free memory we expect to be free after the currently initiated operations
-    HAL::Get(HALData::EMemoryRAMFree, freeRamEstimate);
-    TUint64 freeSwapEstimate = 0;
-    if (iSwapUsageMonitored)
-        {
-        SVMSwapInfo swapInfo;
-        UserSvr::HalFunction(EHalGroupVM, EVMHalGetSwapInfo, &swapInfo, 0);
-        freeSwapEstimate = swapInfo.iSwapFree;
-        }
-        
+    TInt memoryEstimate; // The amount of free memory we expect to be free after the currently initiated operations
+    HAL::Get(HALData::EMemoryRAMFree, memoryEstimate); 
+    
+     
     while (iCurrentActionIndex < iActionRefs.Count() 
             && iActionRefs[iCurrentActionIndex].Priority() <= aMaxPriority)
         {
@@ -357,20 +351,7 @@ void COomActionList::FreeMemory(TInt aMaxPriority)
         
         iMonitor.SetMemoryMonitorStatusProperty(EFreeingMemory);
         
-        // At the moment the actions don't make any difference between freeing
-        // RAM and freeing swap. So we try to free the biggest of the two.
-        // Until the plugins are updated to make a distinction between swap and RAM this is the best
-        // we can do. For application close actions the amount to try to free is ignored anyway.
-        TUint amountToTryToFree = 0;
-		if (iCurrentRamTarget > freeRamEstimate)
-			{
-			amountToTryToFree = iCurrentRamTarget - freeRamEstimate;
-			}
-        if (iSwapUsageMonitored && (iCurrentSwapTarget > freeSwapEstimate) && ((iCurrentSwapTarget - freeSwapEstimate) > amountToTryToFree))
-            {
-            amountToTryToFree = iCurrentSwapTarget - freeSwapEstimate;
-            }
-        action->FreeMemory(amountToTryToFree, iMonitor.iDataPaged);
+        action->FreeMemory(iCurrentTarget - memoryEstimate);
         memoryFreeingActionRun = ETrue;
                 
         // Actions with EContinueIgnoreMaxBatchSize don't add to the tally of running actions
@@ -378,12 +359,12 @@ void COomActionList::FreeMemory(TInt aMaxPriority)
             numberOfRunningActions++;
         
         // Update our estimate of how much RAM we think we'll have after this operation
-        freeRamEstimate += ref.RamEstimate();
+        memoryEstimate += ref.RamEstimate();
          
         // Do we estimate that we are freeing enough memory (only applies if the sync mode is "esimtate" for this action)
         TBool estimatedEnoughMemoryFreed = EFalse;
         if ((ref.SyncMode() == EEstimate)
-            && (freeRamEstimate >= iCurrentRamTarget))
+            && (memoryEstimate >= iCurrentTarget))
             {
             estimatedEnoughMemoryFreed = ETrue;
             }
@@ -410,15 +391,9 @@ void COomActionList::FreeMemory(TInt aMaxPriority)
         // No usable memory freeing action has been found, so we give up
         TRACES("COomActionList::FreeMemory: No usable memory freeing action has been found");
         iMonitor.ResetTargets();
-        TInt freeMemory = 0;
+        TInt freeMemory;
         iMonitor.GetFreeMemory(freeMemory);
-        TInt freeSwap = 0;
-        if (iSwapUsageMonitored)
-            {
-            iMonitor.GetFreeSwapSpace(freeSwap);
-            }
-        if ((freeMemory >= iCurrentRamTarget) &&
-            ((!iSwapUsageMonitored) || (freeSwap >= iCurrentSwapTarget)))
+        if (freeMemory >= iCurrentTarget)
             {
             SwitchOffPlugins();
             iMonitor.SetMemoryMonitorStatusProperty(EAboveTreshHold);
@@ -595,15 +570,9 @@ void COomActionList::StateChanged()
         //and therefore we are still in a memory freeing state
         iFreeingMemory = EFalse;
         // If all of the actions are complete then check memory and run more if necessary
-        TInt freeMemory = 0;
+        TInt freeMemory;
         iMonitor.GetFreeMemory(freeMemory);
-        TInt freeSwap = 0;
-        if (iSwapUsageMonitored)
-            {
-            iMonitor.GetFreeSwapSpace(freeSwap);
-            }
-        if ((freeMemory < iCurrentRamTarget) ||
-            (iSwapUsageMonitored && (freeSwap < iCurrentSwapTarget)))
+        if (freeMemory < iCurrentTarget)
             // If we are still below the good-memory-threshold then continue running actions
             {
             iCurrentActionIndex++;
@@ -613,8 +582,7 @@ void COomActionList::StateChanged()
                 // There are no more actions to try, so we give up
                 TRACES1("COomActionList::StateChanged: All current actions complete, below good threshold with no more actions available. freeMemory=%d", freeMemory);
                 iMonitor.ResetTargets();
-                if ((freeMemory >= iCurrentRamTarget) &&
-                    ((!iSwapUsageMonitored) || (freeSwap >= iCurrentSwapTarget)))
+                if (freeMemory >= iCurrentTarget)
                     {
                     SwitchOffPlugins();
                     iMonitor.SetMemoryMonitorStatusProperty(EAboveTreshHold);
@@ -669,7 +637,6 @@ void COomActionList::ConstructL(COomConfig& aConfig)
     FUNC_LOG;
     
     iCurrentActionIndex = 0;
-    iSwapUsageMonitored = aConfig.GlobalConfig().iSwapUsageMonitored;
     iFreeingMemory = EFalse;
     
     // Get the list of V1 and V2 plugins available to the system
@@ -696,7 +663,7 @@ void COomActionList::ConstructL(COomConfig& aConfig)
         COomRunPluginConfig& pluginConfig = aConfig.GetPluginConfig(iPluginListV2->Uid(pluginIndex));
         
         // Create an action acording to the config
-        COomRunPlugin* action = COomRunPlugin::NewL(iPluginListV2->Uid(pluginIndex), pluginConfig, *this, iPluginListV2->Implementation(pluginIndex), &(iPluginListV2->Implementation(pluginIndex)));
+        COomRunPlugin* action = COomRunPlugin::NewL(iPluginList->Uid(pluginIndex), pluginConfig, *this, iPluginListV2->Implementation(pluginIndex), &(iPluginListV2->Implementation(pluginIndex)));
         
         iRunPluginActions.AppendL(action);
         }
