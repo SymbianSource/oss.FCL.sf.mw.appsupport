@@ -21,7 +21,7 @@ LIBS += -lacccontrol
 symbian { 
 TARGET.UID3 = 0x2002EA56
 SYMBIAN_PLATFORMS = WINSCW ARMV5
-
+TARGET.CAPABILITY = ReadDeviceData WriteDeviceData ReadUserData
 incBlock = \
      "$${LITERAL_HASH}if ( defined (__WINS__) || defined (WINSCW) )" \
      "LIBRARY gsserverenginestub.lib " \

@@ -18,13 +18,14 @@
 */
 
 // SYSTEM INCLUDES
-#include <rfs.rsg>                      
+                 
 #include <PSVariables.h>
 #include <featmgr.h>
 #include <eikenv.h>  
 #include <centralrepository.h>
 #include <pdpcontextmanagerinternalcrkeys.h>
 #include <StringLoader.h> 
+#include <hbtextresolversymbian.h>
 
 
 
@@ -224,8 +225,13 @@ TBool CRfsConnectionObserver::CloseAlwaysOnConnectionL()
     // Start displaying the dialog which will then be closed form the RunL()
     // Here the code execution blocks and we will proceed further only when 
     // this dialog is canceled
+    
+    _LIT(Klocalisationfile, "control_panel_");
+    _LIT(KtsfilePath, "z:/resource/qt/translations/");
 
-    HBufC* prompt = StringLoader::LoadLC( R_CLOSING_CONNECTIONS ); 
+    TBool result = HbTextResolverSymbian::Init(Klocalisationfile,KtsfilePath);
+    _LIT(Kclosingconnections,"txt_cp_info_closing_connections");
+    HBufC* prompt = HbTextResolverSymbian::LoadL(Kclosingconnections);
     
     iDialog->SetTextL(*prompt);
              
@@ -239,8 +245,7 @@ TBool CRfsConnectionObserver::CloseAlwaysOnConnectionL()
     iWait->Start();
     delete iWait;
     iWait=NULL;
-    CleanupStack::PopAndDestroy( prompt );
-              
+                  
     return iAllConnectionClosed;
      }
 

@@ -21,7 +21,12 @@
 #include "../apgrfx/apprivate.h"
 #include <apsidchecker.h>
 #include "aplapplistitem.h"					// class TApaAppEntry
-#include "aplappinforeader.h"				// class ApaUtils
+#include "aplappinforeader.h"			// class ApaUtils
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "aplappregfinderTraces.h"
+#endif
+	
 
 
 GLDEF_C void Panic(TApfPanic aPanic)
@@ -71,6 +76,8 @@ void CApaAppRegFinder::ConstructL()
 // Build a list of currently available drives
 void CApaAppRegFinder::RebuildDriveListL(TScanScope aScopeOfScan)
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPREGFINDER_REBUILDDRIVELISTL_ENTRY, "CApaAppRegFinder::RebuildDriveListL : aScopeOfScan=%d", aScopeOfScan);
+    
 	iListOfDrives.Reset();
 	TDriveList driveList;
 	User::LeaveIfError(iFs.DriveList(driveList));
@@ -129,6 +136,8 @@ EXPORT_C TArray<const TDriveUnitInfo> CApaAppRegFinder::DriveList() const
 
 EXPORT_C void CApaAppRegFinder::FindAllAppsL(TScanScope aScopeOfScan)
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPREGFINDER_FINDALLAPPSL, "TScanScope passed to this API : aScopeOfScan=%d", aScopeOfScan );
+    
 	delete iFileList;
 	iFileList = NULL;
 	RebuildDriveListL(aScopeOfScan);

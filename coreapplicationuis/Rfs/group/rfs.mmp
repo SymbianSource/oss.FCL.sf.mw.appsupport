@@ -31,9 +31,10 @@ USERINCLUDE ../inc
 
 
 SYSTEMINCLUDE		/epoc32/include/mw/hb/hbwidgets
-
+SYSTEMINCLUDE		/epoc32/include/mw/hb/hbcore
 
 LIBRARY		HbWidgets.lib
+LIBRARY     hbcore.lib
 
 
 
@@ -51,11 +52,6 @@ SOURCE rfsCompleter.cpp
 SOURCE rfsConnectionObserver.cpp
 SOURCE rfscontimer.cpp
 
-START RESOURCE  ../src/rfs.rss
-TARGETPATH      RESOURCE_FILES_DIR
-HEADER
-LANGUAGE_IDS
-END  // RESOURCE
 
 LIBRARY euser.lib
 LIBRARY efsrv.lib

@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -17,6 +17,11 @@
 #endif
 #include "timezoneserver.h"
 #include "timezonesession.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "timezoneserverTraces.h"
+#endif
+
 
 // Set server priority
 const TInt KServerPriority = 0;  // EStandard Priority
@@ -94,6 +99,8 @@ CTzServer::CTzServer(TInt aPriority)
 //
 void CTzServer::ConstructL()
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVER_CONSTRUCTL_ENTRY, "CTzServer::ConstructL Entry" );
+    
 	iTzUserDataDb = CTzUserDataDb::NewL();
 	iTzSwiObserver = CTzSwiObserver::NewL();
 	iTimeZoneMgr = CTzConfigAgent::NewL(*this, *iTzUserDataDb, *iTzSwiObserver);
@@ -102,20 +109,29 @@ void CTzServer::ConstructL()
 	iTzUserDataDb->AddObserverL(iTimeZoneMgr);
 	iTimeZoneMgr->AddObserverL(iTzLocalizationDb);
 	StartL(KTimeZoneServerName); 
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVER_CONSTRUCTL_EXIT, "CTzServer::ConstructL Exit" );
+	
 	}
 
 // Create a new server session
 CSession2* CTzServer::NewSessionL(const TVersion& aVersion,const RMessage2& /*aMessage*/) const
 	{
+    OstTraceDefExt3( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVER_NEWSESSIONL_ENTRY, "CTzServer::NewSessionL Entry;Major version No=%hhd;Minorr version No=%hhd;Build  version No=%hd", aVersion.iMajor, aVersion.iMinor, aVersion.iBuild );
+    
+    
 	TVersion ver(KTimeZoneServerMajorVersion, KTimeZoneServerMinorVersion, KTimeZoneServerBuildVersion);
 	if (!User::QueryVersionSupported(ver,aVersion))
 		{
+	    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, CTZSERVER_NEWSESSIONL, "CTzServer::NewSessionL Version not supported  Error value: %d", KErrNotSupported );
+	    
 		User::Leave(KErrNotSupported);
 		}
 
 	CTzServerSession* session = CTzServerSession::NewL();
 
 	SessionAdded();
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, DUP1_CTZSERVER_NEWSESSIONL_EXIT, "CTzServer::NewSessionL Exit" );
+	
 	return session;
 	}
 
@@ -141,6 +157,7 @@ void CTzServer::SessionAdded() const
 // if there is no pending request
 void CTzServer::NotifyTZStatusChange(RTz::TTzChanges aChange, const TAny* aRequester)
 	{
+    
 	iSessionIter.SetToFirst();
 	CSession2* pS;
 	while ((pS = iSessionIter++)!=NULL)

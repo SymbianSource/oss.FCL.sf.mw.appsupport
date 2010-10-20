@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,6 +26,11 @@
 #include <vtzrules.h>
 #include <tzupdate.h>
 #include "tzruleholder.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "timezoneTraces.h"
+#endif
+
 
 const TInt KNumConnectRetries = 5;
 
@@ -45,6 +50,8 @@ TVersion RTz::Version() const
 //
 TInt RTz::StartServer()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_STARTSERVER_ENTRY, "RTz::StartServer Entry" );
+    
 	const TInt KIntServerType = 0x10004019;
 	const TUidType serverUid(KNullUid,TUid::Uid(KIntServerType));
 	
@@ -60,6 +67,8 @@ TInt RTz::StartServer()
 
 	if (err != KErrNone)
 		{
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_STARTSERVER_EXIT, "RTz::StartServer Exit;err=%d", err );
+	    
 		return err;
 		}
 
@@ -78,6 +87,7 @@ TInt RTz::StartServer()
 	User::WaitForRequest(stat);		// wait for start or death
 	server.Close();
 	return stat.Int();
+	
 	}
 
 /**
@@ -91,12 +101,18 @@ ETzUtcTimeReference to generate from UTC, ETzWallTimeReference to generate from 
 */
 EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const TTime& aStartTime, const TTime& aEndTime, TTzTimeReference aTimeRef) const
 	{
+    OstTraceDefExt5( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_ENTRY, "RTz::GetTimeZoneRulesL Entry;Startdate:Year=%d;Month=%d;Day=%d;Hour=%d;Min=%d", aStartTime.DateTime().Year(), aStartTime.DateTime().Month(), aStartTime.DateTime().Day(), aStartTime.DateTime().Hour(), aStartTime.DateTime().Minute() );
+    OstTraceDefExt5( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_ENTRY_PARAM, "Parameters cont..;Sec=%d;End date:Year=%d;month=%d;Day=%d;Hour=%d", aStartTime.DateTime().Second(), aEndTime.DateTime().Year(), aEndTime.DateTime().Month(), aEndTime.DateTime().Day(), aEndTime.DateTime().Hour() );
+    OstTraceDefExt3(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_ENTRY_PARAM2, "parameters  cont..;Min=%d;Sec=%d;aTimeRef=%u", aEndTime.DateTime().Minute(), aEndTime.DateTime().Second(), aTimeRef );
+    
 	TInt rulesSize = 0;
 	TPckg<TTime> startTimeBuffer(aStartTime);
 	TPckg<TTime> endTimeBuffer(aEndTime);
 	TPckg<TTzTimeReference> timeRefBuffer(aTimeRef);
 	TPckg<TInt> rulesSizeBuffer(rulesSize);
 	TIpcArgs args(&startTimeBuffer, &endTimeBuffer, &timeRefBuffer, &rulesSizeBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETTIMEZONERULESL_SEND_RECEIVE4, "RTz::GetTimeZoneRulesL:CTzServer::EGetLocalEncodedTimeZoneRulesSize" );
+	
 	const TInt result = SendReceive(CTzServer::EGetLocalEncodedTimeZoneRulesSize, args);
 	User::LeaveIfError(result);
 	
@@ -108,6 +124,8 @@ EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const TTime& aStartTime, const TTime& 
 	
 	// get the rules
 	TIpcArgs args2(&rulesSizeBuffer,&inPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETTIMEZONERULESL_SEND_RECEIVE3, "RTz::GetTimeZoneRulesL" );
+	
 	const TInt result2 = SendReceive(CTzServer::EGetLocalEncodedTimeZoneRules, args2);
 	User::LeaveIfError(result2);
 	
@@ -117,6 +135,8 @@ EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const TTime& aStartTime, const TTime& 
 	CTzRules* rules = CTzRules::NewL(readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer); // pop #1
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_EXIT, "RTz::GetTimeZoneRulesL Exit" );
+	
 	return rules;
 	}
 	
@@ -132,6 +152,11 @@ ETzUtcTimeReference to generate from UTC, ETzWallTimeReference to generate from 
 */
 EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const CTzId& aZone, const TTime& aStartTime, const TTime& aEndTime, TTzTimeReference aTimeRef) const
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_ENTRY_OVERLOADED, "RTz::GetTimeZoneRulesL Entry;Time zone numerid id=%u", aZone.TimeZoneNumericID() );
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_ENTRY_Overload_PARAM, "Parameters cont..Startdate:Year=%d;Month=%d;Day=%d;Hour=%d;Min=%d", aStartTime.DateTime().Year(), aStartTime.DateTime().Month(), aStartTime.DateTime().Day(), aStartTime.DateTime().Hour(), aStartTime.DateTime().Minute());
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_Entry_OVERLOAD_PARAM, "Parameters cont..;Sec=%d;End date:Year=%d;month=%d;Day=%d;Hour=%d", aStartTime.DateTime().Second(), aEndTime.DateTime().Year(), aEndTime.DateTime().Month(), aEndTime.DateTime().Day(), aEndTime.DateTime().Hour());
+    OstTraceDefExt3(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_Entry_OVERLOAD_PARAM2, "Parameters cont..;Min=%d;Sec=%d;aTimeRef=%u", aEndTime.DateTime().Minute(), aEndTime.DateTime().Second(), aTimeRef );
+    
 	TInt rulesSize = 0;
 	TPckg<TTime> startTimeBuffer(aStartTime);
 	TPckg<TTime> endTimeBuffer(aEndTime);
@@ -148,6 +173,8 @@ EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const CTzId& aZone, const TTime& aStar
 	TPtr8 outPtr(outBuffer->Ptr(0) );
 	
 	TIpcArgs args(&startTimeBuffer, &endTimeBuffer, &outPtr, &rulesSizeBuffer);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,SEND_RECEIVE, RTZ_GETTIMEZONERULESL_SEND_RECEIVE2, "RTz::GetTimeZoneRulesL:CTzServer::EGetForeignEncodedTimeZoneRulesSize");
+	
 	const TInt result = SendReceive(CTzServer::EGetForeignEncodedTimeZoneRulesSize, args);
 	User::LeaveIfError(result);
 	
@@ -160,6 +187,8 @@ EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const CTzId& aZone, const TTime& aStar
 	TPtr8 inPtr(inBuffer->Ptr(0) );
 	
 	TIpcArgs args2(&rulesSizeBuffer, &inPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETTIMEZONERULESL_SEND_RECEIVE, "RTz::GetTimeZoneRulesL:CTzServer::EGetForeignEncodedTimeZoneRules" );
+	
 	const TInt result2 = SendReceive(CTzServer::EGetForeignEncodedTimeZoneRules, args2);
 	User::LeaveIfError(result2);
 	
@@ -169,6 +198,8 @@ EXPORT_C CTzRules* RTz::GetTimeZoneRulesL(const CTzId& aZone, const TTime& aStar
 	CTzRules* rules = CTzRules::NewL(readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer); // pop #1
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETTIMEZONERULESL_EXIT2, "RTz::GetTimeZoneRulesL Exit" );
+	
 	return rules;
 	}
 	
@@ -194,6 +225,8 @@ void RTz::doConvertL(TTime& aTime, TTzTimeReference aTimerRef) const
 	TPckg<TTzTimeReference> timerRefBuffer(aTimerRef);
 
 	TIpcArgs args(&timeBuffer, &timerRefBuffer, &timeInBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_DOCONVERTL, "RTz::doConvertL:CTzServer::EConvertLocalZoneTime" );
+	
 	const TInt result = SendReceive(CTzServer::EConvertLocalZoneTime, args);
 	User::LeaveIfError(result);
 
@@ -219,6 +252,8 @@ void RTz::doConvertL(const CTzId& aZone,
 	TPckg<TTzTimeReference> timerRefBuffer(aTimerRef);
 
 	TIpcArgs args(&timeBuffer, &timerRefBuffer, &outPtr, &timeInBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_DOCONVERTL, "RTz::doConvertL:CTzServer::EConvertForeignZoneTime" );
+	
 	const TInt result = SendReceive(CTzServer::EConvertForeignZoneTime, args);
 	CleanupStack::PopAndDestroy(outBuffer);
 
@@ -250,6 +285,8 @@ code other than KErrNotFound.
 */
 EXPORT_C TInt RTz::Connect()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_CONNECT_ENTRY, "RTz::Connect Entry" );
+    
 	// The number of message slots in the RSessionBase::CreateSession() 
 	// call are delibrately unspecified so the kernel will take messages 
 	// from a global pool as and when required (the session is allowed
@@ -261,11 +298,15 @@ EXPORT_C TInt RTz::Connect()
 		TInt err = CreateSession(KTimeZoneServerName,Version());
 		if (err != KErrNotFound && err!=KErrServerTerminated)
 			{
+		    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_CONNECT_EXIT, "RTz::Connect Exit;err=%d", err );
+		    
 			return err;
 			}
 		// need to restart server
 		if (--retry == 0)
 			{
+		    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_CONNECT_EXIT2, "RTz::Connect Exit;err=%d", err );
+		    
 			return err;
 			}
 		err = StartServer();
@@ -274,8 +315,12 @@ EXPORT_C TInt RTz::Connect()
 			// Time Zone Server is configurable, so it is possible not to find it
 			if (err != KErrNotFound)
 				{
+			    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_CONNECT_EXIT3, "RTz::Connect Exit;err=%d", err );
+			    
 				return err;
 				}
+			OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, RTZ_CONNECT, "RTz::Connect:Panic:Server not found" );
+			
 			Panic(EPanicServerNotFound);
 			}
 		}
@@ -387,6 +432,8 @@ corresponding to the the time zone IDs in aTzNumericIds.
 */
 EXPORT_C void RTz::GetOffsetsForTimeZoneIdsL(const RArray<TInt>& aTzNumericIds, RArray<TInt>& aOffsets) const
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP1_RTZ_GETOFFSETSFORTIMEZONEIDSL_ENTRY, "RTz::GetOffsetsForTimeZoneIdsL Entry" );
+    
 	TInt count 			= aTzNumericIds.Count();
 	TInt tintSize 		= sizeof(TInt);
 	TInt idBufLength	= count * tintSize;
@@ -412,6 +459,8 @@ EXPORT_C void RTz::GetOffsetsForTimeZoneIdsL(const RArray<TInt>& aTzNumericIds, 
 	TInt size = idBuf->Size();
 	TPtr8 outPtr(idBuf->Ptr(0) );
 	TIpcArgs args(size,&outPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETOFFSETSFORTIMEZONEIDSL, "RTz::GetOffsetsForTimeZoneIdsL:CTzServer::EGetOffsetsForTimeZoneIds" );
+	
 	const TInt result = SendReceive(CTzServer::EGetOffsetsForTimeZoneIds, args);	
 	User::LeaveIfError(result);
 	
@@ -429,6 +478,8 @@ EXPORT_C void RTz::GetOffsetsForTimeZoneIdsL(const RArray<TInt>& aTzNumericIds, 
 		pos += tintSize;
 		}
 	CleanupStack::PopAndDestroy(idBuf);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP1_RTZ_GETOFFSETSFORTIMEZONEIDSL_EXIT, "RTz::GetOffsetsForTimeZoneIdsL Exit" );
+	
 	}
 
 /** 
@@ -439,6 +490,7 @@ Retrieves the time zone ID for the current system time zone.
 */
 EXPORT_C CTzId* RTz::GetTimeZoneIdL() const
 	{
+    
 	CBufFlat* inBuffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
 	CleanupStack::PushL(inBuffer);
 
@@ -448,6 +500,8 @@ EXPORT_C CTzId* RTz::GetTimeZoneIdL() const
 	TPtr8 ptr(inBuffer->Ptr(0) );
 
 	TIpcArgs args(&ptr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETTIMEZONEIDL, "RTz::GetTimeZoneIdL, CTzServer::EGetLocalTimeZoneId" );
+	
 	const TInt result = SendReceive(CTzServer::EGetLocalTimeZoneId, args);
 	User::LeaveIfError(result);
 
@@ -467,6 +521,7 @@ supplied time zone ID.
 */
 EXPORT_C void RTz::SetTimeZoneL(CTzId& aZone) const
 	{
+    
 	CBufFlat* outBuffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
 	CleanupStack::PushL(outBuffer);
 
@@ -487,6 +542,8 @@ EXPORT_C void RTz::SetTimeZoneL(CTzId& aZone) const
 	TPtr8 outPtr(outBuffer->Ptr(0) );
 	TPtr8 inPtr(inBuffer->Ptr(0) );
 	TIpcArgs args(&outPtr, &inPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_SETTIMEZONEL, "RTz::SetTimeZoneL, CTzServer::ESetTimeZone" );
+	
 	const TInt result = SendReceive(CTzServer::ESetTimeZone, args);
 	User::LeaveIfError(result);
 
@@ -513,6 +570,7 @@ Tells if daylight savings are applied at the specified zone at the current time
 */	
 EXPORT_C TBool RTz::IsDaylightSavingOnL(CTzId& aZone) const
 	{
+    
 	// prepare out zoneid buffer
 	CBufFlat* outBuffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
 	CleanupStack::PushL(outBuffer);
@@ -520,12 +578,14 @@ EXPORT_C TBool RTz::IsDaylightSavingOnL(CTzId& aZone) const
 	RBufWriteStream writeStream;
 	writeStream.Open(*outBuffer);
 	aZone.ExternalizeL(writeStream);
-	
+		
 	TPckg<TTime> timeBuffer(Time::NullTTime());
 	
 	TPtr8 outPtr(outBuffer->Ptr(0) );
 	TPckgBuf<TInt> package;
 	TIpcArgs args(&outPtr, &timeBuffer, &package);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_ISDAYLIGHTSAVINGONL, "RTz::IsDaylightSavingOnL: For specified zone at the current time, CTzServer::EIsDaylightSavingOn" );
+	
 	const TInt result = SendReceive(CTzServer::EIsDaylightSavingOn, args);
 	User::LeaveIfError(result);
 	CleanupStack::PopAndDestroy(outBuffer);
@@ -541,6 +601,7 @@ Tells if daylight savings are applied at the specified zone at a specified time
 */	
 EXPORT_C TBool RTz::IsDaylightSavingOnL(CTzId& aZone, const TTime& aUTCTime) const
 	{
+    
 	// prepare out zoneid buffer
 	CBufFlat* outBuffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
 	CleanupStack::PushL(outBuffer);
@@ -554,6 +615,8 @@ EXPORT_C TBool RTz::IsDaylightSavingOnL(CTzId& aZone, const TTime& aUTCTime) con
 	TPtr8 outPtr(outBuffer->Ptr(0) );
  	TPckgBuf<TInt> package;
 	TIpcArgs args(&outPtr, &timeBuffer, &package);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_ISDAYLIGHTSAVINGONL, "RTz::IsDaylightSavingOnL:specified zone at a specified time , CTzServer::EIsDaylightSavingOn" );
+	
  	const TInt result = SendReceive(CTzServer::EIsDaylightSavingOn, args);
  	User::LeaveIfError(result);
  	CleanupStack::PopAndDestroy(outBuffer);
@@ -586,6 +649,8 @@ EXPORT_C void RTz::SetAutoUpdateBehaviorL(TTzAutoDSTUpdateModes aUpdateEnabled)
 	TIpcArgs args(aUpdateEnabled);
 	
 	// Send the message.
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_SETAUTOUPDATEBEHAVIORL, "RTz::SetAutoUpdateBehaviorL, CTzServer::EEnableAutoUpdate" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::EEnableAutoUpdate, args));
     }
 
@@ -597,6 +662,8 @@ EXPORT_C TInt RTz::AutoUpdateSettingL()
     {
     TPckgBuf<TInt> package;
 	TIpcArgs args(&package);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_AUTOUPDATESETTINGL, "RTz::AutoUpdateSettingL, CTzServer::EAutoUpdate" );
+	
 	const TInt result = SendReceive(CTzServer::EAutoUpdate, args);
 	User::LeaveIfError(result);
 	return package();	
@@ -623,6 +690,8 @@ EXPORT_C TInt RTz::SetHomeTime(const TTime& aLocalTime) const
 	TPckg<TTime>   timeBuffer(aLocalTime);
 
 	TIpcArgs args(&timeBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_SETHOMETIME, "RTz::SetHomeTime, CTzServer::ESetHomeTime" );
+	
 	return SendReceive(CTzServer::ESetHomeTime, args);
     }
 
@@ -637,6 +706,8 @@ EXPORT_C void RTz::NotifyHomeTimeZoneChangedL(const NTzUpdate::TTimeZoneChange& 
 	TIpcArgs args(aChange.iNewTimeZoneId, aChange.iOldTimeZoneId);
 	
 	// Send the message.
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,SEND_RECEIVE, RTZ_NOTIFYHOMETIMEZONECHANGEDL, "RTz::NotifyHomeTimeZoneChangedL, CTzServer::ENotifyHomeTimeZoneChanged" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ENotifyHomeTimeZoneChanged, args));
 	}
 
@@ -694,6 +765,8 @@ EXPORT_C void RTz::SetUnknownZoneTimeL(const TTime& aUTCTime, const TInt aUTCOff
 	TPckg<TBool> persist(aPersistInCenRep);
 
 	TIpcArgs args(&utcTime, &utcOffset, &persist);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_SETUNKNOWNZONETIMEL, "RTz::SetUnknownZoneTimeL, CTzServer::ESetUnknownZoneTime" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ESetUnknownZoneTime, args));
 	}
 
@@ -706,9 +779,13 @@ returned array will contain no elements.
 */
 EXPORT_C void RTz::LocalizationReadCitiesL(RPointerArray<CTzLocalizedCityRecord>& aCities)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP4_RTZ_LOCALIZATIONREADCITIESL_ENTRY, "RTz::LocalizationReadCitiesL Entry" );
+    
 	TInt resultSize = 0;
 	TPckg<TInt> resultSizeBuffer(resultSize);
 	TIpcArgs args(&resultSizeBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_LOCALIZATIONREADCITIESL, "RTz::LocalizationReadCitiesL; CTzServer::ELocalizationReadCitiesSize");
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCitiesSize, args));
 		
 	CBufFlat* inBuffer = CBufFlat::NewL(resultSize);
@@ -717,6 +794,8 @@ EXPORT_C void RTz::LocalizationReadCitiesL(RPointerArray<CTzLocalizedCityRecord>
 	TPtr8 inPtr(inBuffer->Ptr(0));
 	
 	TIpcArgs args2(&inPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_LOCALIZATIONREADCITIESL, "RTz::LocalizationReadCitiesL; CTzServer::ELocalizationReadCities" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCities, args2));
 	
 	RBufReadStream readStream;
@@ -726,6 +805,8 @@ EXPORT_C void RTz::LocalizationReadCitiesL(RPointerArray<CTzLocalizedCityRecord>
 	CleanupStack::PopAndDestroy(&readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP4_RTZ_LOCALIZATIONREADCITIESL_EXIT, "RTz::LocalizationReadCitiesL Exit" );
+	
 	}
 
 /**
@@ -738,9 +819,13 @@ If the database is empty the returned array will contain no elements.
 */
 EXPORT_C void RTz::LocalizationReadCitiesL(RPointerArray<CTzLocalizedCityRecord>& aCities, TInt aTimeZoneId)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADCITIESL_ENTRY, "RTz::LocalizationReadCitiesL Entry;aTimeZoneId=%d", aTimeZoneId );
+    
 	TInt resultSize = 0;
 	TPckg<TInt> resultSizeBuffer(resultSize);
 	TIpcArgs args(&resultSizeBuffer, aTimeZoneId);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP2_RTZ_LOCALIZATIONREADCITIESL, "RTz::LocalizationReadCitiesL:For a time zone id, CTzServer::ELocalizationReadCitiesTzIdSize" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCitiesTzIdSize, args));
 		
 	CBufFlat* inBuffer = CBufFlat::NewL(resultSize);
@@ -749,6 +834,8 @@ EXPORT_C void RTz::LocalizationReadCitiesL(RPointerArray<CTzLocalizedCityRecord>
 	TPtr8 inPtr(inBuffer->Ptr(0));
 	
 	TIpcArgs args2(&inPtr, aTimeZoneId);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP3_RTZ_LOCALIZATIONREADCITIESL, "RTz::LocalizationReadCitiesL:For a time zone id,CTzServer::ELocalizationReadCities" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCities, args2));
 		
 	RBufReadStream readStream;
@@ -758,6 +845,8 @@ EXPORT_C void RTz::LocalizationReadCitiesL(RPointerArray<CTzLocalizedCityRecord>
 	CleanupStack::PopAndDestroy(&readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer);	
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADCITIESL_EXIT, "RTz::LocalizationReadCitiesL Exit" );
+	
 	}
 
 /**
@@ -769,9 +858,13 @@ If the database is empty the returned array will contain no elements.
 */
 EXPORT_C void RTz::LocalizationReadCitiesInGroupL(RPointerArray<CTzLocalizedCityRecord>& aCities, TUint8 aGroupId)
 	{
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADCITIESINGROUPL_ENTRY, "RTz::LocalizationReadCitiesInGroupL Entry;aGroupId=%hhu", aGroupId );
+    
 	TInt resultSize = 0;
 	TPckg<TInt> resultSizeBuffer(resultSize);
 	TIpcArgs args(&resultSizeBuffer, aGroupId);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_LOCALIZATIONREADCITIESINGROUPL, "RTz::LocalizationReadCitiesInGroupL, CTzServer::ELocalizationReadCitiesInGroupSize" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCitiesInGroupSize, args));
 		
 	CBufFlat* inBuffer = CBufFlat::NewL(resultSize);
@@ -780,6 +873,8 @@ EXPORT_C void RTz::LocalizationReadCitiesInGroupL(RPointerArray<CTzLocalizedCity
 	TPtr8 inPtr(inBuffer->Ptr(0));
 	
 	TIpcArgs args2(&inPtr, aGroupId);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_LOCALIZATIONREADCITIESINGROUPL_SEND, "RTz::LocalizationReadCitiesInGroupL :ELocalizationReadCities" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCities, args2));
 		
 	RBufReadStream readStream;
@@ -789,6 +884,9 @@ EXPORT_C void RTz::LocalizationReadCitiesInGroupL(RPointerArray<CTzLocalizedCity
 	CleanupStack::PopAndDestroy(&readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADCITIESINGROUPL_EXIT, "RTz::LocalizationReadCitiesInGroupL Entry" );
+	
+	
 	}
 
 /**
@@ -800,9 +898,13 @@ The calling function takes ownership of the returned zone
 */
 EXPORT_C CTzLocalizedTimeZoneRecord* RTz::LocalizationReadFrequentlyUsedZoneL(TInt aFrequentlyUsedZone)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADFREQUENTLYUSEDZONEL_ENTRY, "RTz::LocalizationReadFrequentlyUsedZoneL Entry;aFrequentlyUsedZone=%d", aFrequentlyUsedZone );
+    
 	TInt resultSize = 0;
 	TPckg<TInt> resultSizeBuffer(resultSize);
 	TIpcArgs args(&resultSizeBuffer, aFrequentlyUsedZone);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_LOCALIZATIONREADFREQUENTLYUSEDZONEL, "RTz::LocalizationReadFrequentlyUsedZoneL, CTzServer::ELocalizationReadFrequentlyUsedZoneSize" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadFrequentlyUsedZoneSize, args));
 		
 	CBufFlat* inBuffer = CBufFlat::NewL(resultSize);
@@ -811,6 +913,8 @@ EXPORT_C CTzLocalizedTimeZoneRecord* RTz::LocalizationReadFrequentlyUsedZoneL(TI
 	TPtr8 inPtr(inBuffer->Ptr(0));
 	
 	TIpcArgs args2(&inPtr, aFrequentlyUsedZone);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_LOCALIZATIONREADFREQUENTLYUSEDZONEL, "RTz::LocalizationReadFrequentlyUsedZoneL, CTzServer::ELocalizationReadFrequentlyUsedZone" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadFrequentlyUsedZone, args2));
 		
 	RBufReadStream readStream;
@@ -820,6 +924,8 @@ EXPORT_C CTzLocalizedTimeZoneRecord* RTz::LocalizationReadFrequentlyUsedZoneL(TI
 	CleanupStack::PopAndDestroy(&readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer);	
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADFREQUENTLYUSEDZONEL_EXIT, "RTz::LocalizationReadFrequentlyUsedZoneL Exit" );
+	
 	
 	return result;
 	}
@@ -833,9 +939,13 @@ set using a city then the default city for the time zone will be returned instea
 */
 EXPORT_C CTzLocalizedCityRecord* RTz::LocalizationReadCachedTimeZoneCityL(TInt aFrequentlyUsedZone)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP2_RTZ_LOCALIZATIONREADCACHEDTIMEZONECITYL_ENTRY, "RTz::LocalizationReadCachedTimeZoneCityL Entry;aFrequentlyUsedZone=%d", aFrequentlyUsedZone );
+    
 	TInt resultSize = 0;
 	TPckg<TInt> resultSizeBuffer(resultSize);
 	TIpcArgs args(&resultSizeBuffer, aFrequentlyUsedZone);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,SEND_RECEIVE, RTZ_LOCALIZATIONREADCACHEDTIMEZONECITYL, "RTz::LocalizationReadCachedTimeZoneCityL, CTzServer::ELocalizationReadCachedTimeZoneCitySize" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCachedTimeZoneCitySize, args));
 		
 	CBufFlat* inBuffer = CBufFlat::NewL(resultSize);
@@ -844,6 +954,8 @@ EXPORT_C CTzLocalizedCityRecord* RTz::LocalizationReadCachedTimeZoneCityL(TInt a
 	TPtr8 inPtr(inBuffer->Ptr(0));
 	
 	TIpcArgs args2(&inPtr, aFrequentlyUsedZone);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_LOCALIZATIONREADCACHEDTIMEZONECITYL, "RTz::LocalizationReadCachedTimeZoneCityL, CTzServer::ELocalizationReadCachedTimeZoneCity" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationReadCachedTimeZoneCity, args2));
 		
 	RBufReadStream readStream;
@@ -853,6 +965,8 @@ EXPORT_C CTzLocalizedCityRecord* RTz::LocalizationReadCachedTimeZoneCityL(TInt a
 	CleanupStack::PopAndDestroy(&readStream);
 	
 	CleanupStack::PopAndDestroy(inBuffer);	
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONREADCACHEDTIMEZONECITYL_EXIT, "RTz::LocalizationReadCachedTimeZoneCityL Exit" );
+	
 	
 	return result;
 	}
@@ -886,9 +1000,13 @@ EXPORT_C void RTz::LocalizationWriteCityL(const TDesC& aCityName, TInt aCityTzId
 		// This is a mess, although most of the API allows for 32 bit tz ids some of them
 		// only allow for 16 bit tz ids so we accept a TInt but do check that it can fit in 
 		// 16 bits
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, RTZ_LOCALIZATIONWRITECITYL, "RTz::LocalizationWriteCityL, Invalid time zone of the city:Id = %d", aCityTzId);
+	    
 		User::Leave(KErrArgument);
 		}
 	TIpcArgs args(&aCityName, aCityTzId, aCityGroupId, aCityResourceId);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_LOCALIZATIONWRITECITYL, "RTz::LocalizationWriteCityL, CTzServer::ELocalizationWriteCity" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationWriteCity, args));
 	}
 
@@ -909,9 +1027,13 @@ EXPORT_C void RTz::LocalizationDeleteCityL(const TDesC& aCityName, TInt aCityTzI
 		// This is a mess, although most of the API allows for 32 bit tz ids some of them
 		// only allow for 16 bit tz ids so we accept a TInt but do check that it can fit in 
 		// 16 bits
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, RTZ_LOCALIZATIONDELETECITYL, "RTz::LocalizationDeleteCityL:Invalid time zone id  of a city: id = %d" , aCityTzId);
+	    
 		User::Leave(KErrArgument);
 		}
 	TIpcArgs args(&aCityName, aCityTzId);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_LOCALIZATIONDELETECITYL, "RTz::LocalizationDeleteCityL, CTzServer::ELocalizationDeleteCity" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationDeleteCity, args));
 	}
 
@@ -933,6 +1055,8 @@ database.
 EXPORT_C void RTz::LocalizationWriteFrequentlyUsedZoneL(const CTzLocalizedTimeZoneRecord& aTimeZone,
 	const CTzLocalizedCityRecord& aCity, TInt aFrequentlyUsedZone)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP1_RTZ_LOCALIZATIONWRITEFREQUENTLYUSEDZONEL_ENTRY, "RTz::LocalizationWriteFrequentlyUsedZoneL Entry;aFrequentlyUsedZone=%d", aFrequentlyUsedZone );
+    
 	TInt bufferSize = aTimeZone.ExternalizeSize() + aCity.ExternalizeSize() + sizeof(TInt32);
 	CBufFlat* buffer = CBufFlat::NewL(bufferSize);
 	CleanupStack::PushL(buffer);
@@ -946,8 +1070,12 @@ EXPORT_C void RTz::LocalizationWriteFrequentlyUsedZoneL(const CTzLocalizedTimeZo
 	CleanupStack::PopAndDestroy(&bufStream);
 	TPtr8 bufferPtr = buffer->Ptr(0); 
 	TIpcArgs args(&bufferPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_LOCALIZATIONWRITEFREQUENTLYUSEDZONEL, "RTz::LocalizationWriteFrequentlyUsedZoneL, CTzServer::ELocalizationWriteFrequentlyUsedZone" );
+		
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationWriteFrequentlyUsedZone, args));
 	CleanupStack::PopAndDestroy(buffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONWRITEFREQUENTLYUSEDZONEL_EXIT, "RTz::LocalizationWriteFrequentlyUsedZoneL Exit" );
+	
 	}
 
 /**
@@ -956,6 +1084,8 @@ EXPORT_C void RTz::LocalizationWriteFrequentlyUsedZoneL(const CTzLocalizedTimeZo
 EXPORT_C void RTz::LocalizationWriteAllFrequentlyUsedZonesL(const RPointerArray<CTzLocalizedTimeZoneRecord>& aTimeZones,
 		const RPointerArray<CTzLocalizedCityRecord>& aCities)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONWRITEALLFREQUENTLYUSEDZONESL_ENTRY, "RTz::LocalizationWriteAllFrequentlyUsedZonesL Entry" );
+    
 	TInt bufferSize = CTzLocalizedTimeZoneRecord::ExternalizeSize(aTimeZones);
 	bufferSize += CTzLocalizedCityRecord::ExternalizeSize(aCities);
 	CBufFlat* buffer = CBufFlat::NewL(bufferSize);
@@ -969,8 +1099,12 @@ EXPORT_C void RTz::LocalizationWriteAllFrequentlyUsedZonesL(const RPointerArray<
 	CleanupStack::PopAndDestroy(&bufStream);
 	TPtr8 bufferPtr = buffer->Ptr(0); 
 	TIpcArgs args(&bufferPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_LOCALIZATIONWRITEALLFREQUENTLYUSEDZONESL, "RTz::LocalizationWriteAllFrequentlyUsedZonesL, CTzServer::ELocalizationWriteAllFrequentlyUsedZones" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ELocalizationWriteAllFrequentlyUsedZones, args));
 	CleanupStack::PopAndDestroy(buffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_LOCALIZATIONWRITEALLFREQUENTLYUSEDZONESL_EXIT, "RTz::LocalizationWriteAllFrequentlyUsedZonesL Exit" );
+	
 	}
 
 /**
@@ -1046,6 +1180,8 @@ TUint16 RTz::CurrentCachedTzId()
 
 CTzId* RTz::CreateUserTimeZoneL(const CTzRules& aTzUserRules, const CTzUserNames& aTzUserNames)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_CREATEUSERTIMEZONEL_ENTRY, "RTz::CreateUserTimeZoneL Entry" );
+    
 	TInt size = aTzUserNames.SizeOfObject() + aTzUserRules.SizeOfObject();
 
 	CBufFlat* inpBuffer = CBufFlat::NewL(size);
@@ -1062,6 +1198,8 @@ CTzId* RTz::CreateUserTimeZoneL(const CTzRules& aTzUserRules, const CTzUserNames
 	TPtr8 ptrInp(inpBuffer->Ptr(0));
 	TPckgBuf<TUint32> idBuffer;
 	TIpcArgs args(size, &ptrInp, &idBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_CREATEUSERTIMEZONEL, "RTz::CreateUserTimeZoneL, CTzServer::ECreateUserTimeZone" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::ECreateUserTimeZone, args));
 	CleanupStack::PopAndDestroy(2, inpBuffer);
 	return CTzId::NewL(idBuffer());
@@ -1069,10 +1207,14 @@ CTzId* RTz::CreateUserTimeZoneL(const CTzRules& aTzUserRules, const CTzUserNames
 
 CTzUserNames* RTz::GetUserTimeZoneNamesL(const CTzId& aTzId) const
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETUSERTIMEZONENAMESL_ENTRY, "RTz::GetUserTimeZoneNamesL Entry ;Time zone id=%u", aTzId.TimeZoneNumericID());
+    
 	TInt nameSize = 0;
 	TPckg<TInt> nameSizeBuffer(nameSize);
 
 	TIpcArgs args(aTzId.TimeZoneNumericID(),&nameSizeBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETUSERTIMEZONENAMESL, "RTz::GetUserTimeZoneNamesL, CTzServer::EGetUserTimeZoneNamesSize" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::EGetUserTimeZoneNamesSize, args));
 
 	CBufFlat* retBuffer = CBufFlat::NewL(nameSize);
@@ -1081,6 +1223,8 @@ CTzUserNames* RTz::GetUserTimeZoneNamesL(const CTzId& aTzId) const
 	TPtr8 outPtr(retBuffer->Ptr(0) );
 	
 	TIpcArgs args2(&outPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_GETUSERTIMEZONENAMESL, "RTz::GetUserTimeZoneNamesL, CTzServer::EGetUserTimeZoneNames" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::EGetUserTimeZoneNames, args2));
 	
 	RBufReadStream readStream;
@@ -1089,11 +1233,15 @@ CTzUserNames* RTz::GetUserTimeZoneNamesL(const CTzId& aTzId) const
 	
 	CTzUserNames* names = CTzUserNames::NewL(readStream);
 	CleanupStack::PopAndDestroy(2, retBuffer); 
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETUSERTIMEZONENAMESL_EXIT, "RTz::GetUserTimeZoneNamesL Exit" );
+	
 	return names;
 	}
 	
 void RTz::UpdateUserTimeZoneL(const CTzId& aTzId, const CTzRules& aTzUserRules, const CTzUserNames& aTzUserNames)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_UPDATEUSERTIMEZONEL_ENTRY, "RTz::UpdateUserTimeZoneL Entry;Time zone id=%u", aTzId.TimeZoneNumericID());
+    
 	TInt size = aTzUserNames.SizeOfObject() + aTzUserRules.SizeOfObject();
 	
 	CBufFlat* inpBuffer = CBufFlat::NewL(size);
@@ -1109,9 +1257,13 @@ void RTz::UpdateUserTimeZoneL(const CTzId& aTzId, const CTzRules& aTzUserRules, 
 	
 	TPtr8 ptrInp(inpBuffer->Ptr(0) );
 	TIpcArgs args(size, &ptrInp, aTzId.TimeZoneNumericID());
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_UPDATEUSERTIMEZONEL, "RTz::UpdateUserTimeZoneL, CTzServer::EUpdateUserTimeZone" );
+	
 	TInt reply = SendReceive(CTzServer::EUpdateUserTimeZone, args);
 	User::LeaveIfError(reply);
 	CleanupStack::PopAndDestroy(2, inpBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_UPDATEUSERTIMEZONEL_EXIT, "RTz::UpdateUserTimeZoneL Exit" );
+	
 	}
 	
 void RTz::DeleteUserTimeZoneL(const CTzId& aTzId)
@@ -1122,10 +1274,14 @@ void RTz::DeleteUserTimeZoneL(const CTzId& aTzId)
 	
 void RTz::GetUserTimeZoneIdsL(RPointerArray<CTzId>& aTzIds) const
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETUSERTIMEZONEIDSL_ENTRY, "RTz::GetUserTimeZoneIdsL Entry" );
+    
 	TInt idsSize = 0;
 	TPckg<TInt> idsSizeBuffer(idsSize);
 
 	TIpcArgs args(&idsSizeBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, RTZ_GETUSERTIMEZONEIDSL, "RTz::GetUserTimeZoneIdsL, CTzServer::EGetUserTimeZoneIdsSize" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::EGetUserTimeZoneIdsSize, args));
 
 	CBufFlat* retBuffer = CBufFlat::NewL(idsSize);
@@ -1134,6 +1290,8 @@ void RTz::GetUserTimeZoneIdsL(RPointerArray<CTzId>& aTzIds) const
 	TPtr8 outPtr(retBuffer->Ptr(0) );
 	
 	TIpcArgs args2(&outPtr);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, SEND_RECEIVE, DUP1_RTZ_GETUSERTIMEZONEIDSL, "RTz::GetUserTimeZoneIdsL, CTzServer::EGetUserTimeZoneIds" );
+	
 	User::LeaveIfError(SendReceive(CTzServer::EGetUserTimeZoneIds, args2));
 	
 	RBufReadStream readStream;
@@ -1149,6 +1307,8 @@ void RTz::GetUserTimeZoneIdsL(RPointerArray<CTzId>& aTzIds) const
 		aTzIds.AppendL(zone);
 		}
 	CleanupStack::PopAndDestroy(2, retBuffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, RTZ_GETUSERTIMEZONEIDSL_EXIT, "RTz::GetUserTimeZoneIdsL Exit" );
+	
 	}
 
 

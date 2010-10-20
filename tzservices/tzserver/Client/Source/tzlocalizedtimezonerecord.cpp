@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,11 @@
 #include "tzlocalizedtimezonerecord.h"
 #include "tzid.h"
 #include "tzidinternal.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "tzlocalizedtimezonerecordTraces.h"
+#endif
+
 
 
 EXPORT_C CTzLocalizedTimeZoneRecord* CTzLocalizedTimeZoneRecord::NewL(TInt aTimeZoneId, const TDesC& aStandardName,
@@ -88,6 +93,8 @@ void CTzLocalizedTimeZoneRecord::ConstructL(TInt aTzId, const TDesC& aStandardNa
 		// This is a mess, although most of the API allows for 32 bit tz ids some of them
 		// only allow for 16 bit tz ids so we accept a TInt but do check that it can fit in 
 		// 16 bits
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZEDTIMEZONERECORD_CONSTRUCTL, "CTzLocalizedTimeZoneRecord::ConstructL;Invalid time zone id = %d", aTzId );
+	    
 		User::Leave(KErrArgument);
 		}
 	iId = aTzId;

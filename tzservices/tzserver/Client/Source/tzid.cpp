@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,6 +18,11 @@
 #include <tzid.h>
 #include "tzidinternal.h"
 #include <tz.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "tzidTraces.h"
+#endif
+
 
 
 /**
@@ -88,6 +93,8 @@ EXPORT_C void CTzId::InternalizeL(RReadStream& aStream)
 	const TInt KMaxSize = KMaxTInt / 2;
 	if (size < 0 || size >= KMaxSize)
 	    {
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZID_INTERNALIZEL, "CTzId::InternalizeL;Invalid size of Time zone id =%d",size );
+	    
 	    User::Leave( KErrArgument );
 	    }
 

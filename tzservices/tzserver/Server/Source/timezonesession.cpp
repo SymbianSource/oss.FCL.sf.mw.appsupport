@@ -24,6 +24,11 @@
 #include <tzlocalizedtimezonerecord.h>
 #include "timezonesession.h"
 #include "timezoneserver.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "timezonesessionTraces.h"
+#endif
+
 
 CTzServerSession* CTzServerSession::NewL()
 	{
@@ -83,6 +88,9 @@ void CTzServerSession::NotifyTZStatusChange(RTz::TTzChanges aChange, const TAny*
 // Server
 TInt CTzServerSession::doRegisterTzChangeNotifier(const RMessage2& aMessage)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOREGISTERTZCHANGENOTIFIER_ENTRY, "CTzServerSession::doRegisterTzChangeNotifier Entry" );
+    
+    
 	if (!iPendingRequest)
 		{
 		iClientMessage = aMessage;
@@ -93,10 +101,14 @@ TInt CTzServerSession::doRegisterTzChangeNotifier(const RMessage2& aMessage)
 		// the same client already requested such notice
 		// Panic the client
 		iPendingRequest = EFalse;
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOREGISTERTZCHANGENOTIFIER_PANIC, "CTzServerSession::doRegisterTzChangeNotifier : The same client already requested such notice" );
+		
 		aMessage.Panic(KTimeZoneServerName, RTz::EPanicNotificationRequestPending);
+		OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOREGISTERTZCHANGENOTIFIER_EXIT, "CTzServerSession::doRegisterTzChangeNotifier Exit;KErrCancel=%d", KErrCancel );
 		
 		return (KErrCancel);
 		}
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOREGISTERTZCHANGENOTIFIER_EXIT2, "CTzServerSession::doRegisterTzChangeNotifier Exit ;KRequestPending=%d", KRequestPending );
 
 	return KRequestPending;
 	}
@@ -122,6 +134,8 @@ TInt CTzServerSession::doCancelRequestForTzChangeNoticeL(const RMessage2& /* aMe
 
 TInt CTzServerSession::doSetTimeZoneL(const RMessage2& aMessage)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOSETTIMEZONEL_ENTRY, "CTzServerSession::doSetTimeZoneL Entry" );
+    
 	CBufFlat* buffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
 	CleanupStack::PushL(buffer);
 
@@ -141,11 +155,16 @@ TInt CTzServerSession::doSetTimeZoneL(const RMessage2& aMessage)
 	if (err == KErrArgument)
 	    {
     	CleanupStack::PopAndDestroy(buffer);
+      	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOSETTIMEZONEL_PANIC, "CTzServerSession::doSetTimeZoneL: Panic: EPanicInvalidArgument" );
+      	
         aMessage.Panic(KTimeZoneServerName, RTz::EPanicInvalidArgument);
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOSETTIMEZONEL_EXIT, "CTzServerSession::doSetTimeZoneL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
 	    {
+	    
 	    User::LeaveIfError(err);
 	    }
 	
@@ -165,12 +184,15 @@ TInt CTzServerSession::doSetTimeZoneL(const RMessage2& aMessage)
 	aMessage.WriteL(1, buffer->Ptr(0));
 
 	CleanupStack::PopAndDestroy(buffer);
-
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOSETTIMEZONEL_EXIT2, "CTzServerSession::doSetTimeZoneL Exit;KErrNone=%d", KErrNone );
+	
 	return (KErrNone);
 	}
 	
 TInt CTzServerSession::doIsDaylightSavingOnL(const RMessage2& aMessage)
 {
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOISDAYLIGHTSAVINGONL_ENTRY, "CTzServerSession::doIsDaylightSavingOnL Entry" );
+    
 	CBufFlat* buffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
 	CleanupStack::PushL(buffer);
 	// Read from client message buffer
@@ -194,7 +216,11 @@ TInt CTzServerSession::doIsDaylightSavingOnL(const RMessage2& aMessage)
 	if (err == KErrArgument)
 	    {
     	CleanupStack::PopAndDestroy(buffer);
+    	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, CTZSERVERSESSION_DOISDAYLIGHTSAVINGONL_PANIC, "CTzServerSession::doIsDaylightSavingOnL:Client Sent invalid data to server to panic" );
+    	
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOISDAYLIGHTSAVINGONL_EXIT, "CTzServerSession::doIsDaylightSavingOnL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
@@ -215,11 +241,16 @@ TInt CTzServerSession::doIsDaylightSavingOnL(const RMessage2& aMessage)
 	TPckg<TInt> response(isDaylightSavingOn);
 	aMessage.WriteL(2, response);
 	CleanupStack::PopAndDestroy(buffer);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOISDAYLIGHTSAVINGONL_EXIT2, "CTzServerSession::doIsDaylightSavingOnL Exit;KErrNone=%d", KErrNone );
+	
 	return (KErrNone);
 }
 
 TInt CTzServerSession::doGetLocalTimeZoneIdL(const RMessage2& aMessage)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETLOCALTIMEZONEIDL_ENTRY, "CTzServerSession::doGetLocalTimeZoneIdL Entry" );
+    
+    
 	const CTzId& KZoneId = TzServer()->TimeZoneManager().GetTimeZoneIdL();
 
 	CBufFlat* buffer = CBufFlat::NewL(KMaxTimeZoneIdSize);
@@ -237,12 +268,16 @@ TInt CTzServerSession::doGetLocalTimeZoneIdL(const RMessage2& aMessage)
 	aMessage.WriteL(0, buffer->Ptr(0));
 
 	CleanupStack::PopAndDestroy(buffer);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETLOCALTIMEZONEIDL_EXIT, "CTzServerSession::doGetLocalTimeZoneIdL Exit;KErrNone=%d", KErrNone );
+	
 	return (KErrNone);
 
 	}
 
 TInt CTzServerSession::doGetLocalEncodedTimeZoneRulesL(const RMessage2& aMessage)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETLOCALENCODEDTIMEZONERULESL_ENTRY, "CTzServerSession::doGetLocalEncodedTimeZoneRulesL Entry" );
+    
 	TPckgBuf<TInt> rulesSizeBuffer;
 	aMessage.ReadL(0, rulesSizeBuffer);
 
@@ -252,7 +287,11 @@ TInt CTzServerSession::doGetLocalEncodedTimeZoneRulesL(const RMessage2& aMessage
     const TInt KMaxSize = KMaxTInt / 2;
     if (size <= 0 || size >= KMaxSize)
         {
+        OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, CTZSERVERSESSION_DOGETLOCALENCODEDTIMEZONERULESL_PANIC, "CTzServerSession::doGetLocalEncodedTimeZoneRulesL:Invalid rules buffer size sent by client to server" );
+        
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETLOCALENCODEDTIMEZONERULESL_EXIT, "CTzServerSession::doGetLocalEncodedTimeZoneRulesL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
         }
 
@@ -271,7 +310,11 @@ TInt CTzServerSession::doGetLocalEncodedTimeZoneRulesL(const RMessage2& aMessage
 	if (err == KErrArgument)
 	    {
 	    CleanupStack::PopAndDestroy(buffer);
+	    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOGETLOCALENCODEDTIMEZONERULESL_PANIC2, "CTzServerSession::doGetLocalEncodedTimeZoneRulesL:Invalid data sent by client to Server" );
+	    
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETLOCALENCODEDTIMEZONERULESL_EXIT2, "CTzServerSession::doGetLocalEncodedTimeZoneRulesL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
@@ -286,6 +329,8 @@ TInt CTzServerSession::doGetLocalEncodedTimeZoneRulesL(const RMessage2& aMessage
 	aMessage.WriteL(1, buffer->Ptr(0));
 	
 	CleanupStack::PopAndDestroy(buffer);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETLOCALENCODEDTIMEZONERULESL_EXIT3, "CTzServerSession::doGetLocalEncodedTimeZoneRulesL Exit;KErrNone=%d", KErrNone );
+	
 	return KErrNone;
 	}
 
@@ -312,6 +357,8 @@ TInt CTzServerSession::doGetLocalEncodedTimeZoneRulesSizeL(const RMessage2& aMes
 
 TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesL(const RMessage2& aMessage)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESL_ENTRY, "CTzServerSession::doGetForeignEncodedTimeZoneRulesL Entry" );
+    
 	TPckgBuf<TInt> rulesSizeBuffer;
 	aMessage.ReadL(0, rulesSizeBuffer);
    
@@ -321,7 +368,11 @@ TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesL(const RMessage2& aMessa
     const TInt KMaxSize = KMaxTInt/2;
     if (size <= 0 || size >= KMaxSize)
         {
+        OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESL_PANIC, "CTzServerSession::doGetForeignEncodedTimeZoneRulesL Panic: EPanicInvalidArgument" );
+        
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESL_EXIT, "CTzServerSession::doGetForeignEncodedTimeZoneRulesL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
         }
 
@@ -339,7 +390,11 @@ TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesL(const RMessage2& aMessa
 	if (err == KErrArgument)
 	    {
 	    CleanupStack::PopAndDestroy(buffer);
+	    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESL_PANIC2, "CTzServerSession::doGetForeignEncodedTimeZoneRulesL:Invalid data sent by client to Server" );
+	    
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+      OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESL_EXIT2, "CTzServerSession::doGetForeignEncodedTimeZoneRulesL Exit;KRequestPending=%d", KRequestPending );
+      
         return KRequestPending;
 	    }
 	else
@@ -347,6 +402,7 @@ TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesL(const RMessage2& aMessa
 	    User::LeaveIfError(err);
 	    }
 	
+
 	writeStream.CommitL();
 	writeStream.Close();
 	
@@ -354,11 +410,15 @@ TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesL(const RMessage2& aMessa
 	aMessage.WriteL(1, buffer->Ptr(0));
 	
 	CleanupStack::PopAndDestroy(buffer);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESL_EXIT3, "CTzServerSession::doGetForeignEncodedTimeZoneRulesL Exit;KErrNone=%d", KErrNone );
+	
 	return KErrNone;
 	}
 	
 TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL(const RMessage2& aMessage)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESSIZEL_ENTRY, "CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL Entry" );
+    
 	TPckgBuf<TTime> startTimeBuffer;
 	aMessage.ReadL(0, startTimeBuffer);
 
@@ -384,7 +444,11 @@ TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL(const RMessage2& aM
 	if (err == KErrArgument)
 	    {
 	    CleanupStack::PopAndDestroy(buffer);
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESSIZEL_PANIC, "CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL Panic: Invalid   data sent by client to server" );
+	    
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESSIZEL_EXIT, "CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
@@ -406,6 +470,8 @@ TInt CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL(const RMessage2& aM
 	aMessage.WriteL(3, rulesSizeBuffer);
 
 	CleanupStack::PopAndDestroy(2,buffer);
+	OstTraceDef1(  OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETFOREIGNENCODEDTIMEZONERULESSIZEL_EXIT2, "CTzServerSession::doGetForeignEncodedTimeZoneRulesSizeL Exit;KErrNone=%d", KErrNone );
+	
 	return KErrNone;
 	}
 
@@ -430,6 +496,8 @@ TInt CTzServerSession::doConvertLocalZoneTimeL(const RMessage2& aMessage)
 
 TInt CTzServerSession::doConvertForeignZoneTimeL(const RMessage2& aMessage)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOCONVERTFOREIGNZONETIMEL_ENTRY, "CTzServerSession::doConvertForeignZoneTimeL Entry" );
+    
 	TPckgBuf<TTime> timeBuffer;
 	aMessage.ReadL(0, timeBuffer);
 
@@ -455,7 +523,11 @@ TInt CTzServerSession::doConvertForeignZoneTimeL(const RMessage2& aMessage)
 	if (err == KErrArgument)
 	    {
 	    CleanupStack::PopAndDestroy(buffer);
+	    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOCONVERTFOREIGNZONETIMEL_PANIC, "CTzServerSession::doConvertForeignZoneTimeL panic: Invalid data sent by client" );
+	    
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOCONVERTFOREIGNZONETIMEL_EXIT, "CTzServerSession::doConvertForeignZoneTimeL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
@@ -473,6 +545,8 @@ TInt CTzServerSession::doConvertForeignZoneTimeL(const RMessage2& aMessage)
 	aMessage.WriteL(3, timeInBuffer);
 
 	CleanupStack::PopAndDestroy(2);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOCONVERTFOREIGNZONETIMEL_EXIT2, "CTzServerSession::doConvertForeignZoneTimeL Exit;KErrNone=%d", KErrNone );
+	
 	return (KErrNone);
 	}
 	
@@ -481,13 +555,19 @@ Retrieves UTC offset for a number of time zone ids
 */
 TInt CTzServerSession::doGetOffsetsForTimeZoneIdsL(const RMessage2& aMessage) const
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETOFFSETSFORTIMEZONEIDSL_ENTRY, "CTzServerSession::doGetOffsetsForTimeZoneIdsL Entry" );
+    
 	TInt bufferSize = aMessage.Int0();				
     
     // If buffer size invalid then panic client.
     const TInt KMaxSize = KMaxTInt / 4;
     if (bufferSize <= 0 || bufferSize > KMaxSize)
         {
+        OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, CTZSERVERSESSION_DOGETOFFSETSFORTIMEZONEIDSL_PANIC, "CTzServerSession::doGetOffsetsForTimeZoneIdsL panic:Invalid buffer size sent by client" );
+        
         aMessage.Panic( KTimeZoneServerName, RTz::EPanicInvalidArgument );
+        OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETOFFSETSFORTIMEZONEIDSL_EXIT, "CTzServerSession::doGetOffsetsForTimeZoneIdsL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
         }
 	
@@ -504,6 +584,7 @@ TInt CTzServerSession::doGetOffsetsForTimeZoneIdsL(const RMessage2& aMessage) co
 	aMessage.WriteL(1, idBuf->Ptr(0));
 
 	CleanupStack::PopAndDestroy(idBuf);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETOFFSETSFORTIMEZONEIDSL, "CTzServerSession::doGetOffsetsForTimeZoneIdsL;KErrNone=%d", KErrNone );
 		
 	return KErrNone;
 	}
@@ -543,6 +624,8 @@ TInt CTzServerSession::doNotifyHomeTimeZoneChanged(const RMessage2& aMessage)
 	change.iOldTimeZoneId = aMessage.Int1();
 		
 	TPckgBuf<NTzUpdate::TTimeZoneChange> changeBuf(change);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, TTIME_ZONE_CHANGE, "CTzServerSession::doNotifyHomeTimeZoneChanged: Time zone change notification" );
+	
 	return RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::EHomeTimeZoneId, changeBuf);
 	}
 
@@ -573,6 +656,9 @@ TInt CTzServerSession::doSetUnknownZoneTimeL(const RMessage2& aMessage)
  */	
 TInt CTzServerSession::doCreateUserTimeZoneL(const RMessage2& aMessage)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOCREATEUSERTIMEZONEL_ENTRY, "CTzServerSession::doCreateUserTimeZoneL Entry" );
+    
+    
 	const TInt buffersize = aMessage.Int0();
 	
 	CBufFlat* buffer = CBufFlat::NewL(buffersize);
@@ -593,7 +679,11 @@ TInt CTzServerSession::doCreateUserTimeZoneL(const RMessage2& aMessage)
 	if (err == KErrArgument)
 	    {
     	CleanupStack::PopAndDestroy(2, buffer);
+     OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOCREATEUSERTIMEZONEL_FATAL, "CTzServerSession::doCreateUserTimeZoneL:Panic:EPanicInvalidArgument" );
+    	 	 
         aMessage.Panic(KTimeZoneServerName, RTz::EPanicInvalidArgument);
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOCREATEUSERTIMEZONEL_EXIT, "CTzServerSession::doCreateUserTimeZoneL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
@@ -609,6 +699,8 @@ TInt CTzServerSession::doCreateUserTimeZoneL(const RMessage2& aMessage)
 	CleanupStack::PopAndDestroy(4, buffer);
 	TPckgBuf<TInt> idBuffer(id);
 	aMessage.WriteL(2, idBuffer);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOCREATEUSERTIMEZONEL_EXIT2, "CTzServerSession::doCreateUserTimeZoneL Exit;KErrNone=%d", KErrNone );
+	
 	return KErrNone;
 	}
 
@@ -620,6 +712,8 @@ TInt CTzServerSession::doCreateUserTimeZoneL(const RMessage2& aMessage)
  */	
 TInt CTzServerSession::doUpdateUserTimeZoneL(const RMessage2& aMessage)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOUPDATEUSERTIMEZONEL_ENTRY, "CTzServerSession::doUpdateUserTimeZoneL Entry" );
+    
 	const TInt buffersize = aMessage.Int0();
 	
 	CBufFlat* buffer = CBufFlat::NewL(buffersize);
@@ -640,7 +734,11 @@ TInt CTzServerSession::doUpdateUserTimeZoneL(const RMessage2& aMessage)
 	if (err == KErrArgument)
 	    {
     	CleanupStack::PopAndDestroy(2, buffer);
+    	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FATAL, CTZSERVERSESSION_DOUPDATEUSERTIMEZONEL_PANIC, "CTzServerSession::doUpdateUserTimeZoneL Panic: Invalid data sent by client to server" );
+    	
         aMessage.Panic(KTimeZoneServerName, RTz::EPanicInvalidArgument);
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_DOUPDATEUSERTIMEZONEL_EXIT, "CTzServerSession::doUpdateUserTimeZoneL Exit;KRequestPending=%d", KRequestPending );
+        
         return KRequestPending;
 	    }
 	else
@@ -657,6 +755,8 @@ TInt CTzServerSession::doUpdateUserTimeZoneL(const RMessage2& aMessage)
 	
     TzServer()->UserTimeZoneDb().UpdateTzL(id, *rules, *names);
 	CleanupStack::PopAndDestroy(4, buffer);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOUPDATEUSERTIMEZONEL_EXIT2, "CTzServerSession::doUpdateUserTimeZoneL Exit" );
+	
 	return KErrNone;
 	}
 	
@@ -697,6 +797,8 @@ TInt CTzServerSession::doGetUserTimeZoneNamesSizeL(const RMessage2& aMessage)
 */	
  TInt CTzServerSession::doGetUserTimeZoneNamesL(const RMessage2& aMessage)
 	{
+     OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETUSERTIMEZONENAMESL_ENTRY, "CTzServerSession::doGetUserTimeZoneNamesL Entry" );
+          
 	TInt size = iTzUserDataCache->SizeOfNames();
 	if ( size > 0 )
 		{
@@ -712,8 +814,12 @@ TInt CTzServerSession::doGetUserTimeZoneNamesSizeL(const RMessage2& aMessage)
 		writeStream.CommitL();
 		aMessage.WriteL(0, buffer->Ptr(0));
 		CleanupStack::PopAndDestroy(2, buffer);
+		OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETUSERTIMEZONENAMESL_EXIT, "CTzServerSession::doGetUserTimeZoneNamesLExit;KErrNone=%d", KErrNone );
+		
 		return KErrNone;
 		}
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_DOGETUSERTIMEZONENAMESL_EXIT2, "CTzServerSession::doGetUserTimeZoneNamesL Exit;KErrArgument=%d", KErrArgument );
+	
 	return KErrArgument;
 	}
 	
@@ -723,6 +829,7 @@ TInt CTzServerSession::doGetUserTimeZoneNamesSizeL(const RMessage2& aMessage)
  */		
 TInt CTzServerSession::doGetUserTimeZoneIdsSizeL(const RMessage2& aMessage)
 	{
+    
 	RArray<TUint32> ids;
 	CleanupClosePushL(ids);
 	TzServer()->UserTimeZoneDb().ReadTzIdsL(ids);
@@ -742,6 +849,7 @@ TInt CTzServerSession::doGetUserTimeZoneIdsSizeL(const RMessage2& aMessage)
  */	
 TInt CTzServerSession::doGetUserTimeZoneIdsL(const RMessage2& aMessage)
 	{
+    
 	CBufFlat* buffer = CBufFlat::NewL(iTzUserDataCache->SizeOfIds());
 	CleanupStack::PushL(buffer);
 	buffer->ExpandL(0,iTzUserDataCache->SizeOfIds());
@@ -764,6 +872,7 @@ TInt CTzServerSession::doGetUserTimeZoneIdsL(const RMessage2& aMessage)
 
 TInt CTzServerSession::doGetHeapSizeL(const RMessage2& aMessage)
 	{
+    
 	TInt reply = User::Heap().Count();
 	TInt sizeInBytes;
 	reply = User::AllocSize(sizeInBytes);
@@ -776,6 +885,7 @@ TInt CTzServerSession::doGetHeapSizeL(const RMessage2& aMessage)
 
 TInt CTzServerSession::doLocalizationReadCitiesSizeL(const RMessage2& aMessage)
 	{
+    
 	iCitiesResultCache.ResetAndDestroy();
 	TzServer()->LocalizationDb().ReadCitiesL(iCitiesResultCache);
 	TInt resultSize = CTzLocalizedCityRecord::ExternalizeSize(iCitiesResultCache);
@@ -789,6 +899,7 @@ TInt CTzServerSession::doLocalizationReadCitiesSizeL(const RMessage2& aMessage)
 
 TInt CTzServerSession::doLocalizationReadCitiesTzIdSizeL(const RMessage2& aMessage)
 	{
+        
 	iCitiesResultCache.ResetAndDestroy();
 	TzServer()->LocalizationDb().ReadCitiesL(iCitiesResultCache, aMessage.Int1());
 	TInt resultSize = CTzLocalizedCityRecord::ExternalizeSize(iCitiesResultCache);
@@ -802,6 +913,7 @@ TInt CTzServerSession::doLocalizationReadCitiesTzIdSizeL(const RMessage2& aMessa
 
 TInt CTzServerSession::doLocalizationReadCitiesInGroupSizeL(const RMessage2& aMessage)
 	{
+    
 	iCitiesResultCache.ResetAndDestroy();
 	TzServer()->LocalizationDb().ReadCitiesInGroupL(iCitiesResultCache, aMessage.Int1());
 	TInt resultSize = CTzLocalizedCityRecord::ExternalizeSize(iCitiesResultCache);
@@ -815,6 +927,7 @@ TInt CTzServerSession::doLocalizationReadCitiesInGroupSizeL(const RMessage2& aMe
 
 TInt CTzServerSession::doLocalizationReadCitiesL(const RMessage2& aMessage)
 	{
+    
 	TInt maxSize = aMessage.GetDesLengthL(0);
 	CBufFlat* buffer = CBufFlat::NewL(maxSize);
 	CleanupStack::PushL(buffer);
@@ -1022,6 +1135,9 @@ TInt CTzServerSession::doSwiObsEndL(const RMessage2& /*aMessage*/)
 
 void CTzServerSession::ServiceL(const RMessage2& aMessage)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZSERVERSESSION_SERVICEL_ENTRY, "CTzServerSession::ServiceL Entry" );
+    
+    
 	TInt reply = KErrNone;
 	switch(aMessage.Function())
 		{
@@ -1180,6 +1296,8 @@ void CTzServerSession::ServiceL(const RMessage2& aMessage)
 #if defined(_DEBUG)
 	User::Heap().Check();
 #endif
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZSERVERSESSION_SERVICEL_EXIT, "CTzServerSession::ServiceL Exit" );
+	
 	}
 
 const CTzServer* CTzServerSession::TzServer() const

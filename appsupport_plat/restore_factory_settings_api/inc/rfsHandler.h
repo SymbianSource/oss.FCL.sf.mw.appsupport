@@ -41,7 +41,7 @@ enum TRfsType
 
 // FORWARD DECLARATIONS
 
-class CEikonEnv;
+
 class CSecurityHandler;
 class CRfsSecurityHandler;
 class CRfsPdpObserver;
@@ -108,13 +108,7 @@ class CRfsHandler : public CBase
 
     private:    // new functions
 
-        /**
-        * Loads the resources needed for the confirmation query.
-        *
-        * @return resource file offset
-        */
-        void LoadResourceL();
-
+       
         /**
         * Sets the default language code in HAL.
         * This must be done before rebooting the phone for deep level RFS.
@@ -124,13 +118,12 @@ class CRfsHandler : public CBase
         /**
         * Shows the RFS confirmation query.
         * 
-        * @param aThisDestroyed  ETrue, if the RFS handler object was destroyed, otherwise EFalse.          
         * @param aType           Represents RFS reason Normal or Deep.              
         * @return                ETrue, if user selected 'YES' as an option at the confirmation query dialog
         *                        otherwise EFalse.
         * @leave                 leaves with one of the system wide error.
         */
-        TBool AskConfirmationL( const TBool& aThisDestroyed, TRfsType aType );
+        TBool AskConfirmationL( TRfsType aType );
 
         /**
         * Cleans up the mess, by calling Cancel().
@@ -152,12 +145,6 @@ class CRfsHandler : public CBase
         TBool IsGprs() const;
 
     private:    // Data
-
-        // resource file
-        TInt iResourceFileOffset;
-
-        // UIKON environment
-        CEikonEnv* iEnv;
 
         // flags
         TInt iFlags;

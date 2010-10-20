@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -17,6 +17,11 @@
 #include <bautils.h>
 #include <tzlocalizedcityrecord.h>
 #include <tzlocalizedtimezonerecord.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "tzsystemdataTraces.h"
+#endif
+
 
 // Resource File locations
 _LIT(KTzLocalizationTimeZoneResourceFileName,"\\Resource\\TimeZoneLocalization\\timezones.rSC");
@@ -59,6 +64,7 @@ Second phase contructor
 */
 void CTzSystemDataDb::ConstructL()
 	{
+    
 	User::LeaveIfError(iFs.Connect());
 	
 	// If resource files are found on flash drive,
@@ -162,6 +168,8 @@ TInt CTzSystemDataDb::FindTimeZoneResourceIdL(TInt aTimeZoneId)
 		}
 
 	// If it's got to here the aId hasn't been found, so leave
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZSYSTEMDATADB_FINDTIMEZONERESOURCEIDL, "CTzSystemDataDb::FindTimeZoneResourceIdL:Time  zone resource id not found;aTimeZoneId=%d", aTimeZoneId );
+	
 	User::Leave(KErrNotFound);
 
 	return KErrNotFound;	// To satisfy compiler

@@ -214,7 +214,7 @@ void CMemoryMonitor::HandleFocusedWgChangeL()
     User::CompressAllHeaps();
     TInt currentFreeRam = 0;
     HAL::Get( HALData::EMemoryRAMFree, currentFreeRam );
-	TInt currentFreeSwap = 0;
+	TUint64 currentFreeSwap = 0;
 	if (iConfig->GlobalConfig().iSwapUsageMonitored)
 		{
         SVMSwapInfo swapInfo;

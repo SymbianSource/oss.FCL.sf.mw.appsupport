@@ -1,4 +1,4 @@
-// Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -13,9 +13,9 @@
 // Description:
 //
 
-	CAPABILITY		All -TCB
-	TARGET			dstunittestserver.exe
-	TARGETTYPE		exe
+CAPABILITY		All -TCB
+TARGET			dstunittestserver.exe
+TARGETTYPE		exe
 	UID			0x1000007A 0x1028637D
 
 MACRO SYMBIAN_TZ_UNIT_TEST
@@ -49,6 +49,7 @@ SOURCE			tzrulesteststep.cpp
 USERINCLUDE		../../../Include
 USERINCLUDE		../../../Client/Include
 USERINCLUDE		../../../Server/Include
+USERINCLUDE		../../../traces
 
 SOURCE 			../../../../Server/Source/DataProvider.cpp
 SOURCE 			../../../../Server/Source/readonlytzdb.cpp

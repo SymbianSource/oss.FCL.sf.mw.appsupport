@@ -62,6 +62,9 @@ private:
     //Used to handle ShutDown
     CSysApAppUi& 				iSysApServer;
     CHbDevicePowerMenuPrivate* 	iPowerMenuPrivate;
+#ifdef FCC_UNIT_TEST
+        friend class Cutsysapgeneraltest;
+#endif 
 };
 
 #endif // defined(__SYMBIAN32__) || defined(SYMBIAN) || defined(HB_DOXYGEN)

@@ -24,6 +24,16 @@ PRJ_PLATFORMS
 PRJ_TESTEXPORTS
 // NOTE: If using ARS requirements all export operations should be done under this.
 // 'abld test export'
+../init/TestFramework.ini /epoc32/winscw/c/TestFramework/TestFramework.ini
+../init/TestFramework.ini /epoc32/data/z/system/data/TestFramework.ini
+
+../conf/ui_RfsTestModule.cfg /epoc32/winscw/c/TestFramework/ui_RfsTestModule.cfg
+../conf/ui_RfsTestModule.cfg /epoc32/data/z/system/data/ui_RfsTestModule.cfg
+
+../data/rfs_testscript0.txt     /epoc32/release/winscw/udeb/z/data/coreappuistestdata/rfs_testscript0.txt
+../data/rfs_testscript0.txt     /epoc32/data/z/system/data/rfs_testscript0.txt
+
+
 ../rom/RfsTestModule.iby                              CORE_MW_LAYER_IBY_EXPORT_PATH(RfsTestModule.iby)
 
 PRJ_EXPORTS

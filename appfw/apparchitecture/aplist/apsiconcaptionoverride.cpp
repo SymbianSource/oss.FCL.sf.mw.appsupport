@@ -17,6 +17,11 @@
 #include "apsiconcaptionoverride.h"
 #include <centralrepository.h>
 #include <apadef.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "apsiconcaptionoverrideTraces.h"
+#endif
+
 
 //constants defined
 const TUid KUidIconCaptionRepository = { 0x1028583d }; // Central Repository UID
@@ -185,6 +190,8 @@ void TApaIconCaptionOverrideWriter::LoadFieldFromCenRepL(CRepository* aRepositor
 	{
 	TUint32 key = aFullKey & ~KAppBits;
 	TUint32 fieldId = (key & KFieldBits) >> 16;
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_DETAILED, TAPAICONCAPTIONOVERRIDEWRITER_LOADFIELDFROMCENREPL, "fieldId for field to be overridden with value from the cenrep = %d", fieldId );
+	
 	switch (fieldId)
 		{
 		case EOverrideFieldShortCaption:

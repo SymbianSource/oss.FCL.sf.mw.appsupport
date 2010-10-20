@@ -21,7 +21,7 @@
 #include <aknappui.h>
 #include "SysAp.hrh"
 #include <f32file.h> 
-#include <W32STD.H>
+#include <w32std.h>
 #include <coedef.h>
 #include <e32property.h>
 #include <sysapcallback.h>
@@ -99,7 +99,12 @@ const TInt KDummyReason( -1 );
 *  @since 1.0
 */
 
+
+#ifdef  FCC_UNIT_TEST
+class CSysApAppUi : public CBase,
+#else
 class CSysApAppUi : public CAknAppUi,
+#endif                    
                     public MSysApMemoryCardObserver,
                     public MSysApTimerResponder,
                     public MSysapCallback,
@@ -302,6 +307,8 @@ class CSysApAppUi : public CAknAppUi,
         void SetHacIndicatorL();
         void DoNotActivateBt();
         void SetIhfIndicatorL();
+        void SetPosIndicatorL(TInt aValue);
+        void HandlePsmAndChargingIndicatorL(TBool aValue,const TDesC& aLiteral);
 		void HandleLongPowerKeyPressedL();
         void IgnoreZeroNetworkBarNotifications(TBool aIgnore);
         void InitCloseSimApplicationsL();
@@ -512,23 +519,20 @@ class CSysApAppUi : public CAknAppUi,
           
           CSysApAudioRoutingObserver* iSysApAudioRoutingObserver;
           CSysApPsmController* iSysApPsmController;
-		  		CHbSymbianVariant* iVariantAccState ;
-          CSystemLock*                    iSysApSystemLock;
+		  CSystemLock*                    iSysApSystemLock;
           CSysApCenRepCallForwardingObserver* iSysApCenRepCallForwardingObserver;
           CSysApBatteryInfoController* iSysApBatteryInfoController;
           MSysApBtSapController*          iSysApBtSapController;
           CPeriodic*                      iSapTimer;
           MSysApBtController*             iSysApBtController;
           CSysApCenRepLogsObserver*                iSysApCenRepLogsObserver;
-		  		MSysApUsbIndicator*             iSysApUsbIndicatorController;
-		  		CKeyguardAccessApi*             iKeyguardController;
-		  		CHbDevicePowerMenuSymbian*            iPowerMenuDialog;
-	      	CSysApKeyManagement*            iSysApKeyManagement;
-	      	CSysApMMCObserver*              iSysApMMCObserver;
-	      	CSysApEtelConnector*            iSysApEtelConnector;
+		  MSysApUsbIndicator*             iSysApUsbIndicatorController;
+		  CKeyguardAccessApi*             iKeyguardController;
+		  CHbDevicePowerMenuSymbian*            iPowerMenuDialog;
+	      CSysApKeyManagement*            iSysApKeyManagement;
+	      CSysApMMCObserver*              iSysApMMCObserver;
+	      CSysApEtelConnector*            iSysApEtelConnector;
 		  
-	public:		  
-		  CHbIndicatorSymbian* 			  iHbIndicatorSymbian;
 		  
 
      private:         

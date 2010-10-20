@@ -17,9 +17,9 @@
  */
 
 // INCLUDE FILES
-#include "GSLogger.h"
+#include "GsLogger.h"
 #include "GSServerEngine.h"
-#include <AccessoriesCRKeys.h>
+#include <accessoriescrkeys.h>
 
 #include <e32svr.h>
 #include <centralrepository.h>

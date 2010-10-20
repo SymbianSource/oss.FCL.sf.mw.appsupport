@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -211,6 +211,9 @@ class CSysApKeyManagement: public CBase
         * Key handler plugins managed by SysAp.
         */ 
         RSysApPluginsArray iSysApPlugins;
+#ifdef FCC_UNIT_TEST
+        friend class Cutsysapkeymanagement;
+#endif
     };
 
 #endif //SYSAPKEYMANAGEMENT_H

@@ -36,6 +36,7 @@ option MSVC /Od
 SOURCEPATH	../aplist
 
 userinclude	../inc
+userinclude ../traces
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 source		aplapplist.cpp	aplapplistitem.cpp aplappinforeader.cpp apsidchecker.cpp

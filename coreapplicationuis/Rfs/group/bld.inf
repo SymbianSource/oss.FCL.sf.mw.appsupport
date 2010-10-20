@@ -22,9 +22,7 @@ PRJ_PLATFORMS
 DEFAULT
 
 PRJ_EXPORTS
-../loc/rfs.loc                              MW_LAYER_LOC_EXPORT_PATH(rfs.loc)
 ../rom/rfs.iby                              CORE_MW_LAYER_IBY_EXPORT_PATH(rfs.iby)
-../rom/rfsResources.iby                     LANGUAGE_MW_LAYER_IBY_EXPORT_PATH(rfsResources.iby)
 ../rom/rfs_variant.iby                      CUSTOMER_MW_LAYER_IBY_EXPORT_PATH(rfs_variant.iby)
 ../inc/sipsystemstatemonitorpskeys.h 	    SYMBIAN_MW_LAYER_PLATFORM_EXPORT_PATH(sipsystemstatemonitorpskeys.h)
 

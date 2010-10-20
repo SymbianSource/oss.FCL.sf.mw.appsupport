@@ -74,6 +74,10 @@ private:
     TBool       iVibrationEnable;       //Master Vibarate enabled/Disabled
     TBool       iOfflineEnable;         //Oflline Mode enabled or Disabled
     TBool       iCypherOff;             //Encryption/Decryption ON/OFF
+    
+#ifdef FCC_UNIT_TEST
+        friend class Cutsysapgeneraltest;
+#endif  
 };
 
 /**

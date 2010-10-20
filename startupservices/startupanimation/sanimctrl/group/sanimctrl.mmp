@@ -46,5 +46,6 @@ LIBRARY         fbscli.lib
 LIBRARY         featmgr.lib
 LIBRARY         mediatorclient.lib
 LIBRARY         sanimengine.lib
+LIBRARY         ProfileEng.lib
 
 SMPSAFE

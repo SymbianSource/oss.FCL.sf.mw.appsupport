@@ -1,4 +1,4 @@
-// Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,6 +22,7 @@
 const TInt KTestCaseCount = 8;
 const TInt KTestDataSize = 2048;
 _LIT8(KHtmlMimeType,"text/html");
+_LIT8(KHtmlMimeType2,"application/xhtml+xml");	// added as part of platsim
 _LIT8(KXmlMimeType,"text/xml");
 
 CRecWebRecogTest* CRecWebRecogTest::NewL(TAny* aConstructionsParams)
@@ -224,7 +225,7 @@ void CRecWebRecogTest::RunTestCase6L()
 	{
 	_LIT(KTxtTestFile6Path, "z:\\recogtestdata\\sample3");
 	
-	RunTestL(KTxtTestFile6Path(), KHtmlMimeType());
+	RunTestL(KTxtTestFile6Path(), KHtmlMimeType2());
 	}
 	
 void CRecWebRecogTest::RunTestCase7L()

@@ -1,12 +1,30 @@
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+*
+*/
+
 #ifndef __RFSTESTMODULE_IBY__
 #define __RFSTESTMODULE_IBY__
 
 file=ABI_DIR\BUILD_DIR\RfsTestModule.dll                      SHARED_LIB_DIR\RfsTestModule.dll
 
-data=\epoc32\data\z\system\data\TestFramework.ini             \testframework\RFS_TestFramework.ini
+//data=\epoc32\data\z\system\data\TestFramework.ini             \testframework\RFS_TestFramework.ini
 
 data=\epoc32\data\z\system\data\ui_RfsTestModule.cfg                      \testframework\ui_RfsTestModule.cfg
 
+data=\epoc32\data\z\system\data\rfs_testscript0.txt       \data\coreappuistestdata\rfs_testscript0.txt
 
 
 #endif

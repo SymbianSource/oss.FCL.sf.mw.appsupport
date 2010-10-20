@@ -35,6 +35,7 @@ option MSVC /Od
 SOURCEPATH	../apgrfx
 
 userinclude		../inc
+userinclude		../traces
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 source			APGCTL.CPP APGDOOR.CPP APGICNFL.CPP APGSTD.CPP APGTASK.CPP

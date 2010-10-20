@@ -18,7 +18,7 @@
 
 #include <e32debug.h>
 
-#include "rfscontimer.h"
+#include "rfsConTimer.h"
 #include "RfsTraces.h"
 
 const TInt KRfsConnectionTimeOut = 60000000;

@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,6 +18,12 @@
 #include <f32file.h>
 #include "dataprovider.h"
 #include <vtzrules.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "readonlytzdbTraces.h"
+#endif
+
+
 
 const TUint KDefaultTzNumericId = 0;
 
@@ -61,6 +67,8 @@ TInt CReadOnlyTzDb::StartAddress() const
 //
 TInt CReadOnlyTzDb::CopyDatabaseToRam(const TDesC& aTzDbFileName)
   {
+    OstTraceDefExt1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_COPYDATABASETORAM_ENTRY, "CReadOnlyTzDb::CopyDatabaseToRam Entry;aTzDbFileName=%S", aTzDbFileName );
+    
 	TInt error = KErrNone;
 	RFile file;
 
@@ -100,6 +108,8 @@ TInt CReadOnlyTzDb::CopyDatabaseToRam(const TDesC& aTzDbFileName)
 			}
 		}
 	file.Close();
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_COPYDATABASETORAM_EXIT, "CReadOnlyTzDb::CopyDatabaseToRam Exit;error=%d", error );
+	
 	return error;
 	}
   
@@ -120,12 +130,16 @@ TInt CReadOnlyTzDb::InvalidateFlashDatabaseL()
 
 void CReadOnlyTzDb::InitialiseL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP1_CREADONLYTZDB_INITIALISEL_ENTRY, "CReadOnlyTzDb::InitialiseL Entry" );
+    
 	// deny access to Flash-based database 
 	// if it is being restored in this precise moment
 	// We must not allow access to the ROM-based DB either, 
 	// because this might contain outdated data.
 	if (iRestoreInProcess)
 		{
+	    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, CREADONLYTZDB_INITIALISEL, "CReadOnlyTzDb::InitialiseL:Error:Restoring in process" );
+	    
 		User::Leave(KErrNotReady);
 		}
 		
@@ -191,6 +205,8 @@ void CReadOnlyTzDb::InitialiseL()
 	iRuleSetsTable = CTzDbRuleSetsTable::NewL(*this, *(reinterpret_cast<TTzRuleSetsTable*>(KRuleSetsBaseAddress)));
 	iRuleUsesTable = CTzDbRuleUsesTable::NewL(*(reinterpret_cast<TTzRuleUsesTable*>(KRuleUsesBaseAddress)));
 	iRuleDefinitionsTable = CTzDbRuleDefinitionsTable::NewL(*(reinterpret_cast<TTzRuleDefinitionsTable*>(KRuleDefinitionsBaseAddress)));	
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, DUP1_CREADONLYTZDB_INITIALISEL_EXIT, "CReadOnlyTzDb::InitialiseL Exit" );
+	
 	}
 
 //
@@ -224,6 +240,8 @@ CReadOnlyTzDb::~CReadOnlyTzDb()
 //
 CTzId* CReadOnlyTzDb::GetDefaultTimeZoneIdL()
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CREADONLYTZDB_GETDEFAULTTIMEZONEIDL_ENTRY, "CReadOnlyTzDb::GetDefaultTimeZoneIdL Entry" );
+    
 	if (iZonesTable == NULL)
 		{
 		InitialiseL();
@@ -234,6 +252,7 @@ CTzId* CReadOnlyTzDb::GetDefaultTimeZoneIdL()
 
 	if (defZone)
 		{
+	    
 		CleanupStack::PushL(defZone); // push #1
 
 		HBufC8* fullZoneName = defZone->GetFullZoneNameLC(); // push #2
@@ -243,13 +262,18 @@ CTzId* CReadOnlyTzDb::GetDefaultTimeZoneIdL()
 
 		CleanupStack::Pop(defTZID);
 		CleanupStack::PopAndDestroy(2, defZone);
+		
 		}
-
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_GETDEFAULTTIMEZONEIDL_EXIT, "CReadOnlyTzDb::GetDefaultTimeZoneIdL Exit" );
+	
 	return defTZID;
 	}
 
 void CReadOnlyTzDb::GetTzRulesL(CTzRules& aTzRules, CTzId& aTzId)
 	{
+    
+  OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_GETTZRULESL_ENTRY, "CReadOnlyTzDb::GetTzRulesL Entry;Time zone id =%u", aTzId.TimeZoneNumericID());
+  
 	if (iZonesTable == NULL)
 		{
 		InitialiseL();
@@ -258,6 +282,7 @@ void CReadOnlyTzDb::GetTzRulesL(CTzRules& aTzRules, CTzId& aTzId)
 	TRAPD(err, DoGetTzRulesL(aTzRules, aTzId));
 	if ( (err == KErrCorrupt) && (iTzDbData) )
 		{
+	    
 		ReleaseData();
 		// if the corruption occurred while accessing the Flash DB, we must flag it 
 		// as corrupt before propagating the leave
@@ -268,6 +293,8 @@ void CReadOnlyTzDb::GetTzRulesL(CTzRules& aTzRules, CTzId& aTzId)
 		}
 		
 	User::LeaveIfError(err);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CREADONLYTZDB_GETTZRULESL_EXIT, "CReadOnlyTzDb::GetTzRulesL Exit" );
+	
 	}
 	
 void CReadOnlyTzDb::DoGetTzRulesL(CTzRules& aTzRules, CTzId& aTzId)
@@ -303,6 +330,8 @@ TBool CReadOnlyTzDb::IsIdInDbL(TUint aTzId)
 //
 CTzDbZone* CReadOnlyTzDb::FindZoneL(CTzId& aLocation, TBool aFillInLocationIDs)
 	{
+    OstTraceDefExt3( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CREADONLYTZDB_FINDZONEL_EnTRY, "CReadOnlyTzDb::FindZoneL;Time zone id=%u;Time zone name=%s;aFillInLocationIDs=%u", aLocation.TimeZoneNumericID(), aLocation.TimeZoneNameID(), aFillInLocationIDs );
+    
 	CTzDbZone* zone = NULL;
 	if (aLocation.TimeZoneNumericID() > KDefaultTzNumericId)
 		{
@@ -326,6 +355,7 @@ CTzDbZone* CReadOnlyTzDb::FindZoneL(CTzId& aLocation, TBool aFillInLocationIDs)
 			CleanupStack::Pop(zone); // pop #1
 			}
 		}
+OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CREADONLYTZDB_FINDZONEL_EXIT, "CReadOnlyTzDb::FindZoneL Exit" );
 
 	return zone;
 	}
@@ -338,6 +368,9 @@ CTzDbZone* CReadOnlyTzDb::FindZoneL(CTzId& aLocation, TBool aFillInLocationIDs)
 //
 CTzDbZone* CReadOnlyTzDb::FindZoneByNameL(const TDesC8& aLocation)
 	{
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CREADONLYTZDB_FINDZONEBYNAMEL_ENTRY, "CReadOnlyTzDb::FindZoneByNameL Entry;aLocation.=%s", aLocation );
+    
+           
 	// first of all, look in links table
 	CTzDbZone* retZone = iLinksTable->FindZoneL(aLocation);
 
@@ -368,6 +401,7 @@ CTzDbZone* CReadOnlyTzDb::FindZoneByNameL(const TDesC8& aLocation)
 		
 		CleanupStack::PopAndDestroy(2,regionName); // pop #2, #1 - cityName, regionName
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_FINDZONEBYNAMEL_EXIT, "CReadOnlyTzDb::FindZoneByNameL Exit" );
 
 	return retZone;
 	}
@@ -469,6 +503,10 @@ Retrieves the UTC offset for a given numeric time zone id.
 */
 TInt CReadOnlyTzDb::GetOffsetForTimeZoneIdL(const TTime& aTime, TInt aTzId)
 	{
+ 
+    OstTraceDefExt4(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_GETOFFSETFORTIMEZONEIDL_ENTRY, "CReadOnlyTzDb::GetOffsetForTimeZoneIdL Entry;aTzId=%d;Year=%d;Month=%d;Day=%d", aTzId, aTime.DateTime().Year(), aTime.DateTime().Month(), aTime.DateTime().Day());
+    OstTraceDefExt3(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CREADONLYTZDB_GETOFFSETFORTIMEZONEIDL_PARAM, "parameters..;Hour=%d;Minute=%d;seconds=%d",aTime.DateTime().Hour(),aTime.DateTime().Minute() ,aTime.DateTime().Second() );
+    
 	if (iZonesTable == NULL)
 		{
 		InitialiseL();
@@ -503,6 +541,7 @@ TInt CReadOnlyTzDb::GetOffsetForTimeZoneIdL(const TTime& aTime, TInt aTzId)
 			}
 		CleanupStack::PopAndDestroy(zone);
 		}
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CREADONLYTZDB_GETOFFSETFORTIMEZONEIDL_EXIT, "CReadOnlyTzDb::GetOffsetForTimeZoneIdL Exit;offset=%u", offset );
 			
 	return offset;
 	}

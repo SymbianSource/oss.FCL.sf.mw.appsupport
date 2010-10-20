@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -132,3 +132,60 @@ chtmltocrtconvertertest.iby	/epoc32/rom/include/chtmltocrtconvertertest.iby
 ../../tdata/testHtml/outlook06.txt		/epoc32/winscw/c/testhtml/outlook06.txt
 ../../tdata/testHtml/outlook07.txt		/epoc32/winscw/c/testhtml/outlook07.txt
 ../../tdata/testHtml/test1.txt		/epoc32/winscw/c/testhtml/test1.txt
+
+// export the test files for armv5 in platsim
+../../tdata/profiling/test001.txt		/epoc32/data/Z/profiling/test001.txt
+../../tdata/profiling/test002.txt		/epoc32/data/Z/profiling/test002.txt
+../../tdata/profiling/test003.txt		/epoc32/data/Z/profiling/test003.txt
+../../tdata/profiling/test004.txt		/epoc32/data/Z/profiling/test004.txt
+../../tdata/profiling/test005.txt		/epoc32/data/Z/profiling/test005.txt
+../../tdata/profiling/test006.txt		/epoc32/data/Z/profiling/test006.txt
+../../tdata/profiling/test007.txt		/epoc32/data/Z/profiling/test007.txt
+../../tdata/profiling/test008.txt		/epoc32/data/Z/profiling/test008.txt
+../../tdata/profiling/test009.txt		/epoc32/data/Z/profiling/test009.txt
+../../tdata/profiling/test010.txt		/epoc32/data/Z/profiling/test010.txt
+../../tdata/profiling/test011.txt		/epoc32/data/Z/profiling/test011.txt
+../../tdata/profiling/test012.txt		/epoc32/data/Z/profiling/test012.txt
+../../tdata/profiling/test013.txt		/epoc32/data/Z/profiling/test013.txt
+../../tdata/profiling/test014.txt		/epoc32/data/Z/profiling/test014.txt
+../../tdata/profiling/test015.txt		/epoc32/data/Z/profiling/test015.txt
+../../tdata/profiling/test016.txt		/epoc32/data/Z/profiling/test016.txt
+../../tdata/profiling/test017.txt		/epoc32/data/Z/profiling/test017.txt
+../../tdata/profiling/test018.txt		/epoc32/data/Z/profiling/test018.txt
+../../tdata/profiling/test019.txt		/epoc32/data/Z/profiling/test019.txt
+../../tdata/profiling/test020.txt		/epoc32/data/Z/profiling/test020.txt
+../../tdata/profiling/test030.txt		/epoc32/data/Z/profiling/test030.txt
+../../tdata/profiling/test040.txt		/epoc32/data/Z/profiling/test040.txt
+../../tdata/profiling/test050.txt		/epoc32/data/Z/profiling/test050.txt
+../../tdata/profiling/test060.txt		/epoc32/data/Z/profiling/test060.txt
+../../tdata/profiling/test070.txt		/epoc32/data/Z/profiling/test070.txt
+../../tdata/profiling/test080.txt		/epoc32/data/Z/profiling/test080.txt
+../../tdata/profiling/test090.txt		/epoc32/data/Z/profiling/test090.txt
+../../tdata/profiling/test100.txt		/epoc32/data/Z/profiling/test100.txt
+../../tdata/profiling/test110.txt		/epoc32/data/Z/profiling/test110.txt
+../../tdata/profiling/test120.txt		/epoc32/data/Z/profiling/test120.txt
+../../tdata/profiling/test130.txt		/epoc32/data/Z/profiling/test130.txt
+../../tdata/profiling/test140.txt		/epoc32/data/Z/profiling/test140.txt
+../../tdata/profiling/test150.txt		/epoc32/data/Z/profiling/test150.txt
+../../tdata/profiling/test160.txt		/epoc32/data/Z/profiling/test160.txt
+../../tdata/profiling/test170.txt		/epoc32/data/Z/profiling/test170.txt
+../../tdata/profiling/test180.txt		/epoc32/data/Z/profiling/test180.txt
+../../tdata/profiling/test190.txt		/epoc32/data/Z/profiling/test190.txt
+../../tdata/profiling/test200.txt		/epoc32/data/Z/profiling/test200.txt
+
+../../tdata/testHtml/eudora01.txt		/epoc32/data/Z/testhtml/eudora01.txt
+../../tdata/testHtml/LoadConverterTest.txt	/epoc32/data/Z/testhtml/loadconvertertest.txt
+../../tdata/testHtml/malformed01.txt	/epoc32/data/Z/testhtml/malformed01.txt
+../../tdata/testHtml/malformed02.txt	/epoc32/data/Z/testhtml/malformed02.txt
+../../tdata/testHtml/malformed03.txt	/epoc32/data/Z/testhtml/malformed03.txt
+../../tdata/testHtml/other01.txt		/epoc32/data/Z/testhtml/other01.txt
+../../tdata/testHtml/outlook01.txt		/epoc32/data/Z/testhtml/outlook01.txt
+../../tdata/testHtml/outlook02.txt		/epoc32/data/Z/testhtml/outlook02.txt
+../../tdata/testHtml/outlook03.txt		/epoc32/data/Z/testhtml/outlook03.txt
+../../tdata/testHtml/outlook04.txt		/epoc32/data/Z/testhtml/outlook04.txt
+../../tdata/testHtml/outlook05.txt		/epoc32/data/Z/testhtml/outlook05.txt
+../../tdata/testHtml/outlook06.txt		/epoc32/data/Z/testhtml/outlook06.txt
+../../tdata/testHtml/outlook07.txt		/epoc32/data/Z/testhtml/outlook07.txt
+../../tdata/testHtml/test1.txt			/epoc32/data/Z/testhtml/test1.txt
+
+

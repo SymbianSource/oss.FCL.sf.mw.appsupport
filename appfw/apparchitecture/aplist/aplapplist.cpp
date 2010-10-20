@@ -28,6 +28,10 @@
 #ifdef SYMBIAN_BAFL_SYSUTIL
 #include <bafl/sysutil.h>
 #endif
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "aplapplistTraces.h"
+#endif
 
 #ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 #include<usif/scr/scr.h>
@@ -590,6 +594,8 @@ EXPORT_C CApaAppList::~CApaAppList()
 // Stop scanning applications if installation or uninstallation has started	
 EXPORT_C void CApaAppList::StopScan(TBool aNNAInstall)
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPLIST_STOPSCAN, "CApaAppList::StopScan;aNNAInstall=%d", aNNAInstall );
+    
 	if (aNNAInstall)
 		{
 		iNNAInstallation = ETrue;
@@ -611,7 +617,8 @@ EXPORT_C void CApaAppList::RestartScanL()
 
 EXPORT_C TBool CApaAppList::AppListUpdatePending()
 	{
-	return iNNAInstallation;
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPLIST_APPLISTUPDATEPENDING, "CApaAppList::AppListUpdatePending;iNNAInstallation=%d", iNNAInstallation );
+    return iNNAInstallation;
 	}
 #endif
 
@@ -1300,11 +1307,14 @@ TInt CApaAppList::IdleUpdateL()
 	TBool more=EFalse;
 	TApaAppEntry currentApp = TApaAppEntry();
 	TRAPD(err, more = iAppRegFinder->NextL(currentApp, *iForcedRegistrations));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, CAPAAPPLIST_IDLEUPDATEL, "iAppRegFinder-> NextL returned with ;more=%d", more );
+	
 	if (err!=KErrNone)
 		{
 		if (iFlags & ENotifyUpdateOnFirstScanComplete)
 			User::Leave(err);
-
+		
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, DUP1_CAPAAPPLIST_IDLEUPDATEL, "CApaAppList::IdleUpdateL will return with more value returned by iAppRegFinder->NextL" );
 		return more;
 		}
 	TBool hasChanged=EFalse;
@@ -1316,7 +1326,8 @@ TInt CApaAppList::IdleUpdateL()
 			SetNotFound(iAppData,hasChanged);
 			if (iFlags & ENotifyUpdateOnFirstScanComplete)
 				User::Leave(err);
-
+			
+			OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, DUP2_CAPAAPPLIST_IDLEUPDATEL, "UpdayeNextAppL returned with error, so set more to EFalse" );
 			more=EFalse; // abandon ship
 			}
 		}
@@ -1696,8 +1707,10 @@ EXPORT_C void CApaAppList::AddForcedRegistrationL(const TDesC& aRegistrationFile
 	{
 	TInt err = iForcedRegistrations->InsertIsqL(aRegistrationFile, ECmpFolded);
 	if (err != KErrAlreadyExists) // We silently ignore attempts to insert duplicates
-		User::LeaveIfError(err);
-	
+	    {
+        OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPLIST_ADDFORCEDREGISTRATIONL, "Ignore attempts to insert duplicated in iForcedRegistration array. Leave with any other error" );
+        User::LeaveIfError(err);
+	    }
 	} //lint !e818 Suppress pointer parameter 'aRegistrationFile' could be declared as pointing to const
 	
 EXPORT_C void CApaAppList::ResetForcedRegistrations()

@@ -26,6 +26,7 @@ TARGETTYPE      dll
 UID             0x1000008D 0x101FB3E3
 
 CAPABILITY      ALL -TCB
+CAPABILITY		DiskAdmin
 /* Remove comments and replace 0x00000000 with correct vendor id */
 // VENDORID     0x00000000
 /* Remove comments and replace 0x00000000 with correct secure id */

@@ -52,7 +52,6 @@
 const TUint KCoreAppUIsMmcRemovedWithoutEjectCmdMask = 0xFFFF;
 const TUint KCoreAppUIsMmcRemovedWithoutEjectValShift = 16;
 
-_LIT(KGpsIndicatorPlugin, "com.nokia.positioning.indicatorplugin/1.0");
 const TUid KPSUidSecurityUIs = { 0x100059b5 };
 const TUint32 KSecurityUIsLights  = 0x00000308;
 
@@ -928,12 +927,12 @@ void CSysApPubSubObserver::HandlePosIndicatorCategoryL( const TUint aKey, const 
         case KPosIntGpsHwStatus:
             if ( aValue == EPosIntGpsHwOff )
                 {
-                iSysApAppUi.iHbIndicatorSymbian->Deactivate(KGpsIndicatorPlugin);
+                iSysApAppUi.SetPosIndicatorL(aValue);
  //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOff );
                 }
             else if ( aValue == EPosIntGpsHwOn )    
                 {
-                iSysApAppUi.iHbIndicatorSymbian->Activate(KGpsIndicatorPlugin);
+                iSysApAppUi.SetPosIndicatorL(aValue);
  //               iSysApAppUi.SetIndicatorStateL( EAknIndicatorGPS, EAknIndicatorStateOn );
                 }
             else if ( aValue == EPosIntGpsHwIntermediate )

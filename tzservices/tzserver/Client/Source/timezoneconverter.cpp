@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,11 @@
 #include <tzconverter.h>
 #include "tzruleholder.h"
 #include "tzchangenotifier.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "timezoneconverterTraces.h"
+#endif
+
 
 //
 // CTzRuleHolder
@@ -78,6 +83,9 @@ void CTzRuleHolder::ClearRules()
 
 void CTzRuleHolder::DoConvertL(TTime& aTime, TTzTimeReference aTimerRef)
 	{
+    OstTraceDefExt5( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZRULEHOLDER_DOCONVERTL_ENTRY, "CTzRuleHolder::DoConvertL Entry: atime:Year=%d;Month=%d;Day=%d;Hour=%d;Min=%d", aTime.DateTime().Year(), aTime.DateTime().Month(), aTime.DateTime().Day(), aTime.DateTime().Hour(), aTime.DateTime().Minute());
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZRULEHOLDER_DOCONVERTL_ENTRY_PARAM, "Parameters cont..;Sec=%d;aTimerRef=%u", aTime.DateTime().Second(), aTimerRef );
+    
 	// The change notifier may not have had a chance to run yet
 	// so check if it is ready to run now to force the update of the client side cache
 	iTzChangeNotifier->RunIfReadyL();
@@ -122,6 +130,8 @@ void CTzRuleHolder::DoConvertL(TTime& aTime, TTzTimeReference aTimerRef)
 		}
 		
 	User::LeaveIfError(iTzRules->ConvertTime(*iTzActualisedRules, aTime, aTimerRef));
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULEHOLDER_DOCONVERTL_EXIT, "CTzRuleHolder::DoConvertL Exit" );
+	
 	}
 
 /**

@@ -80,7 +80,7 @@ PRJ_TESTEXPORTS
 ../TSRC/w7allchr.doc.qp		/epoc32/release/winscw/udeb/z/resource/test/conarc/w7allchr.doc.qp
 ../TSRC/w7allchrwosplchr.doc.qp	/epoc32/release/winscw/udeb/z/resource/test/conarc/w7allchrwosplchr.doc.qp
  
-../TSRC/W7ALLCHR.DOC 		/epoc32/release/winscw/udeb/z/resource/test/conarc/w7allchr.doc
+../TSRC/W7ALLCHR.DOC.1 		/epoc32/release/winscw/udeb/z/resource/test/conarc/w7allchr.doc
 ../TSRC/RELEASE.TXT 		/epoc32/release/winscw/udeb/z/resource/test/conarc/release.txt
 ../TSRC/release.txt.etext	/epoc32/release/winscw/udeb/z/resource/test/conarc/release.txt.etext
  
@@ -88,7 +88,7 @@ PRJ_TESTEXPORTS
 ../TSRC/w7allchr.doc.b64	/epoc32/release/winscw/urel/z/resource/test/conarc/w7allchr.doc.b64
 ../TSRC/w7allchr.doc.qp		/epoc32/release/winscw/urel/z/resource/test/conarc/w7allchr.doc.qp
 ../TSRC/w7allchrwosplchr.doc.qp		/epoc32/release/winscw/urel/z/resource/test/conarc/w7allchrwosplchr.doc.qp
-../TSRC/W7ALLCHR.DOC 		/epoc32/release/winscw/urel/z/resource/test/conarc/w7allchr.doc
+../TSRC/W7ALLCHR.DOC.1 		/epoc32/release/winscw/urel/z/resource/test/conarc/w7allchr.doc
 ../TSRC/RELEASE.TXT 		/epoc32/release/winscw/urel/z/resource/test/conarc/release.txt
 ../TSRC/release.txt.etext	/epoc32/release/winscw/urel/z/resource/test/conarc/release.txt.etext
 
@@ -96,6 +96,6 @@ PRJ_TESTEXPORTS
 ../TSRC/w7allchr.doc.b64	/epoc32/data/z/resource/test/conarc/w7allchr.doc.b64
 ../TSRC/w7allchr.doc.qp		/epoc32/data/z/resource/test/conarc/w7allchr.doc.qp
 ../TSRC/w7allchrwosplchr.doc.qp		/epoc32/data/z/resource/test/conarc/w7allchrwosplchr.doc.qp
-../TSRC/W7ALLCHR.DOC 		/epoc32/data/z/resource/test/conarc/w7allchr.doc
+../TSRC/W7ALLCHR.DOC.1 		/epoc32/data/z/resource/test/conarc/w7allchr.doc
 ../TSRC/RELEASE.TXT 		/epoc32/data/z/resource/test/conarc/release.txt
 ../TSRC/release.txt.etext	/epoc32/data/z/resource/test/conarc/release.txt.etext

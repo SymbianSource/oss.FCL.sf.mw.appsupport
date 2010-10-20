@@ -25,6 +25,11 @@
 #include "aplappinforeader.h"
 #include <e32uid.h>
 
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "aplapplistitemTraces.h"
+#endif
+
 #ifdef SYMBIAN_UNIVERSAL_INSTALL_FRAMEWORK
 #include <usif/scr/appregentries.h>
 #endif
@@ -152,16 +157,20 @@ void CApaAppViewData::SetIconFileNameL(const TDesC& aFileName)
 	HBufC* fileName = aFileName.AllocL();
 	delete iIconFileName; // after the AllocL succeeds
 	iIconFileName = fileName;
+	OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_DETAILED, CAPAAPPVIEWDATA_SETICONFILENAMEL, "The icon file name is iIconFileName=%S", *iIconFileName );
 	}
 
 void CApaAppViewData::SetNumOfViewIcons(TInt aNumOfViewIcons)
 	{
 	iNumOfViewIcons = aNumOfViewIcons;
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_DETAILED, CAPAAPPVIEWDATA_SETNUMOFVIEWICONS, "Number of view icons iNumOfViewIcons=%d", iNumOfViewIcons );
 	}
 
 void CApaAppViewData::SetNonMbmIconFile(TBool aNonMbmIconFile)
 	{
 	iNonMbmIconFile = aNonMbmIconFile;
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_DETAILED, CAPAAPPVIEWDATA_SETNONMBMICONFILE, "Non Mbm icon file is iNonMbmIconFile=%d", iNonMbmIconFile );
+	
 	}
 
 EXPORT_C TUid CApaAppViewData::Uid() const
@@ -312,8 +321,14 @@ TInt CApaAppData::ReadApplicationInformationFromSCRL(const Usif::CApplicationReg
         delete iIconFileName;
         iIconFileName = appInfoReader->IconFileName();
         iNonMbmIconFile = appInfoReader->NonMbmIconFile();
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, DUP11_CAPAAPPDATA_READAPPLICATIONINFORMATIONFROMSCRL, "Is Icon file Non Mbm :  iNonMbmIconFile=%d", iNonMbmIconFile );
+        
         iNumOfAppIcons = appInfoReader->NumOfAppIcons();
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, DUP5_CAPAAPPDATA_READAPPLICATIONINFORMATIONFROMSCRL, "Number of icons : iNumOfAppIcons=%d", iNumOfAppIcons );
+        
         iApplicationLanguage = appInfoReader->AppLanguage();
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, DUP6_CAPAAPPDATA_READAPPLICATIONINFORMATIONFROMSCRL, "Application language is : iApplicationLanguage=%d", iApplicationLanguage );
+        
                 
         // views
         iViewDataArray->ResetAndDestroy();
@@ -623,6 +638,7 @@ EXPORT_C TPtrC CApaAppData::RegistrationFileName() const
     {
     if (iRegistrationFile)
         {
+        OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, CAPAAPPDATA_REGISTRATIONFILENAME, "Registration File Name is iRegistrationFile=%S", iRegistrationFile );
         return *iRegistrationFile;
         }
     else
@@ -641,6 +657,7 @@ EXPORT_C TPtrC CApaAppData::LocalisableResourceFileName() const
     {
     if (iLocalisableResourceFileName)
         {
+        OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, CAPAAPPDATA_LOCALISABLERESOURCEFILENAME, "Localisable Resource filename is iLocalisableResourceFileName=%S", iLocalisableResourceFileName );
         return *iLocalisableResourceFileName;
         }
     else
@@ -987,6 +1004,7 @@ EXPORT_C void CApaAppData::GetIconInfo(TInt& aIconCount, TInt& aDefaultIconsUsed
 	{
 	aIconCount = iIcons->Count();
 	aDefaultIconsUsed = iIcons->DefaultIconsUsed();
+	OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, CAPAAPPDATA_GETICONINFO, "aIconCount=%d and aDefaultIconsUsed=%d", aIconCount, aDefaultIconsUsed );
 	}
 
 /** Gets the default screen number used by the application.
@@ -1117,6 +1135,8 @@ TInt CApaAppData::ImplementsServiceWithDataType(TUid aServiceUid, const TDataTyp
 
 EXPORT_C void CApaAppData::SetShortCaptionL(const TDesC& aShortCaption)
 	{
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPDATA_SETSHORTCAPTIONL_ENTRY, "CApaAppData::SetShortCaptionL : aShortCaption=%S", aShortCaption );
+    
 	if(iShortCaption->Compare(aShortCaption) != 0)
 		{
 		HBufC* newShortCaption=aShortCaption.AllocL();
@@ -1129,6 +1149,8 @@ EXPORT_C void CApaAppData::SetShortCaptionL(const TDesC& aShortCaption)
 			delete iShortCaption;
 			}
 		iShortCaption = newShortCaption;
+		OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, CAPAAPPDATA_SETSHORTCAPTIONL, "Short caption set is iShortCaption=%S", *iShortCaption );
+		
 		}
 	}
 
@@ -1137,6 +1159,8 @@ EXPORT_C void CApaAppData::SetShortCaptionL(const TDesC& aShortCaption)
 */
 EXPORT_C void CApaAppData::SetCaptionL(const TDesC& aCaption)
 	{
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, CAPAAPPDATA_SETCAPTIONL_ENTRY, "CApaAppData::SetCaptionL : aCaption=%S", aCaption );
+    
 	if(iCaption->Compare(aCaption) != 0)
 		{
 		HBufC* newCaption=aCaption.AllocL();
@@ -1149,6 +1173,7 @@ EXPORT_C void CApaAppData::SetCaptionL(const TDesC& aCaption)
 			delete iCaption;
 			}
 		iCaption = newCaption;
+		OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, CAPAAPPDATA_SETCAPTIONL, "Caption is set iCaption=%S", *iCaption );
 		}
 	}
 

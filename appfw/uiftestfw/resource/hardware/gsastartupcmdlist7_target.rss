@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,8 +20,6 @@
 
 #include <ssm/ssmcmd.rh>
 #include <ssm/ssmsubstates.hrh>
-#include <ssm/cmdpersistreboots.rh>
-#include <ssm/cmdpersistreboots.hrh>
 #ifdef SYMBIAN_SSM_GRACEFUL_SHUTDOWN
 #include <ssm/ssmcmdconditions.rh>
 #endif
@@ -67,8 +65,7 @@ RESOURCE SSM_COMMAND_LIST r_critical_static_commands
    	{
 	commands =
 		{
-		r_increment_boot_count
-		, r_command_publish_system_state
+		r_command_publish_system_state
 		, r_command_ssmutilsrv
 		, r_command_sysmon
 		, r_command_sysagt2svr
@@ -78,10 +75,6 @@ RESOURCE SSM_COMMAND_LIST r_critical_static_commands
 		, r_command_start_splash
 		, r_command_eiksrvs
 		, r_command_tzserver
-#ifdef SYMBIAN_SSM_GRACEFUL_SHUTDOWN 
-		, r_shutdown_event_observer
-#endif
-
 		};
 	}
 
@@ -193,22 +186,6 @@ RESOURCE SSM_START_PROCESS_INFO r_command_tzserver
 	execution_behaviour = ESsmWaitForSignal;
 	}
 
-#ifdef SYMBIAN_SSM_GRACEFUL_SHUTDOWN
-RESOURCE SSM_CHK_ROMPATCHCONST_GRACEFUL_SHUTDOWN r_cnd_rompatchableconstant
-	{
-	 //Condition data is empty as startup policy already has the condition information for graceful shutdown. 
-	 //Empty condition is given to force SSM to evaluate condition at runtime.
-	}
-
-RESOURCE SSM_START_SSM_UTILITY_PLUGIN r_shutdown_event_observer
-	{
-	conditional_information = r_cnd_rompatchableconstant;
-	severity = ECmdCriticalSeverity;
-	filename = "lafshutdowneventobserveradaptor.dll";
-	ordinal = 1;
-	}
-#endif
-
 RESOURCE SSM_START_PROCESS_INFO r_command_initialise_locale
 	{
 	name = "initialiselocale.exe";
@@ -307,20 +284,6 @@ RESOURCE SSM_PUBLISH_SYSTEM_STATE r_command_publish_system_state
 	severity = ECmdCriticalSeverity;
 	}
 
-RESOURCE SSM_START_CUSTOM_COMMAND r_increment_boot_count
-	{
-	severity = ECmdCriticalSeverity;
-	execution_behaviour = ESsmWaitForSignal;
-	dllname = "cmncustomcmds.dll";
-	ordinal = 1; // Persist reboots custom command is at ordinal 1
-	dll_data = r_increment;
-	}
-
-RESOURCE SSM_COMMAND_PERSIST_REBOOTS r_increment
-	{
-	val = EIncrementBootCount;
-	}
-	
 RESOURCE SSM_START_APP_INFO r_command_eshell
 	{
 	severity = ECmdCriticalSeverity;

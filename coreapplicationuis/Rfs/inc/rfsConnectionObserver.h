@@ -26,7 +26,7 @@
 #include <pdpcontextmanagerpskeys.h>
 #include <sipsystemstatemonitorpskeys.h>
 
-#include "rfscontimer.h"
+#include "rfsConTimer.h"
 
 class CRfsConTimer;
 

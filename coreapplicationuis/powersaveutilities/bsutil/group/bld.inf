@@ -23,6 +23,9 @@ DEFAULT
 
 PRJ_EXPORTS
 
+../../conf/powersaveutilities.confml           MW_LAYER_CONFML(powersaveutilities.confml)
+../../conf/powersaveutilities_2000B5E3.crml    MW_LAYER_CRML(powersaveutilities_2000B5E3.crml)
+
 ../inc/bsutil.h          |../../../inc/bsutil.h
 ../rom/powersaveutilities.iby   CORE_MW_LAYER_IBY_EXPORT_PATH(powersaveutilities.iby)
 

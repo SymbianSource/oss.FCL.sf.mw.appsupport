@@ -24,7 +24,7 @@
 #include <barsread.h>
 #include <bautils.h>
 #include "kefresource.h"
-#include <AknKeyEventMap.rsg>
+#include <aknkeyeventmap.rsg>
 #include "keflogger.h"
 #include "kefprovider.h"
 

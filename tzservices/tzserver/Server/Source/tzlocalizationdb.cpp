@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -23,6 +23,11 @@
 #endif
 #include <tzlocalizedcityrecord.h>
 #include <tzlocalizedtimezonerecord.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "tzlocalizationdbTraces.h"
+#endif
+
 
 // Database location and access policy
 _LIT(KTzLocalizationDbName,"c:TzLocalization.db");
@@ -115,6 +120,8 @@ void CTzLocalizationDb::ConstructL()
 
 void CTzLocalizationDb::OpenDbL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_OPENDBL_ENTRY, "CTzLocalizationDb::OpenDbL Entry" );
+    
 	if (iZoneMutex.OpenGlobal(KTzMutexName) != KErrNone)
 		{
 		User::LeaveIfError(iZoneMutex.CreateGlobal(KTzMutexName)) ;
@@ -142,6 +149,8 @@ void CTzLocalizationDb::OpenDbL()
 		{
 		User::Leave(error);
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_OPENDBL_EXIT, "CTzLocalizationDb::OpenDbL Exit" );
+	
 	}
 
 void CTzLocalizationDb::CloseDb()
@@ -168,6 +177,8 @@ Creates the Cached Zone Table.
 */
 void CTzLocalizationDb::CreateBlankFrequentlyUsedZoneTableL()
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_CREATEBLANKFREQUENTLYUSEDZONETABLEL_ENTRY, "CTzLocalizationDb::CreateBlankFrequentlyUsedZoneTableL Entry" );
+    
 	// Create the columns for the cached zones table
 	RArray<TDbCol> cachedTableCols;
 	CleanupClosePushL(cachedTableCols);
@@ -226,6 +237,8 @@ void CTzLocalizationDb::CreateBlankFrequentlyUsedZoneTableL()
 	CleanupStack::PopAndDestroy(&zoneView);
 	CleanupStack::PopAndDestroy(frequentlyUsedZoneColSet);
 	CleanupStack::PopAndDestroy(&cachedTableCols); //cachedTableCols
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_CREATEBLANKFREQUENTLYUSEDZONETABLEL_EXIT, "CTzLocalizationDb::CreateBlankFrequentlyUsedZoneTableL Exit" );
+	
 	}
 
 /**
@@ -262,6 +275,9 @@ void CTzLocalizationDb::CreateBlankUserCityTableL()
 //Check if the database is corrupt or invalid.
 TBool CTzLocalizationDb::IsInvalidL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_ISINVALIDL_ENTRY, "CTzLocalizationDb::IsInvalidL Entry" );
+    
+    
 	RDbView zoneView;
 	CleanupClosePushL(zoneView);
 	PrepareZoneViewL(zoneView);
@@ -282,6 +298,8 @@ TBool CTzLocalizationDb::IsInvalidL()
 		    }
 		}
 	CleanupStack::PopAndDestroy(&zoneView);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_ISINVALIDL_EXIT, "CTzLocalizationDb::IsInvalidL Exit;isInvalid=%u", isInvalid );
+	
 	return isInvalid;
 	}
 
@@ -316,14 +334,20 @@ void CTzLocalizationDb::NotifyUserTzRulesChange(TTzUserDataChange /*aChange*/)
 
 void CTzLocalizationDb::NotifyUserTzNamesChange(TTzUserDataChange aChange)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYUSERTZNAMESCHANGE_ENTRY, "CTzLocalizationDb::NotifyUserTzNamesChange Entry" );
+    
 	if (iLocked)
 		{
+	    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYUSERTZNAMESCHANGE_EXIT, "CTzLocalizationDb::NotifyUserTzNamesChange Exit" );
+	    
 		return;
 		}
 	
 	if (aChange.iOperation == ETzUserDataCreated)
 		{
 		// Creation of new zones has no impact on existing zones
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYUSERTZNAMESCHANGE_EXIT3, "CTzLocalizationDb::NotifyUserTzNamesChange Exit" );
+	    
 		return;
 		}
 	
@@ -336,12 +360,18 @@ void CTzLocalizationDb::NotifyUserTzNamesChange(TTzUserDataChange aChange)
 		// is to reboot the server.
 		iLocked = ETrue;
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYUSERTZNAMESCHANGE_EXIT2, "CTzLocalizationDb::NotifyUserTzNamesChange Exit" );
+	
 	}
 
 void CTzLocalizationDb::NotifyTZDataStatusChangeL(RTz::TTzChanges aChange)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYTZDATASTATUSCHANGEL_ENTRY, "CTzLocalizationDb::NotifyTZDataStatusChangeL;aChange=%u", aChange );
+    
 	if (iLocked)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYTZDATASTATUSCHANGEL_EXIT, "CTzLocalizationDb::NotifyTZDataStatusChangeL Exit" );
+	    
 		return;
 		}
 	
@@ -426,6 +456,8 @@ void CTzLocalizationDb::NotifyTZDataStatusChangeL(RTz::TTzChanges aChange)
 		CleanupStack::PopAndDestroy(&frequentlyUsedZones); 
 		CleanupStack::PopAndDestroy(systemDataDb);
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYTZDATASTATUSCHANGEL_EXIT2, "CTzLocalizationDb::NotifyTZDataStatusChangeL Exit" );
+	
 	}
 
 void CTzLocalizationDb::UpdateTimeZoneAndCityRecordForSystemDataL(RPointerArray<CTzLocalizedTimeZoneRecord>& aFrequentlyUsedZones, 
@@ -468,6 +500,8 @@ void CTzLocalizationDb::ReadCitiesL(RPointerArray<CTzLocalizedCityRecord>& aCiti
 	{
 	if (iLocked)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONDB_READCITIESL, "CTzLocalizationDb::ReadCitiesL:Database locked" );
+	    
 		User::Leave(KErrLocked);
 		}
 	_LIT(KSQLQueryLit,"SELECT * FROM UserCities");
@@ -478,6 +512,8 @@ void CTzLocalizationDb::ReadCitiesL(RPointerArray<CTzLocalizedCityRecord>& aCiti
 	{
 	if (iLocked)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, DUP1_CTZLOCALIZATIONDB_READCITIESL, "CTzLocalizationDb::ReadCitiesL:Database locked" );
+	    
 		User::Leave(KErrLocked);
 		}
 	// Assign basic SQL query literal
@@ -497,6 +533,8 @@ void CTzLocalizationDb::ReadCitiesInGroupL(RPointerArray<CTzLocalizedCityRecord>
 	{
 	if (iLocked)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONDB_READCITIESINGROUPL, "CTzLocalizationDb::ReadCitiesInGroupL:Database locked" );
+	    
 		User::Leave(KErrLocked);
 		}
 	// Assign basic SQL query literal
@@ -522,6 +560,8 @@ CTzLocalizedTimeZoneRecord* CTzLocalizationDb::ReadFrequentlyUsedZoneL(TInt aFre
 	{
 	if (iLocked)
 		{
+	    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, CTZLOCALIZATIONDB_READFREQUENTLYUSEDZONEL, "CTzLocalizationDb::ReadFrequentlyUsedZoneL: Database locked;aFrequentlyUsedZone=%d", aFrequentlyUsedZone );
+	    
 		User::Leave(KErrLocked);
 		}
 	return DoReadFrequentlyUsedZoneL(aFrequentlyUsedZone);
@@ -570,6 +610,8 @@ CTzLocalizedCityRecord* CTzLocalizationDb::ReadCachedTimeZoneCityL(TInt aFrequen
 	{
 	if (iLocked)
 		{
+	    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, CTZLOCALIZATIONDB_READCACHEDTIMEZONECITYL, "CTzLocalizationDb::ReadCachedTimeZoneCityL:Database locked;aFrequentlyUsedZone=%d", aFrequentlyUsedZone );
+	    
 		User::Leave(KErrLocked);
 		}
 	
@@ -612,8 +654,12 @@ CTzLocalizedCityRecord* CTzLocalizationDb::ReadCachedTimeZoneCityL(TInt aFrequen
 
 void CTzLocalizationDb::WriteCityL(const TDesC& aCityName, TUint16 aCityTzId, TUint8 aCityGroupId, TUint aCityTzResourceId)
 	{
+    OstTraceDefExt4(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP2_CTZLOCALIZATIONDB_WRITECITYL_ENTRY, "CTzLocalizationDb::WriteCityL Entry;aCityName=%S;aCityTzId=%hd;aCityGroupId=%hhu;aCityTzResourceId=%u", aCityName, aCityTzId, aCityGroupId, aCityTzResourceId );
+    
 	if (iLocked)
 		{
+	       OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONDB_WRITECITYL, "CTzLocalizationDb::WriteCityL:Database locked" );
+	       
 		User::Leave(KErrLocked);
 		}
 	
@@ -652,18 +698,24 @@ void CTzLocalizationDb::WriteCityL(const TDesC& aCityName, TUint16 aCityTzId, TU
 	else
 		{
 		//City already exists.
+	   OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, DUP1_CTZLOCALIZATIONDB_WRITECITYL, "CTzLocalizationDb::WriteCityL:City already exists" );
+	   
 		User::Leave(KErrAlreadyExists);
 		}
 	CleanupStack::PopAndDestroy(&cityView);
 	iZoneMutex.Wait();
 	iLocalizedTimeZoneDb.Compact();
 	iZoneMutex.Signal();
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP2_CTZLOCALIZATIONDB_WRITECITYL_EXIT, "CTzLocalizationDb::WriteCityL Exit" );
+	
 	}
 
 void CTzLocalizationDb::DeleteCityL(const TDesC& aCityName, TUint16 aCityTzId)
 	{
 	if (iLocked)
 		{
+	  	    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, CTZLOCALIZATIONDB_DELETECITYL, "CTzLocalizationDb::DeleteCityL:Database locked" );
+	  	    
 		User::Leave(KErrLocked);
 		}
 	
@@ -710,8 +762,11 @@ recently used zone 2.  The old recently used zone 2 is discarded.
 void CTzLocalizationDb::WriteFrequentlyUsedZoneL(const CTzLocalizedTimeZoneRecord& aTimeZone, 
 		const CTzLocalizedCityRecord& aCity, TInt aFrequentlyUsedZone)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_WRITEFREQUENTLYUSEDZONEL_ENTRY, "CTzLocalizationDb::WriteFrequentlyUsedZoneL Entry" );
+    
+    
 	if (iLocked)
-		{
+		{	   
 		User::Leave(KErrLocked);
 		}
 	
@@ -797,6 +852,8 @@ void CTzLocalizationDb::WriteFrequentlyUsedZoneL(const CTzLocalizedTimeZoneRecor
 	CleanupStack::PopAndDestroy(&zoneView);
 	iLocalizedTimeZoneDb.Compact();
 	iZoneMutex.Signal();
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_WRITEFREQUENTLYUSEDZONEL_EXIT, "CTzLocalizationDb::WriteFrequentlyUsedZoneL Exit" );
+	
 	}
 
 /**
@@ -811,6 +868,8 @@ void CTzLocalizationDb::WriteAllFrequentlyUsedZonesL(const RPointerArray<CTzLoca
 	{
 	if (iLocked)
 		{
+	 OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONDB_WRITEALLFREQUENTLYUSEDZONESL, "CTzLocalizationDb::WriteAllFrequentlyUsedZonesL:Database locked" );
+	 
 		User::Leave(KErrLocked);
 		}
 	DoWriteAllFrequentlyUsedZonesL(aTimeZones, aCities);
@@ -1008,6 +1067,8 @@ TInt CTzLocalizationDb::GetTimeZoneIdFromTzServerL(CTzSystemDataDb& aSystemDataD
 
 void CTzLocalizationDb::NotifyUserTzNamesChangeL(TTzUserDataChange aChange)
 	{
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYUSERTZNAMESCHANGEL_ENTRY, "CTzLocalizationDb::NotifyUserTzNamesChangeL Entry;Operation=%u;Time zone Id=%d",aChange.iOperation, aChange.iTzId );
+    
 	// If an existing user-defined time zone is updated it means we may have
 	// to refresh the data in the frequently used zones table but the city table
 	// only contains the time zone id so there is nothing to update in there.
@@ -1096,6 +1157,8 @@ void CTzLocalizationDb::NotifyUserTzNamesChangeL(TTzUserDataChange aChange)
 	CleanupStack::PopAndDestroy(&cachedCities); 
 	CleanupStack::PopAndDestroy(&frequentlyUsedZones);
 	CleanupStack::PopAndDestroy(systemDataDb);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_NOTIFYUSERTZNAMESCHANGEL_EXIT, "CTzLocalizationDb::NotifyUserTzNamesChangeL Exit" );
+	
 	}
 
 void CTzLocalizationDb::UpdateTimeZoneAndCityRecordL(RPointerArray<CTzLocalizedTimeZoneRecord>& aFrequentlyUsedZones, RPointerArray<CTzLocalizedCityRecord>& aCachedCities, TInt aTzId)
@@ -1188,6 +1251,8 @@ void CTzLocalizationDb::RestoreBeginningL()
 
 void CTzLocalizationDb::RestoreDbL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_RESTOREDBL_ENTRY, "CTzLocalizationDb::RestoreDbL Entry" );
+    
 	// When the Tz server is connected or a restore completes, we have to
 	// refresh the data in the frequently used zones table and the city table
 	// because it may contain the time zone id that has been deleted.  Or if the
@@ -1250,6 +1315,8 @@ void CTzLocalizationDb::RestoreDbL()
 	CleanupStack::PopAndDestroy(&cachedCities); 
 	CleanupStack::PopAndDestroy(&frequentlyUsedZones);
 	CleanupStack::PopAndDestroy(systemDataDb);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDB_RESTOREDBL_EXIT, "CTzLocalizationDb::RestoreDbL Exit" );
+	
 	}
 
 /**

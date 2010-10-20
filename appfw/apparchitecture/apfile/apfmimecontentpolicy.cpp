@@ -23,6 +23,11 @@
 #include <apgcli.h>    // For RApaLsSession 
 #include <centralrepository.h>
 #include <apmstd.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "apfmimecontentpolicyTraces.h"
+#endif
+
 
 
 /* Closed content and extension information is stored in central repository with UID 0x10003A3F.
@@ -346,11 +351,14 @@ Checks if given MIME type is included in closed content list.
 */
 TBool CApfMimeContentPolicyImpl::IsClosedType(const TDesC& aMimeType) const 
 	{
-	TInt dummy = 0;
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP2_CAPFMIMECONTENTPOLICYIMPL_ISCLOSEDTYPE, "CApfMimeContentPolicyImpl::IsClosedType: The MIME type to be checked : aMimeType=%S", aMimeType );
+    
+    TInt dummy = 0;
 	 
 	// Check if given descriptor is in closed content list.
 	// Find() returns 0 if found from array, non-zero if not.
 	const TBool found = (iCcl->FindIsq(aMimeType, dummy) == 0);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_CAPFMIMECONTENTPOLICYIMPL_ISCLOSEDTYPE, "CApfMimeContentPolicyImpl::IsClosedType: Is the MIME type in the closed content list : found=%d", found );
 	return found;
 	}
 
@@ -361,11 +369,16 @@ Checks the extension of given file against list of closed file extensions.
 */
 TBool CApfMimeContentPolicyImpl::IsClosedExtension(const TDesC& aFileExtension) const
 	{
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP2_CAPFMIMECONTENTPOLICYIMPL_ISCLOSEDEXTENSION, "CApfMimeContentPolicyImpl::IsClosedExtension: File extension to be checked : aFileExtension=%S", aFileExtension );
+    
+    
 	TInt dummy = 0;
 
 	// Check if given descriptor is in closed content list.
 	// Find() returns 0 if found from array, non-zero if not.
 	const TBool found = (iExtList->FindIsq(aFileExtension, dummy) == 0);
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_CAPFMIMECONTENTPOLICYIMPL_ISCLOSEDEXTENSION, "CApfMimeContentPolicyImpl::IsClosedExtension : Is the file extension in the closed extension list : found=%d", found );
 	return found;
 	}
 	

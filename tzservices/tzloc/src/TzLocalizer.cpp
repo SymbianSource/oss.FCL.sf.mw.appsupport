@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -24,6 +24,11 @@
 #include "tzlocalizationuserdatareader.h"
 #include <tzlocalizedtimezonerecord.h>
 #include <tzlocalizedcityrecord.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "TzLocalizerTraces.h"
+#endif
+
 /**
 Allocates and constructs a new CTzLocalizer object.
 @return The newly created CTzLocalizer object.
@@ -63,6 +68,8 @@ CTzLocalizer::CTzLocalizer()
 
 void CTzLocalizer::ConstructL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_CONSTRUCTL_ENTRY, "CTzLocalizer::ConstructL Entry" );
+    
 	User::LeaveIfError(iTzSession.Connect());
 
 	iStaticDataReader = CTzLocalizationResourceReader::NewL();
@@ -83,6 +90,8 @@ void CTzLocalizer::ConstructL()
 		UpdateFrequentlyUsedZonesL();
 		}
 	SetDataSource(ETzDataSourceSystem);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_CONSTRUCTL_EXIT, "CTzLocalizer::ConstructL Exit" );
+	
 	}
 
 // Check if the DB needs upgrading
@@ -178,6 +187,8 @@ reader for the other zones.
 */
 TBool CTzLocalizer::PrepareFrequentlyUsedZonesL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_PREPAREFREQUENTLYUSEDZONESL_ENTRY, "CTzLocalizer::PrepareFrequentlyUsedZonesL Entry" );
+    
 	CTzLocalizedTimeZoneArray* frequentlyUsedZones = CTzLocalizedTimeZoneArray::NewLC();
 	CTzLocalizedCityArray* cachedCities = CTzLocalizedCityArray::NewLC();
 	TBool frequentlyUsedZonesNeedUpdating = EFalse;
@@ -237,6 +248,8 @@ TBool CTzLocalizer::PrepareFrequentlyUsedZonesL()
 
 	CleanupStack::PopAndDestroy(cachedCities);
 	CleanupStack::PopAndDestroy(frequentlyUsedZones);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_PREPAREFREQUENTLYUSEDZONESL_EXIT, "CTzLocalizer::PrepareFrequentlyUsedZonesL Exit;frequentlyUsedZonesNeedUpdating=%u", frequentlyUsedZonesNeedUpdating );
+	
 
 	return frequentlyUsedZonesNeedUpdating;
 	}
@@ -247,6 +260,8 @@ strings that are currently in static data.
 */
 void CTzLocalizer::UpdateFrequentlyUsedZonesL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_UPDATEFREQUENTLYUSEDZONESL_ENTRY, "CTzLocalizer::UpdateFrequentlyUsedZonesL Entry" );
+    
 	CTzLocalizedTimeZoneArray* frequentlyUsedZones = CTzLocalizedTimeZoneArray::NewLC();
 	CTzLocalizedCityArray* cachedCities = CTzLocalizedCityArray::NewLC();
 
@@ -320,6 +335,8 @@ void CTzLocalizer::UpdateFrequentlyUsedZonesL()
 	WriteAllFrequentlyUsedZonesL(*frequentlyUsedZones,*cachedCities);
 	CleanupStack::PopAndDestroy(cachedCities);
 	CleanupStack::PopAndDestroy(frequentlyUsedZones);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_UPDATEFREQUENTLYUSEDZONESL_EXIT, "CTzLocalizer::UpdateFrequentlyUsedZonesL Exit" );
+	
 	}
 
 /**
@@ -335,6 +352,8 @@ default time zone is required.
 */
 CTzLocalizedTimeZone* CTzLocalizer::GetFrequentlyUsedDefaultZoneL(CTzLocalizedTimeZone::TTzFrequentlyUsedZone aFreqUsedZone)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETFREQUENTLYUSEDDEFAULTZONEL_ENTRY, "CTzLocalizer::GetFrequentlyUsedDefaultZoneL Entry;aFreqUsedZone=%u", aFreqUsedZone );
+    
 	// Assume that we will not find the key in the repository or that we do find
 	// the key but it has no value.  If either of these scenarios is true then
 	// we will use the time zone identifier recorded in the resource file for
@@ -369,6 +388,7 @@ CTzLocalizedTimeZone* CTzLocalizer::GetFrequentlyUsedDefaultZoneL(CTzLocalizedTi
 		{
 		defaultTimeZone = iStaticDataReader->ReadFrequentlyUsedZoneL(aFreqUsedZone);
 		}
+OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETFREQUENTLYUSEDDEFAULTZONEL_EXIT, "CTzLocalizer::GetFrequentlyUsedDefaultZoneL Exit" );
 
 	return defaultTimeZone;
 	}
@@ -465,6 +485,8 @@ The calling function takes ownership of the returned array.
 */
 EXPORT_C CTzLocalizedTimeZoneArray* CTzLocalizer::GetAllTimeZonesL(const TTzSortOrder aSortOrder)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETALLTIMEZONESL_ENTRY, "CTzLocalizer::GetAllTimeZonesL Entry;aSortOrder=%u", aSortOrder );
+    
 	CTzLocalizedTimeZoneArray* allTimeZones = CTzLocalizedTimeZoneArray::NewLC();
 	if(iDataSource&ETzDataSourceSystem)
 		{
@@ -488,6 +510,8 @@ EXPORT_C CTzLocalizedTimeZoneArray* CTzLocalizer::GetAllTimeZonesL(const TTzSort
 		}
 
 	CleanupStack::Pop(allTimeZones);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETALLTIMEZONESL_EXIT, "CTzLocalizer::GetAllTimeZonesL Exit" );
+	
 
 	return allTimeZones;
 	}
@@ -545,6 +569,8 @@ ETzAlphaNameAscending, or ETzAlphaNameDescending.
 */
 EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesL(const TTzSortOrder aSortOrder)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESL_ENTRY, "CTzLocalizer::GetCitiesL Entry;aSortOrder=%u", aSortOrder );
+    
 	//Create an empty city array and retrieve all cities
 	CTzLocalizedCityArray* cities = CTzLocalizedCityArray::NewLC();
 	if(iDataSource&ETzDataSourceSystem)
@@ -574,6 +600,8 @@ EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesL(const TTzSortOrder aSor
 		}
 
 	CleanupStack::Pop(cities);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESL_EXIT, "CTzLocalizer::GetCitiesL Exit" );
+	
 	return cities;
 	}
 
@@ -591,6 +619,8 @@ ETzAlphaNameDescending.
 */
 EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesL(TInt aTimeZoneId, const TTzSortOrder aSortOrder)
 	{
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESL_ENTRY_OVERLOADED, "CTzLocalizer::GetCitiesL Entry;aTimeZoneId=%d;aSortOrder=%u", aTimeZoneId, aSortOrder );
+    
 	CTzLocalizedCityArray* cities = CTzLocalizedCityArray::NewLC();
 	ReadCitiesL(*cities, aTimeZoneId, ETrue);
 
@@ -613,6 +643,8 @@ EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesL(TInt aTimeZoneId, const
 		}
 
 	CleanupStack::Pop(cities);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESL_EXIT2, "CTzLocalizer::GetCitiesL Exit" );
+	
 
 	return cities;
 	}
@@ -662,6 +694,8 @@ ETzUnsorted, ETzAlphaNameAscending,	ETzAlphaNameDescending.
 void CTzLocalizer::GetCitiesL(CTzLocalizedCityArray& aCities, const TTzLocalizedId& aLocalizedId,
 		TBool aUseDataSource, const TTzSortOrder aSortOrder)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESL_ENTRY_OVERLOADED2, "CTzLocalizer::GetCitiesL Entry;aUseDataSource=%u;aSortOrder=%u", aUseDataSource, aSortOrder );
+    
 	ReadCitiesL(aCities, aLocalizedId.TimeZoneId(), aUseDataSource);
 
 	RPointerArray<CTzLocalizedCityRecord> cityRecords;
@@ -681,6 +715,8 @@ void CTzLocalizer::GetCitiesL(CTzLocalizedCityArray& aCities, const TTzLocalized
 		{
 		User::Leave(KErrArgument);
 		}
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESL_EXIT3, "CTzLocalizer::GetCitiesL Exit" );
+	
 	}
 
 /**
@@ -697,6 +733,8 @@ belong to a group. Currently supports up to 255 groups
 */
 EXPORT_C CTzLocalizedCity* CTzLocalizer::AddCityL(TInt aTimeZoneId,const TDesC& aCityName, TInt aGroupId)
 	{
+    OstTraceDefExt3( OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_ADDCITYL_ENTRY, "CTzLocalizer::AddCityL Entry;aTimeZoneId=%d;aCityName=%S;aGroupId=%d", aTimeZoneId, aCityName, aGroupId );
+    
 	//Check that aGroupId is a valid TUint8 and leave if not.
 	//Group number > 255 is not supported
 	__ASSERT_ALWAYS(aGroupId >= 0 && aGroupId <256 , User::Leave(KErrArgument));
@@ -736,6 +774,8 @@ EXPORT_C CTzLocalizedCity* CTzLocalizer::AddCityL(TInt aTimeZoneId,const TDesC& 
 	iTzSession.LocalizationWriteCityL(newCity->Name(), (TInt)newCity->TimeZoneId(), newCity->GroupId(),
 			newCity->TzLocalizedId().ResourceId());
 	CleanupStack::Pop(newCity);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZER_ADDCITYL_EXIT, "CTzLocalizer::AddCityL Exit" );
+	
 	return newCity;
 	}
 
@@ -754,6 +794,8 @@ EXPORT_C void CTzLocalizer::RemoveCityL(CTzLocalizedCity* aCity)
 		}
 	else
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZER_REMOVECITYL, "CTzLocalizer::RemoveCityL:Error:Invalid city" );
+	    
 		User::Leave(KErrArgument);
 		}
 	}
@@ -830,6 +872,8 @@ ETzAlphaNameAscending, ETzAlphaNameDescending.
 */
 EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesInGroupL(TInt aGroupId,const TTzSortOrder aSortOrder)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESINGROUPL_ENTRY, "CTzLocalizer::GetCitiesInGroupL Entry;aGroupId=%d;aSortOrder=%u", aGroupId, aSortOrder );
+    
 	//Check that aGroupId is a valid TUint8 and leave if not.
 	//Group number > 255 is not supported
 	__ASSERT_ALWAYS(aGroupId >= 0 && aGroupId <256 , User::Leave(KErrArgument));
@@ -862,6 +906,8 @@ EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesInGroupL(TInt aGroupId,co
 		cities->Sort(sortOrder);
 		}
 	CleanupStack::Pop(cities);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESINGROUPL_EXIT, "CTzLocalizer::GetCitiesInGroupL Exit" );
+	
 	return cities;
 	}
 
@@ -907,6 +953,8 @@ If the system's time zone has been updated, the new localised zone is stored in 
 */
 EXPORT_C CTzLocalizedTimeZone* CTzLocalizer::GetFrequentlyUsedZoneL(const CTzLocalizedTimeZone::TTzFrequentlyUsedZone aFrequentlyUsedZone)
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZER_GETFREQUENTLYUSEDZONEL_ENTRY, "CTzLocalizer::GetFrequentlyUsedZoneL Entry;aFrequentlyUsedZone=%u", aFrequentlyUsedZone );
+    
 	CTzLocalizedTimeZone* timeZone;
 
 	if (aFrequentlyUsedZone == CTzLocalizedTimeZone::ECurrentZone)
@@ -951,6 +999,7 @@ EXPORT_C CTzLocalizedTimeZone* CTzLocalizer::GetFrequentlyUsedZoneL(const CTzLoc
 		timeZone = CreateTimeZoneL(*timeZoneRecord);
 		CleanupStack::PopAndDestroy(timeZoneRecord);
 		}
+OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETFREQUENTLYUSEDZONEL_EXIT, "CTzLocalizer::GetFrequentlyUsedZoneL Exit" );
 
 	return timeZone;
 	}
@@ -962,6 +1011,8 @@ server (app-services/Tz).
 */
 TInt CTzLocalizer::GetTimeZoneIdFromTzServerL()
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZER_GETTIMEZONEIDFROMTZSERVERL_ENTRY, "CTzLocalizer::GetTimeZoneIdFromTzServerL Entry" );
+    
 	// Get current time zone using the current CTzId from the time zone server
 	CTzId* currentCTzId = iTzSession.GetTimeZoneIdL();
 	CleanupStack::PushL(currentCTzId);
@@ -982,6 +1033,7 @@ TInt CTzLocalizer::GetTimeZoneIdFromTzServerL()
 		timeZoneIdInt = homeZone->TimeZoneId();
 		CleanupStack::PopAndDestroy(homeZone);
 		}
+OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETTIMEZONEIDFROMTZSERVERL_EXIT, "CTzLocalizer::GetTimeZoneIdFromTzServerL Exit;timeZoneIdInt=%u", timeZoneIdInt );
 
 	return timeZoneIdInt;
 	}
@@ -996,6 +1048,8 @@ city for the zone is returned.
 */
 EXPORT_C CTzLocalizedCity* CTzLocalizer::GetFrequentlyUsedZoneCityL(const CTzLocalizedTimeZone::TTzFrequentlyUsedZone aFrequentlyUsedZone)
 	{
+    OstTraceDef1(   OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETFREQUENTLYUSEDZONECITYL_ENTRY, "CTzLocalizer::GetFrequentlyUsedZoneCityL Entry;aFrequentlyUsedZone=%u", aFrequentlyUsedZone );
+    
 	CTzLocalizedCityRecord* cityRecord = iTzSession.LocalizationReadCachedTimeZoneCityL(aFrequentlyUsedZone);
 	CleanupStack::PushL(cityRecord);
 	CTzLocalizedCity* city = CreateCityL(*cityRecord);
@@ -1046,6 +1100,8 @@ EXPORT_C CTzLocalizedCity* CTzLocalizer::GetFrequentlyUsedZoneCityL(const CTzLoc
 			}
 
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETFREQUENTLYUSEDZONECITYL_EXIT, "CTzLocalizer::GetFrequentlyUsedZoneCityL Exit" );
+	
 
 	return city;
 	}
@@ -1175,6 +1231,7 @@ correct offset from App-Services/Tz.
 template <class T>
 void CTzLocalizer::PrepareForUTCSortL(T& aArray)
 	{
+    
 	//Prepare an array of timezone IDs to give to the time zone server
 	RArray<TInt> timeZoneIds;
 	CleanupClosePushL(timeZoneIds);
@@ -1225,6 +1282,8 @@ NULL is returned.
 */
 EXPORT_C CTzLocalizedCity* CTzLocalizer::FindCityByNameL(const TDesC& aCityName, const TInt aTimeZoneId)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDCITYBYNAMEL_ENTRY, "CTzLocalizer::FindCityByNameL Entry;aCityName=%S;aTimeZoneId=%d", aCityName, aTimeZoneId );
+    
 	CTzLocalizedCity* foundCity;
 	//Create a dummy city for the search
 	CTzLocalizedCity* aCity = CTzLocalizedCity::NewLC(aCityName,TTzLocalizedId((TUint16)aTimeZoneId,0),0);
@@ -1262,6 +1321,7 @@ EXPORT_C CTzLocalizedCity* CTzLocalizer::FindCityByNameL(const TDesC& aCityName,
 
 	delete citiesToSearch;
 	citiesToSearch = NULL;
+OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDCITYBYNAMEL_EXIT, "CTzLocalizer::FindCityByNameL Exit" );
 
 	return foundCity;
 	}
@@ -1275,6 +1335,8 @@ If the search string is not found, NULL is returned.
 */
 EXPORT_C CTzLocalizedTimeZone* CTzLocalizer::FindTimeZoneByNameL(const TDesC& aTimeZoneName)
 	{
+    OstTraceDefExt1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDTIMEZONEBYNAMEL_ENTRY, "CTzLocalizer::FindTimeZoneByNameL Entry;aTimeZoneName=%S", aTimeZoneName );
+    
 	CTzLocalizedTimeZone* foundTimeZone;
 	//Create a dummy time zone for the search
 	TTzLocalizedId id(0, 0);
@@ -1300,6 +1362,7 @@ EXPORT_C CTzLocalizedTimeZone* CTzLocalizer::FindTimeZoneByNameL(const TDesC& aT
 
 	delete allTimeZones;
 	allTimeZones = NULL;
+OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDTIMEZONEBYNAMEL_EXIT, "CTzLocalizer::FindTimeZoneByNameL Exit" );
 
 	return foundTimeZone;
 	}
@@ -1313,6 +1376,8 @@ If the search string is not found, NULL is returned.
 */
 EXPORT_C CTzLocalizedCityGroup* CTzLocalizer::FindCityGroupByNameL(const TDesC& aCityGroupName)
 	{
+    OstTraceDefExt1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDCITYGROUPBYNAMEL_ENTRY, "CTzLocalizer::FindCityGroupByNameL Entry;aCityGroupName=%S", aCityGroupName );
+    
 	CTzLocalizedCityGroup* foundCityGroup;
 	//Create a dummy city group for the search
 	CTzLocalizedCityGroup* aCityGroup = CTzLocalizedCityGroup::NewLC(aCityGroupName,0);
@@ -1337,6 +1402,7 @@ EXPORT_C CTzLocalizedCityGroup* CTzLocalizer::FindCityGroupByNameL(const TDesC& 
 
 	delete allCityGroups;
 	allCityGroups = NULL;
+OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDCITYGROUPBYNAMEL_EXIT, "CTzLocalizer::FindCityGroupByNameL Exit" );
 
 	return foundCityGroup;
 	}
@@ -1379,6 +1445,8 @@ as all elements in the returned array will have the same UTC offset.
 */
 EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesWithUTCOffsetL(TInt aUTCOffsetInMinutes, const TTzSortOrder aSortOrder)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESWITHUTCOFFSETL_ENTRY, "CTzLocalizer::GetCitiesWithUTCOffsetL Entry;aUTCOffsetInMinutes=%d;aSortOrder=%u", aUTCOffsetInMinutes, aSortOrder );
+    
 	//Fetch all the cities sorted by UTC offset
 	CTzLocalizedCityArray* allCities = GetCitiesL(ETzUTCAscending);
 	TInt count = allCities->Count();
@@ -1400,6 +1468,7 @@ EXPORT_C CTzLocalizedCityArray* CTzLocalizer::GetCitiesWithUTCOffsetL(TInt aUTCO
 		TLinearOrder<CTzLocalizedCity> sortOrder(CitySortOrderL(aSortOrder));
 		allCities->Sort(sortOrder);
 		}
+OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETCITIESWITHUTCOFFSETL_EXIT, "CTzLocalizer::GetCitiesWithUTCOffsetL Exit" );
 
 	return allCities;
 	}
@@ -1415,6 +1484,8 @@ as all elements in the returned array will have the same UTC offset.
 */
 EXPORT_C CTzLocalizedTimeZoneArray* CTzLocalizer::GetTimeZonesWithUTCOffsetL(TInt aUTCOffsetInMinutes, const TTzSortOrder aSortOrder)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETTIMEZONESWITHUTCOFFSETL_ENTRY, "CTzLocalizer::GetTimeZonesWithUTCOffsetL Entry;aUTCOffsetInMinutes=%d;aSortOrder=%u", aUTCOffsetInMinutes, aSortOrder );
+    
 	//Fetch all the time zones sorted by UTC offset
 	CTzLocalizedTimeZoneArray* allTimeZones = GetAllTimeZonesL(ETzUTCAscending);
 	TInt count = allTimeZones->Count();
@@ -1436,6 +1507,8 @@ EXPORT_C CTzLocalizedTimeZoneArray* CTzLocalizer::GetTimeZonesWithUTCOffsetL(TIn
 		TLinearOrder<CTzLocalizedTimeZone> sortOrder(TimeZoneSortOrderL(aSortOrder));
 		allTimeZones->Sort(sortOrder);
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_GETTIMEZONESWITHUTCOFFSETL_EXIT, "CTzLocalizer::GetTimeZonesWithUTCOffsetL Exit" );
+	
 	return allTimeZones;
 	}
 /**
@@ -1579,6 +1652,8 @@ TLinearOrder<CTzLocalizedTimeZone> CTzLocalizer::TimeZoneSortOrderL(const TTzSor
  */
 TBool CTzLocalizer::FindCityAndSetCityIndexL(CTzLocalizedCity& aLocalizedCity, TTzLocalizerDataSource aDataSource)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDCITYANDSETCITYINDEXL_ENTRY, "CTzLocalizer::FindCityAndSetCityIndexL Entry;aDataSource=%u", aDataSource );
+    
 	TBool hasFound = EFalse;
     CTzLocalizedCityArray* citiesInDb = CTzLocalizedCityArray::NewLC();
     if(aDataSource == ETzDataSourceSystem)
@@ -1601,6 +1676,8 @@ TBool CTzLocalizer::FindCityAndSetCityIndexL(CTzLocalizedCity& aLocalizedCity, T
             }
         }
     CleanupStack::PopAndDestroy(citiesInDb);
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_FINDCITYANDSETCITYINDEXL_EXIT, "CTzLocalizer::FindCityAndSetCityIndexL Exit;hasFound=%u", hasFound );
+    
     return hasFound;
 	}
 
@@ -1650,6 +1727,8 @@ supplied.
 */
 void CTzLocalizer::WriteAllFrequentlyUsedZonesL(const CTzLocalizedTimeZoneArray& aTimeZones, const CTzLocalizedCityArray& aCities)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_WRITEALLFREQUENTLYUSEDZONESL_ENTRY, "CTzLocalizer::WriteAllFrequentlyUsedZonesL Entry" );
+    
 	// Ensure that the numbers of items in the arrays are the expected amount
 	__ASSERT_ALWAYS(aTimeZones.Count() == CTzLocalizedTimeZone::ECachedTimeZones &&
 					aCities.Count() == CTzLocalizedTimeZone::ECachedTimeZones, User::Leave(KErrArgument));
@@ -1682,6 +1761,8 @@ void CTzLocalizer::WriteAllFrequentlyUsedZonesL(const CTzLocalizedTimeZoneArray&
 
 	CleanupStack::PopAndDestroy();	// cities
 	CleanupStack::PopAndDestroy();	// timeZones
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZER_WRITEALLFREQUENTLYUSEDZONESL_EXIT, "CTzLocalizer::WriteAllFrequentlyUsedZonesL Exit" );
+	
 	}
 
 void CTzLocalizer::SetFrequentlyUsedZoneL(const CTzLocalizedTimeZone& aTimeZone, const CTzLocalizedCity& aCity,

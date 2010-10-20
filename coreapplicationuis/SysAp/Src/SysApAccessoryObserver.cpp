@@ -20,8 +20,8 @@
 #include "SysApAccessoryObserver.h"
 #include "SysAp.hrh"
 #include "SysApAppUi.h"
-#include <Accpolgenericidarray.h>
-#include <Accpolgenericid.h>
+#include <AccPolGenericIDArray.h>
+#include <AccPolGenericID.h>
 
 #include <e32svr.h>      // RDebug
 

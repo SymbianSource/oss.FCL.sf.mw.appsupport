@@ -183,6 +183,7 @@ void COutOfDiskNotifyObserver::HandleNotifyDisk(
         case EDiskRemoved:
             TRACES("COutOfDiskNotifyObserver::HandleNotifyDisk: EDiskRemoved");
             iDiskNotifyHandler->CancelNotifyDiskSpace(aEvent.iDrive);
+            iOutOfDiskMonitor->SaveDriveStatus(aEvent.iDrive, DISK_SPACE_OK, ETrue);
             break;
         case EDiskStatusChanged:
             TRACES("COutOfDiskNotifyObserver::HandleNotifyDisk: EDiskStatusChanged");

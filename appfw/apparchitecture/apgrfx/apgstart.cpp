@@ -23,6 +23,10 @@
 #include "APGCLI.H"
 #include "APACMDLN.H"
 #include "APGSTD.H"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "apgstartTraces.h"
+#endif
 
 #if defined(USE_IH_RAISE_EVENT)		
 // For performance system test 
@@ -97,13 +101,15 @@ found; otherwise one of the other system-wide error codes.
 */
 EXPORT_C TInt RApaLsSession::StartApp(const CApaCommandLine& aCommandLine,TThreadId& aThreadId,TRequestStatus* aRequestStatusForRendezvous )
 	{
-	return DoStartApp(aCommandLine, &aThreadId,aRequestStatusForRendezvous);
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_STARTAPP, "RApaLsSession::StartApp will return value of DoStartApp" );
+    return DoStartApp(aCommandLine, &aThreadId,aRequestStatusForRendezvous);
 	}
 
 
 TInt RApaLsSession::DoStartApp(const CApaCommandLine& aCommandLine, TThreadId* aThreadId,TRequestStatus* aRequestStatusForRendezvous)
 	{
 	TRAPD(error, DoStartAppL(aCommandLine, aThreadId, aRequestStatusForRendezvous));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, RAPALSSESSION_DOSTARTAPP, "RApaLsSession::DoStartApp will return with error returned from DoStartAppL : error=%d", error );
 	return error;
 	}
 
@@ -134,6 +140,7 @@ void RApaLsSession::DoStartAppL(const CApaCommandLine& aCommandLine, TThreadId* 
 		// requesting from rule-based plug-ins if we can run an application 
 		// if server fails while requested rule-based plug-ins it returns a negative value - proceed with launching the application in this case
 		const TBool okayToRun = SendReceiveWithReconnect(EAppListServRuleBasedLaunching, TIpcArgs(&logicalExecutableName));
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, RAPALSSESSION_DOSTARTAPPL, "RApaLsSession::DoStartAppL will leave with error returned by SebdReceiveWithReconnect okayToRun=%d", okayToRun );
 		User::LeaveIfError(!okayToRun ? KErrCancel : okayToRun);	// May leave with KErrNotFound if exe not found
 		}
 
@@ -147,6 +154,7 @@ void RApaLsSession::DoStartAppL(const CApaCommandLine& aCommandLine, TThreadId* 
 	if (Handle()!=KNullHandle)
 		{
 		const TInt lengthOfOpaqueData=User::LeaveIfError(SendReceiveWithReconnect(EAppListServGetNativeExecutableNameIfNonNative, TIpcArgs(&nativeExecutableNameOfNonNativeApplication, &logicalExecutableName)));
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, DUP1_RAPALSSESSION_DOSTARTAPPL, "RApaLsSession::DoStartAppL will leave with error returned by GetNewOpaueData" );
 		User::LeaveIfError(GetNewOpaqueData(opaqueData, lengthOfOpaqueData));
 		}
 
@@ -154,13 +162,18 @@ void RApaLsSession::DoStartAppL(const CApaCommandLine& aCommandLine, TThreadId* 
 	// assumes "logicalExecutableName" is itself a native executable
 	TUidType uidType(KNullUid, KNullUid, KNullUid);
 	TInt err = process.CreateWithStackOverride(logicalExecutableName, KNullDesC, uidType, MinApplicationStackSize(), EOwnerProcess);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR_INTERNAL, DUP2_RAPALSSESSION_DOSTARTAPPL, "process.CreateWithStackOverride returned with err=%d", err );
+	
 	 
 	// If we haven't been able to create the process using the native executable name from the command line
 	// object, instead try to create it using the native executable name of the non-native application.
 	// Can only do this if apparc is connected and thus this name has been retrieved above and 
 	// nativeExecutableNameOfNonNativeApplication populated.
 	if (err && nativeExecutableNameOfNonNativeApplication.Length() > 0)
+	    {
 		err = process.CreateWithStackOverride(nativeExecutableNameOfNonNativeApplication, KNullDesC, uidType, MinApplicationStackSize(), EOwnerProcess);
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR_INTERNAL, DUP3_RAPALSSESSION_DOSTARTAPPL, "RApaLsSession::DoStartAppL err=%d", err );
+	    }
 
 	// if we managed to create the process via either of the two methods attempted above (with the native 
 	// name or the native name of the non-native app), finish setting it up and "resume" it
@@ -195,6 +208,8 @@ void RApaLsSession::DoStartAppL(const CApaCommandLine& aCommandLine, TThreadId* 
 		}
 
 	CleanupStack::PopAndDestroy(&opaqueData);
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, DUP4_RAPALSSESSION_DOSTARTAPPL, "RApaLsSession::DoStartAppL will leave with err=%d", err );
 	User::LeaveIfError(err);
 	} //lint !e1762 Suppress member function could be made const
 	
@@ -234,14 +249,20 @@ it then invokes aOpcode
 */
 TInt RApaLsSession::GetExecutableNameAndNewOpaqueData(TDes& aNativeExecutableName, TDes& aLogicalExecutableName, HBufC8*& aOpaqueData, TIpcArgs& aIpcArgs, TInt aOpcode) const
 	{
+    OstTraceDefExt4( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, DUP1_RAPALSSESSION_GETEXECUTABLENAMEANDNEWOPAQUEDATA, "RApaLsSession::GetExecutableNameAndNewOpaqueData;aNativeExecutableName=%S;aLogicalExecutableName=%S;aOpaqueData=%s;aOpcode=%d", aNativeExecutableName, aLogicalExecutableName, *aOpaqueData, aOpcode );
+    
 	aNativeExecutableName.SetLength(0); // if this comes out zero-length from EAppListServExecutableNameForXxx below then use the logicalExecutableName in RProcess::Create (in this case it's a native C++ application)
 	aIpcArgs.Set(0, &aNativeExecutableName);
 	aIpcArgs.Set(1, &aLogicalExecutableName);
 	
 	const TInt lengthOfOpaqueData = SendReceiveWithReconnect(aOpcode, aIpcArgs);
 	if (lengthOfOpaqueData < 0)
-		return lengthOfOpaqueData; // it's an error code
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, RAPALSSESSION_GETEXECUTABLENAMEANDNEWOPAQUEDATA, "RApaLsSession::GetExecutableNameAndNewOpaqueData will return with error returned by SendReceiveWithConnect : lengthOfOpaqueData=%d", lengthOfOpaqueData );
+        return lengthOfOpaqueData; // it's an error code
+	    }
 
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, DUP3_RAPALSSESSION_GETEXECUTABLENAMEANDNEWOPAQUEDATA, "RApaLsSession::GetExecutableNameAndNewOpaqueData will return with value returned by GetNewOpaqueData" );
 	return GetNewOpaqueData(aOpaqueData, lengthOfOpaqueData);
 	}
 
@@ -251,9 +272,14 @@ Returns an error code if no opaque data could be allocated or fetched.
 */
 TInt RApaLsSession::GetNewOpaqueData(HBufC8*& aOpaqueData, TInt aLengthOfOpaqueData) const
 	{
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETNEWOPAQUEDATA_ENTRY, "RApaLsSession::GetNewOpaqueData;aOpaqueData=%s;aLengthOfOpaqueData=%d", *aOpaqueData, aLengthOfOpaqueData );
+    
 	aOpaqueData = NULL;
 	if(!aLengthOfOpaqueData)
-		return KErrNone;	// Nothing to get
+	    {
+        OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, RAPALSSESSION_GETNEWOPAQUEDATA, "RApaLsSession::GetNewOpaqueData will return with KErrNone");
+        return KErrNone;	// Nothing to get
+	    }
 	
 	// Make sure it's not a negative error code
 	ASSERT(aLengthOfOpaqueData > 0);
@@ -271,6 +297,7 @@ TInt RApaLsSession::GetNewOpaqueData(HBufC8*& aOpaqueData, TInt aLengthOfOpaqueD
 	else
 		aOpaqueData = opaqueData;
 	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, DUP1_RAPALSSESSION_GETNEWOPAQUEDATA, "RApaLsSession::GetNewOpaqueData will return with error returned from SendReceiveWithReconnect error=%d", error );
 	return error;
 	}
 
@@ -289,7 +316,8 @@ TInt RApaLsSession::StartApplicationPassingFileHandle(const TDesC& aNativeExecut
 
 					DoStartApplicationL(aNativeExecutableName, *commandLine, aThreadId, aRequestStatusForRendezvous);
 					CleanupStack::PopAndDestroy(commandLine));
-					
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, DUP1_RAPALSSESSION_STARTAPPLICATIONPASSINGFILEHANDLE, "RApaLsSession::StartApplicationPassingFileHandle will return with error=%d", error );
 	return error;
 	}
 	
@@ -305,7 +333,8 @@ TInt RApaLsSession::StartApplicationPassingDocumentName(const TDesC& aNativeExec
 
 					DoStartApplicationL(aNativeExecutableName, *commandLine, aThreadId, aRequestStatusForRendezvous);
 					CleanupStack::PopAndDestroy(commandLine));
-
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW_INTERNAL, RAPALSSESSION_STARTAPPLICATIONPASSINGDOCUMENTNAME, "RApaLsSession::StartApplicationPassingDocumentName will return with error =%d", error );
 	return error;
 	}
 
@@ -321,6 +350,8 @@ void RApaLsSession::DoStartApplicationL(const TDesC& aNativeExecutableName, cons
 	if(Handle() != KNullHandle)	// Connected to AppArc server?
 		{
 		const TBool okayToRun = SendReceiveWithReconnect(EAppListServRuleBasedLaunching, TIpcArgs(&actualNativeExecutableName));
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_NORMAL, RAPALSSESSION_DOSTARTAPPLICATIONL, "SendReceiveWithReconnect with okayToRun=%d", okayToRun );
+		
 		// If server fails while requested rule-based plug-ins it returns a negative value. 
 		// We shall proceed with launching an application in this case.
 		User::LeaveIfError(!okayToRun ? KErrCancel : okayToRun);	// May leave with KErrNotFound if exe is not found or KErrNotSupported if embeddable only
@@ -363,10 +394,16 @@ one of the other system-wide error codes.
 */
 EXPORT_C TInt RApaLsSession::StartDocument(const TDesC& aDocFileName, TThreadId& aThreadId, TLaunchType /*aLaunchType*/)
 	{
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_STARTDOCUMENT_ENTRY, "RApaLsSession::StartDocument :aDocFileName=%S;aThreadId=%x", aDocFileName, ( TUint )&( aThreadId ) );
+    
+    
 	HBufC8* buffer = NULL;
 	TInt error = GetNewBufferFromFile(buffer, aDocFileName);
 	if (error)
-		return error;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP2_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned by GetNewBufferFromFile : error=%d", error );
+        return error;
+	    }
 
 	TFileName nativeExecutableName; // the name of the EXE that we pass to RProcess::Create
 	TFileName logicalExecutableName; // the name of the MIDlet, Python script, etc
@@ -375,16 +412,22 @@ EXPORT_C TInt RApaLsSession::StartDocument(const TDesC& aDocFileName, TThreadId&
 	ipcArgs.Set(2, &aDocFileName);
 	ipcArgs.Set(3, buffer);
 	error = GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenDocument);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP3_RAPALSSESSION_STARTDOCUMENT, "GetExecutableNameAndNewOpaqueData returned with error=%d", error );
+	
 	if (error)
 		{
 		delete buffer;
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP4_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned by GetExecutableNameAndNewOpaqueData" );
 		return error;
 		}
 		
 	error = StartApplicationPassingDocumentName(nativeExecutableName, logicalExecutableName, opaqueData, aDocFileName, aThreadId, EApaCommandOpen, NULL);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP5_RAPALSSESSION_STARTDOCUMENT, "StartApplicationPassingDocumentName returned with error=%d", error );
+	
 	delete opaqueData;
 
 	delete buffer;
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP6_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error=%d", error );
 	return error;
 	}
 
@@ -407,14 +450,22 @@ EXPORT_C TInt RApaLsSession::StartDocument(RFile& aDocFile, TThreadId& aThreadId
 	HBufC8* opaqueData = NULL;
 	TIpcArgs ipcArgs;
 	TInt error = aDocFile.TransferToServer(ipcArgs, 2, 3);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_STARTDOCUMENT, "aDocFile.TransferToServer returned with error =%d", error );
+	
 	if (!error)
 		error = GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenDocumentPassedByFileHandle);
 	
 	if (error)
-		return error;
-
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error =%d", error );
+        return error;
+	    }
+	
+	OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP7_RAPALSSESSION_STARTDOCUMENT, "Logical Executable name : [%S]; Native executable name : [%S]", logicalExecutableName, nativeExecutableName );
 	error = StartApplicationPassingFileHandle(nativeExecutableName, logicalExecutableName, opaqueData, aDocFile, aThreadId, aRequestStatusForRendezvous);
 	delete opaqueData;
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP8_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error =%d", error );
 	return error;
 	} //lint !e1764 Suppress reference parameter could be declared const ref
 
@@ -441,11 +492,15 @@ EXPORT_C TInt RApaLsSession::StartDocument(const TDesC& aDocFileName, const TDat
 	ipcArgs.Set(2, &dataType);
 	TInt error=GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenDataType);
 	if (error)
-		return error;
-
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP9_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned GetExecutablleNameAndNewOpaqueData;error=%d", error );
+        return error;
+	    }
+	
 	error = StartApplicationPassingDocumentName(nativeExecutableName, logicalExecutableName, opaqueData, aDocFileName, aThreadId,EApaCommandOpen,NULL);
 	delete opaqueData;
 
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP10_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error StartApplicationPassingDocumentName : error=%d", error );
 	return error;
 	}
 
@@ -469,11 +524,17 @@ EXPORT_C TInt RApaLsSession::StartDocument(RFile& aDocFile, const TDataType& aDa
 	TIpcArgs ipcArgs;
 	ipcArgs.Set(2, &dataType);
 	TInt error = GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenDataType);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP11_RAPALSSESSION_STARTDOCUMENT, "GetExecutabkeNameAndNewOpaqueData returned with error =%d", error );
+	
 	if (error)
-		return error;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP12_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned by GetExecutableNameAndNewOpaqueData : error=%d", error );
+        return error;
+	    }
 
 	error = StartApplicationPassingFileHandle(nativeExecutableName, logicalExecutableName, opaqueData, aDocFile, aThreadId, aRequestStatusForRendezvous);
 	delete opaqueData;
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP13_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned by StartApplicationPassingFileHandle : error=%d", error );
 	return error;
 	} //lint !e1764 Suppress reference parameter could be declared const ref
 
@@ -491,6 +552,8 @@ the list has not completed; KErrNotFound, if no suitable application can
 be found; otherwise one of the other system-wide error codes. */
 EXPORT_C TInt RApaLsSession::StartDocument(const TDesC& aDocFileName, TUid aAppUid, TThreadId& aThreadId, TLaunchType /*aLaunchType*/)
 	{
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP17_RAPALSSESSION_STARTDOCUMENT_ENTRY, "RApaLsSession::StartDocument;aDocFileName=%S;aAppUid.iUid=%d", aDocFileName, aAppUid.iUid );
+    
 	// Get the executable file name and "opaque" app meta-data from AppArc server
 	
 	TFileName nativeExecutableName; // the name of the EXE that we pass to RProcess::Create
@@ -501,14 +564,20 @@ EXPORT_C TInt RApaLsSession::StartDocument(const TDesC& aDocFileName, TUid aAppU
 	ipcArgs.Set(2, aAppUid.iUid);
 	
 	TInt error = GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenAppUid);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP14_RAPALSSESSION_STARTDOCUMENT, "GetExecutableNameAndNewOpaquedata returned with error =%d", error );
+	
 	if (error)
-		return error;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP15_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned by GetExecutableNameAndNewOpaqueData : error=%d", error );
+        return error;
+	    }
 	
 	// Start the application, passing it the document file name
 
 	error = StartApplicationPassingDocumentName(nativeExecutableName, logicalExecutableName, opaqueData, aDocFileName, aThreadId, EApaCommandOpen, NULL);
 	delete opaqueData;
 	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP16_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with error returned by StartApplicationPassingDocumentName : error=%d", error );
 	return error;
 	}
 
@@ -531,10 +600,14 @@ EXPORT_C TInt RApaLsSession::StartDocument(RFile& aDocFile, TUid aAppUid, TThrea
 	ipcArgs.Set(2, aAppUid.iUid);
 	TInt error = GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenAppUid);
 	if (error)
-		return error;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP17_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with the return value of GetExecutableNameAndNewOpaqueData : error=%d", error );
+        return error;
+	    }
 
 	error = StartApplicationPassingFileHandle(nativeExecutableName, logicalExecutableName, opaqueData, aDocFile, aThreadId, aRequestStatusForRendezvous);
 	delete opaqueData;
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP18_RAPALSSESSION_STARTDOCUMENT, "RApaLsSession::StartDocument will return with the return value of StartApplicationPassingFileHandle : error=%d", error );
 	return error;
 	} //lint !e1764 Suppress reference parameter could be declared const ref
 
@@ -567,11 +640,14 @@ EXPORT_C TInt RApaLsSession::CreateDocument(const TDesC& aDocFileName, TUid aApp
 	ipcArgs.Set(2, aAppUid.iUid);
 	TInt error = GetExecutableNameAndNewOpaqueData(nativeExecutableName, logicalExecutableName, opaqueData, ipcArgs, EAppListServGetExecutableNameGivenAppUid);
 	if (error)
-		return error;
-
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_CREATEDOCUMENT, "RApaLsSession::CreateDocument will return with error returned from GetExecutableNameAndNewOpaqueData=%d", error );
+        return error;
+	    }
 	error = StartApplicationPassingDocumentName(nativeExecutableName, logicalExecutableName, opaqueData, aDocFileName, aThreadId,EApaCommandCreate,NULL);
 	delete opaqueData;
-
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_CREATEDOCUMENT, "RApaLsSession::CreateDocument will return with return value of StartApplicationPassingDocumentName =%d", error );
 	return error;
 	}
 	

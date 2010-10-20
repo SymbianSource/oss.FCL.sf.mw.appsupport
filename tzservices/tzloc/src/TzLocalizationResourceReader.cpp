@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -17,7 +17,12 @@
 #include "TzLocalizationDataTypes.h"		//CTzLocalizedCity etc
 #include "TzLocalizer.h"					//TTzLocalizerPanics
 
-#include <bautils.h>						//BaflUtils::NearestLanguageFile
+#include <bautils.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "TzLocalizationResourceReaderTraces.h"
+#endif
+						//BaflUtils::NearestLanguageFile
 
 // Resource File locations
 _LIT(KTzLocalizationTimeZoneResourceFileName,"\\Resource\\TimeZoneLocalization\\timezones.rSC");
@@ -58,6 +63,8 @@ Second phase contructor
 */
 void CTzLocalizationResourceReader::ConstructL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_CONSTRUCTL_ENTRY, "CTzLocalizationResourceReader::ConstructL Entry" );
+    
 	User::LeaveIfError(iFs.Connect());
 
 	// Assign Panic category, in case it's needed
@@ -115,6 +122,8 @@ void CTzLocalizationResourceReader::ConstructL()
 	TRAPD(timeZoneResErr,iTimeZoneResourceFile.OpenL(iFs,*timeZoneResourceFileName));
 	if(timeZoneResErr == KErrNotFound || timeZoneResErr == KErrPathNotFound)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, CTZLOCALIZATIONRESOURCEREADER_CONSTRUCTL, "CTzLocalizationResourceReader::ConstructL:Panic : ETzLocalizerPanicResourceFileNotFound" );
+	    
 		User::Panic(KTzLocalizationCategory,CTzLocalizer::ETzLocalizerPanicResourceFileNotFound);
 		}
 	User::LeaveIfError(timeZoneResErr);		
@@ -131,6 +140,8 @@ void CTzLocalizationResourceReader::ConstructL()
 		iGroupResourceFileExists = ETrue;
 		}
 	CleanupStack::PopAndDestroy(3, dirList); // groupResourceFileName, timeZoneResourceFileName, dirList
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_CONSTRUCTL_EXIT, "CTzLocalizationResourceReader::ConstructL Exit" );
+	
 	}
 
 /**
@@ -157,6 +168,8 @@ leave if the specified ID is not found.
 */
 TInt CTzLocalizationResourceReader::FindTimeZoneResourceIdL(const TInt aTimeZoneId)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_FINDTIMEZONERESOURCEIDL_ENTRY, "CTzLocalizationResourceReader::FindTimeZoneResourceIdL Entry;aTimeZoneId=%d", aTimeZoneId );
+    
 	TInt initialOffset = FirstTimeZoneResourceIdL();
 
 	TInt idToCheck;
@@ -178,13 +191,19 @@ TInt CTzLocalizationResourceReader::FindTimeZoneResourceIdL(const TInt aTimeZone
 		if(idToCheck == aTimeZoneId)
 			{
 			// return the current resource ID
+		    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_FINDTIMEZONERESOURCEIDL_EXIT, "CTzLocalizationResourceReader::FindTimeZoneResourceIdL Exit" );
+		    
 			return initialOffset + i;
 			}
 		++i;
 		}
 
 	// If it's got to here the aId hasn't been found, so leave
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_FINDTIMEZONERESOURCEIDL, "CTzLocalizationResourceReader::FindTimeZoneResourceIdL:Error: Time zone id = %d not found" ,aTimeZoneId);
+	
 	User::Leave(KErrNotFound);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_FINDTIMEZONERESOURCEIDL_EXIT2, "CTzLocalizationResourceReader::FindTimeZoneResourceIdL Exit;KErrNotFound=%d", KErrNotFound );
+	
 
 	return KErrNotFound;	// To satisfy compiler
 	}
@@ -206,6 +225,8 @@ TInt CTzLocalizationResourceReader::LocalizedResourceIdL(const RResourceFile& aR
 
 	if(!aResourceFile.OwnsResourceIdL(resourceIdToReturn))
 		{
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_LOCALIZEDRESOURCEIDL, "CTzLocalizationResourceReader::LocalizedResourceIdL:Error : Resource id = %d not found",resourceIdToReturn );
+	    
 		User::Leave(KErrNotFound);
 		}
 
@@ -260,6 +281,8 @@ void CTzLocalizationResourceReader::BufferResourceL(const RResourceFile& aResour
 	{
 	if(!aResourceFile.OwnsResourceIdL(aResourceId))
 		{
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_BUFFERRESOURCEL, "CTzLocalizationResourceReader::BufferResourceL:Error; resource id=%d not found", aResourceId );
+	    
 		User::Leave(KErrNotFound);
 		}
 
@@ -334,6 +357,8 @@ Reads all time zones from the resource file and appends them to the supplied arr
 */
 void CTzLocalizationResourceReader::ReadAllTimeZonesL(CTzLocalizedTimeZoneArray& aTimeZones)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READALLTIMEZONESL_ENTRY, "CTzLocalizationResourceReader::ReadAllTimeZonesL Entry" );
+    
 	TInt initialOffset = FirstTimeZoneResourceIdL();
 
 	// Variables for us in loop
@@ -358,8 +383,12 @@ void CTzLocalizationResourceReader::ReadAllTimeZonesL(CTzLocalizedTimeZoneArray&
 	// If no owned resources were found - Leave
 	if(i == 0)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_READALLTIMEZONESL, "CTzLocalizationResourceReader::ReadAllTimeZonesL;Error : No owned resources found" );
+	    
 		User::Leave(KErrNotFound);
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READALLTIMEZONESL_EXIT, "CTzLocalizationResourceReader::ReadAllTimeZonesL Exit" );
+	
 	}
 
 /**
@@ -516,6 +545,8 @@ currently found in iResourceReader.
 */
 void CTzLocalizationResourceReader::AddCityArrayFromResourceL(CTzLocalizedCityArray& aCities, const TInt aResourceId)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_ADDCITYARRAYFROMRESOURCEL_ENTRY, "CTzLocalizationResourceReader::AddCityArrayFromResourceL Entry;aResourceId=%d", aResourceId );
+    
 	// Eat up the localised time zone info from the resource
 	CTzLocalizedTimeZone* timeZone = CreateTimeZoneFromResourceL(aResourceId);
 
@@ -532,6 +563,8 @@ void CTzLocalizationResourceReader::AddCityArrayFromResourceL(CTzLocalizedCityAr
 	// Leave if no cities are found
 	if(numCities < 1)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_ADDCITYARRAYFROMRESOURCEL, "CTzLocalizationResourceReader::AddCityArrayFromResourceL:No cities found" );
+	    
 		User::Leave(KErrNotFound);
 		}
 
@@ -554,6 +587,8 @@ void CTzLocalizationResourceReader::AddCityArrayFromResourceL(CTzLocalizedCityAr
 		CleanupStack::Pop(city);
 		city = NULL;
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, DUP1_CTZLOCALIZATIONRESOURCEREADER_ADDCITYARRAYFROMRESOURCEL_EXIT, "CTzLocalizationResourceReader::AddCityArrayFromResourceL Exit" );
+	
 	}
 
 /**
@@ -567,6 +602,8 @@ the group numbering in the resource file is incorrect.
 */
 void CTzLocalizationResourceReader::ReadCitiesInGroupL(CTzLocalizedCityArray& aCities, const TUint8 aGroupId)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READCITIESINGROUPL_ENTRY, "CTzLocalizationResourceReader::ReadCitiesInGroupL Entry" );
+    
 	if(iGroupResourceFileExists)
 	// Only do this if a groups resource file exists - otherwise no groups have been specified
 		{
@@ -613,6 +650,8 @@ void CTzLocalizationResourceReader::ReadCitiesInGroupL(CTzLocalizedCityArray& aC
 		CleanupStack::PopAndDestroy(citiesInTimeZone);
 		citiesInTimeZone = NULL;
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READCITIESINGROUPL_EXIT, "CTzLocalizationResourceReader::ReadCitiesInGroupL Exit" );
+	
 	}
 
 /**
@@ -659,6 +698,8 @@ CTzLocalizedCityGroup* CTzLocalizationResourceReader::ReadGroupL(const TUint8 aG
 	{
 	if(aGroupId < 1)
 		{
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_READGROUPL, "CTzLocalizationResourceReader::ReadGroupL:Error;Invalid groud id = %d",aGroupId );
+	    
 		User::Leave(KErrArgument);
 		}
 
@@ -680,6 +721,8 @@ CTzLocalizedCityGroup* CTzLocalizationResourceReader::ReadGroupL(const TUint8 aG
 	// resource file exists or not, because this function already leaves
 	// with KErrNotFound if the specified Group ID is not found.
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, DUP1_CTZLOCALIZATIONRESOURCEREADER_READGROUPL, "CTzLocalizationResourceReader::ReadGroupL:Error;Group resource file not found" );
+	    
 		User::Leave(KErrNotFound);
 		}
 
@@ -780,6 +823,8 @@ Read and return the specified cached zone.
 */
 CTzLocalizedTimeZone* CTzLocalizationResourceReader::ReadFrequentlyUsedZoneL(const CTzLocalizedTimeZone::TTzFrequentlyUsedZone aFrequentlyUsedZone)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READFREQUENTLYUSEDZONEL_ENTRY, "CTzLocalizationResourceReader::ReadFrequentlyUsedZoneL Entry;aFrequentlyUsedZone=%u", aFrequentlyUsedZone );
+    
 	// You cannot pass ECachedTimeZones in as the argument, because it is only
 	// used to keep count of how many cached zones there are.
 	__ASSERT_ALWAYS(aFrequentlyUsedZone != CTzLocalizedTimeZone::ECachedTimeZones, User::Leave(KErrArgument));
@@ -813,8 +858,12 @@ CTzLocalizedTimeZone* CTzLocalizationResourceReader::ReadFrequentlyUsedZoneL(con
 		break;
 		case CTzLocalizedTimeZone::ECurrentZone:	// FALL THROUGH to default - current zone not supported
 		default:
+		    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_READFREQUENTLYUSEDZONEL, "CTzLocalizationResourceReader::ReadFrequentlyUsedZoneL:Error:Invalid zone " );
+		    
 			User::Leave(KErrArgument);
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READFREQUENTLYUSEDZONEL_EXIT, "CTzLocalizationResourceReader::ReadFrequentlyUsedZoneL Exit" );
+	
 
 	return cachedTimeZone;
 	}
@@ -828,6 +877,8 @@ Read and return the city used to set thespecified cached zone.
 */
 CTzLocalizedCity* CTzLocalizationResourceReader::ReadCachedTimeZoneCityL(const CTzLocalizedTimeZone::TTzFrequentlyUsedZone aFrequentlyUsedZone)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READCACHEDTIMEZONECITYL_ENTRY, "CTzLocalizationResourceReader::ReadCachedTimeZoneCityL Entry;aFrequentlyUsedZone=%u", aFrequentlyUsedZone );
+    
 	// You cannot pass ECachedTimeZones in as the argument, because it is only
 	// used to keep count of how many cached zones there are.
 	__ASSERT_ALWAYS(aFrequentlyUsedZone != CTzLocalizedTimeZone::ECachedTimeZones, User::Leave(KErrArgument));
@@ -861,8 +912,12 @@ CTzLocalizedCity* CTzLocalizationResourceReader::ReadCachedTimeZoneCityL(const C
 		break;
 		case CTzLocalizedTimeZone::ECurrentZone:	// FALL THROUGH to default - current zone not supported
 		default:
+		    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZLOCALIZATIONRESOURCEREADER_READCACHEDTIMEZONECITYL, "CTzLocalizationResourceReader::ReadCachedTimeZoneCityL:Invalid zone" );
+		    
 			User::Leave(KErrArgument);
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONRESOURCEREADER_READCACHEDTIMEZONECITYL_EXIT, "CTzLocalizationResourceReader::ReadCachedTimeZoneCityL Exit" );
+	
 
 	return cachedCity;
 	}

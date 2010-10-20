@@ -36,7 +36,9 @@ void COomConfig::SetDefaultGoodRamThreshold(TInt aGoodRamThreshold)
 
 void COomConfig::SetSwapUsageMonitored(TBool aMonitored)
     {
+#ifndef __WINSCW__
     iGlobalConfig.iSwapUsageMonitored = aMonitored;
+#endif    
     }
 
 void COomConfig::SetDefaultLowSwapThreshold(TInt aLowSwapThreshold)

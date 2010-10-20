@@ -1,5 +1,5 @@
 
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,11 @@
 
 #include "timezoneserver.h"
 #include <s32file.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "MAINTraces.h"
+#endif
+
 
 CTZSrvScheduler::~CTZSrvScheduler()
 	{
@@ -47,7 +52,10 @@ static void RunServerL()
 	// Perform all server initialisation, in particular creation of the
 	// scheduler and server and then run the scheduler
 	//
-	{
+	{ 
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, _RUNSERVERL, "::RunServerL Entry" );
+    
+    
 	// create and install the active scheduler we need
 	CTZSrvScheduler* s = CTZSrvScheduler::NewL();
 	CleanupStack::PushL(s);
@@ -66,13 +74,18 @@ static void RunServerL()
 	//
 	// Cleanup the scheduler
 	CleanupStack::PopAndDestroy(s);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, __RUNSERVERL_EXIT, "::RunServerL Exit" );
+	
 	}
 
 GLDEF_C TInt E32Main()
 //
 // Timezone server entrypoint
 //
-	{
+	{     
+  OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, _E32MAIN_ENTRY, "::E32Main Entry" );
+  
+            
 	__UHEAP_MARK;
 	//
 	CTrapCleanup* cleanup = CTrapCleanup::New();
@@ -84,5 +97,7 @@ GLDEF_C TInt E32Main()
 		}
 	//
 	__UHEAP_MARKEND;
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, _E32MAIN_EXIT, "::E32Main Exit ;return value=%u", r );
+	
 	return r;
 	}

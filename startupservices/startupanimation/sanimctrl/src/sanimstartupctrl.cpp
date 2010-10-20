@@ -26,6 +26,9 @@
 #include <ProfileEngineSDKCRKeys.h>
 #include "sanimengine.h"
 #include <SecondaryDisplay/SecondaryDisplayStartupAPI.h>
+#include <MProfileEngineExtended2.h>
+
+
 
 #include "sanimstartupctrl.h"
 #include "trace.h"
@@ -440,9 +443,12 @@ TInt CSAnimStartupCtrl::ReadVolume(
 
     if ( volume > 0 )
         {
-        TBool isSilent = ETrue;
-        TRAPD_ERR( errorCode, isSilent = IsSilentL() );
-        ERROR( errorCode, "Failed to silent info" );
+		// Replacement of silent profile => Silence Mode
+		MProfileEngineExtended2 *profileEngine = ::CreateProfileEngineExtended2L();
+		//CleanupReleasePushL(profileEngine);
+		// 0: On 1: Off
+		TBool isSilent = profileEngine->SilenceModeL();
+		profileEngine->Release();
         if ( isSilent )
             {
             volume = 0;

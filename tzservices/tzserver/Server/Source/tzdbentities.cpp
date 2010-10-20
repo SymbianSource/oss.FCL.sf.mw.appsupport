@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,11 @@
 #include "tzdbentities.h"
 #include "ReadOnlyTzDb.h"
 #include <vtzrules.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "tzdbentitiesTraces.h"
+#endif
+
 
 /**
 This const must match the last TTzRuleDay enumeration in tzdefines.h.
@@ -308,6 +313,8 @@ CTzDbRegion::CTzDbRegion(CReadOnlyTzDb& aReadOnlyTzDb, const TTzRegion& aRegion)
 
 CTzDbZone* CTzDbRegion::FindZoneL(TUint aCityNameReference)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBREGION_FINDZONEL_ENTRY, "CTzDbRegion::FindZoneL Entry;aCityNameReference=%u", aCityNameReference );
+    
 	TTzRegionalZoneIndex* zoneIndex = const_cast<TTzRegionalZoneIndex*>(&iReadOnlyTzDb.GetTRegionalZoneIndex(iPersistedEntity.iOffsetToRegionalZoneIndex));
 	const TInt KZoneCount = zoneIndex->iNumberOfZones;
 	TTzZone* tzone(NULL);
@@ -321,11 +328,15 @@ CTzDbZone* CTzDbRegion::FindZoneL(TUint aCityNameReference)
 		}
 
 	// if it gets here, it means that the zone has not been found
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBREGION_FINDZONEL_EXIT, "CTzDbRegion::FindZoneL Exit" );
+	
 	return NULL;
 	}
 
 CTzDbZone* CTzDbRegion::FindZoneL(const TDesC8& aCityName)
 	{
+    OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBREGION_FINDZONEL_ENTRY2, "CTzDbRegion::FindZoneL Entry;aCityName=%s", aCityName );
+    
 	TTzZone* tzone(NULL);
 	TTzRegionalZoneIndex* zoneIndex = const_cast<TTzRegionalZoneIndex*>(&iReadOnlyTzDb.GetTRegionalZoneIndex(iPersistedEntity.iOffsetToRegionalZoneIndex));
 	const TInt KZoneCount = zoneIndex->iNumberOfZones;
@@ -363,6 +374,7 @@ CTzDbZone* CTzDbRegion::FindZoneL(const TDesC8& aCityName)
 			start = mid + 1;
 			}
 		}
+OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBREGION_FINDZONEL_EXIT2, "CTzDbRegion::FindZoneL Exit;found=%u", found );
 
 	if (found)
 		{
@@ -390,6 +402,9 @@ CTzDbZone::CTzDbZone(CReadOnlyTzDb& aReadOnlyTzDb, const TTzZone& aZone)
 
 void CTzDbZone::GetRulesL(CTzRules& aRules)
 	{	
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBZONE_GETRULESL_ENTRY, "CTzDbZone::GetRulesL Entry;Start year=%d;End year=%d",aRules.StartYear(), aRules.EndYear() );
+    
+    
 	// start and end years of interest
 	TInt firstYearOfInterest = aRules.StartYear();
 	TInt lastYearOfInterest = aRules.EndYear();
@@ -472,6 +487,8 @@ void CTzDbZone::GetRulesL(CTzRules& aRules)
 				}
 			} // if IsTimeInStdTimeAlignment(...)
 		} // for
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBZONE_GETRULESL_EXIT, "CTzDbZone::GetRulesL Exit" );
+	
 			
 	}
 	
@@ -626,6 +643,8 @@ CTzDbStdTimeAlignment::~CTzDbStdTimeAlignment()
 
 void CTzDbStdTimeAlignment::GetRulesL(CTzRules& aRules, const TDateTime& aStartDateTime, TDateTime& aEndDateTime)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBSTDTIMEALIGNMENT_GETRULESL_ENTRY, "CTzDbStdTimeAlignment::GetRulesL Entry" );
+    
 	// get the ruleSet for this time alignment
 	CTzDbRuleSet* ruleSet = iReadOnlyTzDb.GetRuleSetL(iPersistedEntity.iOffsetToRuleSet);
 	if (ruleSet)
@@ -657,10 +676,14 @@ void CTzDbStdTimeAlignment::GetRulesL(CTzRules& aRules, const TDateTime& aStartD
 	
 		CleanupStack::PopAndDestroy(2, ruleSet); // POP #2,#1 - NEWRULES, RULESET
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBSTDTIMEALIGNMENT_GETRULESL_EXIT, "CTzDbStdTimeAlignment::GetRulesL Exit" );
+	
 	}
 
 void CTzDbStdTimeAlignment::AddRulesToCollectionL(CTzRules& aRuleCollection, CTzRules& aNewRules)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBSTDTIMEALIGNMENT_ADDRULESTOCOLLECTIONL_ENTRy, "CTzDbStdTimeAlignment::AddRulesToCollectionL Entry" );
+        
 	TTzRule* tRule(NULL);
 	TVTzActualisedRule tActRule;
 	TInt count = aNewRules.Count();
@@ -825,6 +848,8 @@ void CTzDbStdTimeAlignment::AddRulesToCollectionL(CTzRules& aRuleCollection, CTz
 				}		
 			}
 		} // for
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBSTDTIMEALIGNMENT_ADDRULESTOCOLLECTIONL_EXIT, "CTzDbStdTimeAlignment::AddRulesToCollectionL Exit" );
+	
 	}
 
 TInt CTzDbStdTimeAlignment::UtcOffset()
@@ -973,6 +998,11 @@ CTzDbRuleSet::CTzDbRuleSet(CReadOnlyTzDb& aReadOnlyTzDb, const TTzRuleSet& aRule
 //
 void CTzDbRuleSet::GetRulesL(CTzRules& aTzRules, TInt aUtcOffset, const TDateTime& aStartDateTime, const TDateTime& aEndDateTime) const
 	{	
+    
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBRULESET_GETRULESL_ENTRY, "CTzDbRuleSet::GetRulesL Entry;aUtcOffset=%d;Startdate:Year=%d;Month=%d;Day=%d;Hours=%d", aUtcOffset,aStartDateTime.Year(),aStartDateTime.Month() , aStartDateTime.Day(),aStartDateTime.Hour() );
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBRULESET_GETRULESL_PARAM, "parameters cont..;Start date:Min=%d;Sec=%d;End Date:Year=%d;Month=%d;Day=%d", aStartDateTime.Minute(), aStartDateTime.Second(), aEndDateTime.Year(), aEndDateTime.Month(), aEndDateTime.Day() );
+    OstTraceDefExt3( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBRULESET_GETRULESL_ENTRY_PARAM2, "parameters cont..;Hour=%d;Min=%d;Sec=%d", aEndDateTime.Hour(), aEndDateTime.Minute(), aEndDateTime.Second() );
+    
 	TInt startYear = aStartDateTime.Year();
 	// the last year we are interested in is the earliest of the following:
 	// 		1) the last year of the CTzRules
@@ -1000,6 +1030,8 @@ void CTzDbRuleSet::GetRulesL(CTzRules& aTzRules, TInt aUtcOffset, const TDateTim
 	CompleteRulesAndAddToCollectionL(aTzRules,ruleDefs,ruleUses,aUtcOffset,initialLocalTimeOffset,aStartDateTime,endDateTime);
 	
 	CleanupStack::PopAndDestroy(2,&ruleDefs); // POP #2,#1 - ruleUses, ruleDefs
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBRULESET_GETRULESL_EXIT, "CTzDbRuleSet::GetRulesL Exit" );
+	
 	}
 
 TInt CTzDbRuleSet::GetLocalTimeOffsetAtEndOfYearL(TInt aYear, TInt aUtcOffset) const
@@ -1034,6 +1066,8 @@ void CTzDbRuleSet::CompleteRulesAndAddToCollectionL(
 					TInt aUtcOffset, TInt aInitialLocalTimeOffset,
 					TDateTime aStart, TDateTime aEnd) const
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBRULESET_COMPLETERULESANDADDTOCOLLECTIONL_ENTRY, "CTzDbRuleSet::CompleteRulesAndAddToCollectionL Entry" );
+    
 	TInt count = aRuleDefs.Count();
 	if (count != aRuleUses.Count())
 		{
@@ -1120,7 +1154,9 @@ void CTzDbRuleSet::CompleteRulesAndAddToCollectionL(
 			aTzRules.AddRuleL(trule);
 	
 			}
-		}	
+		}
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBRULESET_COMPLETERULESANDADDTOCOLLECTIONL_EXIT, "CTzDbRuleSet::CompleteRulesAndAddToCollectionL Exit" );
+	
 	}
 
 void CTzDbRuleSet::FetchRuleDefinitionsL(RArray<TTzRuleDefinition*>& aTzRuleDefinitions, RArray<TTzRuleUse*>& aTzRuleUses, TInt aStartYear, TInt aEndYear) const
@@ -1151,6 +1187,8 @@ void CTzDbRuleSet::FetchRuleDefinitionsL(RArray<TTzRuleDefinition*>& aTzRuleDefi
 
 void CTzDbRuleSet::ActualiseRuleDefinitionsL(CVTzActualisedRules& aActualisedRules, const RArray<TTzRuleDefinition*>& aTzRuleDefinitions, const RArray<TTzRuleUse*>& aTzRuleUses, TInt aUtcOffset, const TDateTime& aStartDateTime, const TDateTime& aEndDateTime, const TVTzActualisedRule& aDefaultRule) const
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZDBRULESET_ACTUALISERULEDEFINITIONSL_ENTRY, "CTzDbRuleSet::ActualiseRuleDefinitionsL Entry" );
+    
 	TInt startYear = aStartDateTime.Year();
 	TInt endYear = (aActualisedRules.EndYear() < (TUint)aEndDateTime.Year()) ? aActualisedRules.EndYear() : aEndDateTime.Year();	
 	TInt rulesAddedSoFar = 0;
@@ -1190,7 +1228,9 @@ void CTzDbRuleSet::ActualiseRuleDefinitionsL(CVTzActualisedRules& aActualisedRul
 	if ( (rulesAddedSoFar == 0) || (yearOfFirstRule > startYear) )
 		{
 		aActualisedRules.AddRuleL(aDefaultRule);
-		}			
+		}	
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZDBRULESET_ACTUALISERULEDEFINITIONSL_EXIT, "CTzDbRuleSet::ActualiseRuleDefinitionsL Exit" );
+	
 	}
 	
 //============================================================================================

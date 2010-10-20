@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,6 +22,11 @@
 #include <tzuserdefineddata.h>
 #endif
 #include "tzidinternal.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "tzuserdataTraces.h"
+#endif
+
 
 _LIT(KUserDatabaseName, "c:\\private\\1020383e\\SQLite__tzuserdata.db");
 _LIT(KTzPrivatePath, "c:\\private\\1020383e\\");
@@ -182,6 +187,7 @@ void CTzUserDataDb::Close()
 		
 void CTzUserDataDb::OpenL()
 	{
+    
 	RFs fs;
 	CleanupClosePushL(fs);
 	
@@ -202,6 +208,8 @@ void CTzUserDataDb::OpenL()
 		}
 	else
 		{
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FATAL, CTZUSERDATADB_OPENL, "CTzUserDataDb::OpenL:Error while creating path;return value=%d", ret );
+	    
 		User::LeaveIfError(ret);
 		}
 	CleanupStack::PopAndDestroy(&fs);
@@ -216,6 +224,9 @@ void CTzUserDataDb::CreateL()
 	
 void CTzUserDataDb::CreateSchemaL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_CREATESCHEMAL_ENTRY, "CTzUserDataDb::CreateSchemaL ENtry" );
+    
+    
 	RSqlStatement stmt;
 	CleanupClosePushL(stmt);
 	
@@ -243,12 +254,18 @@ void CTzUserDataDb::CreateSchemaL()
 	stmt.Close();
 	
 	CleanupStack::PopAndDestroy(&stmt);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_CREATESCHEMAL_EXIT, "CTzUserDataDb::CreateSchemaL Exit" );
+	
 	}
 	
 TInt CTzUserDataDb::CreateTzL(const CTzRules& aRules, const CTzUserNames& aNames)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_CREATETZL_ENTRY, "CTzUserDataDb::CreateTzL Entry" );
+    
 	if(iBackupInProgress || iRestoreInProgress)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_CREATETZL_ERROR, "CTzUserDataDb::CreateTzL:Error:RestoreInProgress or RestoreInProgress" );
+	    
 		User::Leave(KErrLocked);
 		}
 
@@ -277,6 +294,8 @@ TInt CTzUserDataDb::CreateTzL(const CTzRules& aRules, const CTzUserNames& aNames
 	// If all the user IDs have been used, leave with KErrOverflow	
 	if(iNextCandidateTzId == KOutOfBoundsUserId)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_CREATETZL_ERROR1, "CTzUserDataDb::CreateTzL:All user ids has been used " );
+	    
 		User::Leave(KErrOverflow);		
 		}
 				
@@ -335,6 +354,8 @@ TInt CTzUserDataDb::CreateTzL(const CTzRules& aRules, const CTzUserNames& aNames
 		
 		if(ret < KErrNone)
 			{
+		    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_CREATETZL_ERROR2, "CTzUserDataDb::CreateTzL:Error while inserting rule:Error value=%d", ret );
+		    
 			User::Leave(ret);
 			}			
 		}
@@ -367,6 +388,8 @@ TInt CTzUserDataDb::CreateTzL(const CTzRules& aRules, const CTzUserNames& aNames
 	
 	if(ret < KErrNone)
 		{
+	    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_CREATETZL_ERROR3, "CTzUserDataDb::CreateTzL:Errror while inserting a row in Names;Error value=%d", ret );
+	    
 		User::Leave(ret);
 		}
 
@@ -412,13 +435,19 @@ TInt CTzUserDataDb::CreateTzL(const CTzRules& aRules, const CTzUserNames& aNames
 	NotifyTzNamesChange(retId, ETzUserDataCreated);
 
 	CleanupStack::PopAndDestroy(&stmt);
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_CREATETZL_EXIT, "CTzUserDataDb::CreateTzL Exit;retId=%u", retId );
+	
 	return retId;	
 	}
 	
 void CTzUserDataDb::ReadTzRulesL(CTzRules& aRules, TUint aTzId)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_READTZRULESL_ENTRY, "CTzUserDataDb::ReadTzRulesL Entry;aTzId=%u", aTzId );
+    
 	if(iBackupInProgress || iRestoreInProgress)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_READTZRULESL_ERROR, "CTzUserDataDb::ReadTzRulesL:Error:BackupInProgress or RestoreInProgress" );
+	    
 		User::Leave(KErrLocked);
 		}
 		
@@ -512,12 +541,18 @@ void CTzUserDataDb::ReadTzRulesL(CTzRules& aRules, TUint aTzId)
 	__ASSERT_ALWAYS(stmt.Next() == KSqlAtEnd, RTz::Panic(RTz::EPanicBadSchema));
 
 	CleanupStack::PopAndDestroy(&stmt);	
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_READTZRULESL_EXIT, "CTzUserDataDb::ReadTzRulesL Exit" );
+	
 	}
 
 CTzUserNames* CTzUserDataDb::ReadTzNamesL(TUint aTzId)
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZUSERDATADB_READTZNAMESL_ENTRY, "CTzUserDataDb::ReadTzNamesL Entry;aTzId=%u", aTzId );
+    
 	if(iBackupInProgress || iRestoreInProgress)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_READTZNAMESL_ERROR, "CTzUserDataDb::ReadTzNamesL:Error:RestoreInProgress or RestoreInProgress " );
+	    
 		User::Leave(KErrLocked);
 		}
 
@@ -586,14 +621,20 @@ CTzUserNames* CTzUserDataDb::ReadTzNamesL(TUint aTzId)
 	__ASSERT_ALWAYS(stmt.Next() == KSqlAtEnd, RTz::Panic(RTz::EPanicBadSchema));
 
 	CleanupStack::PopAndDestroy(&stmt);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_READTZNAMESL_EXIT, "CTzUserDataDb::ReadTzNamesL Exit" );
+	
 
 	return userNames;
 	}
 	
 void CTzUserDataDb::ReadTzIdsL(RArray<TUint32>& aTzIds)
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_READTZIDSL_ENTRY, "CTzUserDataDb::ReadTzIdsL Entry" );
+    
 	if(iBackupInProgress || iRestoreInProgress )
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_READTZIDSL_ERROR, "CTzUserDataDb::ReadTzIdsL:Error : BackupInProgress or RestoreInProgress" );
+	    
 		User::Leave(KErrLocked);
 		}
 	
@@ -614,12 +655,19 @@ void CTzUserDataDb::ReadTzIdsL(RArray<TUint32>& aTzIds)
 		}
 
 	CleanupStack::PopAndDestroy(&stmt);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_READTZIDSL_EXIT, "CTzUserDataDb::ReadTzIdsL Exit" );
+	
 	}
 	
 void CTzUserDataDb::UpdateTzL(TUint aTzId, const CTzRules& aTzRules, const CTzUserNames& aTzNames)
 	{	
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_UPDATETZL_ENTRY, "CTzUserDataDb::UpdateTzL Entry;aTzId=%u", aTzId );
+    
 	if(iBackupInProgress || iRestoreInProgress)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_UPDATETZL_ERROR, "CTzUserDataDb::UpdateTzL:Error:BackupInProgress or RestoreInProgress" );
+	    
+	    
 		User::Leave(KErrLocked);
 		} 
 		
@@ -797,6 +845,8 @@ void CTzUserDataDb::UpdateTzL(TUint aTzId, const CTzRules& aTzRules, const CTzUs
 	NotifyTzNamesChange(aTzId, ETzUserDataUpdated);
 	
 	CleanupStack::PopAndDestroy(&stmt);	
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_UPDATETZL_EXIT, "CTzUserDataDb::UpdateTzL Exit" );
+	
 	}
     
 /**
@@ -804,8 +854,12 @@ Delete the time zone rule and name from the database that matches aTzId
 */
 void CTzUserDataDb::DeleteTzL(TUint aTzId)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_DELETETZL_ENTRY, "CTzUserDataDb::DeleteTzL Entry;aTzId=%u", aTzId );
+    
 	if(iBackupInProgress || iRestoreInProgress)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATADB_DELETETZL_ERROR, "CTzUserDataDb::DeleteTzL:Error :BackupInProgress or RestoreInProgress" );
+	    
 		User::Leave(KErrLocked);
 		}
 		
@@ -855,6 +909,8 @@ void CTzUserDataDb::DeleteTzL(TUint aTzId)
 	NotifyTzNamesChange(aTzId, ETzUserDataDeleted);	
 	
 	CleanupStack::PopAndDestroy(&stmt);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZUSERDATADB_DELETETZL_EXIT, "CTzUserDataDb::DeleteTzL Exit" );
+	
 	}
 	
 void CTzUserDataDb::CleanupDatabaseRollback(TAny *aDatabase)
@@ -914,6 +970,7 @@ void CTzUserDataDb::NotifyTzRulesChange(TUint aTzId, TTzUserDataChangeOp aChange
     
 void CTzUserDataDb::NotifyTzNamesChange(TUint aTzId, TTzUserDataChangeOp aChangeOp)
 	{
+    
 	TTzUserDataChange change;
 	change.iTzId = aTzId;
 	change.iOperation = aChangeOp;
@@ -930,6 +987,8 @@ void CTzUserDataDb::NotifyTzNamesChange(TUint aTzId, TTzUserDataChangeOp aChange
 	NTzUpdate::TTzNamesChange namesChange;
 	namesChange.iUTCTimeOfNamesChange.UniversalTime();
 	TPckgBuf<NTzUpdate::TTzNamesChange> bufNames(namesChange);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, TZNAMES_CHANGE_NOTIFICATION_3, "CTzUserDataDb::NotifyTzNamesChange:Time zone names change notification" );
+	
 	RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ETzNamesChange, bufNames);	
 	}
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -78,5 +78,64 @@ data=\epoc32\wins\c\testHtml\outlook05.txt				testHtml\outlook05.txt
 data=\epoc32\wins\c\testHtml\outlook06.txt				testHtml\outlook06.txt
 data=\epoc32\wins\c\testHtml\outlook07.txt				testHtml\outlook07.txt
 data=\epoc32\wins\c\testHtml\test1.txt					testHtml\test1.txt
+
+// export the test files for armv5 in platsim
+ECOM_PLUGIN(CHtmlToCrtConverter.DLL, 10203591.RSC)
+data=EPOCROOT##epoc32\data\z\resource\convert\1000a90e.RSC		Resource\Convert\1000a90e.RSC
+data=EPOCROOT##epoc32\data\z\resource\convert\CHTMLTOCRTCONVERTER.RSC	Resource\Convert\CHTMLTOCRTCONVERTER.RSC
+						
+data=EPOCROOT##epoc32\data\Z\profiling\test001.txt				profiling\test001.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test002.txt				profiling\test002.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test003.txt				profiling\test003.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test004.txt				profiling\test004.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test005.txt				profiling\test005.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test006.txt				profiling\test006.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test007.txt				profiling\test007.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test008.txt				profiling\test008.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test009.txt				profiling\test009.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test010.txt				profiling\test010.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test011.txt				profiling\test011.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test012.txt				profiling\test012.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test013.txt				profiling\test013.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test014.txt				profiling\test014.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test015.txt				profiling\test015.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test016.txt				profiling\test016.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test017.txt				profiling\test017.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test018.txt				profiling\test018.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test019.txt				profiling\test019.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test020.txt				profiling\test020.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test030.txt				profiling\test030.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test040.txt				profiling\test040.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test050.txt				profiling\test050.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test060.txt				profiling\test060.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test070.txt				profiling\test070.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test080.txt				profiling\test080.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test090.txt				profiling\test090.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test100.txt				profiling\test100.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test110.txt				profiling\test110.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test120.txt				profiling\test120.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test130.txt				profiling\test130.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test140.txt				profiling\test140.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test150.txt				profiling\test150.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test160.txt				profiling\test160.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test170.txt				profiling\test170.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test180.txt				profiling\test180.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test190.txt				profiling\test190.txt
+data=EPOCROOT##epoc32\data\Z\profiling\test200.txt				profiling\test200.txt
+
+data=EPOCROOT##epoc32\data\Z\testHtml\eudora01.txt				testHtml\eudora01.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\LoadConverterTest.txt			testHtml\LoadConverterTest.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\malformed01.txt				testHtml\malformed01.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\malformed02.txt				testHtml\malformed02.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\malformed03.txt				testHtml\malformed03.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\other01.txt				testHtml\other01.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook01.txt				testHtml\outlook01.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook02.txt				testHtml\outlook02.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook03.txt				testHtml\outlook03.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook04.txt				testHtml\outlook04.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook05.txt				testHtml\outlook05.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook06.txt				testHtml\outlook06.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\outlook07.txt				testHtml\outlook07.txt
+data=EPOCROOT##epoc32\data\Z\testHtml\test1.txt					testHtml\test1.txt
 
 #endif

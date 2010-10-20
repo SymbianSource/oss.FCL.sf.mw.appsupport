@@ -22,7 +22,6 @@
 #include <e32std.h>
 #include <bautils.h>                // BaflUtils
 #include <eikenv.h>                 // CEikonEnv
-#include <rfs.rsg>                  // rfs resource file
 #include <etelmm.h>
 #include <mmtsy_names.h>
 
@@ -54,11 +53,13 @@
 #include "rfsClient.h"
 #include "RfsTraces.h"
 #include <hbdevicemessageboxsymbian.h>
+#include <hbtextresolversymbian.h>
 
 
-_LIT( KRfsResourceFileName, "Z:rfs.rsc");
-_LIT(KYes,"yes");
-_LIT(KNo,"No");
+_LIT(Kcommonerrors,"common_errors_");
+_LIT(Kcontrolpanel,"control_panel_");
+_LIT(KtsfilePath,"z:/resource/qt/translations/");
+
 
 // CONSTANTS
 const TInt KPhoneIndex = 0;
@@ -96,12 +97,7 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
         return;
         }
 
-    // load the resource file
-    if ( !iResourceFileOffset )
-        {
-        LoadResourceL();
-        }
-	
+    
     // Create a generic connection observer for closing all the active connections
     // if they exist. Currently there are only 2 types i.e. SIP and PDP
     CRfsConnectionObserver* connectionObserver = CRfsConnectionObserver::NewLC();
@@ -145,12 +141,7 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
     iFlags |= ( KRfsHandlerActivated | KRfsHandlerInitDone );
     TBool proceed( ETrue );
 
-    // Setup information of whether the CRfsHandler instance has been
-    // destroyed while one of the queries was on the screen.
-    TBool thisDestroyed( EFalse );
-    iDestroyedPtr = &thisDestroyed;
-    CleanupResetPointerPushL( iDestroyedPtr );
-
+    
     // Ask first query.
     if ( aAskSecurityCodeFirst )
         {
@@ -158,7 +149,7 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
         }
     else
         {
-        proceed = AskConfirmationL( thisDestroyed, aType );
+        proceed = AskConfirmationL( aType );
         }
 
     // If OK, ask second query.
@@ -166,7 +157,7 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
         {
         if ( aAskSecurityCodeFirst )
             {
-            proceed = AskConfirmationL( thisDestroyed, aType );
+            proceed = AskConfirmationL( aType );
             }
         else
             {
@@ -186,15 +177,17 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
         if( startersession.Connect() == KErrNone )
             {
 			// Displays information note to the user telling that the device will restart
-            HBufC* prompt = StringLoader::LoadLC( R_DEVICE_RESTART );
+            TBool result = HbTextResolverSymbian::Init(Kcommonerrors, KtsfilePath);
+            _LIT(Krestarting,"txt_error_info_restarting");
+            HBufC* prompt =HbTextResolverSymbian::LoadL(Krestarting);
                  
-          CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
+            CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
                 CleanupStack::PushL(note);
                 note->SetTextL(*prompt);
                 //could have used show() but it is aynchronous and execution proceeds before note is seen so have used synchronous API exec()
                 note->ExecL();
                 CleanupStack::PopAndDestroy(note);
-                CleanupStack::PopAndDestroy( prompt );
+                
                 	
                 	              
                
@@ -224,18 +217,9 @@ EXPORT_C void CRfsHandler::ActivateRfsL( TRfsType aType, TBool aAskSecurityCodeF
         {
         connectionObserver->ReportRfsCompletionToSip();
         }
-    
-    if ( thisDestroyed ) // this object has already been destroyed
-        {
-        // remove cleanup items
-        CleanupStack::Pop( 2 ); // this, iDestroyedPtr
-        }
-    else
-        {
-        // NULLs iDestroyedPtr and calls DoCleanup()
-        CleanupStack::PopAndDestroy( 2 ); // this, iDestroyedPtr
-        }
-    
+       
+    CleanupStack::PopAndDestroy( this ); // this
+     
     CleanupStack::PopAndDestroy(connectionObserver);
     }
 
@@ -272,36 +256,10 @@ EXPORT_C void CRfsHandler::Cancel()
 
     iTelServer.Close();
 
-    // close the resource file
-    if ( iResourceFileOffset )
-        {
-        iEnv->DeleteResourceFile( iResourceFileOffset );
-        iResourceFileOffset = 0;
-        }
-
     // finally, reset the flags
     iFlags = 0;
     }
 
-// -----------------------------------------------------------------------------
-// CRfsHandler::LoadResourceL()
-// -----------------------------------------------------------------------------
-void CRfsHandler::LoadResourceL()
-    {
-    TRACES("CRfsHandler::LoadResourceL()");
-    iEnv = CEikonEnv::Static();
-
-    // eikon environment is needed
-    __ASSERT_DEBUG( iEnv, User::Invariant() );
-
-    TParse* fp = new(ELeave) TParse(); 
-    fp->Set(KRfsResourceFileName, &KDC_RESOURCE_FILES_DIR, NULL);
-    TFileName fileName( fp->FullName() );
-    delete fp;
-
-    BaflUtils::NearestLanguageFile( iEnv->FsSession(), fileName );
-    iResourceFileOffset = iEnv->AddResourceFileL( fileName );
-    }
 
 // -----------------------------------------------------------------------------
 // CRfsHandler::SetDefaultLanguage()
@@ -327,17 +285,30 @@ void CRfsHandler::SetDefaultLanguage() const
 // -----------------------------------------------------------------------------
 // CRfsHandler::AskConfirmationL()
 // -----------------------------------------------------------------------------
-TBool CRfsHandler::AskConfirmationL( const TBool& aThisDestroyed, TRfsType aType )
+TBool CRfsHandler::AskConfirmationL( TRfsType aType )
     {
     TRACES("CRfsHandler::AskConfirmationL()");
-     
    
-    TInt resourceId = ( aType == ERfsNormal ) ? R_CONFIRM_RFS : R_CONFIRM_DEEP_RFS;
-    HBufC* query = iEnv->AllocReadResourceLC( resourceId );
-         
-   // Show the confirmation query.
-          
-   CHbDeviceMessageBoxSymbian::TButtonId selection = CHbDeviceMessageBoxSymbian::QuestionL(*query, KYes, KNo);
+     TBool result = HbTextResolverSymbian::Init(Kcontrolpanel, KtsfilePath);
+     _LIT(Knormalrfs,"txt_cp_info_restore_original_settings_no_data_wil");
+     _LIT(KDeeprfs,"txt_cp_info_delete_all_data_and_restore_original_s");
+    
+        
+     HBufC* query = NULL;
+    if( aType == ERfsNormal ) 
+      query = HbTextResolverSymbian::LoadL(Knormalrfs);
+    else
+      query = HbTextResolverSymbian::LoadL(KDeeprfs); 
+   
+    _LIT(Kcommonlocalisationfile, "common_");
+    TBool result1 = HbTextResolverSymbian::Init(Kcommonlocalisationfile, KtsfilePath);
+    _LIT(Kyes,"txt_common_button_ok");
+    _LIT(Kno,"txt_common_button_cancel");
+   
+    HBufC* yes = HbTextResolverSymbian::LoadL(Kyes);
+    HBufC* no = HbTextResolverSymbian::LoadL(Kno);
+    // Show the confirmation query.   
+   CHbDeviceMessageBoxSymbian::TButtonId selection = CHbDeviceMessageBoxSymbian::QuestionL(*query,*yes,*no);
     TBool ret;    
     if (selection == CHbDeviceMessageBoxSymbian::EAcceptButton) // user pressed yes
         {
@@ -347,7 +318,6 @@ TBool CRfsHandler::AskConfirmationL( const TBool& aThisDestroyed, TRfsType aType
         {
         ret=EFalse;
         }  
-    CleanupStack::PopAndDestroy(query);
     return ret;  
     
     }
@@ -437,15 +407,17 @@ TBool CRfsHandler::CheckConnectionsL()
         ( wlanState == EPSWlanIndicatorActive || wlanState == EPSWlanIndicatorActiveSecure ))
 #endif //__WINS__
         {
-        HBufC* prompt = iEnv->AllocReadResourceLC( R_ACTIVE_CALLS );
+        TRACES("CRfsHandler::checkconnectionsL():show active connections note ");
+        TBool result = HbTextResolverSymbian::Init(Kcontrolpanel, KtsfilePath);
+        _LIT(Kactivecalls,"txt_cp_info_active_calls_and_connections_must_be_d");
+        HBufC* prompt = HbTextResolverSymbian::LoadL(Kactivecalls);
 
-           CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
-                CleanupStack::PushL(note);
-                        note->SetTextL(*prompt);
-                        note->ShowL();
-                         CleanupStack::PopAndDestroy( note );
-                        CleanupStack::PopAndDestroy( prompt );
-               
+        CHbDeviceMessageBoxSymbian* note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
+        CleanupStack::PushL(note);
+        note->SetTextL(*prompt);
+        note->ShowL();
+        CleanupStack::PopAndDestroy( note );
+                      
         return ETrue;
         }
 

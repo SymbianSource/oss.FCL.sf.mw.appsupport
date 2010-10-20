@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -21,6 +21,10 @@
 
 #include <e32base.h>
 
+#ifdef FCC_UNIT_TEST
+class Tut_sysap_batteryinfocontroller;
+#endif
+
 class CBSUtil;
 // class CBatteryPopupControl;
 
@@ -32,7 +36,9 @@ class CBSUtil;
  */
 class CSysApBatteryInfoController : public CBase
     {
-
+#ifdef FCC_UNIT_TEST
+    friend class Tut_sysap_batteryinfocontroller;
+#endif
     /**
     * States for battery information.
     */

@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,6 +18,11 @@
 #include <tz.h>
 
 #include "tzrules.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "vtzrulesTraces.h"
+#endif
+
 
 const TInt KDaysInTheWeek = 7;
 const TInt KTzRulesGranularity = 4;
@@ -246,6 +251,8 @@ eg. Actualise(Friday, ETzDayAfterDate, Fri Jun 22, 2007) returns Jun 22, 2007.
 */
 EXPORT_C TVTzActualisedRule TTzRule::ActualiseL(TInt aYear) const
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, TTZRULE_ACTUALISEL_ENTRY, "TTzRule::ActualiseL Exit;aYear=%d", aYear );
+    
 	TInt dayOfMonth = iDayOfMonth;
 	TInt daysDifference = 0;
 	TDay dayOfWeek(EMonday);
@@ -336,6 +343,7 @@ EXPORT_C TVTzActualisedRule TTzRule::ActualiseL(TInt aYear) const
 	TVTzActualisedRule tActRule(actualTime, 
 		iNewLocalTimeOffset, 
 		static_cast<TTzTimeReference>(iTimeReference));
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, TTZRULE_ACTUALISEL_EXIT, "TTzRule::ActualiseL Exit" );
 	return tActRule;
 	}
 
@@ -710,6 +718,8 @@ to the specified array of actualised rules (CVTzActualisedRules).
 */
 void CTzRules::AddActualisedRulesL(CVTzActualisedRules& aActRules, TInt aYear) const
    	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULES_ADDACTUALISEDRULESL_ENTRY, "CTzRules::AddActualisedRulesL Entry;aYear=%d", aYear );
+    
    	const TInt count=iRules.Count();
    	const TTzRule* trule = NULL;
 
@@ -789,6 +799,8 @@ void CTzRules::AddActualisedRulesL(CVTzActualisedRules& aActRules, TInt aYear) c
   				}
 			}
    		}
+   	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULES_ADDACTUALISEDRULESL_EXIT, "CTzRules::AddActualisedRulesL Exit" );
+   	
    	}
 
 /**
@@ -799,6 +811,8 @@ Get actualised rules for time zone rules.
 */
 EXPORT_C void CTzRules::GetActualisedRulesL(CVTzActualisedRules& aActRules) const
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULES_GETACTUALISEDRULESL_ENTRY, "CTzRules::GetActualisedRulesL Entry" );
+    
 	// Always add the initial offset because there may not have been
 	// any rules to actualise before the actualised rules range specified
 	TVTzActualisedRule tDefRule(TDateTime(iStartYear, EJanuary, 0, 0, 0, 0, 0), iInitialStdTimeOffset, ETzWallTimeReference);
@@ -858,6 +872,8 @@ EXPORT_C void CTzRules::GetActualisedRulesL(CVTzActualisedRules& aActRules) cons
 				}
 			}
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULES_GETACTUALISEDRULESL_EXIT, "CTzRules::GetActualisedRulesL Exit" );
+	
 	}
 
 /**
@@ -907,6 +923,9 @@ Calculate the local time offset at the supplied time.
 */
 EXPORT_C TInt CTzRules::GetOffsetL(const TTime& aTime, TTzTimeReference aTimeRef) const
 	{
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULES_GETOFFSETL_ENTRY, "CTzRules::GetOffsetL Entry; atime:Year=%d;Month=%d;Day=%d;Hour=%d;Min=%d", aTime.DateTime().Year(), aTime.DateTime().Month(), aTime.DateTime().Day(), aTime.DateTime().Hour(), aTime.DateTime().Minute() );
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZRULES_GETOFFSETL_PARAM, "Parameters cont..Sec=%d;aTimerRef=%u", aTime.DateTime().Second(), aTimeRef );
+    
 	if (iActualisedRulesCache)
 		{
 		TTime startTime(TDateTime(iActualisedRulesCache->StartYear(), EJanuary, 0, 0, 0, 0, 0));	
@@ -931,6 +950,8 @@ EXPORT_C TInt CTzRules::GetOffsetL(const TTime& aTime, TTzTimeReference aTimeRef
 		iActualisedRulesCache = NULL;
 		User::LeaveIfError(leaveCode);		
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULES_GETOFFSETL_EXIT, "CTzRules::GetOffsetL Exit" );
+	
 	
 	return iActualisedRulesCache->GetOffsetFromRuleL(aTime, aTimeRef);;
 	}
@@ -1268,6 +1289,9 @@ Tells if Daylight Savings Applies for the current time zone at the current time
 */
 EXPORT_C TBool CVTzActualisedRules::IsDaylightSavingOn(TTime& aTime) const
 	{
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CVTZACTUALISEDRULES_ISDAYLIGHTSAVINGON_ENTRY, "CVTzActualisedRules::IsDaylightSavingOn Entry;aTime:Year=%d;Month=%d;Day=%d;Hour=%d;Min=%d", aTime.DateTime().Year(), aTime.DateTime().Month(), aTime.DateTime().Day(), aTime.DateTime().Hour(), aTime.DateTime().Minute());
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CVTZACTUALISEDRULES_ISDAYLIGHTSAVINGON_PARAM, "Parameter cont..;Sec=%d", aTime.DateTime().Second() );
+    
 	const TInt count = iRules.Count();
 
 	// ensure that there are rules
@@ -1398,6 +1422,8 @@ EXPORT_C TBool CVTzActualisedRules::IsDaylightSavingOn(TTime& aTime) const
 				}
 			}
 	    }
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CVTZACTUALISEDRULES_ISDAYLIGHTSAVINGON_EXIT, "CVTzActualisedRules::IsDaylightSavingOn Exit;dstOn=%u", dstOn );
+	
 	return(dstOn);
 	}
 	
@@ -1417,6 +1443,8 @@ Leaves with KErrNotFound, if it doesn't find the rule
  */
 EXPORT_C TInt CVTzActualisedRules::GetOffsetFromRuleL(const TTime& aUserTime, TTzTimeReference aUserTimeRef) const
 	{
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CVTZACTUALISEDRULES_GETOFFSETFROMRULEL_ENTRY, "CVTzActualisedRules::GetOffsetFromRuleL Entry;aUserTime:Year=%d;Month=%d;Day=%d;Hour=%d;Min=%d", aUserTime.DateTime().Year(), aUserTime.DateTime().Month(), aUserTime.DateTime().Day(), aUserTime.DateTime().Hour(), aUserTime.DateTime().Minute());
+    
 	// The first rule with iTimeOfChange <= aUserTime that is found going backwards in the array is the one that
 	// applies at the requested aUserTime.
 	__ASSERT_ALWAYS(aUserTimeRef!=ETzStdTimeReference, RTz::Panic(RTz::EPanicUnsupportedTimeReference));
@@ -1472,8 +1500,11 @@ EXPORT_C TInt CVTzActualisedRules::GetOffsetFromRuleL(const TTime& aUserTime, TT
 
 	if (!ruleFound)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CVTZACTUALISEDRULES_GETOFFSETFROMRULEL, "CVTzActualisedRules::GetOffsetFromRuleL:Rule not found" );
+	    
 		User::Leave(KErrNotFound);
 		}
+		OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CVTZACTUALISEDRULES_GETOFFSETFROMRULEL_EXIT, "CVTzActualisedRules::GetOffsetFromRuleL Exit;resultOffset=%d", resultOffset );
 		
 	return resultOffset;
 	}

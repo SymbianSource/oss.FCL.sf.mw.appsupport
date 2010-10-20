@@ -182,7 +182,7 @@ void CSysApPsmController::BatteryLow( TBool aBatteryIsLow )
     {
     TRACES( RDebug::Print( _L("CSysApPsmController::BatteryLow: aBatteryIsLow=%d"), aBatteryIsLow ) );
 
-    if ( aBatteryIsLow )
+    if ( aBatteryIsLow && !iChargerConnected )
     	{
     	iForcedPartialPsm = ETrue; 	// when battery is low, at least partial PSM must be active
 		}

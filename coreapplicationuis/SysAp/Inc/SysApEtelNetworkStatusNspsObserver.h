@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -23,6 +23,12 @@
 #include <e32base.h>
 #include <rmmcustomapi.h>
 
+#ifdef FCC_UNIT_TEST
+
+class CutSysApEtelNetworkStatusNspsObserver;
+
+#endif
+
 // FORWARD DECLARATIONS
 class CSysApAppUi;
 
@@ -36,6 +42,9 @@ class CSysApAppUi;
 
 class CSysApEtelNetworkStatusNspsObserver : public CActive
     {
+#ifdef FCC_UNIT_TEST
+    friend class CutSysApEtelNetworkStatusNspsObserver;
+#endif    
     public: // Constructors and destructor
         /**
         * Constructor

@@ -17,9 +17,9 @@
 // INCLUDES
 
 #include <startupdomainpskeys.h>
-#include "sysapappui.h"
+#include "SysApAppUi.h"
 #include "coreapplicationuisprivatepskeys.h"
-#include <HbDeviceMessageBoxSymbian.h>
+#include <hbdevicemessageboxsymbian.h>
 //#include <hbdevicepowermenusymbian.h>
 #include <sacls.h>
 #include <featmgr.h>
@@ -29,7 +29,7 @@
 #include <apgtask.h>
 #include <hwrmpowerstatesdkpskeys.h>
 #include <wlaninternalpskeys.h> 
-#include <HbDeviceNotificationDialogSymbian.h>
+#include <hbdevicenotificationdialogsymbian.h>
 #include <hbsymbianvariant.h>
 #include <hbtextresolversymbian.h>
 #include <UikonInternalPSKeys.h>
@@ -111,8 +111,8 @@ _LIT(KPsm,"PSM");
 _LIT(KCharging,"Charging");
 _LIT(KPsmlocalisationfile, "powermanagement_");
 _LIT(KtsfilePath, "z:/resource/qt/translations/");
-_LIT(KlowbatteryIcon,"qtg_small_bt_low_battery.svg");
-_LIT(KbatteryFullIcon,"qtg_status_battery.svg");
+_LIT(KlowbatteryIcon,"qtg_small_bt_low_battery");
+_LIT(KbatteryFullIcon,"qtg_status_battery");	
 
 
 
@@ -323,9 +323,8 @@ void CSysApAppUi::ConstructL()
     RProperty::Set( KPSUidCoreApplicationUIs, KCoreAppUIsPowerMenuCustomDialogStatus, ECoreAppUIsPowerMenuCustomDialogUninitialized );
     
 	TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: trying CHbIndicatorSymbian::NewL()") ) );
-    iHbIndicatorSymbian = CHbIndicatorSymbian::NewL();
-	
-	  TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
+   
+	TBool result = HbTextResolverSymbian::Init(KPsmlocalisationfile, KtsfilePath);
 	
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );    
     }
@@ -339,8 +338,6 @@ void CSysApAppUi::FreeResources()
     TRACES( RDebug::Print( _L("CSysApAppUi::FreeResources") ) );
     delete iSysApBatteryInfoController;
     delete iSysApPsmController;
-    delete iVariantAccState; 
-
     delete iSysApAudioRoutingObserver;
 
     delete iChargingAnimation;
@@ -390,7 +387,6 @@ void CSysApAppUi::FreeResources()
     
     delete iSysApUsbIndicatorController;
     delete iKeyguardController;
-    delete iHbIndicatorSymbian; 
     delete iSysApKeyManagement;
     iSysApKeyManagement = NULL;
     
@@ -528,12 +524,7 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
        if ( iSysApPsmController->FullPsmEnabled() )
            {
            // activate psm indicator 
-            iVariantAccState = CHbSymbianVariant::NewL(&KPsm, CHbSymbianVariant::EDes);
-            if (!iHbIndicatorSymbian->Activate(KPsmPlugin,iVariantAccState)) 
-               {
-               int error = iHbIndicatorSymbian->Error();
-               //use the errorcode...
-               }
+           HandlePsmAndChargingIndicatorL(ETrue,KPsm);                
            }
      
        }
@@ -697,13 +688,13 @@ TBool CSysApAppUi::ResourcesFreed() const
 void CSysApAppUi::ShowNoteL( const TDesC& noteText )const
     {          
  	TRACES( RDebug::Print( _L("CSysApAppUi::ShowNoteL:: constructing CHbDeviceMessageBoxSymbian:BeGIN") ) );    
-    CHbDeviceMessageBoxSymbian *note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
+  CHbDeviceMessageBoxSymbian *note = CHbDeviceMessageBoxSymbian::NewL(CHbDeviceMessageBoxSymbian::EInformation);
  	CleanupStack::PushL(note);
-    TRACES( RDebug::Print( _L("CSysApAppUi::ShowNoteL:: construction of CHbDeviceMessageBoxSymbian:END") ) ); 
-    note->SetTextL(noteText);
-	note->SetTimeout(3000);
+  TRACES( RDebug::Print( _L("CSysApAppUi::ShowNoteL:: construction of CHbDeviceMessageBoxSymbian:END") ) ); 
+  note->SetTextL(noteText);
+	note->SetTimeout(0);
  	TRACES( RDebug::Print( _L("CSysApAppUi:: Display of  CHbDeviceMessageBoxSymbian::Begin") ) );    
-    note->ShowL();
+  note->ShowL();
 	TRACES( RDebug::Print( _L("CSysApAppUi:: Display of  CHbDeviceMessageBoxSymbian::End") ) );
 	CleanupStack::PopAndDestroy(note);
     }
@@ -1357,7 +1348,11 @@ void CSysApAppUi::HandleAccessoryDisconnectedL()
     if ( accessoryState == EAccModeHandPortable )
         {
         TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryDisconnectedL:Before Deactivating accessory Plugin")));
-        iHbIndicatorSymbian->Deactivate(KAccesoryPlugin);
+        CHbIndicatorSymbian* HbIndicatorSymbian = CHbIndicatorSymbian::NewL();
+        CleanupStack::PushL(HbIndicatorSymbian);
+        HbIndicatorSymbian->Deactivate(KAccesoryPlugin);
+        User::LeaveIfError(HbIndicatorSymbian->Error());
+        CleanupStack::PopAndDestroy(HbIndicatorSymbian); // indicator
         TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryDisconnectedL:After  Deactivating accessory Plugin")));
         iSysApLightsController->AccessoryConnectedL( EFalse );
         iSysApCenRepController->SetInt( KCRUidCoreApplicationUIsSysAp, KSysApAccessoryConnected, 0 );
@@ -1393,18 +1388,20 @@ void CSysApAppUi::HandleAccessoryConnectedL( TAccMode aAccessoryState, TInt aPhy
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryConnectedL( aAccessoryState: %d )(aPhysicalConnectionType: %d "), aAccessoryState, aPhysicalConnectionType ) );
 
-    CHbSymbianVariantMap* iAccVariantMap = CHbSymbianVariantMap::NewL();
-    CleanupStack::PushL(iAccVariantMap);
+    CHbSymbianVariantMap* AccVariantMap = CHbSymbianVariantMap::NewL();
+    CleanupStack::PushL(AccVariantMap);
     CHbSymbianVariant* variantAccState = CHbSymbianVariant::NewL(&aAccessoryState, CHbSymbianVariant::EInt);
-    iAccVariantMap->Add(KAccMode,variantAccState);
+    AccVariantMap->Add(KAccMode,variantAccState);
     CHbSymbianVariant* variantAccType = CHbSymbianVariant::NewL(&aPhysicalConnectionType, CHbSymbianVariant::EInt);
-    iAccVariantMap->Add(KAccPhyConType,variantAccType);
+    AccVariantMap->Add(KAccPhyConType,variantAccType);
     
     
-    CHbSymbianVariant* iAccVariant = CHbSymbianVariant::NewL(iAccVariantMap, CHbSymbianVariant::EVariantMap ); 
-    CleanupStack::PushL(iAccVariant);
-    iHbIndicatorSymbian->Activate(KAccesoryPlugin, iAccVariant);
-
+    CHbSymbianVariant* AccVariant = CHbSymbianVariant::NewL(AccVariantMap, CHbSymbianVariant::EVariantMap ); 
+    CleanupStack::PushL(AccVariant);
+    CHbIndicatorSymbian* HbIndicatorSymbian = CHbIndicatorSymbian::NewL();
+    CleanupStack::PushL(HbIndicatorSymbian);
+    HbIndicatorSymbian->Activate(KAccesoryPlugin, AccVariant);
+    User::LeaveIfError(HbIndicatorSymbian->Error());
 
     TInt swState( StateOfProperty( KPSUidStartup, KPSGlobalSystemState ) );
     TRACES( RDebug::Print( _L("CSysApAppUi::HandleAccessoryConnectedL: swState: %d"), swState ) );
@@ -1440,9 +1437,31 @@ void CSysApAppUi::HandleAccessoryConnectedL( TAccMode aAccessoryState, TInt aPhy
         }
     SetIhfIndicatorL();
     SetHacIndicatorL();
-    CleanupStack::PopAndDestroy(2);
+    CleanupStack::PopAndDestroy(3);
     }
 
+
+void CSysApAppUi::SetPosIndicatorL(TInt aValue)
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::SetPosIndicatorL begin") ) );
+    _LIT(KGpsIndicatorPlugin, "com.nokia.positioning.indicatorplugin/1.0");
+    CHbIndicatorSymbian* HbIndicatorSymbian = CHbIndicatorSymbian::NewL();
+    CleanupStack::PushL(HbIndicatorSymbian);
+    if(aValue)
+        {
+        TRACES( RDebug::Print( _L("CSysApAppUi::SetPosIndicatorL activate") ) );
+        HbIndicatorSymbian->Activate(KGpsIndicatorPlugin);
+        User::LeaveIfError(HbIndicatorSymbian->Error());
+       
+        }
+    else
+        {
+        TRACES( RDebug::Print( _L("CSysApAppUi::SetPosIndicatorL deactivate") ) );
+        HbIndicatorSymbian->Deactivate(KGpsIndicatorPlugin);
+        User::LeaveIfError(HbIndicatorSymbian->Error());
+        }
+    CleanupStack::PopAndDestroy(HbIndicatorSymbian); 
+    }
 
 // ----------------------------------------------------------------------------
 // CSysApAppUi::SetHacIndicatorL()
@@ -1784,22 +1803,16 @@ void CSysApAppUi::NotifyPowerSaveModeL( TSysApPsmStatus aStatus )
     switch ( aStatus )
         {
         case MSysApPsmControllerNotifyCallback::EPsmActivationComplete:
+             TRACES( RDebug::Print( _L("CSysApAppUi::NotifyPowerSaveModeL case MSysApPsmControllerNotifyCallback::EPsmActivationComplete: indicator activation ") ) );
              UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
-             iVariantAccState = CHbSymbianVariant::NewL(&KPsm, CHbSymbianVariant::EDes);
-             if (!iHbIndicatorSymbian->Activate(KPsmPlugin,iVariantAccState)) 
-                {
-                int error = iHbIndicatorSymbian->Error();
-                //use the errorcode...
-                }
+             HandlePsmAndChargingIndicatorL(ETrue,KPsm);
              break;
         
         case MSysApPsmControllerNotifyCallback::EPsmDeactivationComplete:
-             UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
-             if (!iHbIndicatorSymbian->Deactivate(KPsmPlugin)) 
-                {
-                int error = iHbIndicatorSymbian->Error();
-                 //use the errorcode...
-                }
+            TRACES( RDebug::Print( _L("CSysApAppUi::NotifyPowerSaveModeL case MSysApPsmControllerNotifyCallback::EPsmDeactivationComplete: indicator deactivation") ) );
+            UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
+            HandlePsmAndChargingIndicatorL(EFalse,KPsm);  
+              
             break;
             
         case MSysApPsmControllerNotifyCallback::EPsmActivationFailed:
@@ -1816,6 +1829,30 @@ void CSysApAppUi::NotifyPowerSaveModeL( TSysApPsmStatus aStatus )
     }
 
 
+
+void CSysApAppUi::HandlePsmAndChargingIndicatorL(TBool aValue,const TDesC& aLiteral )
+    {
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandlePsmAndChargingIndicatorL aValue:%d"), aValue ) );
+    CHbIndicatorSymbian* HbIndicatorSymbian = CHbIndicatorSymbian::NewL();
+    CleanupStack::PushL(HbIndicatorSymbian);
+   if(aValue)
+       {
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandlePsmAndChargingIndicatorL activate") ) );
+    CHbSymbianVariant* VariantAccState = CHbSymbianVariant::NewL(&aLiteral, CHbSymbianVariant::EDes);
+    CleanupStack::PushL(VariantAccState);
+    HbIndicatorSymbian->Activate(KPsmPlugin,VariantAccState);
+    User::LeaveIfError(HbIndicatorSymbian->Error()); 
+    CleanupStack::PopAndDestroy(VariantAccState);
+       }
+   else
+       {
+       TRACES( RDebug::Print( _L("CSysApAppUi::HandlePsmAndChargingIndicatorL deactivate") ) );
+       HbIndicatorSymbian->Deactivate(KPsmPlugin);
+       User::LeaveIfError(HbIndicatorSymbian->Error());
+       
+       }
+   CleanupStack::PopAndDestroy(HbIndicatorSymbian);
+    }
 // ----------------------------------------------------------------------------
 // CSysApAppUi::ShowAlarmIndicatorL()
 // ----------------------------------------------------------------------------
@@ -2110,9 +2147,9 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote )
                 break;
             case ERechargeBatteryNote:
                 {
-                iSysApLightsController->BatteryEmptyL( ETrue );
                 _LIT(KRechargeBattery,"Battery empty. Recharge");
                 ShowNoteL( KRechargeBattery() );
+                iSysApLightsController->BatteryEmptyL( ETrue );
                 }
                 break;
             case ENotChargingNote:
@@ -2123,7 +2160,6 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote )
                 break;
             case EBatteryFullUnplugChargerNote:
                 {
-                iSysApLightsController->BatteryEmptyL( ETrue );
                  _LIT(KunplugCharger,"txt_power_dpopinfo_unplug_charger_to_save_energy");                 
                  HBufC* unplugCharger = HbTextResolverSymbian::LoadL(KunplugCharger);
                  _LIT(KbatteryFull,"txt_power_management_dpophead_100_full");
@@ -2133,8 +2169,9 @@ void CSysApAppUi::ShowUiNoteL( const TSysApNoteIds aNote )
                 break;
             case EUnplugChargerNote:
                 {
-                _LIT(KUnplugCharger,"Unplug charger from power supply to save energy");
-                ShowNoteL( KUnplugCharger() );
+                _LIT(KunplugCharger,"txt_power_dpopinfo_unplug_charger_to_save_energy"); 
+                HBufC* unplugcharger = HbTextResolverSymbian::LoadL(KunplugCharger);
+                ShowNoteL(*unplugcharger);
                 }
                 break;
             case ESysApRestartPhone:
@@ -2185,41 +2222,28 @@ void CSysApAppUi::ShowQueryL( const TSysApConfirmationQueryIds /* aQueryId */, c
 void CSysApAppUi::HandleChargingStatusL( const TInt aValue )
     {
     TRACES( RDebug::Print( _L("CSysApAppUi::HandleChargingStatusL aValue: %d"), aValue ) );
-    
-    TBool showNote( ETrue );
-    
+           
     UpdateBatteryBarsL( StateOfProperty( KPSUidHWRMPowerState, KHWRMBatteryLevel ) );
 
-    if ( iSysApPsmController && UiReady() ) 
-        {             
-        if ( iCharging && !iSysApPsmController->ChargerConnected() ) // first time after charger connection
+    if ( UiReady() ) 
+        { 
+        if ( iCharging ) // first time after charger connection
             {
+            TRACES( RDebug::Print( _L("CSysApAppUi::HandleChargingStatusL charging ") ) );
             iSysApPsmController->ConnectCharger( ETrue );
-            iSysApPsmController->DoEnableFullPsm(EFalse);             
-            iVariantAccState = CHbSymbianVariant::NewL(&KCharging, CHbSymbianVariant::EDes);
-               
-            if (!iHbIndicatorSymbian->Activate(KPsmPlugin,iVariantAccState)) 
-               {
-               int error = iHbIndicatorSymbian->Error();
-               //use the errorcode...
-               }
-              
-                           
+            iSysApPsmController->DoEnableFullPsm(EFalse);
+            HandlePsmAndChargingIndicatorL(ETrue,KCharging); 
             }
         else if ( aValue == EChargingStatusNotConnected )
             {
+            TRACES( RDebug::Print( _L("CSysApAppUi::HandleChargingStatusL not charging ") ) );
             iSysApPsmController->ConnectCharger( EFalse );
-            if (!iHbIndicatorSymbian->Deactivate(KPsmPlugin)) 
-               {
-               int error = iHbIndicatorSymbian->Error();
-               //use the errorcode...
-               }
-            }            
-        }
-    if( showNote )
-        {
-        HandleChargerNotesL( aValue );    
-        }
+            HandlePsmAndChargingIndicatorL(EFalse,KCharging);  
+            }  
+       }
+    TRACES( RDebug::Print( _L("CSysApAppUi::HandleChargingStatusL end ") ) );
+    HandleChargerNotesL( aValue );    
+       
     }
 
 

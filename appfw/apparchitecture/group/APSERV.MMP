@@ -35,6 +35,7 @@ SOURCEPATH	../apserv
 
 userinclude		../inc ../apparc
 userinclude		../apgrfx
+userinclude		../traces
 MW_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 

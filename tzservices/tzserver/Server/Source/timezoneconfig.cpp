@@ -1,4 +1,4 @@
-// Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -25,6 +25,11 @@
 #include "CBackupRestoreNotification.h"
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <tzuserdefineddata.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "timezoneconfigTraces.h"
+#endif
+
 #endif
 
 _LIT8(KUnknownTZName, "Unknown/Zone");
@@ -224,6 +229,9 @@ void CTzConfigAgent::ConstructL()
 
 void CTzConfigAgent::PublishTzDbChangeInfoL()
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_PUBLISHTZDBCHANGEINFOL_ENTRY, "CTzConfigAgent::PublishTzDbChangeInfoL Entry" );
+    
+    
 	RFile file;
 	CleanupClosePushL(file);
 
@@ -299,6 +307,8 @@ void CTzConfigAgent::PublishTzDbChangeInfoL()
 			NTzUpdate::TTzRulesChange rulesChange;
 			rulesChange.iUTCTimeOfRulesChange.UniversalTime();
 			TPckgBuf<NTzUpdate::TTzRulesChange> bufRules(rulesChange);
+			OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, PUBLISH_UPDATE_NOTIFICATION, TZRULES_CHANGE_NOTIFICATION_2, "Time zone rules change" );
+			
 			RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ETzRulesChange, bufRules);
 			}
 	
@@ -308,13 +318,19 @@ void CTzConfigAgent::PublishTzDbChangeInfoL()
 			NTzUpdate::TTzNamesChange namesChange;
 			namesChange.iUTCTimeOfNamesChange.UniversalTime();
 			TPckgBuf<NTzUpdate::TTzNamesChange> bufNames(namesChange);
+			OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, PUBLISH_UPDATE_NOTIFICATION, TZNAMES_CHANGE_NOTIFICATION_2, "Time zone names change notification" );
+			
 			RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ETzNamesChange, bufNames);	
 			}
 		}
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_PUBLISHTZDBCHANGEINFOL_EXIT, "CTzConfigAgent::PublishTzDbChangeInfoL Exit" );
+	
 	}
 
 void CTzConfigAgent::ReadTimeStampsL(RFile& aFile, TTime& aTzdbSaved, TTime& aUserDbSaved, TTime& aResourceFileSaved)
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_READTIMESTAMPSL_ENTRY, "CTzConfigAgent::ReadTimeStampsL Entry" );
+    
 	RFileReadStream readStream(aFile);
 	CleanupClosePushL(readStream);
 	
@@ -330,6 +346,8 @@ void CTzConfigAgent::ReadTimeStampsL(RFile& aFile, TTime& aTzdbSaved, TTime& aUs
 	high = readStream.ReadUint32L();
 	aResourceFileSaved = TTime(MAKE_TINT64(high, low));
 	CleanupStack::PopAndDestroy(&readStream);
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_READTIMESTAMPSL_EXIT, "CTzConfigAgent::ReadTimeStampsL Exit" );
+	
 	}
 
 void CTzConfigAgent::WriteTimeStampsL(RFile& aFile, const TTime& aTzdbModified, const TTime& aUserDbModified, const TTime& aResourceFileModified)
@@ -351,6 +369,8 @@ void CTzConfigAgent::WriteTimeStampsL(RFile& aFile, const TTime& aTzdbModified, 
  */
 TTime  CTzConfigAgent::GetResourceFileTimeStampsL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_GETRESOURCEFILETIMESTAMPSL_ENTRY, "CTzConfigAgent::GetResourceFileTimeStampsL Entry" );
+    
 	CDir* files = NULL;
 	TInt err = iFs.GetDir(KResourceDir, KEntryAttNormal, ESortNone, files);
 	CleanupStack::PushL(files);
@@ -369,15 +389,22 @@ TTime  CTzConfigAgent::GetResourceFileTimeStampsL()
 			}
 		}
 	CleanupStack::PopAndDestroy(files);
+	OstTraceDefExt1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_GETRESOURCEFILETIMESTAMPSL_EXIT, "CTzConfigAgent::GetResourceFileTimeStampsL Exit;sum=%Ld", sum );
+	
 	if(sum==0)
 		{
+	    
 		return Time::NullTTime();
 		}
+	
 	return TTime(sum);
 	}
 
 void CTzConfigAgent::PublishNewDstChangeInfoL()
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_PUBLISHNEWDSTCHANGEINFOL_ENTRY, "CTzConfigAgent::PublishNewDstChangeInfoL Entry" );
+    
+    
     TInt propertyDefineError = RProperty::Define(KUidSystemCategory,
     												KNextDSTChangePropertyKey,
     												RProperty::EByteArray,
@@ -388,6 +415,8 @@ void CTzConfigAgent::PublishNewDstChangeInfoL()
 	if (propertyDefineError != KErrAlreadyExists)
 		{
 	    // if there was an actual error defining the property then we should leave
+	    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, PROPERTY_DEFINITION, "Property definition return value: =%d", propertyDefineError );
+	    
 		User::LeaveIfError(propertyDefineError);
 		}
 	
@@ -424,8 +453,12 @@ void CTzConfigAgent::PublishNewDstChangeInfoL()
 		{
 		// package the data and set the property value 
 		TPckgBuf<NTzUpdate::TDSTChangeInfo> newDSTChangeInfoBuf(newDSTChangeInfo);
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, NEXT_DST_CHANGE, "Publish New   Dst Change " );
+		
 	    User::LeaveIfError(RProperty::Set(KUidSystemCategory, KNextDSTChangePropertyKey, newDSTChangeInfoBuf));
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_PUBLISHNEWDSTCHANGEINFOL_EXIT, "CTzConfigAgent::PublishNewDstChangeInfoL Exit" );
+	
 	}
 
 /*
@@ -433,6 +466,7 @@ void CTzConfigAgent::PublishNewDstChangeInfoL()
 CTzConfigAgent* CTzConfigAgent::NewL(MTZCfgAgentObserver& aServer, CTzUserDataDb& aUserDataDb,
 		CTzSwiObserver& aTzSwiObserver)
 	{
+    
 	CTzConfigAgent* self = new(ELeave) CTzConfigAgent(aServer, aUserDataDb, aTzSwiObserver);
 	CleanupStack::PushL(self);
 	self->ConstructL();
@@ -452,6 +486,9 @@ const CTzId& CTzConfigAgent::GetTimeZoneIdL() const
 
 const CTzId& CTzConfigAgent::SetTimeZoneL(const CTzId& aZoneId, const TAny* aRequester, TBool aUpdateCentralRepository, TBool aForceCacheUpdate)
 	{
+    OstTraceDefExt3(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETTIMEZONEL_ENTRY, "CTzConfigAgent::SetTimeZoneL Entry;aZoneId=%u;aUpdateCentralRepository=%u;aForceCacheUpdate=%u", aZoneId.TimeZoneNumericID(), aUpdateCentralRepository, aForceCacheUpdate );
+    
+    
 	TInt oldTzId = 0;
 	TBool zoneChanged = EFalse;
 	TTime now;
@@ -476,6 +513,8 @@ const CTzId& CTzConfigAgent::SetTimeZoneL(const CTzId& aZoneId, const TAny* aReq
 		CTzRules& newZoneRules =  newZone->GetEncodedTimeZoneRulesL();
 		if (newZoneRules.Count() == 0)
 		    {
+		    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_ERROR, INVALID_TIME_ZONE, "Invalid Time zone;KErrNotFound=%u", KErrNotFound );
+		    
 		    User::Leave(KErrNotFound);
 		    }
 
@@ -541,6 +580,8 @@ const CTzId& CTzConfigAgent::SetTimeZoneL(const CTzId& aZoneId, const TAny* aReq
 	iTzDataProvider->ReleaseTzRules();
 	
 	TRAP_IGNORE(PublishNewDstChangeInfoL());
+	OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETTIMEZONEL_EXIT, "CTzConfigAgent::SetTimeZoneL Exit;retun value;Time Zone Id=%u;Time Zone Name=%s", iSystemTzCache->TimeZoneId().TimeZoneNumericID(), iSystemTzCache->TimeZoneId().TimeZoneNameID() );
+	
 	
 	return (iSystemTzCache->TimeZoneId());
 	}
@@ -671,6 +712,8 @@ TInt CTzConfigAgent::IsDaylightSavingOnL(const CTzId& aZone, TTime& aUTCTime)
 // Reset the current time zone information to take advantage of any changes.
 void CTzConfigAgent::NotifyTZDataStatusChangeL(RTz::TTzChanges aChange)
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_NOTIFYTZDATASTATUSCHANGEL_ENTRY, "CTzConfigAgent::NotifyTZDataStatusChangeL Entry;aChange=%u", aChange );
+    
 	if (aChange == RTz::ETZLocalizationDataChanged)
 		{
 		TInt j = 0;
@@ -684,6 +727,8 @@ void CTzConfigAgent::NotifyTZDataStatusChangeL(RTz::TTzChanges aChange)
 		NTzUpdate::TTzNamesChange namesChange;
 		namesChange.iUTCTimeOfNamesChange.UniversalTime();
 		TPckgBuf<NTzUpdate::TTzNamesChange> bufNames(namesChange);
+		OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, PUBLISH_UPDATE_NOTIFICATION, TZNAMES_CHANGE_NOTIFICATION, "Time zone names change notification" );
+		
 		User::LeaveIfError(RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ETzNamesChange, bufNames));
 		}
 	else 
@@ -700,8 +745,12 @@ void CTzConfigAgent::NotifyTZDataStatusChangeL(RTz::TTzChanges aChange)
 		NTzUpdate::TTzRulesChange rulesChange;
 		rulesChange.iUTCTimeOfRulesChange.UniversalTime();
 		TPckgBuf<NTzUpdate::TTzRulesChange> bufRules(rulesChange);
+		OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, PUBLISH_UPDATE_NOTIFICATION, TZRULES_CHANGE_NOTIFICATION, "Time zone rules change notification" );
+		
 		User::LeaveIfError(RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ETzRulesChange, bufRules));
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_NOTIFYTZDATASTATUSCHANGEL_EXIT, "CTzConfigAgent::NotifyTZDataStatusChangeL Exit" );
+	
 	}
 
 /**
@@ -734,6 +783,8 @@ not changed.
 */
 TBool CTzConfigAgent::CalculateNextDstChangeL(TTime& aNextDstEvent, TTime& aPreviousDstEvent)
     {
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_CALCULATENEXTDSTCHANGEL_ENTRY, "CTzConfigAgent::CalculateNextDstChangeL Entry" );
+    
     // Get the current time/date.
     TTime now;
     now.UniversalTime();
@@ -785,11 +836,15 @@ TBool CTzConfigAgent::CalculateNextDstChangeL(TTime& aNextDstEvent, TTime& aPrev
         else
             {
             aNextDstEvent = utcTimeOfChange;
+            OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_CALCULATENEXTDSTCHANGEL_EXIT2, "CTzConfigAgent::CalculateNextDstChangeL :DST has changed" );
+            
             return ETrue;
             }
         }
         
     // No DST change has been found.
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_CALCULATENEXTDSTCHANGEL_EXIT, "CTzConfigAgent::CalculateNextDstChangeL Exit: No DST change" );
+    
     return EFalse;
     }
 
@@ -851,6 +906,9 @@ UTC Offset and sets a new DST Change Timer as necessary.
 */
 void CTzConfigAgent::HandleDstChangeTimerL()
     {
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_HANDLEDSTCHANGETIMERL_ENTRY, "CTzConfigAgent::HandleDstChangeTimerL Entry" );
+    
+    
 	// UTC offset must be updated only when Auto Update is ON
 	if (iEnabled == RTz::ETZAutoDSTUpdateOn)
 		{
@@ -867,13 +925,18 @@ void CTzConfigAgent::HandleDstChangeTimerL()
 		// Publish update notification.
 		// Note that the value published is the same as
 		// the AutoUpdate Configuration
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, UTC_OFF_SET_CHANGE, "CTzConfigAgent::HandleDstChangeTimerL:EUtcOffsetChangeNotification" );
+		
 		TInt err = RProperty::Set(
    				NTzUpdate::KPropertyCategory, 
    				NTzUpdate::EUtcOffsetChangeNotification, iEnabled);
+		
 			User::LeaveIfError(err);
 	    }
 	
 	TRAP_IGNORE(PublishNewDstChangeInfoL());
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_HANDLEDSTCHANGETIMERL_EXIT, "CTzConfigAgent::HandleDstChangeTimerL Exit" );
+	
     }
 
     
@@ -918,6 +981,9 @@ time should be updated whenever a DST event occurs.
 */
 void CTzConfigAgent::SetAutoUpdateBehaviorL(TInt aUpdateEnabled)
     {
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETAUTOUPDATEBEHAVIORL_ENTRY, "CTzConfigAgent::SetAutoUpdateBehaviorL Entry;aUpdateEnabled=%u", aUpdateEnabled );
+    
+    
     // Check if the configuration has changed.
     if (aUpdateEnabled != iEnabled)
         {
@@ -945,6 +1011,8 @@ void CTzConfigAgent::SetAutoUpdateBehaviorL(TInt aUpdateEnabled)
         }
     
     TRAP_IGNORE(PublishNewDstChangeInfoL());
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETAUTOUPDATEBEHAVIORL_EXIT, "CTzConfigAgent::SetAutoUpdateBehaviorL Exit" );
+    
     }
 
  /**
@@ -960,6 +1028,9 @@ converting the given local time to UTC.
 */
 TInt CTzConfigAgent::SetHomeTimeL(const TTime& aHomeTime)     
 	{
+    OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETHOMETIMEL_ENTRY, "CTzConfigAgent::SetHomeTimeL Entry;YY=%d;MM=%d;DD=%d;HH=%d;Min=%d", aHomeTime.DateTime().Year(),aHomeTime.DateTime().Month(),aHomeTime.DateTime().Day(),aHomeTime.DateTime().Hour(), aHomeTime.DateTime().Minute() );
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETHOMETIMEL_PARAM, "Parameter..;SS=%d", aHomeTime.DateTime().Second() );
+    
 	TTime utcTime(aHomeTime);
 
 	ConvertL(utcTime, ETzWallTimeReference);
@@ -992,12 +1063,15 @@ TInt CTzConfigAgent::SetHomeTimeL(const TTime& aHomeTime)
 	iChangeNotifier->Start();
 	
 	TRAP_IGNORE(PublishNewDstChangeInfoL());
-
+	OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETHOMETIMEL_EXIT, "CTzConfigAgent::SetHomeTimeL Exit;result=%u", result );
 	return result;
 	}
 
 TInt CTzConfigAgent::SetUnknownTimeZoneTimeL(const TTime& aUTCTime, const TInt aUTCOffset, TBool aPersistInCenRep)     
 	{
+    
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETUNKNOWNTIMEZONETIMEL_ENTRY, "CTzConfigAgent::SetUnknownTimeZoneTimeL Entry;aUTCOffset=%d;aPersistInCenRep=%u", aUTCOffset, aPersistInCenRep );
+    
 	//
 	// Cancel DST timer. (It will not be restarted, as we won't have DST rules for this unknown zone)
 	//
@@ -1016,7 +1090,7 @@ TInt CTzConfigAgent::SetUnknownTimeZoneTimeL(const TTime& aUTCTime, const TInt a
 	// Restart environment change notification.
 	//
 	iChangeNotifier->Start();
-
+    
 	User::LeaveIfError(result);
 
 	TInt oldTzId = iSystemTzCache->TimeZoneId().TimeZoneNumericID();
@@ -1056,9 +1130,13 @@ TInt CTzConfigAgent::SetUnknownTimeZoneTimeL(const TTime& aUTCTime, const TInt a
 	change.iOldTimeZoneId = oldTzId;
 
 	TPckgBuf<NTzUpdate::TTimeZoneChange> changeBuf(change);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, TZCHANGE_NOTIFICATION, "CTzConfigAgent::SetUnknownTimeZoneTimeL:TTimeZoneChange Notification" );
+	
 	RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ECurrentTimeZoneId, changeBuf);
 
 	iTzDataProvider->ReleaseTzRules();
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZCONFIGAGENT_SETUNKNOWNTIMEZONETIMEL_EXIT, "CTzConfigAgent::SetUnknownTimeZoneTimeL Exit;KErrNone=%d", KErrNone );
 
 	return KErrNone;
 	}
@@ -1176,6 +1254,8 @@ void CTzConfigAgent::NotifyUserTzRulesChange(TTzUserDataChange aChange)
 	}
 void CTzConfigAgent::NotifyUserTzRulesChangeL(TTzUserDataChange aChange)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_NOTIFYUSERTZRULESCHANGEL_ENTRY, "CTzConfigAgent::NotifyUserTzRulesChangeL Entry;Operation=%u;Time zone Id=%u",aChange.iOperation , aChange.iTzId );
+    
 	//Only interested when a user TZ rule is updated or deleted
 	if (aChange.iOperation == ETzUserDataUpdated ||	aChange.iOperation == ETzUserDataDeleted)
 		{	
@@ -1205,6 +1285,8 @@ void CTzConfigAgent::NotifyUserTzRulesChangeL(TTzUserDataChange aChange)
 			CleanupStack::PopAndDestroy(tzid);	
 			}
 		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_NOTIFYUSERTZRULESCHANGEL_EXIT, "CTzConfigAgent::NotifyUserTzRulesChangeL Exit" );
+	
 	}
  
 void CTzConfigAgent::NotifyUserTzNamesChange(TTzUserDataChange /*aChange*/)
@@ -1251,6 +1333,8 @@ void CTzConfigAgent::RestoreBeginningL()
 
 void CTzConfigAgent::RestoreCompletedL(TInt aRestoreResult)
 	{
+    OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZCONFIGAGENT_RESTORECOMPLETEDL_ENTRY, "CTzConfigAgent::RestoreCompletedL Entry;aRestoreResult=%u", aRestoreResult );
+    
 	if(aRestoreResult == KErrNone)
 		{
 		//Both read only DB and user defined DB will refresh the data
@@ -1295,8 +1379,12 @@ void CTzConfigAgent::RestoreCompletedL(TInt aRestoreResult)
 		NTzUpdate::TTzNamesChange namesChange;
 		namesChange.iUTCTimeOfNamesChange.UniversalTime();
 		TPckgBuf<NTzUpdate::TTzNamesChange> bufNames(namesChange);
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, TZNAMES_CHANGE_NOTIFICATION_4, "CTzConfigAgent::RestoreCompletedL: TzNames change notification" );
+		
 		RProperty::Set(NTzUpdate::KPropertyCategory, NTzUpdate::ETzNamesChange, bufNames);	
 		}
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,PUBLISH_UPDATE_NOTIFICATION, CTZCONFIGAGENT_RESTORECOMPLETEDL_EXIT, "CTzConfigAgent::RestoreCompletedL Exit" );
+	
 	}
 //------------------------------------------------------------------------------------
 CTZRulesCache::~CTZRulesCache()
@@ -1316,6 +1404,8 @@ void CTZRulesCache::SetDefaultZoneIdL()
 
 const CTzRules& CTZRulesCache::doGetEncodedTimeZoneRulesL(TInt aStartYear, TInt aEndYear)
 	{
+    OstTraceDefExt2(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULESCACHE_DOGETENCODEDTIMEZONERULESL_ENTRY, "CTZRulesCache::doGetEncodedTimeZoneRulesL Entry;aStartYear=%d;aEndYear=%d", aStartYear, aEndYear );
+    
 	CTzDataProvider& tzDataProvider = iTimeZoneConfigAgent.TzDataProvider();
 	
 	CTzRules* newRules = CTzRules::NewL(aStartYear, aEndYear);
@@ -1329,12 +1419,17 @@ const CTzRules& CTZRulesCache::doGetEncodedTimeZoneRulesL(TInt aStartYear, TInt 
 	// replace current cached rules
 	delete iEncodedRules;
 	iEncodedRules = newRules;
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULESCACHE_DOGETENCODEDTIMEZONERULESL_EXIT, "CTZRulesCache::doGetEncodedTimeZoneRulesL Exit" );
+	
 	
 	return *iEncodedRules;
 	}
 	
 void CTZRulesCache::doGetActualisedTimeZoneRulesL(const TTime& aTime)
 	{
+     OstTraceDefExt5(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULESCACHE_DOGETACTUALISEDTIMEZONERULESL_ENTRY, "CTZRulesCache::doGetActualisedTimeZoneRulesL Entry;YY=%d;MM=%d;DD=%d;HH=%d;MIN=%d", aTime.DateTime().Year(),aTime.DateTime().Month(),aTime.DateTime().Day(),aTime.DateTime().Hour(),aTime.DateTime().Minute() );
+     OstTraceDef1(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULESCACHE_DOGETACTUALISEDTIMEZONERULESL_PARAM, "Parameters..;SS=%d",aTime.DateTime().Second());
+     
 	TDateTime dateTime(aTime.DateTime() );
 
 	// At least we need the rule for the year preceeding the converted time
@@ -1368,6 +1463,8 @@ void CTZRulesCache::doGetActualisedTimeZoneRulesL(const TTime& aTime)
 	// replace current cached rules
 	delete iActualisedRules;
 	iActualisedRules = newRules;
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZRULESCACHE_DOGETACTUALISEDTIMEZONERULESL_EXIT, "CTZRulesCache::doGetActualisedTimeZoneRulesL Exit" );
+	
 	}
 	
 void CTZRulesCache::ConstructL(const CTzId& aTimeZoneId, const TTime& aTime)
@@ -1436,6 +1533,7 @@ CTzRules& CTZRulesCache::GetEncodedTimeZoneRulesL()
 
 TInt CTZRulesCache::GetEncodedTimeZoneRulesSizeL(const TTime& aStartTime, const TTime& aEndTime, TTzTimeReference /*aTimeRef */)
 	{
+    
 	// fetch a new set of rules from the data provider if the range of the rules in iEncodedRules does not
 	// contain both aStartTime and aEndTime
 	if (
@@ -1461,6 +1559,7 @@ TInt CTZRulesCache::GetEncodedTimeZoneRulesSizeL(const TTime& aStartTime, const 
 
 CVTzActualisedRules& CTZRulesCache::GetTimeZoneRulesL(const TTime& aTime,TTzTimeReference aTimerRef)
 	{
+    
     if ((iTimeZoneId->TimeZoneNumericID() != KUnknownTZId) 
 		&& (!(RuleApplies(*iActualisedRules, aTime, aTimerRef))))
 		{
@@ -1475,6 +1574,9 @@ Tests if the period covered by the cached rules applies to the supplied time.
 TBool CTZRulesCache::RuleApplies(CVTzActualisedRules& actRules, 
     const TTime& aTime, TTzTimeReference aTimerRef) const 
 	{
+    OstTraceDefExt5( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZRULESCACHE_RULEAPPLIES_ENTRY, "CTZRulesCache::RuleApplies Entry;actRules Start year=%d;actRules End year=%d;aTime:YY=%d;aTime:MM=%d;aTime:DD=%d", actRules.StartYear(),  actRules.EndYear(),aTime.DateTime().Year(),aTime.DateTime().Month(),aTime.DateTime().Day() );
+    OstTraceDefExt4(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZRULESCACHE_RULEAPPLIES_ENTRY_PARAM, "Parametere cont..;aTime:Hours=%d;aTime:Min=%d;aTime:Sec=%d;aTimerRef=%u",aTime.DateTime().Hour(), aTime.DateTime().Minute(), aTime.DateTime().Second(), aTimerRef );
+    
 	TInt startYear = actRules.StartYear();
 	TInt endYear = actRules.EndYear();
 	
@@ -1508,6 +1610,8 @@ TBool CTZRulesCache::RuleApplies(CVTzActualisedRules& actRules,
 		
 	const TTime KStart(TDateTime(startYear, EJanuary, 0, 0, 0, 0, 0));
 	const TTime KEnd(TDateTime(endYear, EJanuary, 0, 0, 0, 0, 0));
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG,TRACE_FLOW_PARAM, CTZRULESCACHE_RULEAPPLIES_EXIT, "CTZRulesCache::RuleApplies Exit" );
+	
 	return ((aTime >= KStart) && (aTime < KEnd));
 	}
 

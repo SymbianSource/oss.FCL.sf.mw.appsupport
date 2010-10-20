@@ -15,6 +15,11 @@
 
 #include "TzLocalizationDbAccessor.h"
 #include "TzLocalizationDataTypes.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "TzLocalizationDbAccessorTraces.h"
+#endif
+
 
 //==================================================================
 // Database location and access policy
@@ -91,6 +96,8 @@ void CTzLocalizationDbAccessor::ConstructL()
 
 void CTzLocalizationDbAccessor::OpenDbL()
 	{
+    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDBACCESSOR_OPENDBL_ENTRY, "CTzLocalizationDbAccessor::OpenDbL Entry" );
+    
 	if (iZoneMutex.OpenGlobal(KTzMutexName) != KErrNone)
 		{
 		User::LeaveIfError(iZoneMutex.CreateGlobal(KTzMutexName)) ;
@@ -115,6 +122,8 @@ void CTzLocalizationDbAccessor::OpenDbL()
  			User::LeaveIfError(CreateUserCityTableL()); 
  			} 
   		}
+	OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_FLOW_PARAM, CTZLOCALIZATIONDBACCESSOR_OPENDBL_EXIT, "CTzLocalizationDbAccessor::OpenDbL Exit" );
+	
 	}
 
 	
@@ -180,6 +189,7 @@ Creates the Cached Zone Table if it doesn't already exist.
 */
 TInt CTzLocalizationDbAccessor::CreateFrequentlyUsedZoneTableL()
 	{
+    
 	// Create the columns for the cached zones table
 	RArray<TDbCol> cachedTableCols;
 	CleanupClosePushL(cachedTableCols);
@@ -248,6 +258,7 @@ Creates the user added city database table if it doesn't exist
 */
 TInt CTzLocalizationDbAccessor::CreateUserCityTableL()
 	{
+    
 	//Create the columns for the user aded cities table
 	RArray<TDbCol> cityTableCols;
 	CleanupClosePushL(cityTableCols);

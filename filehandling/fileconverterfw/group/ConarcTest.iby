@@ -25,7 +25,7 @@
 REM Test code for the Conarc component
 
 define CONARCTESTPATH Resource\test\conarc
-data=ZRESOURCE\test\conarc\w7allchr.doc				CONARCTESTPATH\w7allchr.doc
+data=ZRESOURCE\test\conarc\w7allchr.doc.1				CONARCTESTPATH\w7allchr.doc
 data=ZRESOURCE\test\conarc\w7allchr.doc.b64			CONARCTESTPATH\w7allchr.doc.b64
 data=ZRESOURCE\test\conarc\w7allchr.doc.qp			CONARCTESTPATH\w7allchr.doc.qp
 data=ZRESOURCE\test\conarc\w7allchrwosplchr.doc.qp		CONARCTESTPATH\w7allchrwosplchr.doc.qp

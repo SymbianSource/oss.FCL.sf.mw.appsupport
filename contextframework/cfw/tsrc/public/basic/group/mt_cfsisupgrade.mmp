@@ -54,7 +54,8 @@ LIBRARY                 EUnitUtil.lib
 LIBRARY                 euser.lib
 LIBRARY			bafl.lib
 LIBRARY			efsrv.lib
-LIBRARY			SWInstCli.lib
+// SwinstClin.lib has removed from MCL.. As this test code is still not operational .. we are commenting it for now.
+//LIBRARY			SWInstCli.lib
 LIBRARY			ecom.lib
 LIBRARY			cfclient.lib
 LIBRARY			cfservices.lib

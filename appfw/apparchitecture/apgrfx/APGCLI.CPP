@@ -34,6 +34,10 @@
 #include "APGICNFL.H"
 #include "APGPRIV.H"
 #include "apprivate.h"
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "APGCLITraces.h"
+#endif
 
 const TUint KInitialIconBufSize = sizeof(TSize)*6 + sizeof(TInt);
 const TUint KInitialViewDataBufSize = sizeof(TApaAppViewInfo)*6 + sizeof(TInt);
@@ -150,6 +154,7 @@ with it.
 EXPORT_C TInt RApaLsSession::Connect()
 	{
 	TInt r=CreateSession(KAppListServerName,Version(),KAsyncMessageSlots);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_CONNECT, "RApaLsSession::Connect will return with r=%d", r );
 	return(r); 
 	}
 
@@ -197,6 +202,7 @@ Control panel applications are excluded.
 */
 EXPORT_C TInt RApaLsSession::EmbeddableAppCount(TInt& aCount) const
 	{
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_EMBEDDABLEAPPCOUNT, "RApaLsSession::EmbeddableAppCount" );    
 	return DoAppCount(aCount, EAppListServEmbedCount);
 	}
 
@@ -207,9 +213,13 @@ TInt RApaLsSession::DoAppCount(TInt& aCount,TInt aCommand) const
 	__ASSERT_DEBUG(aCommand==EAppListServEmbedCount || aCommand==EAppListServAppCount,Panic(EDPanicWrongCommand));
 	const TInt returnValue = SendReceiveWithReconnect(aCommand,TIpcArgs());
 	if (returnValue < 0)
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_DOAPPCOUNT, "RApaLsSession::DoAppCount returned with (returnValue)=%d", returnValue );        
 		return returnValue;
+	    }
 	
 	aCount = returnValue;
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_DOAPPCOUNT, "RApaLsSession::DoAppCount will return with KErrNone" );
 	return KErrNone;
 	}
 
@@ -456,12 +466,16 @@ EXPORT_C TInt RApaLsSession::GetNextApp(TApaAppInfo& aInfo,TInt aScreenMode) con
 	{
 	TPckg<TApaAppInfo> info(aInfo);
 	TInt err = SendReceiveWithReconnect(EAppListServGetNextApp, TIpcArgs(aScreenMode,&info));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_GETNEXTAPP, "SendReceiveWithReconnect returned with error returned from SendReceiveWithReconnect : err=%d", err );
+	
 	if (!err)
 		aInfo = info();
 	else if (err==KErrNotFound)
 		err = ENoMoreAppsInList;
 	else if (err==KErrCorrupt)
 		err = EAppListInvalid;
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP1_RAPALSSESSION_GETNEXTAPP, "RApaLsSession::GetNextApp will return with err=%d", err );
 	
 	return err;
 	}
@@ -516,9 +530,14 @@ EXPORT_C TInt RApaLsSession::GetDefaultScreenNumber(TInt& aDefaultScreenNumber, 
 	{
 	const TInt result = SendReceiveWithReconnect(EAppListServGetDefaultScreenNumber, TIpcArgs(aAppUid.iUid));
 	if (result < 0)
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG,APPARC_TRACE_NORMAL, RAPALSSESSION_GETDEFAULTSCREENNUMBER, "SendReceiveWithReconnect returned with result=%d. Return from here", result );
+        
 		return result;
-
+	    }
+	
 	aDefaultScreenNumber = result;
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_GETDEFAULTSCREENNUMBER, "RApaLsSession::GetDefaultScreenNumber will return with KErrNone" );
 	return KErrNone;
 	}
 
@@ -571,6 +590,7 @@ otherwise one of the other system wide error codes.
 EXPORT_C TInt RApaLsSession::GetAppIconSizes(TUid aAppUid, CArrayFixFlat<TSize>& aArrayToFill) const
 	{
 	TRAPD(error, DoGetAppIconSizesL(aAppUid,aArrayToFill));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG , APPARC_TRACE_FLOW, RAPALSSESSION_GETAPPICONSIZES, "RApaLsSession::GetAppIconSizes will return with error=%d", error );
 	return error;
 	}
 
@@ -598,6 +618,8 @@ void RApaLsSession::FetchArrayL(MArrayFiller& aArray, TUid aAppUid, TInt aOpcode
 	// Get the data from the AppArc server
 	
 	const TInt sizeRequired = SendReceiveWithReconnect(aOpcode,TIpcArgs(aAppUid.iUid,buffer->Size(),&bufPtr));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_INTERNAL, RAPALSSESSION_FETCHARRAYL, "SendReceiveWithReconnect returned with sizeRequired=%d", sizeRequired );
+	
 	User::LeaveIfError(sizeRequired); 	// Negative values are error codes
 	if (sizeRequired > 0)	// If the initial buffer was too small...
 		{
@@ -650,13 +672,21 @@ EXPORT_C TInt RApaLsSession::GetAppIcon(TUid aAppUid, TSize aSize, CApaMaskedBit
 	SReturnData_AppIconByUidAndSize returnData = {0,0};
 	TPckg<SReturnData_AppIconByUidAndSize> returnData_asDescriptor(returnData);
 	TInt error = SendReceiveWithReconnect(EAppListServAppIconByUidAndSize, TIpcArgs(aAppUid.iUid,aSize.iWidth,aSize.iHeight,&returnData_asDescriptor));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_GETAPPICON, "SendReceiveWithReconnect returned with error=%d", error );
+	
 	if (!error)
 		{
 		error = aAppBitmap.Duplicate(returnData.iIcon);
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP1_RAPALSSESSION_GETAPPICON, "aAppBitmap.Duplicate returned with error=%d", error );
+		
 		if (!error)
+		    {
 			error = aAppBitmap.Mask()->Duplicate(returnData.iIconMask);
+		    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP2_RAPALSSESSION_GETAPPICON, "aAppBitmap.Mask->Duplicate returned with error=%d", error );
+		    }
 		}
-
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP3_RAPALSSESSION_GETAPPICON, "RApaLsSession::GetAppIcon will return with error=%d", error );
 	return error;
 	}
 
@@ -684,13 +714,22 @@ EXPORT_C TInt RApaLsSession::GetAppIcon(TUid aAppUid, TInt aSize, CApaMaskedBitm
 	SReturnData_AppIconByUid returnData = {0,0};
 	TPckg<SReturnData_AppIconByUid> returnData_asDescriptor(returnData);
 	TInt error = SendReceiveWithReconnect(EAppListServAppIconByUid,TIpcArgs(aAppUid.iUid,aSize,&returnData_asDescriptor));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP5_RAPALSSESSION_GETAPPICON, "SendReceiveWithReconnect returned with error=%d", error );
+	
+	
 	if (!error)
 		{
 		error = aAppBitmap.Duplicate(returnData.iIcon);
-		if (!error)
-			error = aAppBitmap.Mask()->Duplicate(returnData.iIconMask);
-		}
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP6_RAPALSSESSION_GETAPPICON, "aAppBitmap.Duplicate returned with error=%d", error );
 		
+		if (!error)
+		    {
+			error = aAppBitmap.Mask()->Duplicate(returnData.iIconMask);
+			OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP7_RAPALSSESSION_GETAPPICON, "aAppBitmap.Mask()->Duplicate returned with error=%d", error );
+		    }
+		}
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP8_RAPALSSESSION_GETAPPICON, "RApaLsSession::GetAppIcon will return with error=%d", error );
 	return error;
 	}
 
@@ -716,10 +755,14 @@ EXPORT_C TInt RApaLsSession::GetAppIcon(TUid aAppUid, RFile& aFile) const
 	__ASSERT_ALWAYS(aFile.SubSessionHandle() == KNullHandle, Panic(EDPanicHandleAlreadySet));
 	TPckgBuf<TInt> fileHandle;
 	TInt sessionHandleOrErrorCode = SendReceiveWithReconnect(EAppListServAppIconFileHandle, TIpcArgs(aAppUid.iUid, &fileHandle));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP4_RAPALSSESSION_GETAPPICON, "SendReceiveWithReconnect returned with sessionHandleOrErrorCode=%d", sessionHandleOrErrorCode );
+	
 	if (sessionHandleOrErrorCode >= KErrNone)
 	    {
 	    sessionHandleOrErrorCode = aFile.AdoptFromServer(sessionHandleOrErrorCode, fileHandle());
+	    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP9_RAPALSSESSION_GETAPPICON, "aFile.AdoptFromServer returned with sessionHandleOrErrorCode=%d", sessionHandleOrErrorCode );
 	    }
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP10_RAPALSSESSION_GETAPPICON, "RApaLsSession::GetAppIcon will return with sessionHandleOrErrorCode=%d", sessionHandleOrErrorCode );
 	return sessionHandleOrErrorCode;
 	}   
 
@@ -735,7 +778,8 @@ of an application that can handle this type.
 codes. */
 EXPORT_C TInt RApaLsSession::AppForDocument(const TDesC& aFileName, TUid& aAppUid, TDataType& aDataType) const
 	{
-	return DoAppForDocumentOptionallySpecifyingService(aFileName, TUid::Null(), aAppUid, aDataType, EAppListServAppForDocument);
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_APPFORDOCUMENT, "RApaLsSession::AppForDocument" );
+ 	return DoAppForDocumentOptionallySpecifyingService(aFileName, TUid::Null(), aAppUid, aDataType, EAppListServAppForDocument);
 	}
 
 
@@ -753,7 +797,8 @@ codes.
 */
 EXPORT_C TInt RApaLsSession::AppForDocument(const RFile& aFile, TUid& aAppUid, TDataType& aDataType) const
 	{
-	return DoAppForDocumentOptionallySpecifyingService(aFile, TUid::Null(), aAppUid, aDataType, EAppListServAppForDocumentPassedByFileHandle);
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_APPFORDOCUMENT, "RApaLsSession::AppForDocument" );
+ 	return DoAppForDocumentOptionallySpecifyingService(aFile, TUid::Null(), aAppUid, aDataType, EAppListServAppForDocumentPassedByFileHandle);
 	}
 
 
@@ -769,6 +814,7 @@ EXPORT_C TInt RApaLsSession::IsProgram(const TDesC& aFileName, TBool& aProgram) 
 	{
 	_LIT(KLitSysBin, "\\sys\\bin\\");
 	aProgram=(TParsePtrC(aFileName).Path().CompareF(KLitSysBin)==0);
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_ISPROGRAM, "RApaLsSession::IsProgram will return with KErrNone" );
 	return KErrNone;
 	}
 
@@ -789,9 +835,13 @@ EXPORT_C TInt RApaLsSession::GetPreferredBufSize(TInt& aPreferredBufSize) const
 	{
 	const TInt preferredBufSize = SendReceiveWithReconnect(EAppListServPreferredBufSize, TIpcArgs());
 	if (preferredBufSize < KErrNone)
-		return preferredBufSize; // it's an error
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETPREFERREDBUFSIZE, "Error condition - RApaLsSession::GetPreferredBufSize will return with preferredBufSize=%d", preferredBufSize );
+        return preferredBufSize; // it's an error
+	    }
 
 	aPreferredBufSize = preferredBufSize;
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_GETPREFERREDBUFSIZE, "RApaLsSession::GetPreferredBufSize will return with KErrNone" );
 	return KErrNone;
 	}
 
@@ -812,9 +862,12 @@ EXPORT_C TInt RApaLsSession::GetMaxDataBufSize(TInt& aBufSize) const
 	{
 	const TInt returnValue = SendReceiveWithReconnect(EAppListServGetBufSize, TIpcArgs());
 	if (returnValue < 0)
-		return returnValue;
-
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETMAXDATABUFSIZE, "RApaLsSession::GetMaxDataBufSize will return with returnValue=%d", returnValue );
+ 		return returnValue;
+	    }
 	aBufSize = returnValue;
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_GETMAXDATABUFSIZE, "RApaLsSession::GetMaxDataBufSize will return with KErrNone" );
 	return KErrNone;
 	}
 
@@ -838,7 +891,8 @@ codes.
 */
 EXPORT_C TInt RApaLsSession::SetMaxDataBufSize(TInt aBufSize)
 	{
-	return SendReceiveWithReconnect(EAppListServSetBufSize,TIpcArgs(aBufSize));
+    OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_SETMAXDATABUFSIZE, "RApaLsSession::SetMaxDataBufSize" );
+ 	return SendReceiveWithReconnect(EAppListServSetBufSize,TIpcArgs(aBufSize));
 	} //lint !e1762 Suppress member function could be made const
 
 
@@ -863,13 +917,21 @@ EXPORT_C TInt RApaLsSession::GetAppViewIcon(TUid aAppUid, TUid aViewUid, const T
 	SReturnData_ViewIconByUidAndSize returnData = {0,0};
 	TPckg<SReturnData_ViewIconByUidAndSize> returnData_asDescriptor(returnData);
 	TInt error = SendReceiveWithReconnect(EAppListServViewIconByUidAndSize,TIpcArgs(&inputData,&returnData_asDescriptor));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_GETAPPVIEWICON, "SendReceiveWithReconnect returned with error=%d", error );
+	
 	if (!error)
 		{
 		error = aViewBitmap.Duplicate(returnData.iIcon);
-		if (!error)
-			error = aViewBitmap.Mask()->Duplicate(returnData.iIconMask);
-		}
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP1_RAPALSSESSION_GETAPPVIEWICON, "aViewBitmap.Duplicate returned with error=%d", error );
 		
+		if (!error)
+		    {
+    		error = aViewBitmap.Mask()->Duplicate(returnData.iIconMask);
+    	    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP2_RAPALSSESSION_GETAPPVIEWICON, "aViewBitmap.Mask().Duplicate returned with error=%d", error );
+    	    }
+		}
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP3_RAPALSSESSION_GETAPPVIEWICON, "RApaLsSession::GetAppViewIcon will return with error=%d", error );
 	return error;
 	}
 
@@ -889,6 +951,7 @@ be found; otherwise one of the other system wide error codes.
 EXPORT_C TInt RApaLsSession::GetAppViews(CApaAppViewArray& aAppViews, TUid aAppUid) const
 	{
 	TRAPD(error,DoGetAppViewsL(aAppViews,aAppUid));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETAPPVIEWS, "DoGetAppViewsL returned.RApaLsSession::GetAppViews will return with error=%d", error );
 	return error;
 	}
 
@@ -915,6 +978,7 @@ be found; otherwise one of the other system wide error codes.
 EXPORT_C TInt RApaLsSession::GetAppOwnedFiles(CDesCArray& aAppOwnedFiles, TUid aAppUid) const
 	{
 	TRAPD(error,DoGetAppOwnedFilesL(aAppOwnedFiles,aAppUid));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETAPPOWNEDFILES, "DoGetAppOwnedFilesL returned.RApaLsSession::GetAppOwnedFiles will return with error=%d", error );
 	return error;
 	}
 
@@ -932,11 +996,15 @@ the other system-wide error codes.
 */
 EXPORT_C TInt RApaLsSession::NumberOfOwnDefinedIcons(TUid aAppUid, TInt& aCount) const
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_NUMBEROFOWNDEFINEDICONS, "RApaLsSession::NumberOfOwnDefinedIcons: Application UID - aAppUid.iUid=%d", aAppUid.iUid );
+    
+    
 	TPckgBuf<TInt> pckg;
 	const TInt err = SendReceiveWithReconnect(EAppListServNumberOfOwnDefinedIcons,TIpcArgs(aAppUid.iUid,&pckg));
 	if (!err)
 		aCount = pckg();
-
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_NUMBEROFOWNDEFINEDICONS, "RApaLsSession::NumberOfOwnDefinedIcons will return with err=%d", err );
 	return err;
 	}
 
@@ -957,21 +1025,29 @@ provide an application registration file; otherwise one of the other system wide
 */
 EXPORT_C TInt RApaLsSession::GetAppIcon(TUid aAppUid, HBufC*& aFullFileName) const
 	{
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP11_RAPALSSESSION_GETAPPICON, "RApaLsSession::GetAppIcon;aAppUid=%d;aFullFileName=%S", aAppUid.iUid, *aFullFileName );
+    
 	TFileName fileName;
 	TPckg<TFileName> filenamePckg(fileName);
 	const TInt err = SendReceiveWithReconnect(EAppListServAppIconFileName, TIpcArgs(aAppUid.iUid, &filenamePckg));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP12_RAPALSSESSION_GETAPPICON, "SendReceiveWithReconnect returned with err=%d", err );
+	
 	if (!err)
 		{
 		HBufC* fullFileName = HBufC::New(fileName.Length());
 		if (fullFileName == NULL)
-			return KErrNoMemory;
+		    {
+            OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP13_RAPALSSESSION_GETAPPICON, "RApaLsSession::GetAppIcon will return with KErrNoMemory" );
+            return KErrNoMemory;
+		    }
 		else
 			{
 			*fullFileName = fileName;
 			aFullFileName = fullFileName; // ownership transferred to caller
 			}
 		}
-		
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP14_RAPALSSESSION_GETAPPICON, "RApaLsSession::GetAppIcon will retun with err=%d", err );
 	return err;
 	}
 
@@ -994,14 +1070,21 @@ does not provide an application registration file; otherwise one of the other sy
 */
 EXPORT_C TInt RApaLsSession::GetAppViewIcon(TUid aAppUid, TUid aViewUid, HBufC*& aFullFileName) const
 	{
-	TFileName fileName;
+    OstTraceDefExt3( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP6_RAPALSSESSION_GETAPPVIEWICON, "RApaLsSession::GetAppViewIcon;aAppUid=%d;aViewUid=%d;aFullFileName=%S", aAppUid.iUid, aViewUid.iUid , *aFullFileName );
+    
+  	TFileName fileName;
 	TPckg<TFileName> filenamePckg(fileName);
 	const TInt err = SendReceiveWithReconnect(EAppListServAppViewIconFileName, TIpcArgs(aAppUid.iUid, aViewUid.iUid, &filenamePckg));
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP4_RAPALSSESSION_GETAPPVIEWICON, "SendReceiveWithReconnect returned with err=%d", err );
+	
 	if (!err)
 		{
 		HBufC* fullFileName = HBufC::New(fileName.Length());
 		if (fullFileName == NULL)
-			return KErrNoMemory;
+		    {
+            OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP5_RAPALSSESSION_GETAPPVIEWICON, "RApaLsSession::GetAppViewIcon will return with KErrNoMemory" );
+ 			return KErrNoMemory;
+		    }
 		else
 			{
 			*fullFileName = fileName;
@@ -1009,7 +1092,8 @@ EXPORT_C TInt RApaLsSession::GetAppViewIcon(TUid aAppUid, TUid aViewUid, HBufC*&
 			}
 		}
 
-	return err;
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP7_RAPALSSESSION_GETAPPVIEWICON, "RApaLsSession::GetAppViewIcon will return with err=%d", err );
+ 	return err;
 	}
 
 
@@ -1072,7 +1156,8 @@ EXPORT_C TInt RApaLsSession::InsertDataMappingIfHigher(const TDataType& aDataTyp
 	const TInt err = SendReceiveWithReconnect(EAppListInsertDataMappingIfHigher, TIpcArgs(&dataType, TInt(aPriority), aUid.iUid, &inserted));
 	if(!err)
 		aInserted = inserted();
-		
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_INSERTDATAMAPPINGIFHIGHER, "RApaLsSession::InsertDataMappingIfHigher will return with error returned by SendReceiveWithReconnect : err=%d", err );
 	return err;
 	} //lint !e1762 Suppress member function could be made const
 
@@ -1131,7 +1216,10 @@ EXPORT_C TInt RApaLsSession::GetAppByDataType(const TDataType& aDataType, TUid a
 	TPckg<TUid> uid(aAppUid);
 	const TInt returnValue = SendReceiveWithReconnect(EAppListServGetAppByDataType,TIpcArgs(&dataType, aServiceUid.iUid, &uid));
 	if (returnValue < 0)
-		return returnValue;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETAPPBYDATATYPE, "RApaLsSession::GetAppByDataType will return with error returned by SendReceiveWithReconnect : returnValue=%d", returnValue );
+        return returnValue;
+	    }
 	
 	return (aAppUid == KNullUid ? KErrNotFound : KErrNone);
 	} //lint !e1764 Suppress reference parameter 'aAppUid' could be declared const ref
@@ -1146,11 +1234,15 @@ otherwise one of the other system wide error codes.
 */
 EXPORT_C TInt RApaLsSession::ApplicationLanguage(TUid aAppUid, TLanguage& aLanguage) const
 	{
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_APPLICATIONLANGUAGE, "RApaLsSession::ApplicationLanguage;Application UID is aAppUid=%d", aAppUid.iUid );
+    
 	TPckgBuf<TLanguage> pckg;
 	const TInt err = SendReceiveWithReconnect(EAppListServApplicationLanguage, TIpcArgs(aAppUid.iUid, &pckg));
 	if (!err)
 		aLanguage = pckg();
-
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_INTERNAL, DUP2_RAPALSSESSION_APPLICATIONLANGUAGE, "Application language: aLanguage returned = %d", aLanguage );
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_APPLICATIONLANGUAGE, "RApaLsSession::ApplicationLanguage will return with err = %d", err );
 	return err;
 	}
 
@@ -1355,7 +1447,8 @@ registration file.
 */
 EXPORT_C CApaAppServiceInfoArray* RApaLsSession::GetAppServiceOpaqueDataLC(TUid aAppUid, TUid aServiceUid) const
 	{
-	CArrayFixFlat<TApaAppServiceInfo>* serviceArray = new(ELeave) CArrayFixFlat<TApaAppServiceInfo>(4);
+    OstTraceDefExt2( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETAPPSERVICEOPAQUEDATALC, "RApaLsSession::GetAppServiceOpaqueDataLC;aAppUid=%d;aServiceUid=%d", aAppUid.iUid, aServiceUid.iUid );
+    CArrayFixFlat<TApaAppServiceInfo>* serviceArray = new(ELeave) CArrayFixFlat<TApaAppServiceInfo>(4);
 	CleanupStack::PushL(TCleanupItem(CleanupAppServiceArray, serviceArray));
 	CBufBase* buffer = GetServiceBufferLC(EAppListServGetAppServiceOpaqueData, aAppUid, aServiceUid);
 	RBufReadStream readStream(*buffer);
@@ -1433,13 +1526,17 @@ TInt RApaLsSession::DoAppForDocumentOptionallySpecifyingService(const TDesC& aFi
 	if (!aFileName.Length())
 		{
 		aAppUid = KNullUid;
+		OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_DOAPPFORDOCUMENTOPTIONALLYSPECIFYINGSERVICE, "RApaLsSession::DoAppForDocumentOptionallySpecifyingService will return with KErrNone" );
 		return KErrNone;
 		}
 		
 	HBufC8* buffer = NULL;
 	TInt error = GetNewBufferFromFile(buffer, aFileName);
 	if (error)
-		return error;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP5_RAPALSSESSION_DOAPPFORDOCUMENTOPTIONALLYSPECIFYINGSERVICE, "RApaLsSession::DoAppForDocumentOptionallySpecifyingService will return with error return by GetNewBufferFromFile : error=%d", error );
+        return error;
+	    }
 
 	SReturnData_AppForDocument returnData;
 	TPckg<SReturnData_AppForDocument> returnData_asDescriptor(returnData);
@@ -1452,7 +1549,8 @@ TInt RApaLsSession::DoAppForDocumentOptionallySpecifyingService(const TDesC& aFi
 		aAppUid = returnData.iUid;
 		aDataType = returnData.iDataType;
 		}
-
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP6_RAPALSSESSION_DOAPPFORDOCUMENTOPTIONALLYSPECIFYINGSERVICE, "RApaLsSession::DoAppForDocumentOptionallySpecifyingService will return with thr return value from SendReceiveWithReconnect : error=%d", error );
 	return error;
 	}
 
@@ -1464,15 +1562,21 @@ TInt RApaLsSession::DoAppForDocumentOptionallySpecifyingService(const RFile& aFi
 	TPckg<SReturnData_AppForDocument> returnData_asDescriptor(returnData);
 	TIpcArgs ipcArgs(&returnData_asDescriptor, aServiceUid.iUid);
 	TInt error = aFile.TransferToServer(ipcArgs, 2, 3);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP2_RAPALSSESSION_DOAPPFORDOCUMENTOPTIONALLYSPECIFYINGSERVICE, "aFile.TransferToServer returned with error=%d", error );
+	
 	if (!error)
+	    {
 		error = SendReceiveWithReconnect(aOpcode, ipcArgs);
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP3_RAPALSSESSION_DOAPPFORDOCUMENTOPTIONALLYSPECIFYINGSERVICE, "SendReceiveWithReconnect returned with error=%d", error );
+		}
 
 	if (!error)
 		{
 		aAppUid = returnData.iUid;
 		aDataType = returnData.iDataType;
 		}
-		
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP4_RAPALSSESSION_DOAPPFORDOCUMENTOPTIONALLYSPECIFYINGSERVICE, "RApaLsSession::DoAppForDocumentOptionallySpecifyingService will return with error=%d", error );
 	return error;
 	}
 
@@ -1483,21 +1587,32 @@ TInt RApaLsSession::GetNewBufferFromFile(HBufC8*& aBuffer, const TDesC& aFileNam
 	aBuffer = NULL;
 	TInt preferredBufSize = 0;
 	const TInt error = GetPreferredBufSize(preferredBufSize);
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_GETNEWBUFFERFROMFILE, "GetPrefferredBufSize returned with error=%d", error );
+	
 	if (error < KErrNone)
-		return error;
+	    {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_GETNEWBUFFERFROMFILE, "RApaLsSession::GetNewBufferFromFile returned with error=%d", error );
+  		return error;
+	    }
 
 	HBufC8* const buffer = HBufC8::New(Max(8, preferredBufSize)); // 8 is a sensible minimum
 	if (!buffer)
-		return KErrNoMemory;
+	    {
+        OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP2_RAPALSSESSION_GETNEWBUFFERFROMFILE, "RApaLsSession::GetNewBufferFromFile will return with KErrNoMemory" );
+        return KErrNoMemory;
+	    }
 
 	const RFs* fsSession = FsSession();
 	RFs tempFsSession;
 	if (!fsSession)
 		{
 		const TInt error = tempFsSession.Connect();
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP3_RAPALSSESSION_GETNEWBUFFERFROMFILE, "temFsSession.Connect() returned with error=%d", error );
+		
 		if (error)
 			{
 			delete buffer;
+			OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP4_RAPALSSESSION_GETNEWBUFFERFROMFILE, "RApaLsSession::GetNewBufferFromFile will return with error=%d", error );
 			return error;
 			}
 
@@ -1508,10 +1623,13 @@ TInt RApaLsSession::GetNewBufferFromFile(HBufC8*& aBuffer, const TDesC& aFileNam
 		{
 		TPtr8 buffer_asWritable(buffer->Des());
 		const TInt error = fsSession->ReadFileSection(aFileName, 0, buffer_asWritable, preferredBufSize);
+		OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, DUP5_RAPALSSESSION_GETNEWBUFFERFROMFILE, "fsSession->ReadFileSection returned with error=%d", error );
+		
 		if (error)
 			{
 			delete buffer;
 			tempFsSession.Close();
+			OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP6_RAPALSSESSION_GETNEWBUFFERFROMFILE, "RApaLsSession::GetNewBufferFromFile will return with error=%d", error );
 			return error;
 			}
 		}
@@ -1520,6 +1638,7 @@ TInt RApaLsSession::GetNewBufferFromFile(HBufC8*& aBuffer, const TDesC& aFileNam
 		tempFsSession.Close();
 		
 	aBuffer = buffer;
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP7_RAPALSSESSION_GETNEWBUFFERFROMFILE, "RApaLsSession::GetNewBufferFromFile will return with KErrNone" );
 	return KErrNone;
 	}
 
@@ -1654,7 +1773,8 @@ EXPORT_C void RApaLsSession::DeregisterNonNativeApplicationL(TUid aApplication)
 	User::LeaveIfError(SendReceiveWithReconnect(EAppListServDeregisterNonNativeApplication, TIpcArgs(aApplication.iUid)));
 #else
 	(void) aApplication;
-    User::Leave(KErrNotSupported);  	
+	OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_DEREGISTERNONNATIVEAPPLICATIONL, "RApaLsSession::DeregisterNonNativeApplicationL will leave with KErrNotSupported" );
+	User::Leave(KErrNotSupported);  	
 #endif
 	} //lint !e1762 Suppress member function could be made const
 	
@@ -1744,7 +1864,8 @@ Gets the application type of the application. For a native application the type 
 */
 EXPORT_C TInt RApaLsSession::GetAppType(TUid& aTypeUid, TUid aAppUid) const
 	{
-	TPckg<TUid> uid(aTypeUid);
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_GETAPPTYPE, "Applicatio's uid of of which to get the application type : aAppUid=%d", aAppUid.iUid );
+    TPckg<TUid> uid(aTypeUid);
 	return SendReceiveWithReconnect(EAppListServGetAppType,TIpcArgs(aAppUid.iUid,&uid));
 	} //lint !e1764 Suppress reference parameter 'aTypeUid' could be declared const ref
 	
@@ -1774,7 +1895,9 @@ EXPORT_C TInt RApaLsSession::ForceRegistration(const RPointerArray<TDesC>& aRegF
 	CBufFlat* buffer = 0;
 	TRAPD(err, buffer = CreateRegFilesBufferL(aRegFiles));
 	if (err)
-		return err;
+	    {
+        return err;
+	    }
 	
 	TPtr8 ptr = buffer->Ptr(0);
 	const TInt returnValue=SendReceiveWithReconnect(EAppListServForceRegistration,TIpcArgs(&ptr));
@@ -1795,7 +1918,8 @@ TInt RApaLsSession::SendReceiveWithReconnect(TInt aFunction, const TIpcArgs& aIp
 	TInt ret = SendReceive(aFunction, aIpcArgs);
 	if(ret != KErrServerTerminated)
 		{
-		return ret;
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_SENDRECEIVEWITHRECONNECT, "RApaLsSession::SendReceiveWithReconnect will return with ret=%d", ret );
+  		return ret;
 		}
 
 	RApaLsSession ls;
@@ -1807,6 +1931,9 @@ TInt RApaLsSession::SendReceiveWithReconnect(TInt aFunction, const TIpcArgs& aIp
 		localThis->iHandle=ls.iHandle;
 		ret = SendReceive(aFunction, aIpcArgs);
 		}
+	
+	OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_SENDRECEIVEWITHRECONNECT, "RApaLsSession::SendReceiveWithReconnect will return with ret=%d", ret );
+	
 	return ret;
 	}
 
@@ -1950,12 +2077,18 @@ EXPORT_C TInt RApaLsSession::UpdateAppListL(RArray<TApaAppUpdateInfo>& aAppUpdat
     //Create a buffer with the application UID and corresponding action information.
     CBufFlat* buffer = 0;
     TRAPD(err, buffer = CreateAppUpdateInfoBufferL(aAppUpdateInfo));
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_ERROR, RAPALSSESSION_UPDATEAPPLISTL, "CreateAppUpdateInfoBufferL returned with error=%d", err );
+    
     if (err)
+        {
+        OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_UPDATEAPPLISTL, "RApaLsSession::UpdateAppListL will return with error returned from CreateAppUpdateInfoBufferL" );
         return err;
+        }
     
     TPtr8 ptr = buffer->Ptr(0);
     const TInt returnValue=SendReceiveWithReconnect(EAppListServUpdateAppList,TIpcArgs(&ptr));
     delete buffer;
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP2_RAPALSSESSION_UPDATEAPPLISTL, "RApaLsSession::UpdateAppListL will return with error from SendReceiveWithReconnect : returnValue=%d", returnValue );
     return returnValue;
     }
 
@@ -1980,17 +2113,24 @@ EXPORT_C TInt RApaLsSession::ForceRegistration(const RPointerArray<Usif::CApplic
 {
     //If there are no applications to update, just return.
     if(aForceRegAppsInfo.Count()==0)
+        {
+        OstTraceDef0( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_FORCEREGISTRATION, "RApaLsSession::ForceRegistration will return if there are no applications to update" );
         return(KErrNone);
+        }
     
     //Create a buffer with the application uid and corresponding action information.
     CBufFlat* buffer = 0;
     TRAPD(err, buffer = CreateForceRegAppInfoBufferL(aForceRegAppsInfo));
     if (err)
+        {
+        OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP1_RAPALSSESSION_FORCEREGISTRATION, "RApaLsSession::ForceRegistration will return with error returned from CreateForceRegAppInfoBufferL : err=%d", err );
         return err;
+        }
     
     TPtr8 ptr = buffer->Ptr(0);
     const TInt returnValue=SendReceiveWithReconnect(EAppListServForceRegistration,TIpcArgs(&ptr));
     delete buffer;
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, DUP2_RAPALSSESSION_FORCEREGISTRATION, "RApaLsSession::ForceRegistration will return with the return value of SendReceiveWithReconnect : returnValue=%d", returnValue );
     return returnValue;
 }
 
@@ -2129,6 +2269,7 @@ EXPORT_C TInt RApaLsSession::UpdatedAppsInfoL(RArray<TApaAppUpdateInfo>& aUpdate
         }
     
     CleanupStack::PopAndDestroy(buffer);
+    OstTraceDef1( OST_TRACE_CATEGORY_DEBUG, APPARC_TRACE_FLOW, RAPALSSESSION_UPDATEDAPPSINFOL, "RApaLsSession::UpdatedAppsInfoL will return with returnValue=%d", returnValue );
     return returnValue;
     }
 

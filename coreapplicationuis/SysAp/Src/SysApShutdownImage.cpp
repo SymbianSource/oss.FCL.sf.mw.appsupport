@@ -27,7 +27,7 @@
 #include "SysApShutdownImage.h"
 #include "SysAp.hrh"
 #include <data_caging_path_literals.hrh>
-#include <HbDeviceMessageBoxSymbian.h>
+#include <hbdevicemessageboxsymbian.h>
 #include <SVGEngineInterfaceImpl.h>
 
 //_LIT(KDC_APP_BITMAP_DIR,"\\resource\\apps\\"); 

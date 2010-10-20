@@ -18,6 +18,11 @@
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <tzusernames.h>
 #include <tzuserdefineddata.h>
+#include "OstTraceDefinitions.h"
+#ifdef OST_TRACE_COMPILER_IN_USE
+#include "timezoneuserdataTraces.h"
+#endif
+
 #endif
 
 
@@ -55,6 +60,8 @@ void CTzUserNames::ConstructL(const TDesC& aStandardName, const TDesC& aShortSta
   aShortDaylightName.Length() > KMaxShortName
 			)
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERNAMES_CONSTRUCTL, "CTzUserNames::ConstructL:Invalid size of the argument" );
+	    
 		User::Leave(KErrArgument);
 		}
 	
@@ -426,6 +433,8 @@ EXPORT_C CTzRules* CTzUserData::ReadRulesL(const CTzId& aTzId) const
 	{
 	if (!aTzId.IsUserTzId())
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATA_READRULESL, "CTzUserData::ReadRulesL:Invalid Time zone id" );
+	    
 		User::Leave(KErrArgument);	
 		}
 		
@@ -451,6 +460,8 @@ EXPORT_C CTzUserNames* CTzUserData::ReadNamesL(const CTzId& aTzId) const
 	{
 	if (!aTzId.IsUserTzId())
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATA_READNAMESL, "CTzUserData::ReadNamesL;Invalid time zone id" );
+	    
 		User::Leave(KErrArgument);	
 		}
 
@@ -481,6 +492,8 @@ EXPORT_C void CTzUserData::UpdateL(const CTzId& aTzId, const CTzRules& aTzUserRu
 	{
 	if (!aTzId.IsUserTzId())
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATA_UPDATEL, "CTzUserData::UpdateL, Invalid time zone id" );
+	    
 		User::Leave(KErrArgument);	
 		}
 
@@ -517,6 +530,8 @@ EXPORT_C void CTzUserData::DeleteL(const CTzId& aTzId)
 	{
 	if (!aTzId.IsUserTzId())
 		{
+	    OstTraceDef0(OST_TRACE_CATEGORY_DEBUG, TRACE_ERROR, CTZUSERDATA_DELETEL, "CTzUserData::DeleteL:Invalid time zone id" );
+	    	    
 		User::Leave(KErrArgument);	
 		}
 

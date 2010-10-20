@@ -27,7 +27,7 @@
 
 ; Local files and the target location to be updated (eclipsed).
 "tzdb.dbz"-"$:\private\1020383E\tzdb.dbz"
-"tz.r01 "-"$:\resource\timezonelocalization\timezones.r01"
+"tz.r01"-"$:\resource\timezonelocalization\timezones.r01"
 "tzg.r01"-"$:\resource\timezonelocalization\timezonegroups.r01"
-"tz.r02 "-"$:\resource\timezonelocalization\timezones.r02"
+"tz.r02"-"$:\resource\timezonelocalization\timezones.r02"
 "tzg.r02"-"$:\resource\timezonelocalization\timezonegroups.r02"

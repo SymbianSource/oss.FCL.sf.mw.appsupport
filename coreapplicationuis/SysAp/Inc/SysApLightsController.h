@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -451,7 +451,10 @@ public:
 #ifdef RD_LIGHT_CONTROL_CHANGE
         CSysApLightPluginHandler* iLightPluginHandler;
         TBool iKeyEventsObserved;
-#endif // RD_LIGHT_CONTROL_CHANGE        
+#endif // RD_LIGHT_CONTROL_CHANGE       
+#ifdef FCC_UNIT_TEST
+        friend class Cutsysaplightscontroller;
+#endif // FCC_UNIT_TEST 
     };
 
 #endif      // SYSAPSLIGHTSCONTROLLER_H
