@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -18,6 +18,7 @@
 
 #include <platform_paths.hrh>
 
+#define USE_SF_SPLASH_SVG //comment this to use standard S60 splash icon
 PRJ_PLATFORMS
 DEFAULT
 
@@ -32,5 +33,9 @@ PRJ_EXTENSIONS
 START EXTENSION s60/mifconv
     OPTION TARGETFILE splashscreen.mif
     OPTION HEADERFILE splashscreen.mbg
+#ifdef USE_SF_SPLASH_SVG
+		// use the local file (also called qgn_startup_screen to keep the mbg file the same)
+    OPTION SOURCEDIR ../sfimage
+#endif
     OPTION SOURCES -c8 qgn_startup_screen
 END
