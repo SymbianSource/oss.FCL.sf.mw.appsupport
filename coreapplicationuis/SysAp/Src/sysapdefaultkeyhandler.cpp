@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -57,6 +57,7 @@ CSysApDefaultKeyHandler::CSysApDefaultKeyHandler( MSysapCallback& aCallback ) :
                                                      iCallback(aCallback),
                                                      iCameraSupported(EFalse),
                                                      iCoverDisplaySupported(EFalse),
+                                                     iCameraLongPress(EFalse),
                                                      iKeylock(NULL),
                                                      iCapturedEKeyCamera(0),
                                                      iCapturedEKeyTwistOpen(0),
@@ -90,6 +91,7 @@ void CSysApDefaultKeyHandler::ConstructL()
     FeatureManager::InitializeLibL();
     iCameraSupported = FeatureManager::FeatureSupported( KFeatureIdCamera );
     iCoverDisplaySupported = FeatureManager::FeatureSupported( KFeatureIdCoverDisplay );
+    iCameraLongPress = FeatureManager::FeatureSupported(KFeatureIdFfCameraLongKeyPress);
     FeatureManager::UnInitializeLib();
     
     TKeyLockBuf lockBuf;
@@ -196,7 +198,6 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
                 TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyGripOpen") ) );
                 RProperty::Set( KPSUidHWRM, KHWRMGripStatus, EPSHWRMGripOpen );
                 iKeypadWasLocked = iKeylock->IsKeyLockEnabled();
-                iKeylockPolicy->DisableKeyguardFeature();
                 iKeylock->DisableKeyLock();
                 if (!IsDeviceLocked())
                     {
@@ -294,9 +295,21 @@ TKeyResponse CSysApDefaultKeyHandler::HandleKeyEventL( const TKeyEvent& aKeyEven
 
             case EKeyCamera:
                 TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyCamera") ) );
-                if ( iCameraSupported && !IsDeviceLocked() && !DoShowKeysLockedNote() )
+                
+                TBool repeatCount(EFalse);
+                if ( iCameraLongPress ) 
                     {
-					iCallback.ExecCommandL( MSysapCallback::ECancelPowermenu );
+                    repeatCount = ( aKeyEvent.iRepeats > 0 ) ? ETrue: EFalse;
+                    }
+                else 
+                    {
+                    repeatCount = ETrue;
+                    }
+
+                if ( iCameraSupported && !IsDeviceLocked() && !DoShowKeysLockedNote() && repeatCount)
+                    {
+                    TRACES( RDebug::Print(_L("CSysApDefaultKeyHandler::HandleKeyEventL: EKeyCamera aKeyEvent.iRepeats = %d, repeatCount= %d"), aKeyEvent.iRepeats, repeatCount ) );
+					iCallback.ExecCommandL( MSysapCallback::ECancelPowermenu ); 
                     ActivateApplicationL( KSysApCamcorderUid );
                     }
                 break;

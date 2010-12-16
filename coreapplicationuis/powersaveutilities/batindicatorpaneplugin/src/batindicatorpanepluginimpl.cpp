@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -195,13 +195,19 @@ void CBatIndicatorPanePluginImpl::HandleIndicatorTapL( const TInt /*aUid*/ )
     iLinkText = NULL;
     
     TInt err = KErrNone;
+    TInt error = KErrNone;
     
     if ( iBatteryStateUtil )
         {
-        TInt batteryStatus;
+        TInt batteryStatus,chargingStatus;
         err = RProperty::Get( KPSUidHWRMPowerState, KHWRMBatteryStatus, batteryStatus );
+        error = RProperty::Get( KPSUidHWRMPowerState, KHWRMChargingStatus,chargingStatus  );
+        if(!error && ( chargingStatus==EChargingStatusChargingContinued || chargingStatus==EChargingStatusCharging))
+            {
+            iContentText = StringLoader::LoadL( R_QTN_BATTERY_CHARGING_POPUP ); 
+            }
         
-        if( !err && batteryStatus == EBatteryStatusLow )
+        else if( !err && batteryStatus == EBatteryStatusLow )
             {
             iContentText = StringLoader::LoadL( R_QTN_BATTERY_LOW_PREVIEW_POPUP ); 
             }

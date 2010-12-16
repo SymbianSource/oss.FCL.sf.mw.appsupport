@@ -404,21 +404,18 @@ void CSelectiveFormatter::HandleNrExcludeListsL()
                  }
              }
          // Look for augmentations.
-         if(regEntry.IsAugmentationL())
+         regEntry.AugmentationsL(augmentationPackages);
+         count = regEntry.AugmentationsNumberL();
+         for (TInt augPkgCount=0; augPkgCount < count; ++augPkgCount)
              {
-             regEntry.AugmentationsL(augmentationPackages);
-             count = regEntry.AugmentationsNumberL();
-             for (TInt augPkgCount=0; augPkgCount < count; ++augPkgCount)
+             User::LeaveIfError(augmentForRegEntry.OpenL(session,*augmentationPackages[augPkgCount]));
+             if(EFalse == augmentForRegEntry.RemovableL())
                  {
-                 User::LeaveIfError(augmentForRegEntry.OpenL(session,*augmentationPackages[augPkgCount]));
-                 if(EFalse == augmentForRegEntry.RemovableL())
-                     {
-                     INFO( "In CSelectiveFormatter::HandleNrExcludeListsL() get the augmented nonRemovable and registry files");
-                     augmentForRegEntry.FilesL(nonRemovableAugmentedFiles);
-                     augmentForRegEntry.RegistryFilesL(augmentedRegistryFiles);
-                     }
-                 augmentForRegEntry.Close();
+                 INFO( "In CSelectiveFormatter::HandleNrExcludeListsL() get the augmented nonRemovable and registry files");
+                 augmentForRegEntry.FilesL(nonRemovableAugmentedFiles);
+                 augmentForRegEntry.RegistryFilesL(augmentedRegistryFiles);
                  }
+             augmentForRegEntry.Close();
              }
          }
      AppendNrlisttoExcludeListL(nonRemovableFiles);

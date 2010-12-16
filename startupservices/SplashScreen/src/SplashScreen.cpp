@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -453,6 +453,19 @@ CSplashWsClient::~CSplashWsClient ()
     if  ( iMainWindow )
         {
         TRACES("CSplashWsClient::~CSplashWsClient(): To background");
+        // If the charger is connected in the device powered off state,
+        // The NOKIA logo screen is replaced with dark screen to save the power
+        TInt state( 0 );
+        TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
+        if ( error == KErrNone && state == ESwStateCharging )
+            {
+            iGc->Activate(iMainWindow->Window());
+            iMainWindow->Window().BeginRedraw();
+            iGc->SetBrushColor(KRgbBlack);
+            iGc->Clear();
+            iMainWindow->Window().EndRedraw();
+            iGc->Deactivate();
+            }            
     	iMainWindow->Client()->Group().SetOrdinalPosition(-1,ECoeWinPriorityNormal);	// Back to the normal position
         iWs.Flush();
         }

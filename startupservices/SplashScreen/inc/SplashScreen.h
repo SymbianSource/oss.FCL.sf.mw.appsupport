@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -84,10 +84,10 @@ class CWsClient : public CActive
 
     protected:
         TInt iLastScreenMode;
+        CWindowGc*      iGc;
 
     private:
 		RWindowGroup    iGroup;
-		CWindowGc*      iGc;
 		friend class    CWsRedrawer; // needs to get at session
 		friend class    CWindow; // needs to get at session
         RProperty       iProperty;

@@ -487,9 +487,7 @@ void CSysApAppUi::ConstructL()
     // Create HAC setting observer now because telephony state may change before entering to normal state
     TRACES( RDebug::Print( _L("CCSysApAppUi::ConstructL  trying CSysApCenRepHacSettingObserver::NewL") ) );
     iSysApCenRepHacSettingObserver = CSysApCenRepHacSettingObserver::NewL( *this );
-    
-    DeactivatePSMifBatteryNotLowL ();
-    
+            
     TRACES( RDebug::Print( _L("CSysApAppUi::ConstructL: END") ) );
     }
 
@@ -3794,12 +3792,14 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
 		TInt callType ( StateOfProperty( KPSUidCtsyCallInformation, KCTsyCallType ) );
 		if ( !( callState == EPSCTsyCallStateConnected && callType == EPSCTsyCallTypeH324Multimedia ) )
 			{
-        if ( ( iSysApFeatureManager->GripNotSupported() && !iSysApFeatureManager->SlideSupported() ) ||
+       /* Commenting code for disable lock keys and screen when cover is Open
+		if ( ( iSysApFeatureManager->GripNotSupported() && !iSysApFeatureManager->SlideSupported() ) ||
              ( (!iSysApFeatureManager->GripNotSupported() || iSysApFeatureManager->SlideSupported() ) && 
              ( StateOfProperty( KPSUidHWRM, KHWRMGripStatus ) ==  EPSHWRMGripClosed ) ) )
             // "Lock keypad" command is shown always when there is no grip, and if there
             // there is no grip, only when the grip is closed.
 				{
+		*/
 				if ( CKeyLockPolicyApi::KeyguardAllowed() )
 					{
 					if ( iSysApFeatureManager->PenEnabled() )
@@ -3820,8 +3820,8 @@ void CSysApAppUi::ShowPowerKeyPopUpMenuL()
                     iPowerkeyMenuLockKeypadSelection = powerMenuItemIndex;
                     powerMenuItemIndex++;
                     }
-                }
-            }
+           //     }
+              } 
         if ( iSysApFeatureManager->PowerKeyIsLockKey() )
             {
             AddMmcMenuItemsL( profileNameCDesCArray,
@@ -4486,6 +4486,7 @@ void CSysApAppUi::HandleUiReadyAfterBootL()
     InitializeStatusPaneAreaL();
     CheckSilentModeL();
     HandleAccessoryProfileInStartupL();
+    DeactivatePSMifBatteryNotLowL ();
     
     if ( iSysApFeatureManager->MmcSupported() )
         {

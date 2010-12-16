@@ -1110,12 +1110,17 @@ void CSysApLightsController::SetLightsOnL( TBool aBlinking )
 					iSysApAppUi.StopChargingBatteryL();
 					}
 				else
-					{
-					iSysApAppUi.StartChargingBatteryL();
-					//To switch on the display 
-					TInt result = HAL::Set( HALData::EDisplayState, 1 );
-					}
-				}	
+				    {
+                    if((value==EChargingStatusCharging)||
+				       (value==EChargingStatusAlmostComplete)||
+				       (value==EChargingStatusChargingContinued))
+                            {
+                            iSysApAppUi.StartChargingBatteryL();
+                            }
+                    //To switch on the display 
+                    TInt result = HAL::Set( HALData::EDisplayState, 1 );
+				    }
+				}
             }
         else
             {

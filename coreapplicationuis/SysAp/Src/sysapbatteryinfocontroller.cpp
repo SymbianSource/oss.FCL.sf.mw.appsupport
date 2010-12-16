@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -28,6 +28,8 @@
 #include "batterypopupcontrol.h"
 #include "sysapbatteryinfocontroller.h"
 #include "SysAp.hrh"
+
+#include "startupdomainpskeys.h"
 
 static const TInt KDefaultThreshold = 30;
 static const TInt KNotInitialized = -1;
@@ -186,6 +188,16 @@ void CSysApBatteryInfoController::BatteryStatusUpdated( const TInt aValue )
 void CSysApBatteryInfoController::ShowBatteryPreviewPopupL( TInt aCapacity )
     {
     TRACES( RDebug::Print( _L("CSysApBatteryInfoController::ShowBatteryPreviewPopupL: aCapacity=%d"), aCapacity ) );
+    
+	// If the charger is connected in the device powered off state,
+    // The NOKIA logo screen is replaced with dark screen to save the power
+    // SysAp is not showing the Battery % level.
+	TInt state( 0 );
+    TInt error = RProperty::Get( KPSUidStartup, KPSGlobalSystemState, state );
+    if ( error == KErrNone && state == ESwStateCharging ) 
+        {
+        return;
+        }
     
     delete iBatteryPopup;
     iBatteryPopup = NULL;
